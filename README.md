@@ -11,13 +11,13 @@ instructions, [provision a Kubernetes](README.k8s.md) cluster on the infrastruct
 
 1. Clone this repository.
 
-1. Set the appropriate value for `opsconf.storageClass.create` in `values.yaml`. If you set this field to anything other
+1. Set the appropriate value for `opsconf.storageClass.create` in `conf.yaml`. If you set this field to anything other
    than `none`, you'll need to specify a value for `opsconf.storageClass.zone`, too. These options
    configure [Dynamic Volume Provisioning](https://kubernetes.io/docs/concepts/storage/dynamic-provisioning/) in the
    Kubernetes cluster.
 
-1. Edit the other fields in `values.yaml` to set the configuration values of your choice. At the top level,
-   `values.yaml` has two fields:
+1. Edit the other fields in `conf.yaml` to set the configuration values of your choice. At the top level,
+   `conf.yaml` has two fields:
    * `opsconf` contains cluster-level configuration. Consult
      the [scaling documentation](https://about.sourcegraph.com/docs/datacenter/scaling) for advice on tuning the CPU,
      memory, and replication options.
@@ -41,7 +41,7 @@ environment does not permite RBAC, consult the instructions below for installing
 1.  Install the Helm chart on your cluster. From the root of this directory, run the following:
 
     ```bash
-    helm install --name sourcegraph .
+    helm install -f constants.yaml -f conf.yaml --name sourcegraph .
     ```
 
     If you see the error `could not find a ready tiller pod`, wait a minute and try again.
@@ -69,7 +69,7 @@ Sourcegraph Data Center communicates with the Kubernetes API for service discove
 which clean up temporary cache data. To do that we need to create RBAC resources. Please see
 Helm's [Role-based Access Control](https://github.com/kubernetes/helm/blob/v2.8.2/docs/rbac.md) documentation to find
 out alternative approaches. Alternatively, if you are not using RBAC you can set `"conf.rbac": "disabled"` in
-`values.yaml` and run `helm init` instead of `helm init --service-account tiller` to install Tiller.
+`conf.yaml` and run `helm init` instead of `helm init --service-account tiller` to install Tiller.
 
 ## Install without Tiller
 
@@ -77,6 +77,6 @@ If installing Tiller on your cluster is not an option, you can locally generate 
 the following from this directory:
 
 ```
-helm template . --output-dir=generated
+helm template -f constants.yaml -f conf.yaml . --output-dir=generated
 kubectl apply -R -f ./generated/sourcegraph/templates
 ```
