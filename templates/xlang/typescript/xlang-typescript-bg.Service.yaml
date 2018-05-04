@@ -1,0 +1,21 @@
+{{- $tsArgs := (dict "langservers" .Values.conf.langservers "lang" "typescript") -}}
+{{- include "hasLanguage" $tsArgs -}}
+{{- $jsArgs := (dict "langservers" .Values.conf.langservers "lang" "javascript") -}}
+{{- include "hasLanguage" $jsArgs -}}
+{{- if (or $jsArgs.ret $tsArgs.ret) -}}
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: xlang-typescript-bg
+  name: xlang-typescript-bg
+spec:
+  ports:
+  - name: lsp
+    port: 2088
+    targetPort: lsp
+  selector:
+    app: xlang-typescript-bg
+  type: ClusterIP
+{{ end -}}

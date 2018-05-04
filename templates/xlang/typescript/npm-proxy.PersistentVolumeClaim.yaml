@@ -1,0 +1,19 @@
+{{- $tsArgs := (dict "langservers" .Values.conf.langservers "lang" "typescript") -}}
+{{- include "hasLanguage" $tsArgs -}}
+{{- $jsArgs := (dict "langservers" .Values.conf.langservers "lang" "javascript") -}}
+{{- include "hasLanguage" $jsArgs -}}
+{{- if (or $jsArgs.ret $tsArgs.ret) -}}
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    volume.beta.kubernetes.io/storage-class: {{ .Values.opsconf.storageClass.name }}
+  name: npm-proxy
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+{{ end -}}

@@ -1,0 +1,51 @@
+{{- $args := (dict "langservers" .Values.conf.langservers "lang" "java") -}}
+{{- include "hasLanguage" $args -}}
+{{- if $args.ret -}}
+
+{{- $envVars := dict -}}
+{{- include "collectTracingEnv" (dict "envVars" $envVars "Values" .Values) -}}
+{{- $_ := set $envVars "JVM_OPT" "-Xms8000m -Xmx8000m -XX:+PrintFlagsFinal -Dsun.zip.disableMemoryMapping=true -agentlib:jdwp=transport=dt_socket,address=127.0.0.1:8001,suspend=n,server=y" -}}
+{{- $_ := set $envVars "LS_OPT" "-l INFO" -}}
+{{- $_ := set $envVars "EXECUTE_GRADLE_ORIGINAL_ROOT_PATHS" .Values.conf.executeGradleOriginalRootPaths -}}
+{{- $_ := set $envVars "PRIVATE_ARTIFACT_REPO_ID" .Values.conf.privateArtifactRepoID -}}
+{{- $_ := set $envVars "PRIVATE_ARTIFACT_REPO_URL" .Values.conf.privateArtifactRepoURL -}}
+{{- $_ := set $envVars "PRIVATE_ARTIFACT_REPO_USERNAME" .Values.conf.privateArtifactRepoUsername -}}
+{{- $_ := set $envVars "PRIVATE_ARTIFACT_REPO_PASSWORD" .Values.conf.privateArtifactRepoPassword -}}
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: LSP server for Java (used for background indexing jobs).
+  name: xlang-java-bg
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: xlang-java-bg
+    spec:
+      containers:
+      - env:
+{{ include "envVars" $envVars | trimSuffix "\n" | indent 8 }}
+        image: {{ .Values.opsconf.xlangJava.image }}
+        name: xlang-java-bg
+        ports:
+        - containerPort: 2088
+          name: lsp
+{{- include "resourceRequirements" (list .Values "xlangJava" "xlang-java") | nindent 8 }}
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+{{- include "nodeSelector" (list .Values "xlangJava") | nindent 6 | trimSuffix "\n      " }}
+      volumes:
+      - emptyDir: {}
+        name: tmp
+{{ end -}}

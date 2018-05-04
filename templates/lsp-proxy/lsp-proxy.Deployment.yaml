@@ -1,0 +1,79 @@
+{{- $langserverMapping := (dict "go" (dict "LANGSERVER_GO" "tcp://xlang-go:4389" "LANGSERVER_GO_BG" "tcp://xlang-go-bg:4389")                                                                 "java" (dict "LANGSERVER_JAVA" "tcp://xlang-java:2088" "LANGSERVER_JAVA_BG" "tcp://xlang-java-bg:2088")                                                       "javascript" (dict "LANGSERVER_JAVASCRIPT" "tcp://xlang-typescript:2088" "LANGSERVER_JAVASCRIPT_BG" "tcp://xlang-typescript-bg:2088")                         "typescript" (dict "LANGSERVER_TYPESCRIPT" "tcp://xlang-typescript:2088" "LANGSERVER_TYPESCRIPT_BG" "tcp://xlang-typescript-bg:2088")                         "php" (dict "LANGSERVER_PHP" "tcp://xlang-php:2088" "LANGSERVER_PHP_BG" "tcp://xlang-php:2088")                                                               "python" (dict "LANGSERVER_PYTHON" "tcp://xlang-python:2087" "LANGSERVER_PYTHON_BG" "tcp://xlang-python-bg:2087")) -}}
+{{- $envVars := dict -}}
+{{- include "collectConfigEnv" (dict "envVars" $envVars "Values" .Values "Files" .Files) }}
+{{- include "collectTracingEnv" (dict "envVars" $envVars "Values" .Values) }}
+{{- range $ls := .Values.conf.langservers -}}
+  {{- if (hasKey $langserverMapping $ls.language) -}}
+    {{- $langVars := (index $langserverMapping $ls.language) -}}
+    {{- range $k, $v := $langVars -}}
+      {{- $_ := set $envVars $k $v -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- $_ := set $envVars "SRC_GIT_SERVERS" (include "gitservers" .) -}}
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: Multiplexer between frontend and LSP servers.
+  name: lsp-proxy
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: lsp-proxy
+    spec:
+      containers:
+      - args:
+        - -addr=:4388
+        env:
+{{ include "envVars" $envVars | trimSuffix "\n" | indent 8 }}
+        - name: REDIS_MASTER_ENDPOINT
+          value: redis-cache:6379
+        - name: SRC_PROF_HTTP
+          value: :6060
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        image: {{ .Values.opsconf.lspProxy.image }}
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: lsp
+          timeoutSeconds: 5
+        name: lsp-proxy
+        ports:
+        - containerPort: 4388
+          name: lsp
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          tcpSocket:
+            port: 4388
+{{- include "resourceRequirements" (list .Values "lspProxy" "lsp-proxy") | nindent 8 }}
+        volumeMounts:
+        - mountPath: /etc/sourcegraph
+          name: sg-config
+        - mountPath: /mnt/cache
+          name: cache-ssd
+{{- include "jaeger" .Values.conf.useJaeger | nindent 6 | trimSuffix "\n      " }}
+{{- include "nodeSelector" (list .Values "lspProxy") | nindent 6 | trimSuffix "\n      " }}
+{{- include "securityContext" . | nindent 6 }}
+      volumes:
+      - configMap:
+          defaultMode: 464
+          name: config-file
+        name: sg-config
+{{- include "mountCacheVolume" (list .Values.conf.nodeSSDPath) | nindent 6 }}

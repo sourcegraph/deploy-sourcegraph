@@ -1,0 +1,47 @@
+{{- if .Values.conf.useJaeger -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: Database for Jaeger.
+  name: jaeger-cassandra
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: jaeger-cassandra
+    spec:
+      containers:
+      - env:
+        - name: HEAP_NEWSIZE
+          value: 1G
+        - name: MAX_HEAP_SIZE
+          value: 6G
+        image: docker.sourcegraph.com/cassandra:3
+        name: cassandra
+        ports:
+        - containerPort: 9042
+          name: cql
+        resources:
+          limits:
+            cpu: "4"
+            memory: 8Gi
+          requests:
+            cpu: 500m
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /var/lib/cassandra
+          name: data
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: jaeger
+{{ end -}}

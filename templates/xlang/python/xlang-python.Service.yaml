@@ -1,0 +1,18 @@
+{{- $args := (dict "langservers" .Values.conf.langservers "lang" "python") -}}
+{{- include "hasLanguage" $args -}}
+{{- if $args.ret -}}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: xlang-python
+  name: xlang-python
+spec:
+  ports:
+  - name: lsp
+    port: 2087
+    targetPort: lsp
+  selector:
+    app: xlang-python
+  type: ClusterIP
+{{ end -}}

@@ -1,0 +1,18 @@
+{{- $global := . -}}
+{{- range $index, $gitserverIndex := until (required ".Values.opsconf.gitserver.shards required" .Values.opsconf.gitserver.shards | int) }}
+{{- if eq $index 0 | not }}
+---
+{{ end -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    volume.beta.kubernetes.io/storage-class: {{ $global.Values.opsconf.storageClass.name }}
+  name: gitserver-{{ add1 $gitserverIndex }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ required ".Values.conf.gitserverDiskSize is required" $global.Values.conf.gitserverDiskSize }}
+{{ end }}

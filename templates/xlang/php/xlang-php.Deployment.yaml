@@ -1,0 +1,41 @@
+{{- $args := (dict "langservers" .Values.conf.langservers "lang" "php") -}}
+{{- include "hasLanguage" $args -}}
+{{- if $args.ret -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: LSP server for PHP.
+  name: xlang-php
+spec:
+  minReadySeconds: 10
+  replicas: {{ required ".Values.opsconf.xlangPHP.replicas is required" .Values.opsconf.xlangPHP.replicas }}
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: xlang-php
+    spec:
+      containers:
+      - env:
+        - name: COMPOSER_AUTH
+          value: '{"github-oauth": {"github.com": ""}}'
+        image: {{ .Values.opsconf.xlangPHP.image }}
+        name: xlang-php
+        ports:
+        - containerPort: 2088
+          name: lsp
+{{- include "resourceRequirements" (list .Values "xlangPHP" "xlang-php") | nindent 8 }}
+{{- include "nodeSelector" (list .Values "xlangPHP") | nindent 6 | trimSuffix "\n      " }}
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
+      volumes:
+      - emptyDir: {}
+        name: tmp
+{{ end -}}

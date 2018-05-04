@@ -1,0 +1,20 @@
+{{- if (and .Values.conf.authProxyIP .Values.conf.authProxyPassword ) -}}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: auth-proxy
+  name: auth-proxy
+spec:
+  loadBalancerIP: {{ .Values.conf.authProxyIP }}
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  - name: https
+    port: 443
+    targetPort: https
+  selector:
+    app: auth-proxy
+  type: LoadBalancer
+{{ end -}}

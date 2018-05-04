@@ -1,0 +1,14 @@
+{{- if .Values.conf.nodeSSDPath -}}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: '{{.Release.Namespace}}-pod-tmp-gc'
+roleRef:
+  apiGroup: ""
+  kind: ClusterRole
+  name: pod-tmp-gc
+subjects:
+- kind: ServiceAccount
+  name: pod-tmp-gc
+  namespace: '{{.Release.Namespace}}'
+{{- end -}}

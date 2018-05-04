@@ -1,0 +1,74 @@
+{{- $global := . -}}
+{{- $envVars := dict -}}
+{{- include "collectConfigEnv" (dict "envVars" $envVars "Values" $global.Values "Files" $global.Files) }}
+{{- $_ := set $envVars "SRC_PROF_HTTP" ":6060" -}}
+{{- $_ := set $envVars "SRC_REPOS_DIR" "/data/repos" -}}
+{{- $_ := set $envVars "ORIGIN_MAP" $global.Values.conf.gitOriginMap -}}
+
+{{- range $index, $gitserverIndex := until (required ".Values.opsconf.gitserver.shards required" .Values.opsconf.gitserver.shards | int) }}
+{{- if eq $index 0 | not }}
+---
+{{ end -}}
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: Stores clones of repositories to perform Git operations.
+  name: gitserver-{{ add1 $gitserverIndex }}
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: gitserver-{{ add1 $gitserverIndex }}
+        group: backend
+        type: gitserver
+    spec:
+      containers:
+      - args:
+        - run
+        env:
+{{ include "envVars" $envVars | trimSuffix "\n" | indent 8 }}
+        image: {{ $global.Values.opsconf.gitserver.image }}
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: rpc
+          timeoutSeconds: 5
+        name: gitserver-{{ add1 $gitserverIndex }}
+        ports:
+        - containerPort: 3178
+          name: rpc
+        - containerPort: 3278
+          name: rpcnew
+{{- include "resourceRequirements" (list $global.Values "gitserver" "gitserver") | nindent 8 }}
+        volumeMounts:
+        - mountPath: /etc/sourcegraph
+          name: sg-config
+        - mountPath: /data/repos
+          name: repos
+        - mountPath: /root/.ssh
+          name: ssh
+{{- include "jaeger" $global.Values.conf.useJaeger | nindent 6 | trimSuffix "\n      " }}
+{{- include "nodeSelector" (list $global.Values "gitserver") | nindent 6 | trimSuffix "\n      " }}
+{{- include "securityContext" $global | nindent 6 | trimSuffix "\n      " }}
+      volumes:
+      - configMap:
+          defaultMode: 464
+          name: config-file
+        name: sg-config
+      - name: repos
+        persistentVolumeClaim:
+          claimName: gitserver-{{ add1 $gitserverIndex }}
+      - name: ssh
+        secret:
+          defaultMode: 384
+          secretName: gitserver-ssh
+{{ end }}

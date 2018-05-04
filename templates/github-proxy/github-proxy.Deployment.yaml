@@ -1,0 +1,54 @@
+{{- $envVars := dict -}}
+{{- include "collectConfigEnv" (dict "envVars" $envVars "Values" .Values "Files" .Files) }}
+{{- $_ := set $envVars "GITHUB_CLIENT_ID" .Values.conf.githubClientID -}}
+{{- $_ := set $envVars "GITHUB_CLIENT_SECRET" .Values.conf.githubClientSecret -}}
+{{- $_ := set $envVars "GITHUB_PERSONAL_ACCESS_TOKEN" .Values.conf.githubPersonalAccessToken -}}
+{{- $_ := set $envVars "LOG_REQUESTS" "\"true\"" -}}
+{{- $_ := set $envVars "SRC_PROF_HTTP" ":6060" -}}
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: Rate-limiting proxy for the GitHub API.
+  name: github-proxy
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: github-proxy
+    spec:
+      containers:
+      - env:
+{{ include "envVars" $envVars | trimSuffix "\n" | indent 8 }}
+        image: {{ .Values.opsconf.githubProxy.image }}
+        name: github-proxy
+        ports:
+        - containerPort: 3180
+          name: http
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1G
+          requests:
+            cpu: 100m
+            memory: 250M
+        volumeMounts:
+        - mountPath: /etc/sourcegraph
+          name: sg-config
+{{- include "jaeger" .Values.conf.useJaeger | nindent 6 | trimSuffix "\n      " }}
+{{- include "securityContext" . | nindent 6 }}
+{{- include "nodeSelector" (list .Values "githubProxy") | nindent 6 | trimSuffix "\n      " }}
+      volumes:
+      - configMap:
+          defaultMode: 464
+          name: config-file
+        name: sg-config

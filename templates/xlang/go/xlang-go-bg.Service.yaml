@@ -1,0 +1,24 @@
+{{- $args := (dict "langservers" .Values.conf.langservers "lang" "go") -}}
+{{- include "hasLanguage" $args -}}
+{{- if $args.ret -}}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    prometheus.io/scrape: "true"
+  labels:
+    app: xlang-go-bg
+  name: xlang-go-bg
+spec:
+  ports:
+  - name: debug
+    port: 6060
+    targetPort: debug
+  - name: lsp
+    port: 4389
+    targetPort: lsp
+  selector:
+    app: xlang-go-bg
+  type: ClusterIP
+{{ end -}}

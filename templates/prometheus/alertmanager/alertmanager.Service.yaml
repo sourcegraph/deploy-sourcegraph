@@ -1,0 +1,16 @@
+{{- if .Values.conf.useAlertManager -}}
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: alertmanager
+  name: alertmanager
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  selector:
+    app: alertmanager
+  type: ClusterIP
+{{- end -}}

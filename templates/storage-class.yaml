@@ -1,0 +1,26 @@
+{{- $storageClassName := required ".Values.opsconf.storageClass.name is required" .Values.opsconf.storageClass.name -}}
+{{- $storageClassCreate := required ".Values.opsconf.storageClass.create is required" .Values.opsconf.storageClass.create -}}
+{{- $storageClassName := required ".Values.opsconf.storageClass.name is required" .Values.opsconf.storageClass.name -}}
+{{- if eq $storageClassCreate "gcp" }}
+{{- $storageClassZone := required ".Values.opsconf.storageClass.zone is required" .Values.opsconf.storageClass.zone -}}
+kind: StorageClass
+apiVersion: storage.k8s.io/v1beta1
+metadata:
+  name: {{ $storageClassName }}
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-ssd
+  zone: {{ $storageClassZone }}
+{{ else if eq $storageClassCreate "aws" }}
+{{- $storageClassZone := required ".Values.opsconf.storageClass.zone is required" .Values.opsconf.storageClass.zone -}}
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: {{ $storageClassName }}
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+  zones: {{ $storageClassZone }}
+{{ else }}
+{{- /* Do not emit a storage class if "create" is "none" */ -}}
+{{ end }}

@@ -1,0 +1,14 @@
+{{- if hasKey .Values.conf "prometheus" -}}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: '{{.Release.Namespace}}-prometheus'
+roleRef:
+  apiGroup: ""
+  kind: ClusterRole
+  name: prometheus
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: '{{.Release.Namespace}}'
+{{ end -}}
