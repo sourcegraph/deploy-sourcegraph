@@ -2,7 +2,6 @@
 # are tunable.
 opsconf:
   frontend:
-    image: docker.sourcegraph.com/frontend:14410_2018-04-20_fddd20b
     replicas: 1
     containers:
       frontend:
@@ -13,7 +12,6 @@ opsconf:
           cpu: "2"
           memory: 1G
   searcher:
-    image: docker.sourcegraph.com/searcher:14232_2018-04-13_770f492
     replicas: 1
     containers:
       searcher:
@@ -24,7 +22,6 @@ opsconf:
           cpu: "500m"
           memory: "500M"
   symbols:
-    image: docker.sourcegraph.com/symbols:13932_2018-04-09_b6883b9
     replicas: 1
     containers:
       symbols:
@@ -35,7 +32,6 @@ opsconf:
           cpu: "500m"
           memory: "500M"
   gitserver:
-    image: docker.sourcegraph.com/gitserver:14231_2018-04-13_770f492
     shards: 1
     containers:
       gitserver:
@@ -45,10 +41,7 @@ opsconf:
         requests:
           cpu: "500m"
           memory: 1G
-  githubProxy:
-    image: docker.sourcegraph.com/github-proxy:11943_2018-02-23_8bfb2ee
   indexedSearch:
-    image: docker.sourcegraph.com/zoekt:18-04-18_8c48307
     containers:
       zoekt-indexserver:
         limits:
@@ -69,10 +62,7 @@ opsconf:
       # # assigned to larger nodes.
       # nodeSelector:
       #   beta.kubernetes.io/instance-type: i3.4xlarge
-  indexer:
-    image: docker.sourcegraph.com/indexer:14412_2018-04-20_fddd20b
   lspProxy:
-    image: docker.sourcegraph.com/lsp-proxy:14260_2018-04-16_be94954
     containers:
       lsp-proxy:
         limits:
@@ -81,15 +71,7 @@ opsconf:
         requests:
           cpu: "500m"
           memory: 2Gi
-  queryRunner:
-    image: docker.sourcegraph.com/query-runner:14411_2018-04-20_fddd20b
-  repoUpdater:
-    image: docker.sourcegraph.com/repo-updater:14230_2018-04-13_770f492
-  pgsql:
-    exporterImage: docker.sourcegraph.com/pgsql-exporter:a294a9b6d83c139d3e1217f02c8f80a54cbf73ac
-    image: docker.sourcegraph.com/postgres:9.4
   xlangGo:
-    image: docker.sourcegraph.com/xlang-go:14054_2018-04-11_4bd6356
     replicas: 1
     containers:
       xlang-go:
@@ -100,7 +82,6 @@ opsconf:
           cpu: "500m"
           memory: 2Gi
   xlangJava:
-    image: docker.sourcegraph.com/xlang-java-skinny:2018-04-19-1708
     replicas: 1
     containers:
       xlang-java:
@@ -111,7 +92,6 @@ opsconf:
           cpu: "500m"
           memory: 2Gi
   xlangJavascriptTypescript:
-    image: docker.sourcegraph.com/xlang-javascript-typescript:00033_2018-03-02_80d7845
     replicas: 1
     containers:
       xlang-javascript-typescript:
@@ -122,7 +102,6 @@ opsconf:
           cpu: "500m"
           memory: 2Gi
   xlangPython:
-    image: docker.sourcegraph.com/xlang-python:13187_2018-03-22_b2b49c2
     replicas: 1
     containers:
       xlang-python:
@@ -133,7 +112,6 @@ opsconf:
           cpu: "500m"
           memory: 1G
   xlangPHP:
-    image: docker.sourcegraph.com/xlang-php:00006_2017-11-09_6ead48c
     replicas: 1
     containers:
       xlang-php:
