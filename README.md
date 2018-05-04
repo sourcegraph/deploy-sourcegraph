@@ -26,38 +26,38 @@ instructions, [provision a Kubernetes](README.k8s.md) cluster on the infrastruct
 
 1. Install Tiller (the server-side counterpart to Helm) on your cluster:
 
-    ```bash
-    # Give Helm privileges to create RBAC resources.
-    kubectl create serviceaccount --namespace kube-system tiller
-    kubectl create clusterrolebinding tiller --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+   ```bash
+   # Give Helm privileges to create RBAC resources.
+   kubectl create serviceaccount --namespace kube-system tiller
+   kubectl create clusterrolebinding tiller --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
 
-    # Add Helm to your cluster using the created service account.
-    helm init --service-account tiller
+   # Add Helm to your cluster using the created service account.
+   helm init --service-account tiller
     ```
 
-If installing Tiller is not an option, consult the instructions below for installing without Tiller. If your Kubernetes
-environment does not permite RBAC, consult the instructions below for installing without RBAC.
+  If installing Tiller is not an option, consult the instructions below for installing without Tiller. If your
+  Kubernetes environment does not permite RBAC, consult the instructions below for installing without RBAC.
 
-1.  Install the Helm chart on your cluster. From the root of this directory, run the following:
+1. Install the Helm chart on your cluster. From the root of this directory, run the following:
 
-    ```bash
-    helm install -f constants.yaml -f conf.yaml --name sourcegraph .
-    ```
+   ```bash
+   helm install -f constants.yaml -f conf.yaml --name sourcegraph .
+   ```
 
-    If you see the error `could not find a ready tiller pod`, wait a minute and try again.
+   If you see the error `could not find a ready tiller pod`, wait a minute and try again.
 
-1.  Confirm that your deployment is launching by running `kubectl get pods`. If pods get stuck in `Pending` status, run
-    `kubectl get pv` to check if the necessary volumes have been provisioned (you should see at least 4). Google Cloud
-    Platform users may need to [request an increase in storage quota](https://cloud.google.com/compute/quotas).
+1. Confirm that your deployment is launching by running `kubectl get pods`. If pods get stuck in `Pending` status, run
+   `kubectl get pv` to check if the necessary volumes have been provisioned (you should see at least 4). Google Cloud
+   Platform users may need to [request an increase in storage quota](https://cloud.google.com/compute/quotas).
 
-1.  When the deployment completes, you need to make the main web server accessible over the network to external users. To
-    do so, connect port 30080 (or the value of `httpNodePort`) on the nodes in your cluster to the Internet. The easiest
-    way to do this is to add a network rule that allows ingress traffic to port 30080 on at least one node (see
-    [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html),
-    [Google Cloud Platform Firewall rules](https://cloud.google.com/compute/docs/vpc/using-firewalls)). Sourcegraph
-    should then be accessible at `$EXTERNAL_ADDR_OF_YOUR_NODE:30080`. For production environments, we recommend using an
-    [Internet Gateway](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html) (or equivalent)
-    and configuring a load balancer in Kubernetes.
+1. When the deployment completes, you need to make the main web server accessible over the network to external users. To
+   do so, connect port 30080 (or the value of `httpNodePort`) on the nodes in your cluster to the Internet. The easiest
+   way to do this is to add a network rule that allows ingress traffic to port 30080 on at least one node (see
+   [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html),
+   [Google Cloud Platform Firewall rules](https://cloud.google.com/compute/docs/vpc/using-firewalls)). Sourcegraph
+   should then be accessible at `$EXTERNAL_ADDR_OF_YOUR_NODE:30080`. For production environments, we recommend using an
+   [Internet Gateway](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html) (or equivalent)
+   and configuring a load balancer in Kubernetes.
 
 You will now see the Sourcegraph setup page when you visit the address of your instance. If you made your instance
 accessible on the public Internet, make sure you secure it before adding your private repositories.
