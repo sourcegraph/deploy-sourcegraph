@@ -33,10 +33,10 @@ instructions, [provision a Kubernetes](README.k8s.md) cluster on the infrastruct
 
    # Add Helm to your cluster using the created service account.
    helm init --service-account tiller
-    ```
+   ```
 
-  If installing Tiller is not an option, consult the instructions below for installing without Tiller. If your
-  Kubernetes environment does not permite RBAC, consult the instructions below for installing without RBAC.
+   If installing Tiller is not an option, consult the instructions below for installing without Tiller. If your
+   Kubernetes environment does not permite RBAC, consult the instructions below for installing without RBAC.
 
 1. Install the Helm chart on your cluster. From the root of this directory, run the following:
 
