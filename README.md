@@ -12,6 +12,8 @@ instructions, [provision a Kubernetes](README.k8s.md) cluster on the infrastruct
 
 1. Clone this repository.
 
+1. Copy the contents of `conf.default.yaml` to a file named `conf.yaml`.
+
 1. Set the appropriate value for `opsconf.storageClass.create` in `conf.yaml`. If this field is set to something other
    than `none`, a value must be specified for `opsconf.storageClass.zone`, too. This
    configures [Dynamic Volume Provisioning](https://kubernetes.io/docs/concepts/storage/dynamic-provisioning/) in the
@@ -65,7 +67,7 @@ You will now see the Sourcegraph setup page when you visit the address of your i
 accessible on the public Internet, make sure you secure it before adding your private repositories.
 
 
-## Install without RBAC
+### Install without RBAC
 
 Sourcegraph Data Center communicates with the Kubernetes API for service discovery. It also has some janitor DaemonSets
 which clean up temporary cache data. To do that we need to create RBAC resources. For details, see
@@ -76,7 +78,7 @@ If using RBAC is not an option, you can set `"conf.rbac": "disabled"` in `conf.y
 `helm init --service-account tiller` to install Tiller.
 
 
-## Install without Tiller
+### Install without Tiller
 
 If installing Tiller is not an option, you can locally generate the Kubernetes configuration by running the following:
 
@@ -84,4 +86,34 @@ If installing Tiller is not an option, you can locally generate the Kubernetes c
 mkdir -p generated
 helm template -f constants.yaml -f conf.yaml . --output-dir=generated
 kubectl apply -R -f ./generated/sourcegraph/templates
+```
+
+
+## Update
+
+Versions of Sourcegraph Data Center are released as tags in this Git repository. To update to a new version, fetch this
+repository and check out the appropriate tag. To conveniently update to new versions of Data Center while additionally
+tracking changes to your specific configuration (`conf.yaml`), we recommend the following procedure:
+
+1. Fork this repository
+1. Clone your fork and configure the local clone to have an additional remote `upstream` set to `https://github.com/sourcegraph/datacenter`.
+1. Copy `conf.default.yaml` to `conf.yaml` and keep your custom configuration in `conf.yaml`. Push changes to `master` in your fork.
+1. On update:
+   1. Run `git fetch upstream && git rebase upstream/master`. There should never be conflicts, because you have
+      not modified any of the original files.
+   1. Run `git checkout $VERSION && git cherry-pick upstream/master...master` to cherry-pick your `conf.yaml` onto the
+      tagged revision that contains the source files for the new version of Data Center.
+   1. Install the `helm-diff` plugin (`helm plugin install https://github.com/databus23/helm-diff`). Then run `helm diff
+      -f constants.yaml -f conf.yaml sourcegraph .` to display the update diff.
+   1. Run `helm update -f constants.yaml -f conf.yaml sourcegraph .`
+   1. After updating, run `watch kubectl get pods -o wide` to verify the health of the cluster.
+
+If you need to make changes to any of the existing files in this repository, please upstream your changes--pull requests
+are very welcome!
+
+### Rollback
+
+```
+helm history sourcegraph
+helm rollback sourcegraph [REVISION]
 ```
