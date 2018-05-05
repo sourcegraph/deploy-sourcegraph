@@ -10,7 +10,7 @@ and [contact us](https://about.sourcegraph.com/contact/sales) for more informati
 Sourcegraph Data Center is deployed using Kubernetes. Before proceeding with these
 instructions, [provision a Kubernetes](README.k8s.md) cluster on the infrastructure of your choice.
 
-1. Clone this repository.
+1. Fork this repository and clone the fork to your local machine.
 
 1. Copy the contents of `conf.default.yaml` to a file named `conf.yaml`.
 
@@ -95,7 +95,7 @@ Versions of Sourcegraph Data Center are released as tags in this Git repository.
 repository and check out the appropriate tag. To conveniently update to new versions of Data Center while additionally
 tracking changes to your specific configuration (`conf.yaml`), we recommend the following procedure:
 
-1. Fork this repository
+1. Fork this repository.
 1. Clone your fork and configure the local clone to have an additional remote `upstream` set to `https://github.com/sourcegraph/datacenter`.
 1. Copy `conf.default.yaml` to `conf.yaml` and keep your custom configuration in `conf.yaml`. Push changes to `master` in your fork.
 1. On update:
@@ -105,7 +105,7 @@ tracking changes to your specific configuration (`conf.yaml`), we recommend the 
       tagged revision that contains the source files for the new version of Data Center.
    1. Install the `helm-diff` plugin (`helm plugin install https://github.com/databus23/helm-diff`). Then run `helm diff
       -f constants.yaml -f conf.yaml sourcegraph .` to display the update diff.
-   1. Run `helm update -f constants.yaml -f conf.yaml sourcegraph .`
+   1. Run `helm update -f constants.yaml -f conf.yaml sourcegraph .`.
    1. After updating, run `watch kubectl get pods -o wide` to verify the health of the cluster.
 
 If you need to make changes to any of the existing files in this repository, please upstream your changes--pull requests
