@@ -1,8 +1,8 @@
-{{- if .Values.conf.useAlertManager -}}
+{{- if .Values.site.useAlertManager -}}
 apiVersion: v1
 data:
   config.yml: |
-    {{ include "expandedString" (dict "str" .Values.conf.alertmanagerConfig "Files" .Files) }}
+    {{ include "expandedString" (dict "str" .Values.site.alertmanagerConfig "Files" .Files) }}
 kind: ConfigMap
 metadata:
   name: alertmanager

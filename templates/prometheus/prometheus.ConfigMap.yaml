@@ -1,7 +1,7 @@
-{{- if hasKey .Values.conf "prometheus" -}}
+{{- if hasKey .Values.site "prometheus" -}}
 apiVersion: v1
 data:
-{{- if .Values.conf.prometheus.noDefaultAlerts }}
+{{- if .Values.site.prometheus.noDefaultAlerts }}
   alert.rules: |
     # DISABLED
 {{- else }}
@@ -179,9 +179,9 @@ data:
         sum(rate(src_xlang_request_duration_seconds_bucket{le="10",success="true"}[1d])) by (mode, method)
       ) / 2 / sum(rate(src_xlang_request_duration_seconds_count[1d])) by (mode, method)
 
-{{- if .Values.conf.prometheus.customRules }}
+{{- if .Values.site.prometheus.customRules }}
   extra.rules: |
-{{ include "expandedString" (dict "str" .Values.conf.prometheus.customRules "Files" .Files) | trimSuffix "\n" | indent 4 }}
+{{ include "expandedString" (dict "str" .Values.site.prometheus.customRules "Files" .Files) | trimSuffix "\n" | indent 4 }}
 {{- else }}
   extra.rules: ""
 {{- end }}

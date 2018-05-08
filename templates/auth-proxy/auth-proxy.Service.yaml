@@ -1,4 +1,4 @@
-{{- if (and .Values.conf.authProxyIP .Values.conf.authProxyPassword ) -}}
+{{- if (and .Values.site.authProxyIP .Values.site.authProxyPassword ) -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -6,7 +6,7 @@ metadata:
     app: auth-proxy
   name: auth-proxy
 spec:
-  loadBalancerIP: {{ .Values.conf.authProxyIP }}
+  loadBalancerIP: {{ .Values.site.authProxyIP }}
   ports:
   - name: http
     port: 80

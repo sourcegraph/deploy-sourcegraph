@@ -1,6 +1,6 @@
-{{- $tsArgs := (dict "langservers" .Values.conf.langservers "lang" "typescript") -}}
+{{- $tsArgs := (dict "langservers" .Values.site.langservers "lang" "typescript") -}}
 {{- include "hasLanguage" $tsArgs -}}
-{{- $jsArgs := (dict "langservers" .Values.conf.langservers "lang" "javascript") -}}
+{{- $jsArgs := (dict "langservers" .Values.site.langservers "lang" "javascript") -}}
 {{- include "hasLanguage" $jsArgs -}}
 {{- if (or $jsArgs.ret $tsArgs.ret) -}}
 
@@ -57,7 +57,7 @@ spec:
           name: cache-ssd
 {{- include "nodeSelector" (list .Values "xlangJavascriptTypescript") | nindent 6 | trimSuffix "\n      " }}
       volumes:
-{{- include "mountCacheVolume" (list .Values.conf.nodeSSDPath) | nindent 6 }}
+{{- include "mountCacheVolume" (list .Values.site.nodeSSDPath) | nindent 6 }}
       - configMap:
           name: yarn-config
         name: yarn-config

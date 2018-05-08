@@ -1,11 +1,11 @@
-{{- $args := (dict "langservers" .Values.conf.langservers "lang" "go") -}}
+{{- $args := (dict "langservers" .Values.site.langservers "lang" "go") -}}
 {{- include "hasLanguage" $args -}}
 {{- if $args.ret -}}
 
 {{- $envVars := dict -}}
 {{- include "collectConfigEnv" (dict "envVars" $envVars "Values" .Values "Files" .Files) }}
 {{- include "collectTracingEnv" (dict "envVars" $envVars "Values" .Values) }}
-{{- $_ := set $envVars "NO_GO_GET_DOMAINS" .Values.conf.noGoGetDomains -}}
+{{- $_ := set $envVars "NO_GO_GET_DOMAINS" .Values.site.noGoGetDomains -}}
 {{- $_ := set $envVars "CLONE_FROM_GITSERVER" (quote "true") -}}
 {{- $_ := set $envVars "REDIS_MASTER_ENDPOINT" "redis-cache:6379" -}}
 {{- $_ := set $envVars "SRC_GIT_SERVERS" (include "gitservers" .) -}}
@@ -64,12 +64,12 @@ spec:
           name: sg-config
         - mountPath: /mnt/cache
           name: cache-ssd
-{{- include "jaeger" .Values.conf.useJaeger | nindent 6 | trimSuffix "\n      " }}
+{{- include "jaeger" .Values.site.useJaeger | nindent 6 | trimSuffix "\n      " }}
 {{- include "nodeSelector" (list .Values "xlangGo") | nindent 6 | trimSuffix "\n      " }}
       volumes:
       - configMap:
           defaultMode: 464
           name: config-file
         name: sg-config
-{{- include "mountCacheVolume" (list .Values.conf.nodeSSDPath) | nindent 6 }}
+{{- include "mountCacheVolume" (list .Values.site.nodeSSDPath) | nindent 6 }}
 {{ end -}}
