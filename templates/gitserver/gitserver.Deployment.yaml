@@ -3,7 +3,7 @@
 {{- include "collectConfigEnv" (dict "envVars" $envVars "Values" $global.Values "Files" $global.Files) }}
 {{- $_ := set $envVars "SRC_PROF_HTTP" ":6060" -}}
 {{- $_ := set $envVars "SRC_REPOS_DIR" "/data/repos" -}}
-{{- $_ := set $envVars "ORIGIN_MAP" $global.Values.conf.gitOriginMap -}}
+{{- $_ := set $envVars "ORIGIN_MAP" $global.Values.site.gitOriginMap -}}
 
 {{- range $index, $gitserverIndex := until (required ".Values.cluster.gitserver.shards required" .Values.cluster.gitserver.shards | int) }}
 {{- if eq $index 0 | not }}
@@ -56,7 +56,7 @@ spec:
           name: repos
         - mountPath: /root/.ssh
           name: ssh
-{{- include "jaeger" $global.Values.conf.useJaeger | nindent 6 | trimSuffix "\n      " }}
+{{- include "jaeger" $global.Values.site.useJaeger | nindent 6 | trimSuffix "\n      " }}
 {{- include "nodeSelector" (list $global.Values "gitserver") | nindent 6 | trimSuffix "\n      " }}
 {{- include "securityContext" $global | nindent 6 | trimSuffix "\n      " }}
       volumes:

@@ -47,7 +47,7 @@ spec:
           name: sg-config
         - mountPath: /mnt/cache
           name: cache-ssd
-{{- include "jaeger" .Values.conf.useJaeger | nindent 6 | trimSuffix "\n      " }}
+{{- include "jaeger" .Values.site.useJaeger | nindent 6 | trimSuffix "\n      " }}
 {{- include "securityContext" . | nindent 6 }}
 {{- include "nodeSelector" (list .Values "symbols") | nindent 6 | trimSuffix "\n      " }}
       volumes:
@@ -55,4 +55,4 @@ spec:
           defaultMode: 464
           name: config-file
         name: sg-config
-{{- include "mountCacheVolume" (list .Values.conf.nodeSSDPath) | nindent 6 }}
+{{- include "mountCacheVolume" (list .Values.site.nodeSSDPath) | nindent 6 }}

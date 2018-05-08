@@ -21,10 +21,10 @@ instructions, [provision a Kubernetes](README.k8s.md) cluster on the infrastruct
 
 1. Edit the other fields in `conf.yaml` to set the configuration values of your choice. At the top level,
    `conf.yaml` has two fields:
-   * `cluster` contains cluster-level configuration. Consult
-     the [scaling documentation](https://about.sourcegraph.com/docs/datacenter/scaling) for advice on tuning the CPU,
-     memory, and replication settings.
-   * `conf` contains [app-level configuration](https://about.sourcegraph.com/docs/config/settings)
+   * `cluster` configures the the Kubernetes cluster. Consult
+     the [scaling documentation](https://about.sourcegraph.com/docs/datacenter/scaling) for advice
+     on tuning the CPU, memory, and replication settings.
+   * `site` is [Sourcegraph site configuration](https://about.sourcegraph.com/docs/config/settings)
 
 1. Install Tiller (the server-side counterpart to Helm) on your cluster:
 
@@ -53,7 +53,7 @@ instructions, [provision a Kubernetes](README.k8s.md) cluster on the infrastruct
    Platform users may need to [request an increase in storage quota](https://cloud.google.com/compute/quotas).
 
 1. When the deployment completes, you need to make the main web server accessible over the network to external users. To
-   do so, connect port 30080 (or the value of `httpNodePort` in the app config) on the nodes in the cluster to the
+   do so, connect port 30080 (or the value of `httpNodePort` in the site config) on the nodes in the cluster to the
    Internet. The easiest way to do this is to add a network rule that allows ingress traffic to port 30080 on at least
    one node
    (see
@@ -74,7 +74,7 @@ which clean up temporary cache data. To do that we need to create RBAC resources
 Helm's
 [Role-based Access Control documentation](https://github.com/kubernetes/helm/blob/v2.8.2/docs/rbac.md).
 
-If using RBAC is not an option, you can set `"conf.rbac": "disabled"` in `conf.yaml` and run `helm init` instead of
+If using RBAC is not an option, you can set `"site.rbac": "disabled"` in `conf.yaml` and run `helm init` instead of
 `helm init --service-account tiller` to install Tiller.
 
 

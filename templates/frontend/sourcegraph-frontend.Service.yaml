@@ -9,25 +9,25 @@ metadata:
   name: sourcegraph-frontend
 spec:
   ports:
-{{- if .Values.conf.httpNodePort }}
+{{- if .Values.site.httpNodePort }}
   - name: http
     nodePort: 30080
     port: 30080
     targetPort: http
 {{- end -}}
-{{- if .Values.conf.httpsNodePort }}
+{{- if .Values.site.httpsNodePort }}
   - name: https
     nodePort: 30081
     port: 30081
     targetPort: https
 {{- end -}}
-{{- if not (or .Values.conf.httpNodePort .Values.conf.httpsNodePort) }}
+{{- if not (or .Values.site.httpNodePort .Values.site.httpsNodePort) }}
   - port: 3080
     targetPort: ""
 {{- end }}
   selector:
     app: sourcegraph-frontend
-{{- if not (or .Values.conf.httpNodePort .Values.conf.httpsNodePort) }}
+{{- if not (or .Values.site.httpNodePort .Values.site.httpsNodePort) }}
   type: ClusterIP
 {{- else }}
   type: NodePort

@@ -2,7 +2,7 @@
 {{- $envVars := dict -}}
 {{- include "collectConfigEnv" (dict "envVars" $envVars "Values" .Values "Files" .Files) }}
 {{- include "collectTracingEnv" (dict "envVars" $envVars "Values" .Values) }}
-{{- range $ls := .Values.conf.langservers -}}
+{{- range $ls := .Values.site.langservers -}}
   {{- if (hasKey $langserverMapping $ls.language) -}}
     {{- $langVars := (index $langserverMapping $ls.language) -}}
     {{- range $k, $v := $langVars -}}
@@ -68,7 +68,7 @@ spec:
           name: sg-config
         - mountPath: /mnt/cache
           name: cache-ssd
-{{- include "jaeger" .Values.conf.useJaeger | nindent 6 | trimSuffix "\n      " }}
+{{- include "jaeger" .Values.site.useJaeger | nindent 6 | trimSuffix "\n      " }}
 {{- include "nodeSelector" (list .Values "lspProxy") | nindent 6 | trimSuffix "\n      " }}
 {{- include "securityContext" . | nindent 6 }}
       volumes:
@@ -76,4 +76,4 @@ spec:
           defaultMode: 464
           name: config-file
         name: sg-config
-{{- include "mountCacheVolume" (list .Values.conf.nodeSSDPath) | nindent 6 }}
+{{- include "mountCacheVolume" (list .Values.site.nodeSSDPath) | nindent 6 }}

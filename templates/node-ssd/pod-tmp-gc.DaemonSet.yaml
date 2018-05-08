@@ -1,4 +1,4 @@
-{{- if .Values.conf.nodeSSDPath -}}
+{{- if .Values.site.nodeSSDPath -}}
 apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
@@ -31,7 +31,7 @@ spec:
       serviceAccountName: pod-tmp-gc
       volumes:
       - hostPath:
-          path: {{ .Values.conf.nodeSSDPath }}/pod-tmp
+          path: {{ .Values.site.nodeSSDPath }}/pod-tmp
         name: pod-tmp
   updateStrategy: {}
 {{- end -}}

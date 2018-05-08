@@ -24,7 +24,7 @@
 {{/* Collects config-related environment variables into the `.envVars` field of the argument. */}}
 {{- define "collectConfigEnv" -}}
 {{- $_ := set .envVars "SOURCEGRAPH_CONFIG_FILE" "/etc/sourcegraph/config.json" -}}
-{{- $_ := set .envVars "CONFIG_FILE_HASH" (include "expandedJSON" (dict "val" .Values.conf "Files" .Files) | sha256sum) -}}
+{{- $_ := set .envVars "CONFIG_FILE_HASH" (include "expandedJSON" (dict "val" .Values.site "Files" .Files) | sha256sum) -}}
 {{- end -}}
 
 {{/* --------------- START OF TEMPLATE ------------- */}}
@@ -32,9 +32,9 @@
 
 {{/* Collects tracing-related environment variables into the `.envVars` field of the argument. */}}
 {{- define "collectTracingEnv" -}}
-{{- $_ := set .envVars "LIGHTSTEP_PROJECT" .Values.conf.lightstepProject -}}
-{{- $_ := set .envVars "LIGHTSTEP_ACCESS_TOKEN" .Values.conf.lightstepAccessToken -}}
-{{- if .Values.conf.lightstepAccessToken -}}
+{{- $_ := set .envVars "LIGHTSTEP_PROJECT" .Values.site.lightstepProject -}}
+{{- $_ := set .envVars "LIGHTSTEP_ACCESS_TOKEN" .Values.site.lightstepAccessToken -}}
+{{- if .Values.site.lightstepAccessToken -}}
     {{- $_ := set .envVars "LIGHTSTEP_INCLUDE_SENSITIVE" "true" -}}
 {{- end -}}
 {{- end -}}
@@ -42,24 +42,24 @@
 {{/* --------------- START OF TEMPLATE ------------- */}}
 
 {{- define "collectCustomFrontendEnv" -}}
-{{- $_ := set .envVars "ADMIN_USERNAMES" .Values.conf.adminUsernames -}}
+{{- $_ := set .envVars "ADMIN_USERNAMES" .Values.site.adminUsernames -}}
 {{- $_ := set .envVars "DEPLOY_TYPE" "datacenter" -}}
-{{- $_ := set .envVars "CORS_ORIGIN" .Values.conf.corsOrigin -}}
-{{- $_ := set .envVars "NO_GO_GET_DOMAINS" .Values.conf.noGoGetDomains -}}
+{{- $_ := set .envVars "CORS_ORIGIN" .Values.site.corsOrigin -}}
+{{- $_ := set .envVars "NO_GO_GET_DOMAINS" .Values.site.noGoGetDomains -}}
 {{- $_ := set .envVars "SRC_APP_DISABLE_SUPPORT_SERVICES" "\"true\"" -}}
-{{- $_ := set .envVars "SRC_APP_URL" .Values.conf.appURL -}}
-{{- $_ := set .envVars "TRACKING_APP_ID" .Values.conf.siteID -}}
-{{- $_ := set .envVars "SSO_USER_HEADER" .Values.conf.ssoUserHeader -}}
-{{- $_ := set .envVars "OIDC_OP" .Values.conf.oidcProvider -}}
-{{- $_ := set .envVars "OIDC_CLIENT_ID" .Values.conf.oidcClientID -}}
-{{- $_ := set .envVars "OIDC_CLIENT_SECRET" .Values.conf.oidcClientSecret -}}
-{{- $_ := set .envVars "OIDC_EMAIL_DOMAIN" .Values.conf.oidcEmailDomain -}}
-{{- $_ := set .envVars "OIDC_OVERRIDE_TOKEN" .Values.conf.oidcOverrideToken -}}
-{{- $_ := set .envVars "SAML_CERT" .Values.conf.samlSPCert -}}
-{{- $_ := set .envVars "SAML_KEY" .Values.conf.samlSPKey -}}
-{{- $_ := set .envVars "SAML_ID_PROVIDER_METADATA_URL" .Values.conf.samlIDProviderMetadataURL -}}
-{{- $_ := set .envVars "MAX_REPOS_TO_SEARCH" .Values.conf.maxReposToSearch -}}
-{{- if .Values.conf.experimentIndexedSearch -}}
+{{- $_ := set .envVars "SRC_APP_URL" .Values.site.appURL -}}
+{{- $_ := set .envVars "TRACKING_APP_ID" .Values.site.siteID -}}
+{{- $_ := set .envVars "SSO_USER_HEADER" .Values.site.ssoUserHeader -}}
+{{- $_ := set .envVars "OIDC_OP" .Values.site.oidcProvider -}}
+{{- $_ := set .envVars "OIDC_CLIENT_ID" .Values.site.oidcClientID -}}
+{{- $_ := set .envVars "OIDC_CLIENT_SECRET" .Values.site.oidcClientSecret -}}
+{{- $_ := set .envVars "OIDC_EMAIL_DOMAIN" .Values.site.oidcEmailDomain -}}
+{{- $_ := set .envVars "OIDC_OVERRIDE_TOKEN" .Values.site.oidcOverrideToken -}}
+{{- $_ := set .envVars "SAML_CERT" .Values.site.samlSPCert -}}
+{{- $_ := set .envVars "SAML_KEY" .Values.site.samlSPKey -}}
+{{- $_ := set .envVars "SAML_ID_PROVIDER_METADATA_URL" .Values.site.samlIDProviderMetadataURL -}}
+{{- $_ := set .envVars "MAX_REPOS_TO_SEARCH" .Values.site.maxReposToSearch -}}
+{{- if .Values.site.experimentIndexedSearch -}}
     {{- $_ := set .envVars "SEARCH_UNINDEXED_NOMISSING" "t" -}}
     {{- $_ := set .envVars "SEARCH10_INDEX_DEFAULT" "only" -}}
 {{- end -}}
@@ -83,29 +83,29 @@
 
 {{- define "collectFrontendCommonEnv" -}}
 
-{{- if .Values.conf.htmlBodyBottom -}}
-    {{- $_ := set .envVars "HTML_BODY_BOTTOM" .Values.conf.htmlBodyBottom -}}
+{{- if .Values.site.htmlBodyBottom -}}
+    {{- $_ := set .envVars "HTML_BODY_BOTTOM" .Values.site.htmlBodyBottom -}}
 {{- end -}}
 
-{{- if .Values.conf.htmlBodyTop -}}
-    {{- $_ := set .envVars "HTML_BODY_TOP" .Values.conf.htmlBodyTop -}}
+{{- if .Values.site.htmlBodyTop -}}
+    {{- $_ := set .envVars "HTML_BODY_TOP" .Values.site.htmlBodyTop -}}
 {{ end -}}
 
-{{- if .Values.conf.htmlHeadBottom -}}
-    {{- $_ := set .envVars "HTML_HEAD_BOTTOM" .Values.conf.htmlHeadBottom -}}
+{{- if .Values.site.htmlHeadBottom -}}
+    {{- $_ := set .envVars "HTML_HEAD_BOTTOM" .Values.site.htmlHeadBottom -}}
 {{ end -}}
 
-{{- if .Values.conf.htmlHeadTop -}}
-    {{- $_ := set .envVars "HTML_HEAD_TOP" .Values.conf.htmlHeadTop -}}
+{{- if .Values.site.htmlHeadTop -}}
+    {{- $_ := set .envVars "HTML_HEAD_TOP" .Values.site.htmlHeadTop -}}
 {{ end -}}
 
-{{- if .Values.conf.licenseKey -}}
-    {{- $_ := set .envVars "LICENSE_KEY" (include "expandedString" (dict "str" .Values.conf.licenseKey "Files" .Files) | trimSuffix "\n" | printf "%q") -}}
+{{- if .Values.site.licenseKey -}}
+    {{- $_ := set .envVars "LICENSE_KEY" (include "expandedString" (dict "str" .Values.site.licenseKey "Files" .Files) | trimSuffix "\n" | printf "%q") -}}
 {{- end -}}
 
 {{- $_ := set .envVars "LSP_PROXY" "lsp-proxy:4388" -}}
 
-{{- if .Values.conf.phabricator -}}
+{{- if .Values.site.phabricator -}}
     {{- $_ := set .envVars "PHABRICATOR_URL" "https://phabricator.sgdev.org" -}}
 {{- end -}}
 
@@ -117,7 +117,7 @@
 {{- $_ := set .envVars "SRC_GIT_SERVERS" (include "gitservers" .) -}}
 {{- $_ := set .envVars "SRC_INDEXER" "indexer:3179" -}}
 {{- $_ := set .envVars "SRC_LOG_LEVEL" "dbug" -}}
-{{- $_ := set .envVars "SRC_SESSION_COOKIE_KEY" .Values.conf.sessionCookieKey -}}
+{{- $_ := set .envVars "SRC_SESSION_COOKIE_KEY" .Values.site.sessionCookieKey -}}
 {{- $_ := set .envVars "SRC_SESSION_STORE_REDIS" "redis-store:6379" -}}
 {{- $_ := set .envVars "SRC_SYNTECT_SERVER" "http://syntect-server:9238" -}}
 {{- $_ := set .envVars "SRC_PROF_HTTP" ":6060" -}}
@@ -128,7 +128,7 @@
 {{/* --------------- START OF TEMPLATE ------------- */}}
 
 {{- define "gitservers" -}}
-{{- include "joinFmt" (dict "count" (int (default 1 .Values.conf.gitserverCount)) "fmt" "gitserver-%d:3178" "sep" " ") -}}
+{{- include "joinFmt" (dict "count" (int (default 1 .Values.site.gitserverCount)) "fmt" "gitserver-%d:3178" "sep" " ") -}}
 {{- end -}}
 
 {{/* --------------- START OF TEMPLATE ------------- */}}
