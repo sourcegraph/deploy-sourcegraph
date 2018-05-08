@@ -237,11 +237,11 @@
 
 resources:
   limits:
-    cpu: {{ include "indexOrEmpty" (dict "obj" $Values.opsconf "keys" (list $deploy "containers" $container "limits" "cpu")) | quote }}
-    memory: {{ include "indexOrEmpty" (dict "obj" $Values.opsconf "keys" (list $deploy "containers" $container "limits" "memory")) | quote }}
+    cpu: {{ include "indexOrEmpty" (dict "obj" $Values.cluster "keys" (list $deploy "containers" $container "limits" "cpu")) | quote }}
+    memory: {{ include "indexOrEmpty" (dict "obj" $Values.cluster "keys" (list $deploy "containers" $container "limits" "memory")) | quote }}
   requests:
-    cpu: {{ include "indexOrEmpty" (dict "obj" $Values.opsconf "keys" (list $deploy "containers" $container "requests" "cpu")) | quote }}
-    memory: {{ include "indexOrEmpty" (dict "obj" $Values.opsconf "keys" (list $deploy "containers" $container "requests" "memory")) | quote }}
+    cpu: {{ include "indexOrEmpty" (dict "obj" $Values.cluster "keys" (list $deploy "containers" $container "requests" "cpu")) | quote }}
+    memory: {{ include "indexOrEmpty" (dict "obj" $Values.cluster "keys" (list $deploy "containers" $container "requests" "memory")) | quote }}
 {{- end -}}
 
 
@@ -269,9 +269,9 @@ resources:
 {{- $Values := index . 0 -}}
 {{- $deploy := index . 1 -}}
 
-{{- if and (hasKey $Values.opsconf $deploy) (hasKey (index $Values.opsconf $deploy) "nodeSelector") -}}
+{{- if and (hasKey $Values.cluster $deploy) (hasKey (index $Values.cluster $deploy) "nodeSelector") -}}
 nodeSelector:
-{{- range $k, $v := (index $Values.opsconf $deploy).nodeSelector }}
+{{- range $k, $v := (index $Values.cluster $deploy).nodeSelector }}
   {{ $k }}: {{ $v }}
 {{- end -}}
 {{- end -}}
@@ -283,13 +283,13 @@ nodeSelector:
 
 {{- define "securityContext" -}}
 
-{{- if .Values.opsconf.securityContext -}}
+{{- if .Values.cluster.securityContext -}}
 securityContext:
-{{- if .Values.opsconf.securityContext.runAsUser }}
-  runAsUser: {{ .Values.opsconf.securityContext.runAsUser }}
+{{- if .Values.cluster.securityContext.runAsUser }}
+  runAsUser: {{ .Values.cluster.securityContext.runAsUser }}
 {{- end -}}
-{{- if .Values.opsconf.securityContext.fsGroup }}
-  fsGroup: {{ .Values.opsconf.securityContext.fsGroup }}
+{{- if .Values.cluster.securityContext.fsGroup }}
+  fsGroup: {{ .Values.cluster.securityContext.fsGroup }}
 {{- end -}}
 {{- else -}}
 securityContext:

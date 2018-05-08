@@ -14,14 +14,14 @@ instructions, [provision a Kubernetes](README.k8s.md) cluster on the infrastruct
 
 1. Copy the contents of `conf.default.yaml` to a file named `conf.yaml`.
 
-1. Set the appropriate value for `opsconf.storageClass.create` in `conf.yaml`. If this field is set to something other
-   than `none`, a value must be specified for `opsconf.storageClass.zone`, too. This
+1. Set the appropriate value for `cluster.storageClass.create` in `conf.yaml`. If this field is set to something other
+   than `none`, a value must be specified for `cluster.storageClass.zone`, too. This
    configures [Dynamic Volume Provisioning](https://kubernetes.io/docs/concepts/storage/dynamic-provisioning/) in the
    Kubernetes cluster.
 
 1. Edit the other fields in `conf.yaml` to set the configuration values of your choice. At the top level,
    `conf.yaml` has two fields:
-   * `opsconf` contains cluster-level configuration. Consult
+   * `cluster` contains cluster-level configuration. Consult
      the [scaling documentation](https://about.sourcegraph.com/docs/datacenter/scaling) for advice on tuning the CPU,
      memory, and replication settings.
    * `conf` contains [app-level configuration](https://about.sourcegraph.com/docs/config/settings)

@@ -20,7 +20,7 @@ metadata:
   name: xlang-java
 spec:
   minReadySeconds: 10
-  replicas: {{ required ".Values.opsconf.xlangJava.replicas is required" .Values.opsconf.xlangJava.replicas }}
+  replicas: {{ required ".Values.cluster.xlangJava.replicas is required" .Values.cluster.xlangJava.replicas }}
   revisionHistoryLimit: 10
   strategy:
     rollingUpdate:
@@ -35,7 +35,7 @@ spec:
       containers:
       - env:
 {{ include "envVars" $envVars | trimSuffix "\n" | indent 8 }}
-        image: {{ .Values.opsconf.xlangJava.image }}
+        image: {{ .Values.cluster.xlangJava.image }}
         name: xlang-java
         ports:
         - containerPort: 2088

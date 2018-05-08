@@ -15,7 +15,7 @@ metadata:
   name: xlang-typescript
 spec:
   minReadySeconds: 10
-  replicas: {{ required ".Values.opsconf.xlang-javascript-typescript.replicas is required" .Values.opsconf.xlangJavascriptTypescript.replicas }}
+  replicas: {{ required ".Values.cluster.xlang-javascript-typescript.replicas is required" .Values.cluster.xlangJavascriptTypescript.replicas }}
   revisionHistoryLimit: 10
   strategy:
     rollingUpdate:
@@ -36,7 +36,7 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: {{ .Values.opsconf.xlangJavascriptTypescript.image }}
+        image: {{ .Values.cluster.xlangJavascriptTypescript.image }}
         livenessProbe:
           initialDelaySeconds: 30
           tcpSocket:

@@ -5,7 +5,7 @@
 {{- $_ := set $envVars "SRC_REPOS_DIR" "/data/repos" -}}
 {{- $_ := set $envVars "ORIGIN_MAP" $global.Values.conf.gitOriginMap -}}
 
-{{- range $index, $gitserverIndex := until (required ".Values.opsconf.gitserver.shards required" .Values.opsconf.gitserver.shards | int) }}
+{{- range $index, $gitserverIndex := until (required ".Values.cluster.gitserver.shards required" .Values.cluster.gitserver.shards | int) }}
 {{- if eq $index 0 | not }}
 ---
 {{ end -}}
@@ -36,7 +36,7 @@ spec:
         - run
         env:
 {{ include "envVars" $envVars | trimSuffix "\n" | indent 8 }}
-        image: {{ $global.Values.opsconf.gitserver.image }}
+        image: {{ $global.Values.cluster.gitserver.image }}
         livenessProbe:
           initialDelaySeconds: 5
           tcpSocket:

@@ -13,7 +13,7 @@ metadata:
   name: sourcegraph-frontend
 spec:
   minReadySeconds: 10
-  replicas: {{ required ".Values.opsconf.frontend.replicas is required" .Values.opsconf.frontend.replicas }}
+  replicas: {{ required ".Values.cluster.frontend.replicas is required" .Values.cluster.frontend.replicas }}
   revisionHistoryLimit: 10
   strategy:
     rollingUpdate:
@@ -42,7 +42,7 @@ spec:
               key: key
               name: tls
 {{- end }}
-        image: {{ .Values.opsconf.frontend.image }}
+        image: {{ .Values.cluster.frontend.image }}
         name: frontend
         ports:
         - containerPort: 3080
