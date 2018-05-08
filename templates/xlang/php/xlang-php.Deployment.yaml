@@ -9,7 +9,7 @@ metadata:
   name: xlang-php
 spec:
   minReadySeconds: 10
-  replicas: {{ required ".Values.opsconf.xlangPHP.replicas is required" .Values.opsconf.xlangPHP.replicas }}
+  replicas: {{ required ".Values.cluster.xlangPHP.replicas is required" .Values.cluster.xlangPHP.replicas }}
   revisionHistoryLimit: 10
   strategy:
     rollingUpdate:
@@ -25,7 +25,7 @@ spec:
       - env:
         - name: COMPOSER_AUTH
           value: '{"github-oauth": {"github.com": ""}}'
-        image: {{ .Values.opsconf.xlangPHP.image }}
+        image: {{ .Values.cluster.xlangPHP.image }}
         name: xlang-php
         ports:
         - containerPort: 2088

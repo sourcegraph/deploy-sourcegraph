@@ -1,5 +1,5 @@
 {{- $global := . -}}
-{{- range $index, $gitserverIndex := until (required ".Values.opsconf.gitserver.shards required" .Values.opsconf.gitserver.shards | int) }}
+{{- range $index, $gitserverIndex := until (required ".Values.cluster.gitserver.shards required" .Values.cluster.gitserver.shards | int) }}
 {{- if eq $index 0 | not }}
 ---
 {{ end -}}
@@ -7,7 +7,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   annotations:
-    volume.beta.kubernetes.io/storage-class: {{ $global.Values.opsconf.storageClass.name }}
+    volume.beta.kubernetes.io/storage-class: {{ $global.Values.cluster.storageClass.name }}
   name: gitserver-{{ add1 $gitserverIndex }}
 spec:
   accessModes:

@@ -15,7 +15,7 @@ spec:
   type: ClusterIP
 
 {{- $global := . -}}
-{{- range $index, $gitserverIndex := until (required ".Values.opsconf.gitserver.shards required" .Values.opsconf.gitserver.shards | int) }}
+{{- range $index, $gitserverIndex := until (required ".Values.cluster.gitserver.shards required" .Values.cluster.gitserver.shards | int) }}
 ---
 apiVersion: v1
 kind: Service
