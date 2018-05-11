@@ -25,7 +25,7 @@ spec:
           value: /data/pgdata
         - name: POSTGRES_USER
           value: sg
-        image: {{ .Values.cluster.pgsql.image }}
+        image: {{ .Values.const.pgsql.image }}
         livenessProbe:
           initialDelaySeconds: 15
           tcpSocket:
@@ -47,7 +47,7 @@ spec:
       - env:
         - name: DATA_SOURCE_NAME
           value: postgres://sg:@localhost:5432/?sslmode=disable
-        image: {{ .Values.cluster.pgsql.exporterImage }}
+        image: {{ .Values.const.pgsql.exporterImage }}
         name: pgsql-exporter
         resources:
           limits:
