@@ -1,4 +1,7 @@
-# Sourcegraph Data Center
+Note: This is pre-release software. Existing users of Sourcegraph Data Center should still refer to the installation
+instructions here: https://about.sourcegraph.com/docs/datacenter/.
+
+# Sourcegraph Data Center (pre-release)
 
 The Data Center deployment option for Sourcegraph is for organizations that need highly scalable, highly available code
 search and intelligence for 10,000s of repositories and users. See [pricing](https://about.sourcegraph.com/pricing/),
