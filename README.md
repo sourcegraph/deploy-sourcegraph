@@ -12,7 +12,7 @@ instructions, [provision a Kubernetes](README.k8s.md) cluster on the infrastruct
 
 1. Fork this repository and clone the fork to your local machine.
 
-1. Copy the contents of `conf.default.yaml` to a file named `conf.yaml`.
+1. Copy the contents of `defaults.yaml` to a file named `conf.yaml`.
 
 1. Set the appropriate value for `cluster.storageClass.create` in `conf.yaml`. If this field is set to something other
    than `none`, a value must be specified for `cluster.storageClass.zone`, too. This
@@ -97,7 +97,7 @@ tracking changes to your specific configuration (`conf.yaml`), we recommend the 
 
 1. Fork this repository.
 1. Clone your fork and configure the local clone to have an additional remote `upstream` set to `https://github.com/sourcegraph/datacenter`.
-1. Copy `conf.default.yaml` to `conf.yaml` and keep your custom configuration in `conf.yaml`. Push changes to `master` in your fork.
+1. Copy `defaults.yaml` to `conf.yaml` and keep your custom configuration in `conf.yaml`. Push changes to `master` in your fork.
 1. On update:
    1. Run `git fetch upstream && git rebase upstream/master`. There should never be conflicts, because you have
       not modified any of the original files.
