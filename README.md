@@ -13,22 +13,6 @@ and [contact us](https://about.sourcegraph.com/contact/sales) for more informati
 Sourcegraph Data Center is deployed using Kubernetes. Before proceeding with these
 instructions, [provision a Kubernetes](README.k8s.md) cluster on the infrastructure of your choice.
 
-1. Fork this repository and clone the fork to your local machine.
-
-1. Copy the contents of `defaults.yaml` to a file named `conf.yaml`.
-
-1. Set the appropriate value for `cluster.storageClass.create` in `conf.yaml`. If this field is set to something other
-   than `none`, a value must be specified for `cluster.storageClass.zone`, too. This
-   configures [Dynamic Volume Provisioning](https://kubernetes.io/docs/concepts/storage/dynamic-provisioning/) in the
-   Kubernetes cluster.
-
-1. Edit the other fields in `conf.yaml` to set the configuration values of your choice. At the top level,
-   `conf.yaml` has two fields:
-   * `cluster` configures the the Kubernetes cluster. Consult
-     the [scaling documentation](https://about.sourcegraph.com/docs/datacenter/scaling) for advice
-     on tuning the CPU, memory, and replication settings.
-   * `site` is [Sourcegraph site configuration](https://about.sourcegraph.com/docs/config/settings)
-
 1. Install Tiller (the server-side counterpart to Helm) on your cluster:
 
    ```bash
@@ -43,10 +27,26 @@ instructions, [provision a Kubernetes](README.k8s.md) cluster on the infrastruct
    If installing Tiller is not an option, consult the instructions below for installing without Tiller. If your
    Kubernetes environment does not permite RBAC, consult the instructions below for installing without RBAC.
 
-1. Install the Helm chart to your cluster. From the root of this directory, run the following:
+1. Create a `values.yaml` file with the following contents:
+
+```
+cluster:
+  storageClass:
+    create: {none,aws,gcp}
+site: {}
+```
+
+Set the `create` field to "aws" or "gcp" if you are using AWS or Google Cloud. Otherwise, set it to "none".
+- If you set it to "aws" or "gcp", you also need to set `cluster.storageClass.zone` to the zone in which your cluster resides.
+- If you set it to "none", you need to create
+  a [storage class](https://kubernetes.io/docs/concepts/storage/storage-classes/) in your cluster with name "default"
+  that defines the persistent volumes to be auto-provisioned in the cluster (we recommend low-latency SSDs). For more
+  info, see the section below on "creating a storage class manually".
+
+1. Install the Helm chart to your cluster:
 
    ```bash
-   helm install -f constants.yaml -f conf.yaml --name sourcegraph .
+   helm install sourcegraph -f conf.yaml https://github.com/sourcegraph/datacenter/archive/latest.tar.gz
    ```
 
    If you see the error `could not find a ready tiller pod`, wait a minute and try again.
@@ -91,6 +91,31 @@ helm template -f constants.yaml -f conf.yaml . --output-dir=generated
 kubectl apply -R -f ./generated/sourcegraph/templates
 ```
 
+### Creating a storage class manually
+
+If `cluster.storageClass.create` is set to `none`, then you will need to create a storage class manually:
+
+1. Create a file called `storage-class.yaml` that meets
+   the [requirements described in the Kubernetes docs](https://kubernetes.io/docs/concepts/storage/storage-classes/).
+   The name of the storage class should match the name set in `cluster.storageClass.name` ("default" by default). We
+   recommend specifying SSDs as the disk type if possible.
+1. Run `kubectl apply -f storage-class.yaml`.
+1. You should see the storage class appear when you run `kubectl get storageclass`.
+
+After installing the Sourcegraph Helm chart, you should see persistent volume claims (`kubectl get pvc`) bound to
+volumes provisioned using this storage class.
+
+## Configuration
+
+You can set additional values in `conf.yaml` to configure your cluster. The default set of configuration values is
+defined by the `values.yaml` file in this directory.
+
+The configuration structure is split into two top-level fields:
+- `site` defines application-level settings like code host integrations and authentication settings. The full set of
+  options for `site` is described here: https://about.sourcegraph.com/docs/config/settings.
+- `cluster` defines settings specific to the configuration of the Kubernetes cluster, like replica counts and CPU/memory
+  allocation. All `cluster` settings are explicitly set in `values.yaml`, so refer to this file if you wish to override
+  any of the default values.
 
 ## Update
 
