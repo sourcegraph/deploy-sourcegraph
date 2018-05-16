@@ -128,7 +128,7 @@
 {{/* --------------- START OF TEMPLATE ------------- */}}
 
 {{- define "gitservers" -}}
-{{- include "joinFmt" (dict "count" (int (default 1 .Values.site.gitserverCount)) "fmt" "gitserver-%d:3178" "sep" " ") -}}
+{{- include "joinFmt" (dict "count" (int (default 1 .Values.cluster.gitserver.shards)) "fmt" "gitserver-%d:3178" "sep" " ") -}}
 {{- end -}}
 
 {{/* --------------- START OF TEMPLATE ------------- */}}
