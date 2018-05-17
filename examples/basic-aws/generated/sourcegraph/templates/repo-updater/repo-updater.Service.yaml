@@ -1,0 +1,19 @@
+##---
+# Source: sourcegraph/templates/repo-updater/repo-updater.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    prometheus.io/scrape: "true"
+  labels:
+    app: repo-updater
+  name: repo-updater
+spec:
+  ports:
+  - name: http
+    port: 3182
+    targetPort: http
+  selector:
+    app: repo-updater
+  type: ClusterIP
