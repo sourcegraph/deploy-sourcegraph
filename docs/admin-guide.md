@@ -60,13 +60,14 @@ Sourcegraph Data Center includes an optional Prometheus instance. To turn on Pro
 the `deploymentOverrides` section of `config.json`.
 
 ```yaml
-site:
-  prometheus: {}
+site: {
+  "prometheus": {}
+}
 ```
 
-After updating the cluster, the running Prometheus pod will be visible in the list printed by `kubectl get pods`. Once
-this is enabled, Prometheus will begin recording performance metrics across all services running in Sourcegraph Data
-Center.
+After updating the cluster, the running Prometheus pod will be visible in the list printed by
+`kubectl get pods`. Once this is enabled, Prometheus will begin recording performance metrics across
+all services running in Sourcegraph Data Center.
 
 ---
 
@@ -74,17 +75,18 @@ Center.
 
 #### Port-forwarding
 
-Use `kubectl port-forward` to grant direct access to the Prometheus UI. This is the simplest way to access Prometheus
-data, but requires access to the cluster via `kubectl`.
+Use `kubectl port-forward` to grant direct access to the Prometheus UI. This is the simplest way to
+access Prometheus data, but requires access to the cluster via `kubectl`.
 
 1.  Run `kubectl port-forward $(kubectl get pods -l app=prometheus -o jsonpath="{.items[0].metadata.name}") 9090`.
 1.  Navigate to `http://localhost:9090`.
 
 #### Kubernetes service
 
-Create a YAML file defining a
-[Kubernetes service](https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service) that exposes
-the Prometheus deployment.
+Create a YAML file defining
+a
+[Kubernetes service](https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service) that
+exposes the Prometheus deployment.
 
 We recommend using a NodePort service with the following configuration:
 
@@ -109,48 +111,55 @@ spec:
   type: NodePort
 ```
 
-(Note: some cloud infrastructure providers support the "LoadBalancer" service type, which automatically provisions an
-external load balancer for the service. We recommend against this type of service for Prometheus, because almost
-certainly you do NOT want to expose Prometheus to public Internet traffic.)
+(Note: some cloud infrastructure providers support the "LoadBalancer" service type, which
+automatically provisions an external load balancer for the service. We recommend against this type
+of service for Prometheus, because almost certainly you do NOT want to expose Prometheus to public
+Internet traffic.)
 
-After creating the Prometheus service, add the appropriate network ingress rules in your infrastructure provider to
-allow trusted incoming traffic to access port 30010 on nodes in the Kubernetes cluster. SECURITY NOTE: Prometheus is
-unauthenticated, so whatever incoming traffic the ingress rules allow will have _complete access_ to the Prometheus UI.
-Be careful that the ingress rules restrict incoming traffic to trusted sources.
+After creating the Prometheus service, add the appropriate network ingress rules in your
+infrastructure provider to allow trusted incoming traffic to access port 30010 on nodes in the
+Kubernetes cluster. SECURITY NOTE: Prometheus is unauthenticated, so whatever incoming traffic the
+ingress rules allow will have _complete access_ to the Prometheus UI.  Be careful that the ingress
+rules restrict incoming traffic to trusted sources.
 
-If a stable IP is required, provision a static IP and an external load balancer in lieu of adding ingress rules. On most
-infrastructure providers, the steps are roughly the following:
+If a stable IP is required, provision a static IP and an external load balancer in lieu of adding
+ingress rules. On most infrastructure providers, the steps are roughly the following:
 
 *   Provision the static IP.
 *   Create an external load balancer. (On AWS, use an "Application Load Balancer".)
-*   Connect the internal/backend half of the load balancer to the set of nodes in the Kubernetes cluster. (On AWS, create
-    a "target group" that contains the instances in the cluster. On Google Cloud, define a "target pool".)
-*   Connect the external/frontend half of the load balancer to the static IP. (On AWS, create a "listener rule". On Google
-    Cloud, create a "forwarding rule".)
+*   Connect the internal/backend half of the load balancer to the set of nodes in the Kubernetes
+    cluster. (On AWS, create a "target group" that contains the instances in the cluster. On Google
+    Cloud, define a "target pool".)
+*   Connect the external/frontend half of the load balancer to the static IP. (On AWS, create a
+    "listener rule". On Google Cloud, create a "forwarding rule".)
 
 #### Exposing the Prometheus API endpoint
 
-Some customers may want to make the Prometheus API endpoint accessible to other services like the following:
+Some customers may want to make the Prometheus API endpoint accessible to other services like the
+following:
 
 *   An analytics visualization tool like Grafana
 *   An metrics ingestion pipeline
 
-To expose the Prometheus API to such a service, follow the steps to expose Prometheus via Kubernetes service with an
-external load balancer. Ensure that the load balancer permits incoming traffic from the other service. The
-[Prometheus API](https://prometheus.io/docs/prometheus/latest/querying/api/) is reachable under the path `/api/v1`.
+To expose the Prometheus API to such a service, follow the steps to expose Prometheus via Kubernetes
+service with an external load balancer. Ensure that the load balancer permits incoming traffic from
+the other service. The [Prometheus API](https://prometheus.io/docs/prometheus/latest/querying/api/)
+is reachable under the path `/api/v1`.
 
 ---
 
 ### Metrics
 
-See the [Prometheus metrics page](/docs/datacenter/prometheus-metrics) for a full list of available Prometheus metrics.
+See the [Prometheus metrics page](metrics.md) for a full list of available
+Prometheus metrics.
 
 ---
 
 ### Sample queries
 
-Sourcegraph Data Center's Prometheus includes by default many useful metrics for tracking application performance. The
-following are some commonly used queries that you can try out in the UI:
+Sourcegraph Data Center's Prometheus includes by default many useful metrics for tracking
+application performance. The following are some commonly used queries that you can try out in the
+UI:
 
 *   Average (5-minute) HTTP requests per second: `job:src_http_request_count:rate5m`
 *   Average (5-minute) HTTP requests per second, bucketed by request duration:
@@ -162,22 +171,22 @@ following are some commonly used queries that you can try out in the UI:
 
 ### Custom recording rules
 
-Admins can define custom [Prometheus recording rules](https://prometheus.io/docs/practices/rules/) via the
-`customPrometheusRules` configuration field.
+Admins can define custom [Prometheus recording rules](https://prometheus.io/docs/practices/rules/)
+via the `customPrometheusRules` configuration field.
 
-Add the following to `config.json`:
-
-```json
-  "customPrometheusRules: "file!custom.rules",
-```
-
-Then add a file named `custom.rules` to the same directory that contains `config.json`. Define your recording rules in
-this file. Here's an example:
+Add a file named `custom.rules` to the same directory that contains `config.json`. Define your
+recording rules in this file. Here's an example:
 
 ```
 # This is a comment
 myCustomMetric1 = rate(src_http_request_duration_seconds_bucket{job=~"sourcegraph-.*"}[5m])
 myCustomMetric2 = sum by (route, ns, le)(task:src_http_request_duration_seconds_bucket:rate5m)
+```
+
+Add the following flag when running the `helm upgrade ...` command:
+
+```
+--set site.customPrometheusRules="$(cat custom.rules)"
 ```
 
 ---
@@ -207,11 +216,11 @@ You can view these alerts and their definitions in the Prometheus UI under the "
 (http://localhost:9090/alerts if you're using `kubectl port-forward` to expose the Prometheus UI).
 
 To define additional alerting rules, add them to a file named `custom.rules`. (If you've already created such a file for
-custom recording rules, add the alerting rules to the end of the existing file.) Then ensure `config.json` contains the
-following:
+custom recording rules, add the alerting rules to the end of the existing file.) Then ensure your `helm update ...`
+command contains the following flag:
 
-```json
-  "customPrometheusRules: "file!custom.rules",
+```
+--set site.customPrometheusRules="$(cat custom.rules)"
 ```
 
 Refer to the
@@ -244,15 +253,23 @@ The default set of alerts can be disabled with the following config:
 #### Alertmanager
 
 Enable [Alertmanager](https://prometheus.io/docs/alerting/alertmanager/) to send alerts to external services like
-PagerDuty, OpsGenie, Slack, or email. To enable, add the following config:
+PagerDuty, OpsGenie, Slack, or email. To enable, do the following:
 
-```json
-  "useAlertManager": true,
-  "alertmanagerConfig": "file!alertmanager.yaml",
-```
+1. Add the following to `values.yaml`:
+   ```yaml
+   site: {
+     "useAlertManager": true,
+   }
+   ```
+1. Create a file in the same directory called `alertmanager.yaml`. To determine the contents of this
+   file, refer to
+   the
+   [Alertmanager configuration documentation](https://prometheus.io/docs/alerting/configuration/).
+1. Include the following flag when running `helm update ...`:
+   ```
+   --set site.alertmanagerConfig="$(cat alertmanager.yaml)"
+   ```
 
-Then create a file in the same directory called `alertmanager.yaml`. To determine the contents of this file, refer to
-the [Alertmanager configuration documentation](https://prometheus.io/docs/alerting/configuration/).
 
 ---
 
