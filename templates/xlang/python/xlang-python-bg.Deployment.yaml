@@ -26,11 +26,11 @@ spec:
         app: xlang-python-bg
     spec:
       containers:
+      - image: {{ .Values.const.xlangPython.image }}
 {{- if include "envVars" $envVars | trim | empty | not }}
-      - env:
+        env:
 {{ include "envVars" $envVars | trimSuffix "\n" | indent 8 }}
 {{- end }}
-      - image: {{ .Values.const.xlangPython.image }}
         livenessProbe:
           initialDelaySeconds: 5
           tcpSocket:
