@@ -59,7 +59,7 @@ commonly used to track key performance metrics over time, such as the following:
 Sourcegraph Data Center includes an optional Prometheus instance. To turn on Prometheus, add the following snippet to
 the `deploymentOverrides` section of `config.json`.
 
-```json
+```yaml
   "deploymentOverrides": {
     "prometheus": {
       "replicas": 1
