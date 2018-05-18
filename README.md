@@ -27,26 +27,28 @@ instructions, [provision a Kubernetes](README.k8s.md) cluster on the infrastruct
    If installing Tiller is not an option, consult the instructions below for installing without Tiller. If your
    Kubernetes environment does not permite RBAC, consult the instructions below for installing without RBAC.
 
+Azure AKS doesn't have RBAC https://github.com/Azure/AKS/issues/67
+
 1. Create a `values.yaml` file with the following contents:
 
 ```
 cluster:
   storageClass:
-    create: {none,aws,gcp}
+    create: {none,aws,gcp,managed-premium}
 site: {}
 ```
 
-Set the `create` field to "aws" or "gcp" if you are using AWS or Google Cloud. Otherwise, set it to "none".
+Set the `create` field to "aws" or "gcp" if you are using AWS or Google Cloud. Set it to `managed-premium` if you're using Azure. Otherwise, set it to "none".
 - If you set it to "aws" or "gcp", you also need to set `cluster.storageClass.zone` to the zone in which your cluster resides.
 - If you set it to "none", you need to create
   a [storage class](https://kubernetes.io/docs/concepts/storage/storage-classes/) in your cluster with name "default"
   that defines the persistent volumes to be auto-provisioned in the cluster (we recommend low-latency SSDs). For more
-  info, see the section below on "creating a storage class manually".
+  info, see the section below on [creating a storage class manually](#Creating-a-storage-class-manually).
 
 1. Install the Helm chart to your cluster:
 
    ```bash
-   helm install sourcegraph -f conf.yaml https://github.com/sourcegraph/datacenter/archive/latest.tar.gz
+   helm install --name sourcegraph -f values.yaml https://github.com/sourcegraph/datacenter/archive/latest.tar.gz
    ```
 
    If you see the error `could not find a ready tiller pod`, wait a minute and try again.
@@ -77,7 +79,7 @@ which clean up temporary cache data. To do that we need to create RBAC resources
 Helm's
 [Role-based Access Control documentation](https://github.com/kubernetes/helm/blob/v2.8.2/docs/rbac.md).
 
-If using RBAC is not an option, you can set `"site.rbac": "disabled"` in `conf.yaml` and run `helm init` instead of
+If using RBAC is not an option, you can set `"site.rbac": "disabled"` in `values.yaml` and run `helm init` instead of
 `helm init --service-account tiller` to install Tiller.
 
 
@@ -87,7 +89,7 @@ If installing Tiller is not an option, you can locally generate the Kubernetes c
 
 ```
 mkdir -p generated
-helm template -f constants.yaml -f conf.yaml . --output-dir=generated
+helm template -f constants.yaml -f values.yaml . --output-dir=generated
 kubectl apply -R -f ./generated/sourcegraph/templates
 ```
 
@@ -107,7 +109,7 @@ volumes provisioned using this storage class.
 
 ## Configuration
 
-You can set additional values in `conf.yaml` to configure your cluster. The default set of configuration values is
+You can set additional values in `values.yaml` to configure your cluster. The default set of configuration values is
 defined by the `values.yaml` file in this directory.
 
 The configuration structure is split into two top-level fields:
@@ -121,19 +123,19 @@ The configuration structure is split into two top-level fields:
 
 Versions of Sourcegraph Data Center are released as tags in this Git repository. To update to a new version, fetch this
 repository and check out the appropriate tag. To conveniently update to new versions of Data Center while additionally
-tracking changes to your specific configuration (`conf.yaml`), we recommend the following procedure:
+tracking changes to your specific configuration (`values.yaml`), we recommend the following procedure:
 
 1. Fork this repository.
 1. Clone your fork and configure the local clone to have an additional remote `upstream` set to `https://github.com/sourcegraph/datacenter`.
-1. Copy `defaults.yaml` to `conf.yaml` and keep your custom configuration in `conf.yaml`. Push changes to `master` in your fork.
+1. Copy `defaults.yaml` to `values.yaml` and keep your custom configuration in `values.yaml`. Push changes to `master` in your fork.
 1. On update:
    1. Run `git fetch upstream && git rebase upstream/master`. There should never be conflicts, because you have
       not modified any of the original files.
-   1. Run `git checkout $VERSION && git cherry-pick upstream/master...master` to cherry-pick your `conf.yaml` onto the
+   1. Run `git checkout $VERSION && git cherry-pick upstream/master...master` to cherry-pick your `values.yaml` onto the
       tagged revision that contains the source files for the new version of Data Center.
    1. Install the `helm-diff` plugin (`helm plugin install https://github.com/databus23/helm-diff`). Then run `helm diff
-      -f constants.yaml -f conf.yaml sourcegraph .` to display the update diff.
-   1. Run `helm update -f constants.yaml -f conf.yaml sourcegraph .`.
+      -f constants.yaml -f values.yaml sourcegraph .` to display the update diff.
+   1. Run `helm update -f constants.yaml -f values.yaml sourcegraph .`.
    1. After updating, run `watch kubectl get pods -o wide` to verify the health of the cluster.
 
 If you need to make changes to any of the existing files in this repository, please upstream your changes--pull requests
