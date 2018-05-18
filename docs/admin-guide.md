@@ -60,11 +60,8 @@ Sourcegraph Data Center includes an optional Prometheus instance. To turn on Pro
 the `deploymentOverrides` section of `config.json`.
 
 ```yaml
-  "deploymentOverrides": {
-    "prometheus": {
-      "replicas": 1
-    }
-  }
+site:
+  prometheus: {}
 ```
 
 After updating the cluster, the running Prometheus pod will be visible in the list printed by `kubectl get pods`. Once
