@@ -1,0 +1,16 @@
+##---
+# Source: sourcegraph/templates/indexed-search/indexed-search.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: indexed-search
+  name: indexed-search
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  selector:
+    app: indexed-search
+  type: ClusterIP
