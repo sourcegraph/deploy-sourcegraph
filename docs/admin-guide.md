@@ -318,8 +318,8 @@ the following to `values.yaml`:
 
 ```
 site: {
-  "lightstepAccessToken": "${LIGHTSTEP_TOKEN}"
-  "lightstepProject": "${LIGHTSTEP_PROJECT}"
+  "lightstepAccessToken": "${LIGHTSTEP_TOKEN}",
+  "lightstepProject": "${LIGHTSTEP_PROJECT}",
 }
 ```
 
