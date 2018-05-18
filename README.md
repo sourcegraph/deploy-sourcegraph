@@ -7,8 +7,8 @@ Sourcegraph Data Center is for organizations that need highly scalable and avail
 code intelligence. See [pricing](https://about.sourcegraph.com/pricing/)
 and [contact us](https://about.sourcegraph.com/contact/sales) for more information.
 
-* [Install](docs/install.md)
-* [Update](docs/update.md)
+* [Installation](docs/install.md)
+* [Updating](docs/update.md)
 
 
 ## Contributing
