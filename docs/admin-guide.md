@@ -291,8 +291,10 @@ enabled, Sourcegraph Data Center will run a Jaeger instance inside the Kubernete
 
 To enable, add the following to `config.json`:
 
-```json
+```yaml
+site: {
   "useJaeger": true,
+}
 ```
 
 After applying the config change, some additional manual setup is required to initialize the Jaeger Cassandra DB:
