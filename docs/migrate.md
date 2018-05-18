@@ -18,3 +18,6 @@ use the new Helm chart. Follow these steps:
   `sourcegraph-server-gen update $PREVIOUS_VERSION` to revert to the previous version of the
   generator binary and then apply the previous configuration using the normal process with
   `sourcegraph-server-gen`.
+
+Note: the `file!` and `exec!` syntax from `config.json` has been retired. File contents can still be
+embedded using the `helm --set` flag (automatically included in `helm.sh`).

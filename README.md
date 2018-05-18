@@ -4,11 +4,20 @@
 # Sourcegraph Data Center (beta)
 
 Sourcegraph Data Center is for organizations that need highly scalable and available code search and
-code intelligence. See [pricing](https://about.sourcegraph.com/pricing/)
-and [contact us](https://about.sourcegraph.com/contact/sales) for more information.
+code intelligence. This repository contains documentation for creating, updating, and maintaining a
+Sourcegraph Data Center cluster.
+
+For product and [pricing](https://about.sourcegraph.com/pricing/) information,
+visit [about.sourcegraph.com](https://about.sourcegraph.com)
+or [contact us](https://about.sourcegraph.com/contact/sales) for more information. If you're just
+starting out, we recommend installing [Sourcegraph](https://about.sourcegraph.com/docs) on a single
+node first. Migrating to Data Center is easy when you're ready to upgrade.
+
 
 * [Installation](docs/install.md)
 * [Updating](docs/update.md)
+* [Scaling](/docs/scale.md)
+* [Troubleshooting](/docs/troubleshoot.md)
 
 
 ## Contributing

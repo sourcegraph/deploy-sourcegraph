@@ -1,5 +1,14 @@
 # Installation
 
+## Requirements
+
+*   <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/" target="_blank">kubectl</a>, v1.8.6 or later
+*   <a href="https://docs.helm.sh/using_helm/#installing-helm" target="_blank">Helm</a>, v2.9.1 or later
+*   Access to server infrastructure on which you can create a Kubernetes cluster (see
+    [resource allocation guidelines](scaling.md))
+
+## Install
+
 Sourcegraph Data Center is deployed using Kubernetes. Before proceeding with these
 instructions, [provision a Kubernetes](k8s.md) cluster on the infrastructure of your choice.
 
@@ -71,6 +80,20 @@ instructions, [provision a Kubernetes](k8s.md) cluster on the infrastructure of 
 You will now see the Sourcegraph setup page when you visit the address of your instance. If you made your instance
 accessible on the public Internet, make sure you secure it before adding your private repositories.
 
+### Common errors
+
+*   `kubectl get pv` shows no Persistent Volumes, and/or `kubectl get events` shows a `Failed to provision volume with
+    StorageClass "default"` error.
+
+    Check that a storage class named "default" exists via `kubectl get storageclass`. If one does exist, run `kubectl get storageclass default -o=yaml` and verify that the zone indicated in the output matches the zone of your cluster.
+
+*   `Error: release sourcegraph failed: namespaces "default" is forbidden: User "system:serviceaccount:kube-system:default" cannot get namespaces in the namespace "default": Unknown user "system:serviceaccount:kube-system:default"`. Ensure you have created the RBAC resources and helm is using them. A common reason for it to fail is you are already using Helm, so `helm init --service-account tiller` does not work correctly. To fix this for your existing Helm installation, run:
+
+    ```bash
+    kubectl apply -f https://about.sourcegraph.com/k8s/rbac-config.yml
+    kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+    helm init --service-account tiller --upgrade
+    ```
 
 ### Install without RBAC
 
