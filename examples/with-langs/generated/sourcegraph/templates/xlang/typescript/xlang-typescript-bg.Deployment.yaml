@@ -1,0 +1,62 @@
+##---
+# Source: sourcegraph/templates/xlang/typescript/xlang-typescript-bg.Deployment.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: LSP server for JavaScript and TypeScript (used for background indexing
+      jobs).
+  name: xlang-typescript-bg
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: xlang-typescript-bg
+    spec:
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        image: docker.sourcegraph.com/xlang-javascript-typescript:00035_2018-04-26_8701864
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: lsp
+          timeoutSeconds: 5
+        name: xlang-typescript-bg
+        ports:
+        - containerPort: 2088
+          name: lsp
+        readinessProbe:
+          tcpSocket:
+            port: lsp
+        resources:
+          limits:
+            cpu: "4"
+            memory: "5Gi"
+          requests:
+            cpu: "500m"
+            memory: "2Gi"
+        volumeMounts:
+        - mountPath: /yarn-config
+          name: yarn-config
+        - mountPath: /mnt/cache
+          name: cache-ssd
+      volumes:
+      - emptyDir: {}
+        name: cache-ssd
+      - configMap:
+          name: yarn-config
+        name: yarn-config

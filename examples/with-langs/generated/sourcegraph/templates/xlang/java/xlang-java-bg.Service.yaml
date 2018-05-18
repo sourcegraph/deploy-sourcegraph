@@ -1,0 +1,16 @@
+##---
+# Source: sourcegraph/templates/xlang/java/xlang-java-bg.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: xlang-java-bg
+  name: xlang-java-bg
+spec:
+  ports:
+  - name: lsp
+    port: 2088
+    targetPort: lsp
+  selector:
+    app: xlang-java-bg
+  type: ClusterIP

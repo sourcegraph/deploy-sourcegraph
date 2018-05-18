@@ -1,0 +1,60 @@
+##---
+# Source: sourcegraph/templates/query-runner/query-runner.Deployment.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: Saved search query runner / notification service.
+  name: query-runner
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: query-runner
+    spec:
+      containers:
+      - env:
+        - name: CONFIG_FILE_HASH
+          value: f50b8004d2bee7aea369d3e79a84c23b635d47d5703fa3796c93ffeb8dc98494
+        - name: DEPLOY_TYPE
+          value: datacenter
+        - name: FRONTEND_URL
+          value: http://sourcegraph-frontend-internal
+        - name: SOURCEGRAPH_CONFIG_FILE
+          value: /etc/sourcegraph/config.json
+        - name: SRC_APP_DISABLE_SUPPORT_SERVICES
+          value: "true"
+        - name: SRC_APP_URL
+          value: http://localhost:3080
+        - name: SRC_PROF_HTTP
+          value: :6060
+        image: docker.sourcegraph.com/query-runner:14411_2018-04-20_fddd20b
+        name: query-runner
+        ports:
+        - containerPort: 3183
+          name: http
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1G
+          requests:
+            cpu: 500m
+            memory: 1G
+        volumeMounts:
+        - mountPath: /etc/sourcegraph
+          name: sg-config
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - configMap:
+          defaultMode: 464
+          name: config-file
+        name: sg-config

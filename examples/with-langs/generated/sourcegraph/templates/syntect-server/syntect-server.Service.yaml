@@ -1,0 +1,16 @@
+##---
+# Source: sourcegraph/templates/syntect-server/syntect-server.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: syntect-server
+  name: syntect-server
+spec:
+  ports:
+  - name: http
+    port: 9238
+    targetPort: http
+  selector:
+    app: syntect-server
+  type: ClusterIP
