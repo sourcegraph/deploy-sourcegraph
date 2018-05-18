@@ -247,10 +247,12 @@ ALERT ProdPageLoadLatency
 
 The default set of alerts can be disabled with the following config:
 
-```json
+```yaml
+site: {
   "prometheus": {
     "noDefaultAlerts": true
-  }
+  },
+}
 ```
 
 #### Alertmanager
