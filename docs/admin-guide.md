@@ -324,3 +324,19 @@ the following to `config.json`:
 The `sourcegraph-server-gen` command supports creating and restoring snapshots of the database, which can be useful for
 backups and syncing database state from one cluster to another (e.g., in a blue-green deployment setting). Run
 `sourcegraph-server-gen snapshot --help` for more information.
+
+1.  Download the `sourcegraph-server-gen` tool, which helps generate the Kubernetes cluster configuration.
+
+    On macOS:
+
+    ```
+    curl -O https://storage.googleapis.com/sourcegraph-assets/sourcegraph-server-gen/darwin_amd64/sourcegraph-server-gen
+    chmod +x ./sourcegraph-server-gen
+    ```
+
+    On Linux:
+
+    ```bash
+    curl -O https://storage.googleapis.com/sourcegraph-assets/sourcegraph-server-gen/linux_amd64/sourcegraph-server-gen
+    chmod +x ./sourcegraph-server-gen
+    ```
