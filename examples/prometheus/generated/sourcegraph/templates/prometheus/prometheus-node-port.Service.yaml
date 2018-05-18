@@ -1,0 +1,17 @@
+##---
+# Source: sourcegraph/templates/prometheus/prometheus-node-port.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: prometheus
+  name: prometheus-node-port
+spec:
+  ports:
+  - name: http
+    nodePort: 30010
+    port: 30010
+    targetPort: http
+  selector:
+    app: prometheus
+  type: NodePort
