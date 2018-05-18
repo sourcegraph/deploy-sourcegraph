@@ -35,7 +35,7 @@
 {{- $_ := set .envVars "LIGHTSTEP_PROJECT" .Values.site.lightstepProject -}}
 {{- $_ := set .envVars "LIGHTSTEP_ACCESS_TOKEN" .Values.site.lightstepAccessToken -}}
 {{- if .Values.site.lightstepAccessToken -}}
-    {{- $_ := set .envVars "LIGHTSTEP_INCLUDE_SENSITIVE" "true" -}}
+    {{- $_ := set .envVars "LIGHTSTEP_INCLUDE_SENSITIVE" "t" -}}
 {{- end -}}
 {{- end -}}
 
