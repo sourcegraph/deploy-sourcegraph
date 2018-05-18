@@ -5,7 +5,10 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 .buildkite/install-helm.sh
 
-# Ensure examples were re-generated.
+# Ensure examples are re-generated.
+
+echo "Ensuring examples are consistent with Helm chart..."
+
 export GIT_PAGER=cat
 working_copy_hash=$((git diff; git status) | (md5sum || md5) 2> /dev/null)
 examples/generate-examples.sh
