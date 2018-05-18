@@ -78,7 +78,10 @@ all services running in Sourcegraph Data Center.
 Use `kubectl port-forward` to grant direct access to the Prometheus UI. This is the simplest way to
 access Prometheus data, but requires access to the cluster via `kubectl`.
 
-1.  Run `kubectl port-forward $(kubectl get pods -l app=prometheus -o jsonpath="{.items[0].metadata.name}") 9090`.
+1.  
+    ```bash
+    kubectl port-forward $(kubectl get pods -l app=prometheus -o jsonpath="{.items[0].metadata.name}") 9090
+    ```
 1.  Navigate to `http://localhost:9090`.
 
 #### Kubernetes service
