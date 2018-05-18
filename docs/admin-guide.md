@@ -310,7 +310,11 @@ After applying the config change, some additional manual setup is required to in
     ```
 *   In the root directory of the jaeger repositiory, run `env MODE=test sh ./plugin/storage/cassandra/schema/create.sh | cqlsh`
 
-To access the Jaeger UI, run `kubectl port-forward $(kubectl get pods -l app=jaeger-query -o jsonpath='{.items[0].metadata.name}') 16686` and then navigate to http://localhost:16686.
+To access the Jaeger UI, forward port 16686:
+```bash
+kubectl port-forward $(kubectl get pods -l app=jaeger-query -o jsonpath='{.items[0].metadata.name}') 16686
+```
+Then navigate to http://localhost:16686.
 
 ---
 
