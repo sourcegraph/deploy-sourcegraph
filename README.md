@@ -10,6 +10,7 @@ and [contact us](https://about.sourcegraph.com/contact/sales) for more informati
 * [Install](docs/install.md)
 * [Update](docs/update.md)
 
+
 ## Contributing
 
 We understand there is great diversity in Kubernetes environments from company to company, which is
