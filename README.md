@@ -1,5 +1,5 @@
 > If you are migrating from the old version of Data Center (configured
-> using `sourcegraph-sersver-gen`), see [README.migrate.md].
+> using `sourcegraph-sersver-gen`), see [README.migrate.md](README.migrate.md).
 
 # Sourcegraph Data Center (beta)
 
