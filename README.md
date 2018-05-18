@@ -17,8 +17,8 @@ node first. Migrating to Data Center is easy when you're ready to upgrade.
 * [Updating](docs/update.md)
 * [Scaling](/docs/scale.md)
 * [Troubleshooting](/docs/troubleshoot.md)
-* [Admin guide](/docs/admin-guide.md): useful guides for Sourcegraph admins
-  * [Prometheus metrics](/docs/prom-metrics.md): list of all Prometheus metrics that can be used for
+* [Admin guide](/docs/admin-guide.md) - useful guide for Sourcegraph admins
+  * [Prometheus metrics](/docs/prom-metrics.md) - list of all Prometheus metrics that can be used for
     application performance monitoring
 
 
