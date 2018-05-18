@@ -43,6 +43,13 @@ spec:
               name: tls
 {{- end }}
         image: {{ .Values.const.frontend.image }}
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 3443
+            scheme: HTTPS
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
         name: frontend
         ports:
         - containerPort: 3080
