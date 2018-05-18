@@ -1,7 +1,7 @@
 # Installation
 
 Sourcegraph Data Center is deployed using Kubernetes. Before proceeding with these
-instructions, [provision a Kubernetes](docs/k8s.md) cluster on the infrastructure of your choice.
+instructions, [provision a Kubernetes](k8s.md) cluster on the infrastructure of your choice.
 
 1. Install Tiller with RBAC privileges (the server-side counterpart to Helm) on your cluster:
 
