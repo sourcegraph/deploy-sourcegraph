@@ -56,8 +56,8 @@ commonly used to track key performance metrics over time, such as the following:
 
 <img src="./images/prometheus.png" />
 
-Sourcegraph Data Center includes an optional Prometheus instance. To turn on Prometheus, add the following snippet to
-the `deploymentOverrides` section of `config.json`.
+Sourcegraph Data Center includes an optional Prometheus instance. To turn on Prometheus, add the
+following snippet to `values.yaml`:
 
 ```yaml
 site: {
