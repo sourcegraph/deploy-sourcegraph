@@ -317,8 +317,10 @@ To enable, you must first purchase Lightstep and create a project corresponding 
 the following to `values.yaml`:
 
 ```
+site: {
   "lightstepAccessToken": "${LIGHTSTEP_TOKEN}"
   "lightstepProject": "${LIGHTSTEP_PROJECT}"
+}
 ```
 
 ## Snapshots
