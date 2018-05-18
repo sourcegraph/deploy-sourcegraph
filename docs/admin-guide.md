@@ -174,7 +174,7 @@ UI:
 Admins can define custom [Prometheus recording rules](https://prometheus.io/docs/practices/rules/)
 via the `customPrometheusRules` configuration field.
 
-Add a file named `custom.rules` to the same directory that contains `config.json`. Define your
+Add a file named `custom.rules` to the same directory that contains your `values.yaml`. Define your
 recording rules in this file. Here's an example:
 
 ```
