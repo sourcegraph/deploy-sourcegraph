@@ -1,7 +1,7 @@
-Note: This is pre-release software. Existing users of Sourcegraph Data Center should still refer to the installation
-instructions here: https://about.sourcegraph.com/docs/datacenter/.
+> If you are migrating from the old version of Data Center (configured
+> using `sourcegraph-sersver-gen`), see [README.migrate.md].
 
-# Sourcegraph Data Center (pre-release)
+# Sourcegraph Data Center (beta)
 
 The Data Center deployment option for Sourcegraph is for organizations that need highly scalable, highly available code
 search and intelligence for 10,000s of repositories and users. See [pricing](https://about.sourcegraph.com/pricing/),
