@@ -322,7 +322,7 @@ the following to `config.json`:
 ## Snapshots
 
 The `sourcegraph-server-gen` command supports creating and restoring snapshots of the database,
-which can be useful for backups and syncing database state from one cluster to another.
+which can be useful for backups and syncing database state from one cluster to another:
 
 *   On macOS:
     ```
