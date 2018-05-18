@@ -153,7 +153,7 @@ is reachable under the path `/api/v1`.
 
 ### Metrics
 
-See the [Prometheus metrics page](metrics.md) for a full list of available
+See the [Prometheus metrics page](prom-metrics.md) for a full list of available
 Prometheus metrics.
 
 ---
