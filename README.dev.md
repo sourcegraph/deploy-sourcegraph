@@ -1,3 +1,5 @@
+# Development
+
 ## Release
 
 Sourcegraph Datacenter uses semantic versioning. To cut a new release, push a Git tag with the version name to this
