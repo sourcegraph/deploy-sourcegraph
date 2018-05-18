@@ -336,4 +336,4 @@ blue-green deployment setting).
     chmod +x ./sourcegraph-server-gen
     ```
 
- Run `sourcegraph-server-gen snapshot --help` for more information.
+Run `sourcegraph-server-gen snapshot --help` for more information.
