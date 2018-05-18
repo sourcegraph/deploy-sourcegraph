@@ -1,4 +1,4 @@
-# Provisioning a Kubernetes cluster for Sourcegraph Data Center
+# Provisioning a Kubernetes cluster
 
 <div class="alert alert-info">
 
@@ -10,31 +10,23 @@ mechanism. Take care to secure your cluster in a manner that meets your organiza
 
 </div>
 
-1.  Follow the instructions in the table below for provisioning a Kubernetes cluster on your infrastructure. Use the
-    listed node type for your cluster.
+Follow the instructions linked in the table below to provision a Kubernetes cluster for the
+infrastructure provider of your choice, using the recommended node and list types in the
+table.
 
-  <div class="resources">
-  <table class="table">
-    <tr>
-      <th colspan="3">Compute nodes</th>
-    </tr>
-    <tr><th>Provider</th><th>Node type</th><th>Boot/ephemeral disk size</th></tr>
-    <tr><td><a href="https://kubernetes.io/docs/getting-started-guides/aws/">AWS EC2</a></td><td>m4.4xlarge</td><td>N/A</td></tr>
-    <tr><td><a href="https://cloud.google.com/container-engine/docs/quickstart">Google Compute Engine</a></td><td>n1-standard-16</td><td>100 GB (default)</td></tr>
-    <tr><td><a href="https://azure.microsoft.com/en-us/services/container-service/kubernetes/">Azure VM</a></td><td>D16 v3</td><td>100 GB (SSD preferred)</td></tr>
-    <tr><td><a href="https://kubernetes.io/docs/setup/pick-right-solution/">Other</a></td><td>16 vCPU, 60 GiB memory per node</td><td>100 GB (SSD preferred)</td></tr>
-  </table>
-  </div>
+> Note: Sourcegraph Data Center can run on any Kubernetes cluster, so if your infrastructure
+> provider is not listed, see the "Other" row. Pull requests to add rows for more infrastructure
+> providers are welcome!
 
-2. Set
-    up
-    [Dynamic Provisioning](http://blog.kubernetes.io/2017/03/dynamic-provisioning-and-storage-classes-kubernetes.html)
-    for persistent volumes.
-* If you are using AWS or Google Cloud, you can skip this step as you will configure the Sourcegraph Helm chart later to
-  include a storage class.
-* If you are using Azure, we recommend creating a storage class that uses a Premium Managed Disk (SSD) with Premium_LRS.
-* If you are using another cloud provider, refer to
-  the [Kubernetes storage documentation](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#storageclasses)
-  for the appropriate configuration. For performance reasons, SSDs are recommended.
-* You can also manually provision the persistent volumes required by Sourcegraph Data Center. If that is the case,
-  inspect all files ending in ".PersistentVolumeClaim.yaml" and ensure a volume is created that satisfies each claim.
+<div class="resources">
+<table class="table">
+  <tr>
+    <th colspan="3">Compute nodes</th>
+  </tr>
+  <tr><th>Provider</th><th>Node type</th><th>Boot/ephemeral disk size</th></tr>
+  <tr><td><a href="https://kubernetes.io/docs/getting-started-guides/aws/">AWS EC2</a></td><td>m4.4xlarge</td><td>N/A</td></tr>
+  <tr><td><a href="https://cloud.google.com/container-engine/docs/quickstart">Google Compute Engine</a></td><td>n1-standard-16</td><td>100 GB (default)</td></tr>
+  <tr><td><a href="https://azure.microsoft.com/en-us/services/container-service/kubernetes/">Azure VM</a></td><td>D16 v3</td><td>100 GB (SSD preferred)</td></tr>
+  <tr><td><a href="https://kubernetes.io/docs/setup/pick-right-solution/">Other</a></td><td>16 vCPU, 60 GiB memory per node</td><td>100 GB (SSD preferred)</td></tr>
+</table>
+</div>

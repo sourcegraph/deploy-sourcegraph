@@ -19,4 +19,19 @@ Less frequently used commands:
 *   `kubectl delete pod $POD_NAME` — delete a failing pod so it gets recreated, possibly on a different node
 *   `kubectl drain --force --ignore-daemonsets --delete-local-data $NODE` — remove all pods from a node and mark it as unschedulable to prevent new pods from arriving
 
+### Common errors
+
+*   `kubectl get pv` shows no Persistent Volumes, and/or `kubectl get events` shows a `Failed to provision volume with
+    StorageClass "default"` error.
+
+    Check that a storage class named "default" exists via `kubectl get storageclass`. If one does exist, run `kubectl get storageclass default -o=yaml` and verify that the zone indicated in the output matches the zone of your cluster.
+
+*   `Error: release sourcegraph failed: namespaces "default" is forbidden: User "system:serviceaccount:kube-system:default" cannot get namespaces in the namespace "default": Unknown user "system:serviceaccount:kube-system:default"`. Ensure you have created the RBAC resources and helm is using them. A common reason for it to fail is you are already using Helm, so `helm init --service-account tiller` does not work correctly. To fix this for your existing Helm installation, run:
+
+    ```bash
+    kubectl apply -f https://about.sourcegraph.com/k8s/rbac-config.yml
+    kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
+    helm init --service-account tiller --upgrade
+    ```
+
 If you have any other issues with installation, email <mailto:support@sourcegraph.com>.
