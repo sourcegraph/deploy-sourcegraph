@@ -314,7 +314,7 @@ Lightstep is a closed-source distributed tracing and performance monitoring tool
 Dapper.
 
 To enable, you must first purchase Lightstep and create a project corresponding to the Sourcegraph instance. Then add
-the following to `config.json`:
+the following to `values.yaml`:
 
 ```
   "lightstepAccessToken": "${LIGHTSTEP_TOKEN}"
