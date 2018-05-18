@@ -13,7 +13,7 @@ and [contact us](https://about.sourcegraph.com/contact/sales) for more informati
 Sourcegraph Data Center is deployed using Kubernetes. Before proceeding with these
 instructions, [provision a Kubernetes](README.k8s.md) cluster on the infrastructure of your choice.
 
-1. Install Tiller (the server-side counterpart to Helm) on your cluster:
+1. Install Tiller with RBAC privileges (the server-side counterpart to Helm) on your cluster:
 
    ```bash
    # Give Helm privileges to create RBAC resources.
@@ -24,8 +24,9 @@ instructions, [provision a Kubernetes](README.k8s.md) cluster on the infrastruct
    helm init --service-account tiller
    ```
 
-   If installing Tiller is not an option, consult the instructions below for installing without Tiller. If your
-   Kubernetes environment does not permite RBAC, consult the instructions below for installing without RBAC.
+   * If installing Tiller is not an option, consult the instructions below for installing without Tiller.
+   * If your Kubernetes environment does not permite RBAC, consult the instructions below for
+     installing without RBAC.
 
 1. Create a `values.yaml` file with the following contents:
 
