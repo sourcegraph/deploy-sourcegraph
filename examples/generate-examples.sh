@@ -4,8 +4,17 @@
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-for example in $(ls | grep -v generate-examples.sh); do
+function generate() {
+    example="$1"
     rm -rf "${example}/generated"
     mkdir -p "${example}/generated"
     helm template -f "${example}/values.yaml" ../ --output-dir "${example}/generated"
-done
+}
+
+if [ -z "$EXAMPLE" ]; then
+    for example in $(ls | grep -v generate-examples.sh); do
+        generate "$example"
+    done
+else
+    generate "$EXAMPLE"
+fi
