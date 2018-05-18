@@ -289,7 +289,7 @@ standard. Currently, two tracing tools are supported by Sourcegraph configuratio
 Jaeger is an open-source distributed tracing system created by Uber that was inspired by Dapper and OpenZipkin. When
 enabled, Sourcegraph Data Center will run a Jaeger instance inside the Kubernetes cluster.
 
-To enable, add the following to `config.json`:
+To enable, add the following to `values.yaml`:
 
 ```yaml
 site: {
