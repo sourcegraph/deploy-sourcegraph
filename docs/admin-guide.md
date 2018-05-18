@@ -304,7 +304,10 @@ After applying the config change, some additional manual setup is required to in
 
 *   Clone https://github.com/jaegertracing/jaeger.
 *   Install [cqlsh](http://cassandra.apache.org/doc/latest/tools/cqlsh.html).
-*   Run `kubectl port-forward $(kubectl get pods -l app=jaeger-cassandra -o jsonpath='{.items[0].metadata.name}') 9042`
+*   Forward port 9042:
+    ```bash
+    kubectl port-forward $(kubectl get pods -l app=jaeger-cassandra -o jsonpath='{.items[0].metadata.name}') 9042
+    ```
 *   In the root directory of the jaeger repositiory, run `env MODE=test sh ./plugin/storage/cassandra/schema/create.sh | cqlsh`
 
 To access the Jaeger UI, run `kubectl port-forward $(kubectl get pods -l app=jaeger-query -o jsonpath='{.items[0].metadata.name}') 16686` and then navigate to http://localhost:16686.
