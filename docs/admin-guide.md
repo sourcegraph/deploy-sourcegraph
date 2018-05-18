@@ -54,7 +54,7 @@ commonly used to track key performance metrics over time, such as the following:
 *   HTTP error codes
 *   Time since last search index update
 
-<img src="./images/prometheus.png" width="500"/>
+<img src="./images/prometheus.png" />
 
 Sourcegraph Data Center includes an optional Prometheus instance. To turn on Prometheus, add the following snippet to
 the `deploymentOverrides` section of `config.json`.
