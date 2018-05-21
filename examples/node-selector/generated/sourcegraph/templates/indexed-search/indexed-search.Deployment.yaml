@@ -27,7 +27,7 @@ spec:
         - /data/index
         - -pprof
         - -rpc
-        image: docker.sourcegraph.com/zoekt:18-05-08_69c0db5
+        image: docker.sourcegraph.com/zoekt:18-05-21_71d89f8
         name: zoekt-webserver
         ports:
         - containerPort: 6070
@@ -61,7 +61,10 @@ spec:
         - 1m
         - -cpu_fraction
         - "1.0"
-        image: docker.sourcegraph.com/zoekt:18-05-08_69c0db5
+        env:
+        - name: ZOEKT_DELETE_REPOS_MIGRATION
+          value: t
+        image: docker.sourcegraph.com/zoekt:18-05-21_71d89f8
         name: zoekt-indexserver
         ports:
         - containerPort: 6072
