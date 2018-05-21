@@ -8,7 +8,7 @@ function generate() {
     example="$1"
     rm -rf "${example}/generated"
     mkdir -p "${example}/generated"
-    helm template -f "${example}/values.yaml" ../ --output-dir "${example}/generated"
+    helm template --namespace default -f "${example}/values.yaml" ../ --output-dir "${example}/generated"
 }
 
 if [ -z "$EXAMPLE" ]; then
