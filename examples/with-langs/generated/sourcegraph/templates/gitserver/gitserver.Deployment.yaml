@@ -58,8 +58,6 @@ spec:
           name: sg-config
         - mountPath: /data/repos
           name: repos
-        - mountPath: /root/.ssh
-          name: ssh
       securityContext:
         runAsUser: 0
       volumes:
@@ -70,8 +68,4 @@ spec:
       - name: repos
         persistentVolumeClaim:
           claimName: gitserver-1
-      - name: ssh
-        secret:
-          defaultMode: 384
-          secretName: gitserver-ssh
 
