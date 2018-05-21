@@ -54,8 +54,10 @@ spec:
           name: sg-config
         - mountPath: /data/repos
           name: repos
+{{- if $global.Values.site.gitserverSSH }}
         - mountPath: /root/.ssh
           name: ssh
+{{ end }}
 {{- include "jaeger" $global.Values.site.useJaeger | nindent 6 | trimSuffix "\n      " }}
 {{- include "nodeSelector" (list $global.Values "gitserver") | nindent 6 | trimSuffix "\n      " }}
 {{- include "securityContext" $global | nindent 6 | trimSuffix "\n      " }}
@@ -67,8 +69,10 @@ spec:
       - name: repos
         persistentVolumeClaim:
           claimName: gitserver-{{ add1 $gitserverIndex }}
+{{- if $global.Values.site.gitserverSSH }}
       - name: ssh
         secret:
           defaultMode: 384
           secretName: gitserver-ssh
+{{ end }}
 {{ end }}

@@ -58,8 +58,6 @@ spec:
           name: sg-config
         - mountPath: /data/repos
           name: repos
-        - mountPath: /root/.ssh
-          name: ssh
       nodeSelector:
         beta.kubernetes.io/instance-type: m4.4xlarge
       securityContext:
@@ -72,8 +70,4 @@ spec:
       - name: repos
         persistentVolumeClaim:
           claimName: gitserver-1
-      - name: ssh
-        secret:
-          defaultMode: 384
-          secretName: gitserver-ssh
 
