@@ -79,9 +79,11 @@ cluster:
           memory: 1G
   indexedSearch:
     containers:
+      # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
+      # lower lag between a new commit and it being indexed for search.
       zoekt-indexserver:
         limits:
-          cpu: "2"
+          cpu: "4"
           memory: 4G
         requests:
           cpu: "500m"
