@@ -53,6 +53,10 @@ spec:
         - 1m
         - -cpu_fraction
         - "1.0"
+        env:
+{{- /* Remove for July 2018 release. https://github.com/sourcegraph/sourcegraph/issues/10775 */}}
+        - name: ZOEKT_DELETE_REPOS_MIGRATION
+          value: t
         image: {{ .Values.const.indexedSearch.image }}
         name: zoekt-indexserver
         ports:
