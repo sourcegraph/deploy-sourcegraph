@@ -1,0 +1,64 @@
+
+{{- range $index, $langserver := .Values.site.langservers -}}
+
+{{- if not (has $langserver.language (list "go" "java" "php" "python" "javascript" "typescript")) }}
+
+{{- if eq $index 0 | not }}
+---
+{{ end -}}
+
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: xlang-{{ $langserver.language }}
+  name: xlang-{{ $langserver.language }}
+spec:
+  ports:
+  - name: lsp
+    port: 8080
+    targetPort: lsp
+  selector:
+    app: xlang-{{ $langserver.language }}
+  type: ClusterIP
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: LSP server for {{ $langserver.language }} (used for live requests).
+  name: xlang-{{ $langserver.language }}
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: xlang-{{ $langserver.language }}
+    spec:
+      containers:
+      - image: sourcegraph/codeintel-{{ default $langserver.language (index (dict "cs" "csharp" "dockerfile" "docker") $langserver.language) }}
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: lsp
+          timeoutSeconds: 5
+        name: xlang-{{ $langserver.language }}
+        ports:
+        - containerPort: 8080
+          name: lsp
+        readinessProbe:
+          tcpSocket:
+            port: lsp
+
+{{- end }}
+
+{{- end -}}

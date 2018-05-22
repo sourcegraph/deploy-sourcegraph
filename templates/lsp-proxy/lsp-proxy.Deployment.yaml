@@ -37,6 +37,12 @@ spec:
         - -addr=:4388
         env:
 {{ include "envVars" $envVars | trimSuffix "\n" | indent 8 }}
+{{- range $langserver := .Values.site.langservers }}
+{{- if not (has $langserver.language (list "go" "java" "php" "python" "javascript" "typescript")) }}
+        - name: LANGSERVER_{{ $langserver.language | upper }}
+          value: tcp://xlang-{{ default $langserver.language }}:8080
+{{- end }}
+{{- end }}
         - name: REDIS_MASTER_ENDPOINT
           value: redis-cache:6379
         - name: SRC_PROF_HTTP
