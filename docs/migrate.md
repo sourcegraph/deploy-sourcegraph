@@ -54,16 +54,16 @@ use the new pure Helm chart. Follow these steps:
    - The ordering of environment variables may change (the `env` field in container configuration).
    - Resource limits may now use explicit strings:
      ```diff
-          resources:
-            limits:
-              cpu: "4"
--             memory: 8Gi
-+             memory: "8Gi"
-            requests:
--             cpu: 500m
--             memory: 2Gi
-+             cpu: "500m"
-+             memory: "2Gi"
+               resources:
+                 limits:
+                   cpu: "4"
+     -             memory: 8Gi
+     +             memory: "8Gi"
+                 requests:
+     -             cpu: 500m
+     -             memory: 2Gi
+     +             cpu: "500m"
+     +             memory: "2Gi"
      ```
 
    If you notice unexpected changes, email us with the unexpected diff.
