@@ -26,7 +26,7 @@ use the new pure Helm chart. Follow these steps:
    ```bash
    ./helm.sh diff upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/v2.8.0.tar.gz | less -R
    ```
-   Scan the diff for unexpected changes. The following changes are *expected*:
+   Scan the diff for unexpected changes. If you notice unexpected changes, email us with the unexpected diff. The following changes are *expected*:
    - If you do **NOT** have the `gitserverSSH` config field set, some deployments drop the
      unnecessary `gitserver-ssh` secret:
 
@@ -86,8 +86,6 @@ use the new pure Helm chart. Follow these steps:
      - `PHABRICATOR_URL`
      - `MAX_REPOS_TO_SEARCH`
      - `SEARCH_SCOPES`, `searchScopes`
-
-   If you notice unexpected changes, email us with the unexpected diff.
 
 1. Update your cluster from the pure Helm chart:
    ```bash
