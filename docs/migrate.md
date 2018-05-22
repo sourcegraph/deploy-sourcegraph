@@ -27,13 +27,45 @@ use the new pure Helm chart. Follow these steps:
    ./helm.sh diff upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/v2.8.0.tar.gz | less -R
    ```
    Scan the diff for unexpected changes. The following changes are *expected*:
-   - If you do **NOT** have the `gitserverSSH` config field set, some deployments will have the following diff:
+   - If you do **NOT** have the `gitserverSSH` config field set, some deployments drop the
+     unnecessary `gitserver-ssh` secret:
+
      ```diff
      -       - name: ssh
      -         secret:
      -           defaultMode: 384
      -           secretName: gitserver-ssh
      ```
+
+   - `indexed-search` deployment:
+     ```diff
+     +         env:
+     +         - name: ZOEKT_DELETE_REPOS_MIGRATION
+     +           value: t
+     ```
+   - `CONFIG_FILE_HASH` will change:
+     ```diff
+               env:
+     -         - name: CONFIG_FILE_HASH
+     -           value: 73e94ff25f265a57b3dc8e51260fa5a51bb2942efe1e988858324432e7635c71
+     +         - name: CONFIG_FILE_HASH
+     +           value: 5d8a54fc10b4b144e580c2a9dfa23fa71b7da7dcfb5250572c9491e1a58ef50c
+     ```
+   - The ordering of environment variables may change (the `env` field in container configuration).
+   - Resource limits may now use explicit strings:
+     ```diff
+          resources:
+            limits:
+              cpu: "4"
+-             memory: 8Gi
++             memory: "8Gi"
+            requests:
+-             cpu: 500m
+-             memory: 2Gi
++             cpu: "500m"
++             memory: "2Gi"
+     ```
+
    If you notice unexpected changes, email us with the unexpected diff.
 
 1. Update your cluster from the pure Helm chart:
