@@ -137,7 +137,7 @@ is defined by the `values.yaml` file in *this* directory.
 
 The structure of `values.yaml` is split into two top-level fields:
 - `site` defines application-level settings like code host integrations and authentication settings. The full set of
-  options for `site` is described here: https://about.sourcegraph.com/docs/config/settings.
+  options for `site` is described here: https://about.sourcegraph.com/docs/config/site.
 - `cluster` defines settings specific to the configuration of the Kubernetes cluster, like replica counts and CPU/memory
   allocation. Refer to the `values.yaml` in this repository to see which `cluster` fields can be overridden.
 

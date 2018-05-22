@@ -4,8 +4,8 @@ Sourcegraph Data Center can be configured to scale to very large codebases and l
 users. If you notice latency for search or code intelligence is higher than desired, changing these
 parameters can yield a drastic improvement in performance.
 
-> For assistance scaling and tuning Sourcegraph, contact us
-> at <mailto:support@sourcegraph.com>. We're happy to help!
+> For assistance scaling and tuning
+> Sourcegraph, [contact us](https://about.sourcegraph.com/contact/). We're happy to help!
 
 
 ## Tuning replica counts for horizontal scalability
@@ -36,8 +36,8 @@ table. See the following sections for how to modify your `values.yaml` file to a
 | 200-1k       | 5-10                                 |
 | 1k-5k        | 10-15                                |
 | 5k-25k       | 20-40                                |
-| 25k+         | 40+ (contact us for scaling advice)  |
-| Monorepo     | 1-25 (contact us for scaling advice) |
+| 25k+         | 40+ ([contact us](https://about.sourcegraph.com/contact/) for scaling advice)  |
+| Monorepo     | 1-25 ([contact us](https://about.sourcegraph.com/contact/) for scaling advice) |
 
 <br>
 
@@ -48,8 +48,8 @@ table. See the following sections for how to modify your `values.yaml` file to a
 | 500-1000     | 3                                   |
 | 1k-5k        | 4-8                                 |
 | 5k-25k       | 8-20                                |
-| 25k+         | 20+ (contact us for scaling advice) |
-| Monorepo     | 1 (contact us for scaling advice)   |
+| 25k+         | 20+ ([contact us](https://about.sourcegraph.com/contact/) for scaling advice) |
+| Monorepo     | 1 ([contact us](https://about.sourcegraph.com/contact/) for scaling advice)   |
 
 </div>
 
@@ -100,9 +100,11 @@ Notes:
     sourcegraph N` (where `N` is the previous version number as reported by `helm history sourcegraph`).
     Then run `kubectl delete deployment indexed-search && kubectl delete pvc
     indexed-search` and `helm upgrade sourcegraph ./helm-chart` again.
-*   If your change requires `gitserver` pods to be restarted and they are scheduled on another node when they restart,
-    they may go offline for 60-90 seconds (and temporarily show a `Multi-Attach` error). This delay is caused by Kubernetes
-    detaching and reattaching the volume. Mitigation steps depend on your cloud provider; contact us for advice.
+*   If your change requires `gitserver` pods to be restarted and they are scheduled on another node
+    when they restart, they may go offline for 60-90 seconds (and temporarily show a `Multi-Attach`
+    error). This delay is caused by Kubernetes detaching and reattaching the volume. Mitigation
+    steps depend on your cloud provider; [contact us](https://about.sourcegraph.com/contact/) for
+    advice.
 
 ---
 

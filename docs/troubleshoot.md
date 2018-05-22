@@ -34,4 +34,6 @@ Less frequently used commands:
     helm init --service-account tiller --upgrade
     ```
 
-If you have any other issues with installation, email <mailto:support@sourcegraph.com>.
+Any other issues? Contact us at [@srcgraph](https://twitter.com/srcgraph)
+or <mailto:support@sourcegraph.com>, or file issues on
+our [public issue tracker](https://github.com/sourcegraph/issues/issues).
