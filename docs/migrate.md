@@ -4,36 +4,40 @@ Prior to the existence of this repository, Data Center Kubernetes configuration 
 `sourcegraph-server-gen` binary from a `config.json` file. Existing clusters should be migrated to
 use the new Helm chart. Follow these steps:
 
-- First, upgrade to version 2.8.0 using the legacy process:
-  ```bash
-  sourcegraph-server-gen update 2.8.0`
-  sourcegraph-server-gen config.json ./helm-chart
-  helm upgrade sourcegraph ./helm-chart
-  ```
-- Migrate `config.json` to the new `values.yaml` config file:
-  ```bash
-  sourcegraph-server-gen migrate config.json .
-  ```
-  Observe that this creates two new files: `values.yaml` and `helm.sh`.
-- Show the diff associated with applying the new Data Center Helm chart:
-  ```bash
-  ./helm.sh diff upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/latest.tar.gz | less -R
-  ```
-  Scan the diff for unexpected changes. The following changes are *expected*:
-  - If you do **NOT** have the `gitserverSSH` config field set, some deployments will have the following diff:
-    ```diff
-    -       - name: ssh
-    -         secret:
-    -           defaultMode: 384
-    -           secretName: gitserver-ssh
-    ```
-  If you notice unexpected changes, email us with the unexpected diff.
-- Update your cluster from the new pure Helm chart:
-  ```bash
-  ./helm.sh upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/latest.tar.gz
-  ```
-- Use `kubectl get pods` to check the health of the cluster. If something goes wrong, you can revert
-  the change by running through the old update process with `sourcegraph-server-gen`.
+1. Upgrade to version 2.8.0 using the legacy process:
+   ```bash
+   sourcegraph-server-gen update 2.8.0`
+   sourcegraph-server-gen config.json ./helm-chart
+   helm upgrade sourcegraph ./helm-chart
+   ```
+
+1. Migrate `config.json` to the new `values.yaml` config file:
+   ```bash
+   sourcegraph-server-gen migrate config.json .
+   ```
+   Observe that this creates two new files: `values.yaml` and `helm.sh`.
+
+1. Show the diff associated with applying the new Data Center Helm chart:
+   ```bash
+   ./helm.sh diff upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/latest.tar.gz | less -R
+   ```
+   Scan the diff for unexpected changes. The following changes are *expected*:
+   - If you do **NOT** have the `gitserverSSH` config field set, some deployments will have the following diff:
+     ```diff
+     -       - name: ssh
+     -         secret:
+     -           defaultMode: 384
+     -           secretName: gitserver-ssh
+     ```
+   If you notice unexpected changes, email us with the unexpected diff.
+
+1. Update your cluster from the new pure Helm chart:
+   ```bash
+   ./helm.sh upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/latest.tar.gz
+   ```
+
+1. Use `kubectl get pods` to check the health of the cluster. If something goes wrong, you can revert
+   the change by running through the old update process with `sourcegraph-server-gen`.
 
 Note: the `file!` and `exec!` syntax from `config.json` has been retired. File contents can still be
 embedded using the `helm --set` flag (automatically included in `helm.sh`).
