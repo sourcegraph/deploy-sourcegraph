@@ -37,7 +37,7 @@ use the new pure Helm chart. Follow these steps:
      -           secretName: gitserver-ssh
      ```
 
-   - If you do **NOT** have the `tlsKey` or `tlsCert` config fields set, the unnecessary `tls` Secret will be removed.
+   - If you do **NOT** have the `tlsKey` or `tlsCert` config fields set, the unnecessary `tls` Secret is removed.
 
    - `indexed-search` deployment adds `ZOEKT_DELETE_REPOS_MIGRATION`:
      ```diff
@@ -53,7 +53,7 @@ use the new pure Helm chart. Follow these steps:
      +         - name: CONFIG_FILE_HASH
      +           value: 5d8a54fc10b4b144e580c2a9dfa23fa71b7da7dcfb5250572c9491e1a58ef50c
      ```
-   - Resource limits may now use explicit strings:
+   - Resource limits now use explicit strings:
      ```diff
                resources:
                  limits:
@@ -77,9 +77,15 @@ use the new pure Helm chart. Follow these steps:
      -         - name: PRIVATE_ARTIFACT_REPO_USERNAME
      -         - name: PRIVATE_ARTIFACT_REPO_PASSWORD
      ```
-   - The `config-file` ConfigMap drops the `deploymentOverrides` section and adds and removes some fields.
-   - The ordering of environment variables changes (the `env` field in container configuration).
+   - The `config-file` ConfigMap drops the `deploymentOverrides` section and adds/removes some fields.
+   - The ordering of environment variables changes.
    - The `xlang-*-bg` deployments will now have the same NodeSelectors as the `xlang-*` (non-bg) deployments.
+   - The `nodeSelector` field is shifted in location.
+   - Some environment variables have been removed:
+     - `PHABRICATOR_CONFIG`
+     - `PHABRICATOR_URL`
+     - `MAX_REPOS_TO_SEARCH`
+     - `SEARCH_SCOPES`, `searchScopes`
 
    If you notice unexpected changes, email us with the unexpected diff.
 
