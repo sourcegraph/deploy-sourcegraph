@@ -37,13 +37,15 @@ use the new pure Helm chart. Follow these steps:
      -           secretName: gitserver-ssh
      ```
 
-   - `indexed-search` deployment:
+   - If you do **NOT** have the `tlsKey` or `tlsCert` config fields set, the unnecessary `tls` Secret will be removed.
+
+   - `indexed-search` deployment adds `ZOEKT_DELETE_REPOS_MIGRATION`:
      ```diff
      +         env:
      +         - name: ZOEKT_DELETE_REPOS_MIGRATION
      +           value: t
      ```
-   - `CONFIG_FILE_HASH` will change:
+   - `CONFIG_FILE_HASH` changes:
      ```diff
                env:
      -         - name: CONFIG_FILE_HASH
@@ -51,7 +53,6 @@ use the new pure Helm chart. Follow these steps:
      +         - name: CONFIG_FILE_HASH
      +           value: 5d8a54fc10b4b144e580c2a9dfa23fa71b7da7dcfb5250572c9491e1a58ef50c
      ```
-   - The ordering of environment variables may change (the `env` field in container configuration).
    - Resource limits may now use explicit strings:
      ```diff
                resources:
@@ -65,6 +66,20 @@ use the new pure Helm chart. Follow these steps:
      +             cpu: "500m"
      +             memory: "2Gi"
      ```
+   - If Java is enabled, `xlang-java` and `xlang-java-bg` drop empty environment variables:
+     ```diff
+     +           value: -Xms8000m -Xmx8000m -XX:+PrintFlagsFinal -Dsun.zip.disableMemoryMapping=true -agentlib:jdwp=transport=dt_socket,address=127.0.0.1:8001,suspend=n,server=y
+               - name: LS_OPT
+                 value: -l INFO
+     -         - name: EXECUTE_GRADLE_ORIGINAL_ROOT_PATHS
+     -         - name: PRIVATE_ARTIFACT_REPO_ID
+     -         - name: PRIVATE_ARTIFACT_REPO_URL
+     -         - name: PRIVATE_ARTIFACT_REPO_USERNAME
+     -         - name: PRIVATE_ARTIFACT_REPO_PASSWORD
+     ```
+   - The `config-file` ConfigMap drops the `deploymentOverrides` section and adds and removes some fields.
+   - The ordering of environment variables changes (the `env` field in container configuration).
+   - The `xlang-*-bg` deployments will now have the same NodeSelectors as the `xlang-*` (non-bg) deployments.
 
    If you notice unexpected changes, email us with the unexpected diff.
 
