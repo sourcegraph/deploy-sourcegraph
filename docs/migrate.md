@@ -36,9 +36,9 @@ use the new pure Helm chart. Follow these steps:
      ```
    If you notice unexpected changes, email us with the unexpected diff.
 
-1. Update your cluster from the new pure Helm chart:
+1. Update your cluster from the pure Helm chart:
    ```bash
-   ./helm.sh upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/latest.tar.gz
+   ./helm.sh upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/v2.8.0.tar.gz
    ```
 
 1. Use `kubectl get pods` to check the health of the cluster. If something goes wrong, you can revert
