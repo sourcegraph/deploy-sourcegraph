@@ -24,6 +24,7 @@ use the new pure Helm chart. Follow these steps:
 
 1. View the diff associated with updating from the pure Helm chart:
    ```bash
+   helm plugin install https://github.com/databus23/helm-diff
    ./helm.sh diff upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/v2.8.0.tar.gz | less -R
    ```
    Scan the diff for unexpected changes. If you notice unexpected changes, email us with the unexpected diff. The following changes are *expected*:
@@ -78,14 +79,13 @@ use the new pure Helm chart. Follow these steps:
      -         - name: PRIVATE_ARTIFACT_REPO_PASSWORD
      ```
    - The `config-file` ConfigMap drops the `deploymentOverrides` section and adds/removes some fields.
-   - The ordering of environment variables changes.
-   - The `xlang-*-bg` deployments will now have the same NodeSelectors as the `xlang-*` (non-bg) deployments.
-   - The `nodeSelector` field is shifted in location.
-   - Some environment variables have been removed:
+   - The ordering of environment variables changes. Some environment variables have been removed:
      - `PHABRICATOR_CONFIG`
      - `PHABRICATOR_URL`
      - `MAX_REPOS_TO_SEARCH`
      - `SEARCH_SCOPES`, `searchScopes`
+   - The `xlang-*-bg` deployments now have the same NodeSelectors as the corresponding `xlang-*` (non-bg) deployments.
+   - The `nodeSelector` field has shifted in location.
 
 1. Update your cluster from the pure Helm chart:
    ```bash
