@@ -26,7 +26,7 @@ table.
   <tr><th>Provider</th><th>Node type</th><th>Boot/ephemeral disk size</th></tr>
   <tr><td><a href="https://kubernetes.io/docs/getting-started-guides/aws/">AWS EC2</a></td><td>m4.4xlarge</td><td>N/A</td></tr>
   <tr><td><a href="https://cloud.google.com/container-engine/docs/quickstart">Google Compute Engine</a></td><td>n1-standard-16</td><td>100 GB (default)</td></tr>
-  <tr><td><a href="https://azure.microsoft.com/en-us/services/container-service/kubernetes/">Azure VM</a></td><td>D16 v3</td><td>100 GB (SSD preferred)</td></tr>
+  <tr><td><a href="/k8s.azure.md">Azure</a> </td><td>D16 v3</td><td>100 GB (SSD preferred)</td></tr>
   <tr><td><a href="https://kubernetes.io/docs/setup/pick-right-solution/">Other</a></td><td>16 vCPU, 60 GiB memory per node</td><td>100 GB (SSD preferred)</td></tr>
 </table>
 </div>

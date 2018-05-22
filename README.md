@@ -11,7 +11,7 @@ For product and [pricing](https://about.sourcegraph.com/pricing/) information,
 visit [about.sourcegraph.com](https://about.sourcegraph.com)
 or [contact us](https://about.sourcegraph.com/contact/sales) for more information. If you're just
 starting out, we recommend installing [Sourcegraph](https://about.sourcegraph.com/docs) on a single
-node first. Migrating to Data Center is easy when you're ready to upgrade.
+node first. Migrating to Data Center is easy when you're ready.
 
 * [Installation](docs/install.md)
 * [Updating](docs/update.md)

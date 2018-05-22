@@ -1,8 +1,7 @@
 # Updating
 
-Sourcegraph updates are released monthly (with patch releases in between, released as needed). Releases are announced
-on [the Sourcegraph blog](https://about.sourcegraph.com/blog). Site admins can also check for updates in their Sourcegraph instance's site admin
-area.
+A new version of Sourcegraph is released every month (with patch releases in between, released as
+needed). Check the [Sourcegraph blog](https://about.sourcegraph.com/blog) or the site admin updates page to learn about updates.
 
 See the [changelog](https://about.sourcegraph.com/changelog) for a list of changes in each version.
 
