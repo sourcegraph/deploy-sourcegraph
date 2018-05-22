@@ -19,12 +19,12 @@ use the new pure Helm chart. Follow these steps:
    ```
 
    Observe that this creates two new files: `values.yaml` and `helm.sh`. The latter is just a
-   wrapper around `helm` that includes values that used to be embedded with the `file!` and `exec!`
+   wrapper around `helm` that includes values that were embedded with the `file!` and `exec!`
    syntax.
 
-1. Show the diff associated with applying the new Data Center Helm chart:
+1. View the diff associated with updating from the pure Helm chart:
    ```bash
-   ./helm.sh diff upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/latest.tar.gz | less -R
+   ./helm.sh diff upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/v2.8.0.tar.gz | less -R
    ```
    Scan the diff for unexpected changes. The following changes are *expected*:
    - If you do **NOT** have the `gitserverSSH` config field set, some deployments will have the following diff:
