@@ -70,7 +70,9 @@ cluster:
           cpu: "500m"
           memory: "500M"
   gitserver:
+    # Number of shards for caching git data. If you change this, you should also change indexedSearch.diskSize.
     shards: 1
+    # Size of disk of each gitserver shard. If you change this, you should also change indexedSearch.diskSize.
     diskSize: 200Gi
     containers:
       gitserver:
@@ -81,6 +83,8 @@ cluster:
           cpu: "500m"
           memory: 1G
   indexedSearch:
+    # The size of disk to used for search indexes (this should typically be gitserver.diskSize multipled by gitserver.shards)
+    diskSize: 200Gi
     containers:
       # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
       # lower lag between a new commit and it being indexed for search.
@@ -201,9 +205,6 @@ site: {
   # The authentication provider(s) to use for identifying and signing in users. Defaults to built-in authentication.
   #
   # "auth.providers": [{"type": "builtin"}],
-
-  # The size of disk to used for search indexes (this should typically be the gitserverDiskSize multipled by the number of gitserver shards)
-  "indexedSearchDiskSize": "200Gi",
 
   # Uncomment the languages for which you wish to enable code intelligence
   "langservers": [
