@@ -3,10 +3,9 @@
 ## Cutting a release
 
 * Make your desired changes to this repository. You're likely looking for the docker images in [values.yaml](./values.yaml).
-* `cd` into `sourcegraph/deploy-sourcegraph`
 * Run `./examples/generate-examples.sh`
 * Open a PR and wait for buildkite to pass and for your changes to be approved, then merge and check out master
-* Run `./release.sh $VERSION`. If this is for an iteration release, `$VERSION` should have the
+* Run `./release.sh $VERSION`. If this a release candidate, `$VERSION` should have the
   suffix `-rcN` where `N` starts at 0 and increments as you test/cut new versions. Once you're ready,
   run the command again without the suffix.
 
