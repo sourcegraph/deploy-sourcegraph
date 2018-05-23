@@ -55,7 +55,7 @@ spec:
           name: sg-config
         - mountPath: /data/repos
           name: repos
-{{- if $global.Values.site.gitserverSSH }}
+{{- if $global.Values.cluster.gitserver.ssh }}
         - mountPath: /root/.ssh
           name: ssh
 {{ end }}
@@ -70,7 +70,7 @@ spec:
       - name: repos
         persistentVolumeClaim:
           claimName: gitserver-{{ add1 $gitserverIndex }}
-{{- if $global.Values.site.gitserverSSH }}
+{{- if $global.Values.cluster.gitserver.ssh }}
       - name: ssh
         secret:
           defaultMode: 384

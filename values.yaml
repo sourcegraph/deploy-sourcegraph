@@ -77,6 +77,12 @@ cluster:
     shards: 1
     # Size of disk of each gitserver shard. If you change this, you should also change indexedSearch.diskSize.
     diskSize: 200Gi
+    # # ssh is a map that describes the structure of gitserver's .ssh directory. If you have configured Sourcegraph
+    # # to index a private git repository and clone via SSH, you'll need to add the appropriate files to this
+    # # field.
+    # ssh:
+    #   known_hosts: "Set this to the desired value for the SSH known_hosts file."
+    #   id_rsa: "Set this to the value of a private key authorized to clone repositories from the code host."
     containers:
       gitserver:
         limits:

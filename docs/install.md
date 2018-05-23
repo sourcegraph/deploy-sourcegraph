@@ -193,6 +193,6 @@ while deploying:
 ```bash
 helm install --name sourcegraph -f values.yaml \
     --set "site.awsCodeCommit[0].secretAccessKey"="$(cat secretAccessKeyFile)" \
-    --set "site.gitserverSSH.known_hosts"="$(cat known_hosts)" \
+    --set "cluster.gitserver.ssh.known_hosts"="$(cat known_hosts)" \
     https://github.com/sourcegraph/datacenter/archive/latest.tar.gz
 ```
