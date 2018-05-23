@@ -66,8 +66,8 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: disk
-{{- include "securityContext" . | nindent 6 }}
 {{- include "nodeSelector" (list .Values "indexedSearch") | nindent 6 | trimSuffix "\n      " }}
+{{- include "securityContext" . | nindent 6 }}
       volumes:
       - name: disk
         persistentVolumeClaim:
