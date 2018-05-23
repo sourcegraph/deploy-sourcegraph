@@ -39,6 +39,9 @@ const:
 # cluster specifies the Docker images to use for each service along with replica counts and resource specs where they
 # are tunable.
 cluster:
+  # RBAC is enabled by default. Some Kubernetes environments do not permit RBAC. Set to "disabled" to disable and
+  # prevent RBAC objects from being generated.
+  rbac: enabled
   frontend:
     replicas: 1
     containers:
@@ -270,7 +273,4 @@ site: {
     #   "language": "rust",
     # },
   ],
-
-  # RBAC is enabled by default. Some Kubernetes environments do not permit RBAC. Set to "disabled" to disable and prevent RBAC objects from being generated.
-  "rbac": "enabled",
 }
