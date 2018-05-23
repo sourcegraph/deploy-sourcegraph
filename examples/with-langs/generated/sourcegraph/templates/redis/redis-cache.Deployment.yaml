@@ -29,6 +29,14 @@ spec:
         ports:
         - containerPort: 6379
           name: redis
+        livenessProbe:
+          tcpSocket:
+            port: redis
+          initialDelaySeconds: 30
+        readinessProbe:
+          tcpSocket:
+            port: redis
+          initialDelaySeconds: 5
         resources:
           limits:
             cpu: "1"
