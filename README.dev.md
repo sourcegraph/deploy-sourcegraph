@@ -6,8 +6,7 @@
 * Run `./examples/generate-examples.sh`
 * Open a PR and wait for buildkite to pass and for your changes to be approved, then merge and check out master
 * Run `./release.sh $VERSION`. If this a release candidate, `$VERSION` should have the
-  suffix `-rcN` where `N` starts at 0 and increments as you test/cut new versions. Once you're ready,
-  run the command again without the suffix.
+  suffix `-rcN` where `N` starts at 0 and increments as you test/cut new versions.
 
 See `./release.sh --help` for information on what the script does.
 
