@@ -105,10 +105,6 @@
 
 {{- $_ := set .envVars "LSP_PROXY" "lsp-proxy:4388" -}}
 
-{{- if .Values.site.phabricator -}}
-    {{- $_ := set .envVars "PHABRICATOR_URL" "https://phabricator.sgdev.org" -}}
-{{- end -}}
-
 {{- $_ := set .envVars "PUBLIC_REPO_REDIRECTS" "\"true\"" -}}
 {{- $_ := set .envVars "QUERY_RUNNER_URL" "http://query-runner" -}}
 {{- $_ := set .envVars "REDIS_MASTER_ENDPOINT" "redis-cache:6379" -}}
