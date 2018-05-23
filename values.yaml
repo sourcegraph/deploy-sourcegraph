@@ -71,6 +71,7 @@ cluster:
           memory: "500M"
   gitserver:
     shards: 1
+    diskSize: 200Gi
     containers:
       gitserver:
         limits:
@@ -200,9 +201,6 @@ site: {
   # The authentication provider(s) to use for identifying and signing in users. Defaults to built-in authentication.
   #
   # "auth.providers": [{"type": "builtin"}],
-
-  # The size of disk to use for each gitserver instance
-  "gitserverDiskSize": "200Gi",
 
   # The size of disk to used for search indexes (this should typically be the gitserverDiskSize multipled by the number of gitserver shards)
   "indexedSearchDiskSize": "200Gi",
