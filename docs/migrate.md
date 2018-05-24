@@ -4,6 +4,12 @@ Prior to the existence of this repository, Data Center Kubernetes configuration 
 `sourcegraph-server-gen` binary from a `config.json` file. Existing clusters should be migrated to
 use the new pure Helm chart. Follow these steps:
 
+## Pre-requisites
+
+Ensure you have Helm 2.9.1 or later installed.
+
+## Migration
+
 1. Upgrade to Sourcegraph Data Center 2.8.1 using the legacy process:
    ```bash
    sourcegraph-server-gen update 2.8.1
