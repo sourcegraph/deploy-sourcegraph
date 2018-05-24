@@ -73,6 +73,13 @@ spec:
         - name: ZOEKT_HOST
           value: indexed-search:80
         image: docker.sourcegraph.com/frontend:15968_2018-05-22_b3d9479
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
         name: frontend
         ports:
         - containerPort: 3080
