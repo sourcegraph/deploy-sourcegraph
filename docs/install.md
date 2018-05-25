@@ -165,7 +165,8 @@ If installing Tiller is not an option, you can locally generate the Kubernetes c
 
 ```
 mkdir -p generated
-wget https://github.com/sourcegraph/datacenter/archive/latest.tar.gz && helm template -f values.yaml latest.tar.gz --output-dir=generated
+wget https://github.com/sourcegraph/datacenter/archive/latest.tar.gz
+helm template -f values.yaml latest.tar.gz --output-dir=generated
 kubectl apply -R -f generated/sourcegraph/templates
 ```
 
