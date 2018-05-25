@@ -11,14 +11,14 @@ spec:
   ports:
 {{- if .Values.site.httpNodePort }}
   - name: http
-    nodePort: 30080
-    port: 30080
+    nodePort: {{ .Values.site.httpNodePort }}
+    port: {{ .Values.site.httpNodePort }}
     targetPort: http
 {{- end -}}
 {{- if .Values.site.httpsNodePort }}
   - name: https
-    nodePort: 30081
-    port: 30081
+    nodePort: {{ .Values.site.httpsNodePort }}
+    port: {{ .Values.site.httpsNodePort }}
     targetPort: https
 {{- end -}}
 {{- if not (or .Values.site.httpNodePort .Values.site.httpsNodePort) }}
