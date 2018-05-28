@@ -61,6 +61,7 @@ When you're using Sourcegraph with many repositories (100s-10,000s), the most im
 
 *   `sourcegraph-frontend` CPU/memory resource allocations
 *   `searcher` replica count
+*   `indexedSearch` CPU/memory resource allocations
 *   `gitserver` replica count
 *   `gitMaxConcurrentClones`, because `git clone` and `git fetch` operations are IO- and CPU-intensive
 *   `repoListUpdateInterval` (in minutes), because each interval triggers `git fetch` operations for all repositories
@@ -86,6 +87,23 @@ cluster:
           memory: 8G
   searcher:
     replicas: 8
+  indexedSearch:
+    replicas: 1
+    containers:
+      zoekt-indexserver:
+        limits:
+          cpu: "4"
+          memory: 5G
+        requests:
+          cpu: "4"
+          memory: 5G
+      zoekt-webserver:
+        limits:
+          cpu: "2"
+          memory: 10G
+        requests:
+          cpu: "2"
+          memory: 10G
   gitserver:
     shards: 3
 ```
@@ -115,9 +133,8 @@ are:
 
 *   `sourcegraph-frontend` CPU/memory resource allocations
 *   `searcher` CPU/memory resource allocations (allocate enough memory to hold all non-binary files in your repositories)
+*   `indexedSearch` CPU/memory resource allocations (for the `zoekt-indexserver` pod, allocate enough memory to hold all non-binary files in your largest repository; for the `zoekt-webserver` pod, allocate enough memory to hold ~2.7x the size of all non-binary files in your repositories)
 *   `gitserver` CPU/memory resource allocations (allocate enough memory to hold your Git packed bare repositories)
-
-<!-- * `indexed-search` CPU/memory resource allocations? TODO(sqs) -->
 
 **Note:** the `gitserver` resource allocations are specified differently (one per replica) from the those for other
 services; this will be standardized in a future release (in a backward-compatible manner).
@@ -142,10 +159,27 @@ cluster:
       searcher:
         limits:
           cpu: "4"
-          memory: 24G
+          memory: 10G
         requests:
           cpu: "4"
-          memory: 24G
+          memory: 10G
+  indexedSearch:
+    replicas: 1
+    containers:
+      zoekt-indexserver:
+        limits:
+          cpu: "4"
+          memory: 8G
+        requests:
+          cpu: "4"
+          memory: 8G
+      zoekt-webserver:
+        limits:
+          cpu: "2"
+          memory: 27G
+        requests:
+          cpu: "2"
+          memory: 27G
   gitserver:
     shards: 1
     containers:
