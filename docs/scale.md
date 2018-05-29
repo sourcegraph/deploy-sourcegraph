@@ -63,6 +63,7 @@ When you're using Sourcegraph with many repositories (100s-10,000s), the most im
 *   `searcher` replica count
 *   `indexedSearch` CPU/memory resource allocations
 *   `gitserver` replica count
+*   `symbols` replica count and CPU/memory resource allocations
 *   `gitMaxConcurrentClones`, because `git clone` and `git fetch` operations are IO- and CPU-intensive
 *   `repoListUpdateInterval` (in minutes), because each interval triggers `git fetch` operations for all repositories
 
@@ -104,6 +105,16 @@ cluster:
         requests:
           cpu: "2"
           memory: 10G
+  symbols:
+    replicas: 2
+    containers:
+      symbols:
+        limits:
+          cpu: "4"
+          memory: 4G
+        requests:
+          cpu: "4"
+          memory: 4G
   gitserver:
     shards: 3
 ```
@@ -134,6 +145,7 @@ are:
 *   `sourcegraph-frontend` CPU/memory resource allocations
 *   `searcher` CPU/memory resource allocations (allocate enough memory to hold all non-binary files in your repositories)
 *   `indexedSearch` CPU/memory resource allocations (for the `zoekt-indexserver` pod, allocate enough memory to hold all non-binary files in your largest repository; for the `zoekt-webserver` pod, allocate enough memory to hold ~2.7x the size of all non-binary files in your repositories)
+*   `symbols` CPU/memory resource allocations
 *   `gitserver` CPU/memory resource allocations (allocate enough memory to hold your Git packed bare repositories)
 
 **Note:** the `gitserver` resource allocations are specified differently (one per replica) from the those for other
@@ -180,6 +192,16 @@ cluster:
         requests:
           cpu: "2"
           memory: 27G
+  symbols:
+    replicas: 1
+    containers:
+      symbols:
+        limits:
+          cpu: "8"
+          memory: 8G
+        requests:
+          cpu: "8"
+          memory: 8G
   gitserver:
     shards: 1
     containers:
