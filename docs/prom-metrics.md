@@ -254,7 +254,7 @@ span.gray {
     query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
     xlang-go</span><br>Number of bytes obtained by system. Sum of all system allocations.
 *   `golangserver_build_open_connections`<span class="gray"> : gauge : xlang-go</span><br>Number of open connections to
-    the langserver.
+    the Go language server.
 *   `golangserver_build_path_has_git_suffix`<span class="gray"> : counter : sourcegraph-frontend,
     xlang-go</span><br>Temporary counter to determine if paths have a git suffix.
 *   `golangserver_symbol_cache_size`<span class="gray"> : gauge : sourcegraph-frontend, xlang-go</span><br>Number of items
