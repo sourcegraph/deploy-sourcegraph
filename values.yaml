@@ -206,11 +206,16 @@ site: {
   # Port exposed on all nodes directing HTTP traffic to sourcegraph-frontend pod.
   "httpNodePort": 30080,
 
-  # The authentication provider to use for identifying and signing in users. Only one entry is supported.
+  # Allows new visitors to sign up for accounts. The sign-up page will be enabled and accessible to all visitors.
   #
-  # The builtin auth provider (show in the default value) with signup disallowed means that after the initial site admin signs in, all other users must be invited.
+  # SECURITY: If the site has no users (i.e., during initial setup), it will always allow the first user to sign up and become site admin without any approval (first user to sign up becomes the admin).
   #
-  "auth.providers": [{"type": "builtin", "allowSignup": false}],
+  # Requires auth.provider == "builtin".
+  "auth.allowSignup": true,
+
+  # The authentication provider(s) to use for identifying and signing in users. Defaults to built-in authentication.
+  #
+  # "auth.providers": [{"type": "builtin"}],
 
   # Uncomment the languages for which you wish to enable code intelligence
   "langservers": [
