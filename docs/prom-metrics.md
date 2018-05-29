@@ -10,7 +10,7 @@ We recommend tracking the following key performance metrics through Prometheus. 
 done by creating dashboards of related metrics, so the metrics are grouped into logical dashboards.
 
 If you're using Grafana for dashboards and have connected Sourcegraph's Prometheus instance to it,
-you can [import these dashboards directly from JSON](https://github.com/sourcegraph/data-center-resources/tree/master/grafana).
+you can [import these dashboards directly from JSON](/docs/grafana/).
 
 ### Dashboard: frontend
 
