@@ -131,16 +131,21 @@ For more information,
 
 ### Additional configuration
 
-You can set additional fields in `values.yaml` to configure your cluster to index your code host,
-add custom search scopes, enable TLS, turn on SSO, and more. The default set of configuration values
-is defined by the `values.yaml` file in *this* directory.
+You can set additional fields in `values.yaml` to configure your Sourcegraph instance. The `values.yaml` file is split into two top-level fields:
 
-The structure of `values.yaml` is split into two top-level fields:
-- `site` defines application-level settings like code host integrations and authentication settings. The full set of
-  options for `site` is described here: https://about.sourcegraph.com/docs/config/site.
+- `site` defines Sourcegraph site configuration. For the full list of options, see "[Sourcegraph site configuration options](https://about.sourcegraph.com/docs/config/site)".
 - `cluster` defines settings specific to the configuration of the Kubernetes cluster, like replica counts and CPU/memory
-  allocation. Refer to the `values.yaml` in this repository to see which `cluster` fields can be overridden.
+  allocation. Refer to [`../values.yaml`](../values.yaml) in this repository to see which `cluster` fields can be overridden.
 
+The default configuration is defined in this repository's [top-level `values.yaml`](../values.yaml).
+
+For common site configuration tasks, see:
+
+- "[Add repositories](https://about.sourcegraph.com/docs/config/repositories)"
+- "[User authentication](https://about.sourcegraph.com/docs/config/authentication)" (passwords, SAML, OpenID Connect, HTTP proxy auth, etc.)
+- "[Use a custom domain](https://about.sourcegraph.com/docs/config/custom-domain)"
+- "[Using TLS/SSL](https://about.sourcegraph.com/docs/config/tlsssl)"
+- "[Monitoring and tracing](https://about.sourcegraph.com/docs/config/monitoring-and-tracing)"
 
 ### Troubleshooting
 
