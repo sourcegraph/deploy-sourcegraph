@@ -42,7 +42,6 @@
 {{/* --------------- START OF TEMPLATE ------------- */}}
 
 {{- define "collectCustomFrontendEnv" -}}
-{{- $_ := set .envVars "ADMIN_USERNAMES" .Values.site.adminUsernames -}}
 {{- $_ := set .envVars "DEPLOY_TYPE" "datacenter" -}}
 {{- $_ := set .envVars "CORS_ORIGIN" .Values.site.corsOrigin -}}
 {{- $_ := set .envVars "NO_GO_GET_DOMAINS" .Values.site.noGoGetDomains -}}
