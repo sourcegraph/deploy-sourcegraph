@@ -1,6 +1,8 @@
 > Note to existing customers: if you are migrating from the old version of Data Center (configured
 > using `sourcegraph-server-gen`), see [docs/migrate.md](docs/migrate.md).
 
+test
+
 # Sourcegraph Data Center
 
 Sourcegraph Data Center is for organizations that need highly scalable and available code search and
