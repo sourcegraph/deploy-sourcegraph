@@ -1,7 +1,8 @@
 
+{{- $experimentalLangServers := .Values.const.experimentalLangServers -}}
 {{- range $index, $langserver := .Values.site.langservers -}}
 
-{{- if not (has $langserver.language (list "go" "java" "php" "python" "javascript" "typescript")) }}
+{{- if (hasKey $experimentalLangServers $langserver.language) -}}
 
 {{- if eq $index 0 | not }}
 ---
@@ -45,7 +46,8 @@ spec:
         app: xlang-{{ $langserver.language }}
     spec:
       containers:
-      - image: sourcegraph/codeintel-{{ default $langserver.language (index (dict "cs" "csharp" "dockerfile" "docker") $langserver.language) }}
+      {{ $imageName := (pluck "image" (pluck $langserver.language $experimentalLangServers | first) | first) -}}
+      - image: {{ $imageName }}
         livenessProbe:
           initialDelaySeconds: 5
           tcpSocket:
