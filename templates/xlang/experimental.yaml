@@ -46,7 +46,7 @@ spec:
         app: xlang-{{ $langserver.language }}
     spec:
       containers:
-      {{ $imageName := (pluck "image" (pluck $langserver.language $experimentalLangServers | first) | first) -}}
+      {{ $imageName := index $experimentalLangServers $langserver.language "image" -}}
       - image: {{ $imageName }}
         livenessProbe:
           initialDelaySeconds: 5
