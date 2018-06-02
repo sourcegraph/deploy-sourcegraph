@@ -3,3 +3,5 @@ steps:
     command: .buildkite/verify-generated.sh
   - label: ":k8s:"
     command: .buildkite/verify-valid.sh
+  - label: "tests"
+    command: curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py && python2.7 get-pip.py && pip install yq && ./test
