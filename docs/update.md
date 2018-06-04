@@ -1,9 +1,7 @@
 # Updating
 
 A new version of Sourcegraph is released every month (with patch releases in between, released as
-needed). Check the [Sourcegraph blog](https://about.sourcegraph.com/blog) or the site admin updates page to learn about updates.
-
-See the [changelog](https://about.sourcegraph.com/changelog) for a list of changes in each version.
+needed). Check the [Sourcegraph blog](https://about.sourcegraph.com/blog) for release announcements.
 
 ## Update to a new version of Sourcegraph Data Center
 
