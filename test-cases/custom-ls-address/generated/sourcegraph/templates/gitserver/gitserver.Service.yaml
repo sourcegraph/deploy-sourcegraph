@@ -1,0 +1,39 @@
+##---
+# Source: sourcegraph/templates/gitserver/gitserver.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    type: gitserver
+  name: gitserver
+spec:
+  clusterIP: None
+  ports:
+  - name: unused
+    port: 10811
+    targetPort: 10811
+  selector:
+    type: gitserver
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    prometheus.io/scrape: "true"
+  labels:
+    app: gitserver-1
+  name: gitserver-1
+spec:
+  ports:
+  - name: rpc
+    port: 3178
+    targetPort: rpc
+  - name: rpcnew
+    port: 3278
+    targetPort: rpcnew
+  selector:
+    app: gitserver-1
+  type: ClusterIP
+
