@@ -12,7 +12,7 @@ function generate() {
 }
 
 if [ -z "$EXAMPLE" ]; then
-    for example in $(ls | grep -v generate-examples.sh); do
+    for example in $(ls | grep -v $(basename ${BASH_SOURCE[0]})); do
         generate "$example"
     done
 else

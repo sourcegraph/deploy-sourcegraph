@@ -1,0 +1,1 @@
+../examples/generate-examples.sh
