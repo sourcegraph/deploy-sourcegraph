@@ -60,7 +60,6 @@ which tell Kubernetes to assign certain pods to specific nodes. See
 the [docs on enabling node selectors](scale.md#node-selector) for Sourcegraph Data Center.
 
 
-
 ## High-availability updates
 
 Sourcegraph Data Center is designed to be a high-availability (HA) service. Updates require zero downtime and employ
@@ -76,6 +75,35 @@ features include the following:
   the service. These are used to check the health of new instances after an update and during regular operation to
   determine if an instance goes down.
 * Database migrations are handled automatically on update when they are necessary.
+
+
+### Updating blue-green deployments
+
+Some users may wish to opt for running two separate Sourcegraph clusters running in a
+[blue-green](https://martinfowler.com/bliki/BlueGreenDeployment.html) deployment. Such a setup makes
+the update step more complex, but itcan still be done with the `sourcegraph-server-gen snapshot`
+command:
+
+* Suppose cluster A is currently live, and cluster B is in standby. As a precondition, both should
+  be running the same version of Sourcegraph Data Center.
+* Upgrade `sourcegraph-server-gen` to the version of Sourcegraph Data Center currently running (`sourcegraph-server-gen update ${VERSION}`).
+* Snapshot A: Configure `kubectl` to access A and then run `sourcegraph-server-gen
+  snapshot create`.
+* Restore A's snapshot to B: Configure `kubectl` to access B and then run `sourcegraph-server-gen
+  snapshot restore` from the same directory as you ran it before.
+* Upgrade `sourcegraph-server-gen` to the new version of Sourcegraph Data Center (`sourcegraph-server-gen update`).
+* Upgrade B to the new version.
+* Switch traffic over to B. (B is now live.)
+* Upgrade A to the new version.
+* Snapshot A: Configure `kubectl` to access A and then run `sourcegraph-server-gen
+  snapshot create`.
+* Switch traffic back to A. (A is now live again.)
+* Restore A's snapshot to B: Configure `kubectl` to access B and then run `sourcegraph-server-gen
+  snapshot restore` from the same directory as you ran it before.
+
+After the update, cluster A will be live, cluster B will be in standby, and both will be running the
+same new version of Sourcegraph Data Center.
+
 
 ### Troubleshooting
 
