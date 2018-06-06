@@ -10,9 +10,9 @@ Ensure you have Helm 2.9.1 or later installed.
 
 ## Migration
 
-1. Upgrade to Sourcegraph Data Center 2.8.1 using the legacy process:
+1. Upgrade to Sourcegraph Data Center 2.8.9 using the legacy process:
    ```bash
-   sourcegraph-server-gen update 2.8.1
+   sourcegraph-server-gen update 2.8.9
    sourcegraph-server-gen config.json ./helm-chart
    helm upgrade sourcegraph ./helm-chart
    ```
@@ -31,7 +31,7 @@ Ensure you have Helm 2.9.1 or later installed.
 1. View the diff associated with updating from the pure Helm chart:
    ```bash
    helm plugin install https://github.com/databus23/helm-diff
-   ./helm.sh diff upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/v2.8.1.tar.gz | less -R
+   ./helm.sh diff upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/v2.8.9.tar.gz | less -R
    ```
    Scan the diff for unexpected changes. If you notice unexpected changes, email us with the unexpected diff. The following changes are *expected*:
    - If you do **NOT** have the `gitserverSSH` config field set, some deployments drop the
@@ -101,7 +101,7 @@ Ensure you have Helm 2.9.1 or later installed.
 
 1. Update your cluster from the pure Helm chart:
    ```bash
-   ./helm.sh upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/v2.8.1.tar.gz
+   ./helm.sh upgrade sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/v2.8.9.tar.gz
    ```
 
 1. Use `kubectl get pods` to check the health of the cluster. If something goes wrong, you can revert
