@@ -91,18 +91,18 @@ command:
   snapshot create`.
 * Restore A's snapshot to B: Configure `kubectl` to access B and then run `sourcegraph-server-gen
   snapshot restore` from the same directory as you ran it before.
-* Upgrade `sourcegraph-server-gen` to the new version of Sourcegraph Data Center (`sourcegraph-server-gen update`).
 * Upgrade B to the new version.
 * Switch traffic over to B. (B is now live.)
 * Upgrade A to the new version.
-* Snapshot A: Configure `kubectl` to access A and then run `sourcegraph-server-gen
-  snapshot create`.
 * Switch traffic back to A. (A is now live again.)
-* Restore A's snapshot to B: Configure `kubectl` to access B and then run `sourcegraph-server-gen
-  snapshot restore` from the same directory as you ran it before.
 
 After the update, cluster A will be live, cluster B will be in standby, and both will be running the
-same new version of Sourcegraph Data Center.
+same new version of Sourcegraph Data Center. Under the above update procedure, you may lose a few
+minutes of database updates while A is not live, but that is generally acceptable.
+
+To keep the database on B current, you may periodically wish to sync A's database over to B
+(`sourcegraph-server-gen snapshot create` on A, `sourcegraph-server-gen snapshot restore` on B). It
+is important that the versions of A and B are equivalent when this is done.
 
 
 ### Troubleshooting
