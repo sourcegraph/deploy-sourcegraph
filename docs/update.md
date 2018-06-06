@@ -81,7 +81,7 @@ features include the following:
 
 Some users may wish to opt for running two separate Sourcegraph clusters running in a
 [blue-green](https://martinfowler.com/bliki/BlueGreenDeployment.html) deployment. Such a setup makes
-the update step more complex, but itcan still be done with the `sourcegraph-server-gen snapshot`
+the update step more complex, but it can still be done with the `sourcegraph-server-gen snapshot`
 command:
 
 * Suppose cluster A is currently live, and cluster B is in standby. As a precondition, both should
