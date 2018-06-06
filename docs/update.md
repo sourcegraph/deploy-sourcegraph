@@ -97,8 +97,8 @@ command:
 * Switch traffic back to A. (A is now live again.)
 
 After the update, cluster A will be live, cluster B will be in standby, and both will be running the
-same new version of Sourcegraph Data Center. Under the above update procedure, you may lose a few
-minutes of database updates while A is not live, but that is generally acceptable.
+same new version of Sourcegraph Data Center. You may lose a few minutes of database updates while A
+is not live, but that is generally acceptable.
 
 To keep the database on B current, you may periodically wish to sync A's database over to B
 (`sourcegraph-server-gen snapshot create` on A, `sourcegraph-server-gen snapshot restore` on B). It
