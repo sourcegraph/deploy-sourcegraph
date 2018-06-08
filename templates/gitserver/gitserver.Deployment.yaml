@@ -36,7 +36,7 @@ spec:
       - args:
         - run
         env:
-{{ include "envVars" $envVars | trimSuffix "\n" | indent 8 }}
+{{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
         image: {{ $global.Values.const.gitserver.image }}
         livenessProbe:
           initialDelaySeconds: 5

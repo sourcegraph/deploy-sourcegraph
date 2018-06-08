@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - env:
-{{ include "envVars" $envVars | trimSuffix "\n" | indent 8 }}
+{{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
         image: {{ .Values.const.repoUpdater.image }}
         name: repo-updater
         ports:

@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
       - env:
-{{- include "envVars" $envVars | trimSuffix "\n" | nindent 8 | trimSuffix "\n        " }}
+{{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
         - name: POD_NAME
           valueFrom:
             fieldRef:

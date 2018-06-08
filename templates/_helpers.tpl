@@ -2,20 +2,20 @@
 
 {{/* Emits environment variables */}}
 {{- define "envVars" -}}
-
 {{- range $k, $v := . -}}
-{{- if $v -}}
+
+{{- if $v }}
 - name: {{ $k }}
-  {{ if (typeIsLike "float64" $v) -}}
-    value: {{ printf "%g" $v | printf "%q" }}
-  {{- else if (typeIsLike "bool" $v) -}}
-    value: {{ printf "%t" $v | printf "%q" }}
-  {{- else -}}
-    value: {{ $v }}
-  {{- end }}
-{{ end -}}
+  {{- if (typeIsLike "float64" $v) }}
+  value: {{ printf "%g" $v | printf "%q" }}
+  {{- else if (typeIsLike "bool" $v) }}
+  value: {{ printf "%t" $v | printf "%q" }}
+  {{- else }}
+  value: {{ $v }}
+  {{- end -}}
 {{- end -}}
 
+{{- end -}}
 {{- end -}}
 
 {{/* --------------- START OF TEMPLATE ------------- */}}

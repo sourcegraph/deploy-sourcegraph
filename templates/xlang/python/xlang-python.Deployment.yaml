@@ -29,7 +29,7 @@ spec:
       - image: {{ .Values.const.xlangPython.image }}
 {{- if include "envVars" $envVars | trim | empty | not }}
         env:
-{{ include "envVars" $envVars | trimSuffix "\n" | indent 8 }}
+{{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
 {{- end }}
         livenessProbe:
           initialDelaySeconds: 5

@@ -36,7 +36,7 @@ spec:
       - args:
         - -addr=:4388
         env:
-{{ include "envVars" $envVars | trimSuffix "\n" | indent 8 }}
+{{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
 {{- range $langserver := .Values.site.langservers }}
   {{- if not (has $langserver.language (list "go" "java" "php" "python" "javascript" "typescript")) }}
         - name: LANGSERVER_{{ $langserver.language | upper }}
