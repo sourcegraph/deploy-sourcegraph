@@ -24,7 +24,7 @@ spec:
         - /go/bin/collector-linux
         - --cassandra.servers=jaeger-cassandra
         - --cassandra.keyspace=jaeger_v1_test
-        image: docker.sourcegraph.com/jaeger-collector
+        image: {{ .Values.const.jaeger.collector.image }}
         name: jaeger-collector
         ports:
         - containerPort: 14267

@@ -44,6 +44,26 @@ const:
     image: docker.sourcegraph.com/xlang-php:00024_2018-05-16_beca197
   redis:
     image: docker.sourcegraph.com/redis:18-02-07_8205764_3.2-alpine
+    exporterImage: docker.sourcegraph.com/redis_exporter:18-02-07_bb60087_v0.15.0
+  jaeger:
+    agent:
+      image: docker.sourcegraph.com/jaeger-agent
+    query:
+      image: docker.sourcegraph.com/jaeger-query
+    cassandra:
+      image: docker.sourcegraph.com/cassandra:3
+    collector:
+      image: docker.sourcegraph.com/jaeger-collector
+  podTmpGC:
+    image: docker.sourcegraph.com/pod-tmp-gc:latest
+  prometheus:
+    image: docker.sourcegraph.com/prometheus:v1.4.1
+  configMapReload:
+    image: docker.sourcegraph.com/configmap-reload:v0.1
+  authProxy:
+    image: docker.sourcegraph.com/auth-proxy:latest
+  alertManager:
+    image: docker.sourcegraph.com/alertmanager:v0.4.2
   experimentalLangServers:
     bash:
       image: sourcegraph/codeintel-bash:00239_2018-05-31_6b6cac4

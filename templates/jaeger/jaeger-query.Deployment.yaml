@@ -25,7 +25,7 @@ spec:
         - --query.static-files=/go/jaeger-ui/
         - --cassandra.servers=jaeger-cassandra
         - --cassandra.keyspace=jaeger_v1_test
-        image: docker.sourcegraph.com/jaeger-query
+        image: {{ .Values.const.jaeger.query.image }}
         name: jaeger-query
         ports:
         - containerPort: 16686
