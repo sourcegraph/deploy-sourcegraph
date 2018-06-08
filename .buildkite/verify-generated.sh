@@ -11,8 +11,8 @@ echo "Ensuring examples are consistent with Helm chart..."
 
 export GIT_PAGER=cat
 working_copy_hash=$((git diff; git status) | (md5sum || md5) 2> /dev/null)
-examples/generate-examples.sh
-test-cases/generate-test-cases.sh
+examples/generate.sh
+test-cases/generate.sh
 new_working_copy_hash=$((git diff; git status) | (md5sum || md5) 2> /dev/null)
 
 if [[ ${working_copy_hash} = ${new_working_copy_hash} ]]; then
