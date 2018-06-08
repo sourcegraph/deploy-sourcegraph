@@ -1,11 +1,11 @@
 ##---
-# Source: sourcegraph/templates/lsp-proxy/lsp-proxy.Deployment.yaml
+# Source: sourcegraph/templates/xlang/go/xlang-go-bg.Deployment.yaml
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    description: Multiplexer between frontend and LSP servers.
-  name: lsp-proxy
+    description: LSP server for Go (used for background indexing jobs).
+  name: xlang-go-bg
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -18,44 +18,23 @@ spec:
   template:
     metadata:
       labels:
-        app: lsp-proxy
+        app: xlang-go-bg
     spec:
       containers:
       - args:
-        - -addr=:4388
+        - -mode=tcp
+        - -addr=:4389
         env:
+        - name: CLONE_FROM_GITSERVER
+          value: "true"
         - name: CONFIG_FILE_HASH
           value: ad622f4e70f7edc1056a270559e8ca07bba00abd81c1bea1e8940c7156532081
-        - name: LANGSERVER_GO
-          value: tcp://xlang-go:4389
-        - name: LANGSERVER_GO_BG
-          value: tcp://xlang-go-bg:4389
-        - name: LANGSERVER_JAVA
-          value: tcp://xlang-java:2088
-        - name: LANGSERVER_JAVASCRIPT
-          value: tcp://xlang-typescript:2088
-        - name: LANGSERVER_JAVASCRIPT_BG
-          value: tcp://xlang-typescript-bg:2088
-        - name: LANGSERVER_JAVA_BG
-          value: tcp://xlang-java-bg:2088
-        - name: LANGSERVER_PHP
-          value: tcp://xlang-php:2088
-        - name: LANGSERVER_PHP_BG
-          value: tcp://xlang-php:2088
-        - name: LANGSERVER_PYTHON
-          value: tcp://xlang-python:2087
-        - name: LANGSERVER_PYTHON_BG
-          value: tcp://xlang-python-bg:2087
-        - name: LANGSERVER_TYPESCRIPT
-          value: tcp://xlang-typescript:2088
-        - name: LANGSERVER_TYPESCRIPT_BG
-          value: tcp://xlang-typescript-bg:2088
+        - name: REDIS_MASTER_ENDPOINT
+          value: redis-cache:6379
         - name: SOURCEGRAPH_CONFIG_FILE
           value: /etc/sourcegraph/config.json
         - name: SRC_GIT_SERVERS
           value: gitserver-1:3178
-        - name: REDIS_MASTER_ENDPOINT
-          value: redis-cache:6379
         - name: SRC_PROF_HTTP
           value: :6060
         - name: POD_NAME
@@ -64,24 +43,24 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: docker.sourcegraph.com/lsp-proxy:16321_2018-06-01_297e2ff
+        image: docker.sourcegraph.com/xlang-go:16161_2018-05-30_21033f1
         livenessProbe:
           initialDelaySeconds: 5
           tcpSocket:
             port: lsp
           timeoutSeconds: 5
-        name: lsp-proxy
+        name: xlang-go-bg
         ports:
-        - containerPort: 4388
+        - containerPort: 4389
           name: lsp
         - containerPort: 6060
           name: debug
         readinessProbe:
           tcpSocket:
-            port: 4388
+            port: 4389
         resources:
           limits:
-            cpu: "1"
+            cpu: "4"
             memory: "8Gi"
           requests:
             cpu: "500m"
@@ -91,8 +70,6 @@ spec:
           name: sg-config
         - mountPath: /mnt/cache
           name: cache-ssd
-      securityContext:
-        runAsUser: 0
       volumes:
       - configMap:
           defaultMode: 464
