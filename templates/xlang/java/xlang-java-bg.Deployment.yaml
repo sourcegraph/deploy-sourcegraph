@@ -11,6 +11,7 @@
 {{- $_ := set $envVars "PRIVATE_ARTIFACT_REPO_URL" .Values.site.privateArtifactRepoURL -}}
 {{- $_ := set $envVars "PRIVATE_ARTIFACT_REPO_USERNAME" .Values.site.privateArtifactRepoUsername -}}
 {{- $_ := set $envVars "PRIVATE_ARTIFACT_REPO_PASSWORD" .Values.site.privateArtifactRepoPassword -}}
+{{- include "collectEnv" (list $envVars (index .Values.cluster.xlangJava.containers "xlang-java" ).env) -}}
 
 apiVersion: extensions/v1beta1
 kind: Deployment

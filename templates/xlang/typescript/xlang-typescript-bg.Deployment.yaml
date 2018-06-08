@@ -6,6 +6,7 @@
 
 {{- $envVars := dict -}}
 {{- include "collectTracingEnv" (dict "envVars" $envVars "Values" .Values) -}}
+{{- include "collectEnv" (list $envVars (index .Values.cluster.xlangJavascriptTypescript.containers "xlang-javascript-typescript" ).env) -}}
 
 apiVersion: extensions/v1beta1
 kind: Deployment

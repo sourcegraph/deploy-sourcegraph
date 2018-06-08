@@ -18,6 +18,22 @@
 {{- end -}}
 {{- end -}}
 
+
+{{/* --------------- START OF TEMPLATE ------------- */}}
+
+{{/* Collects config-related environment variables into the `.envVars` field of the argument. */}}
+{{- define "collectEnv" -}}
+
+{{- $envVars := (index . 0) -}}
+{{- $toAdd := (index . 1) -}}
+
+{{- range $k, $v := $toAdd -}}
+{{- $_ := set $envVars $k $v -}}
+{{- end -}}
+
+{{- end -}}
+
+
 {{/* --------------- START OF TEMPLATE ------------- */}}
 
 
@@ -28,7 +44,6 @@
 {{- end -}}
 
 {{/* --------------- START OF TEMPLATE ------------- */}}
-
 
 {{/* Collects tracing-related environment variables into the `.envVars` field of the argument. */}}
 {{- define "collectTracingEnv" -}}

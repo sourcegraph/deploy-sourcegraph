@@ -11,6 +11,7 @@
   {{- end -}}
 {{- end -}}
 {{- $_ := set $envVars "SRC_GIT_SERVERS" (include "gitservers" .) -}}
+{{- include "collectEnv" (list $envVars (index .Values.cluster.lspProxy.containers "lsp-proxy" ).env) -}}
 
 apiVersion: extensions/v1beta1
 kind: Deployment

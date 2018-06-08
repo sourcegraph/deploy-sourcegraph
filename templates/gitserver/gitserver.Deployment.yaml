@@ -5,6 +5,7 @@
 {{- $_ := set $envVars "SRC_PROF_HTTP" ":6060" -}}
 {{- $_ := set $envVars "SRC_REPOS_DIR" "/data/repos" -}}
 {{- $_ := set $envVars "ORIGIN_MAP" $global.Values.site.gitOriginMap -}}
+{{- include "collectEnv" (list $envVars .Values.cluster.gitserver.containers.gitserver.env) -}}
 
 {{- range $index, $gitserverIndex := until (required ".Values.cluster.gitserver.shards required" .Values.cluster.gitserver.shards | int) }}
 {{- if eq $index 0 | not }}

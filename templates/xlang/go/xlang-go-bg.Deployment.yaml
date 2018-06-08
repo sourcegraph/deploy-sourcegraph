@@ -10,6 +10,7 @@
 {{- $_ := set $envVars "REDIS_MASTER_ENDPOINT" "redis-cache:6379" -}}
 {{- $_ := set $envVars "SRC_GIT_SERVERS" (include "gitservers" .) -}}
 {{- $_ := set $envVars "SRC_PROF_HTTP" ":6060" -}}
+{{- include "collectEnv" (list $envVars (index .Values.cluster.xlangGo.containers "xlang-go" ).env) -}}
 
 apiVersion: extensions/v1beta1
 kind: Deployment
