@@ -1,0 +1,20 @@
+##---
+# Source: sourcegraph/templates/auth-proxy/auth-proxy.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: auth-proxy
+  name: auth-proxy
+spec:
+  loadBalancerIP: 0.0.0.0
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  - name: https
+    port: 443
+    targetPort: https
+  selector:
+    app: auth-proxy
+  type: LoadBalancer
