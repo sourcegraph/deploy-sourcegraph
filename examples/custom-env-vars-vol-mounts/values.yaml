@@ -46,6 +46,21 @@ cluster:
       xlang-python:
         env:
           VAR: val
+  pgsql:
+    volumes:
+    - name: vol1
+      emptyDir: {}
+    - name: vol2
+      configMap:
+        defaultMode: 0600
+        name: config
+    containers:
+      pgsql:
+        volumeMounts:
+        - mountPath: /etc/mount1
+          name: vol1
+        - mountPath: /etc/mount2
+          name: vol2
 site: {
   "langservers": [
     {
@@ -67,4 +82,8 @@ site: {
       "language": "php",
     },
   ],
+  "prometheus": {},
+  "useAlertManager": true,
+  "authProxyIP": "0.0.0.0",
+  "authProxyPassword": "asdf",
 }
