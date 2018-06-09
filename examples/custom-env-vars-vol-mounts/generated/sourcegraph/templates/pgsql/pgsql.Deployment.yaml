@@ -44,6 +44,10 @@ spec:
             cpu: 250m
             memory: 1G
         volumeMounts:
+        - mountPath: /etc/mount1
+          name: vol1
+        - mountPath: /etc/mount2
+          name: vol2
         - mountPath: /data
           name: disk
       - env:
@@ -61,6 +65,12 @@ spec:
       securityContext:
         runAsUser: 0
       volumes:
+      - emptyDir: {}
+        name: vol1
+      - configMap:
+          defaultMode: 384
+          name: config
+        name: vol2
       - name: disk
         persistentVolumeClaim:
           claimName: pgsql
