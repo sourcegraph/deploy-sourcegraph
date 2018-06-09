@@ -42,6 +42,7 @@ spec:
             cpu: 250m
             memory: 1G
         volumeMounts:
+        {{- include "volumeMounts" (list .Values "pgsql" "pgsql") | indent 8 | trimPrefix (repeat 8 " ") }}
         - mountPath: /data
           name: disk
       - env:
@@ -59,6 +60,7 @@ spec:
 {{- include "securityContext" . | nindent 6 }}
 {{- include "nodeSelector" (list .Values "pgsql") | nindent 6 | trimSuffix "\n      " }}
       volumes:
+      {{- include "expandedYAML" .Values.cluster.pgsql.volumes | indent 6 | trimPrefix (repeat 6 " ") }}
       - name: disk
         persistentVolumeClaim:
           claimName: pgsql
