@@ -330,3 +330,69 @@ securityContext:
 {{- end -}}
 
 {{- end -}}
+
+
+{{/* --------------- START OF TEMPLATE ------------- */}}
+
+{{- define "volumeMounts" -}}
+
+{{- $Values := (index . 0) -}}
+{{- $deployment := (index . 1) -}}
+{{- $container := (index . 2) -}}
+
+{{- include "expandedYAML" (index (index $Values.cluster $deployment).containers $container).volumeMounts -}}
+
+{{- end -}}
+
+
+{{/* --------------- START OF TEMPLATE ------------- */}}
+
+{{/* expands an object into pretty-printed YAML */}}
+{{- define "expandedYAML" -}}
+{{- if . }}{{ "\n" }}{{- include "_expandedYAML" . | trimSuffix "\n" -}}{{ end -}}
+{{- end -}}
+
+
+{{- define "_expandedYAML" -}}
+
+{{- if (typeIsLike "map[string]interface {}" .) -}}
+
+{{- if len . | eq 0 -}}{}{{- else -}}
+
+{{- range $k, $v := . }}
+{{- if (and $v (or (typeIsLike "[]interface {}" $v) (typeIsLike "map[string]interface {}" $v))) -}}
+    {{ $k }}:{{ include "_expandedYAML" $v | trimSuffix "\n" | nindent 2 }}{{ "\n" }}
+{{- else -}}
+    {{ $k }}: {{ include "_expandedYAML" $v }}{{ "\n" }}
+{{- end -}}
+{{- end -}}
+
+{{- end -}}
+
+{{- else if (typeIsLike "[]interface {}" .) -}}
+
+{{- if len . | eq 0 -}}[]{{- else -}}
+
+{{- range $e := . -}}
+{{- if (and $e (or (typeIsLike "[]interface {}" $e) (typeIsLike "map[string]interface {}" $e))) -}}
+- {{ include "_expandedYAML" $e | trimSuffix "\n" | indent 2 | trimPrefix "  " }}
+{{ else -}}
+- {{ include "_expandedYAML" $e }}
+{{ end -}}
+{{- end -}}
+
+{{- end -}}
+
+{{- else if (typeIsLike "string" .) -}}
+    {{- if not . }}{{ "" }}{{ else }}{{ . }}{{ end -}}
+{{- else if (typeIsLike "float64" .) -}}
+    {{ printf "%g" . }}
+{{- else if (typeIsLike "bool" .) -}}
+    {{ printf "%t" . }}
+{{- else if (typeIsLike "<nil>" .) -}}
+    null
+{{- else -}}
+    {{ call "error: unsupported JSON type" }}
+{{- end -}}
+
+{{- end -}}
