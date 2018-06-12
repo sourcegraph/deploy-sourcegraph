@@ -65,7 +65,7 @@ spec:
           name: sg-config
         - mountPath: /mnt/cache
           name: cache-ssd
-{{- include "jaeger" .Values.site.useJaeger | nindent 6 | trimSuffix "\n      " }}
+{{- include "jaeger" . | nindent 6 | trimSuffix "\n      " }}
 {{- include "nodeSelector" (list .Values "xlangGo") | nindent 6 | trimSuffix "\n      " }}
       volumes:
       - configMap:

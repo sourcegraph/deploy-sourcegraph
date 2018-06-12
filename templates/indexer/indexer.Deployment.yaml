@@ -45,7 +45,7 @@ spec:
         volumeMounts:
         - mountPath: /etc/sourcegraph
           name: sg-config
-{{- include "jaeger" .Values.site.useJaeger | nindent 6 | trimSuffix "\n      " }}
+{{- include "jaeger" . | nindent 6 | trimSuffix "\n      " }}
 {{- include "nodeSelector" (list .Values "indexer") | nindent 6 | trimSuffix "\n      " }}
 {{- include "securityContext" . | nindent 6 }}
       volumes:
