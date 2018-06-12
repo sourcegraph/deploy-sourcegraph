@@ -62,7 +62,9 @@
 {{- $_ := set .envVars "NO_GO_GET_DOMAINS" .Values.site.noGoGetDomains -}}
 {{- $_ := set .envVars "SRC_APP_DISABLE_SUPPORT_SERVICES" "\"true\"" -}}
 {{- $_ := set .envVars "SRC_APP_URL" .Values.site.appURL -}}
-{{- $_ := set .envVars "TRACKING_APP_ID" .Values.site.siteID -}}
+{{- if .Values.site.siteID -}}
+    {{- $_ := set .envVars "TRACKING_APP_ID" (quote .Values.site.siteID) -}}
+{{- end -}}
 {{- $_ := set .envVars "SSO_USER_HEADER" .Values.site.ssoUserHeader -}}
 {{- $_ := set .envVars "OIDC_OP" .Values.site.oidcProvider -}}
 {{- $_ := set .envVars "OIDC_CLIENT_ID" .Values.site.oidcClientID -}}
