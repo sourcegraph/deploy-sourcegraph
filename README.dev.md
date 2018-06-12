@@ -2,7 +2,9 @@
 
 ## Cutting a release
 
-* Make your desired changes to this repository. You're likely looking for the docker images in [values.yaml](./values.yaml).
+* Make the desired changes to this repository. Most commonly, this involves updating the Docker image versions in `values.yaml`.
+  * A convenience script [`update_docker_image_versions.py`](update_docker_image_versions.py)
+    updates the Docker image versions to be those currently deployed to dogfood.
 * Run `./generate.sh`.
 * Open a PR and wait for buildkite to pass and for your changes to be approved, then merge and check out master.
 * Run `./release.sh $VERSION`. If this is a release candidate, `$VERSION` should have the
