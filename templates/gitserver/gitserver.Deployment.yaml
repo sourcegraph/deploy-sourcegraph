@@ -65,7 +65,7 @@ spec:
 {{- include "securityContext" $global | nindent 6 | trimSuffix "\n      " }}
       volumes:
       - configMap:
-          defaultMode: 464
+          defaultMode: {{ $global.Values.cluster.configVolume.defaultMode }}
           name: config-file
         name: sg-config
       - name: repos

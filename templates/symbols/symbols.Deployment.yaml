@@ -53,7 +53,7 @@ spec:
 {{- include "securityContext" . | nindent 6 }}
       volumes:
       - configMap:
-          defaultMode: 464
+          defaultMode: {{ .Values.cluster.configVolume.defaultMode }}
           name: config-file
         name: sg-config
 {{- include "mountCacheVolume" (list .Values.site.nodeSSDPath) | nindent 6 }}
