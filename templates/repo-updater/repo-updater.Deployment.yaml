@@ -51,6 +51,6 @@ spec:
 {{- include "nodeSelector" (list .Values "repoUpdater") | nindent 6 | trimSuffix "\n      " }}
       volumes:
       - configMap:
-          defaultMode: 464
+          defaultMode: {{ .Values.cluster.configVolume.defaultMode }}
           name: config-file
         name: sg-config
