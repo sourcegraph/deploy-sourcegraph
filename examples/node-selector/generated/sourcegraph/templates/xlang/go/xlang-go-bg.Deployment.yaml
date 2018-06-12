@@ -1,11 +1,11 @@
 ##---
-# Source: sourcegraph/templates/symbols/symbols.Deployment.yaml
+# Source: sourcegraph/templates/xlang/go/xlang-go-bg.Deployment.yaml
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    description: Backend for symbols operations.
-  name: symbols
+    description: LSP server for Go (used for background indexing jobs).
+  name: xlang-go-bg
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -18,40 +18,53 @@ spec:
   template:
     metadata:
       labels:
-        app: symbols
+        app: xlang-go-bg
     spec:
       containers:
-      - env:
+      - args:
+        - -mode=tcp
+        - -addr=:4389
+        env:
+        - name: CLONE_FROM_GITSERVER
+          value: "true"
         - name: CONFIG_FILE_HASH
           value: ad622f4e70f7edc1056a270559e8ca07bba00abd81c1bea1e8940c7156532081
+        - name: REDIS_MASTER_ENDPOINT
+          value: redis-cache:6379
         - name: SOURCEGRAPH_CONFIG_FILE
           value: /etc/sourcegraph/config.json
         - name: SRC_GIT_SERVERS
           value: gitserver-1:3178
         - name: SRC_PROF_HTTP
           value: :6060
-        - name: SYMBOLS_CACHE_SIZE_MB
-          value: "100000"
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: docker.sourcegraph.com/symbols:16803_2018-06-11_32c5a47
-        name: symbols
+        image: docker.sourcegraph.com/xlang-go:16800_2018-06-11_32c5a47
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: lsp
+          timeoutSeconds: 5
+        name: xlang-go-bg
         ports:
-        - containerPort: 3184
-          name: http
+        - containerPort: 4389
+          name: lsp
         - containerPort: 6060
           name: debug
+        readinessProbe:
+          tcpSocket:
+            port: 4389
         resources:
           limits:
-            cpu: "2"
-            memory: "2G"
+            cpu: "4"
+            memory: "8Gi"
           requests:
             cpu: "500m"
-            memory: "500M"
+            memory: "2Gi"
         volumeMounts:
         - mountPath: /etc/sourcegraph
           name: sg-config
@@ -59,8 +72,6 @@ spec:
           name: cache-ssd
       nodeSelector:
         beta.kubernetes.io/instance-type: m4.4xlarge
-      securityContext:
-        runAsUser: 0
       volumes:
       - configMap:
           defaultMode: 464
