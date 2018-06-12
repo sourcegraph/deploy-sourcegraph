@@ -1,0 +1,120 @@
+##---
+# Source: sourcegraph/templates/frontend/sourcegraph-frontend.Deployment.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: Serves the frontend of Sourcegraph via HTTP(S).
+  name: sourcegraph-frontend
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: sourcegraph-frontend
+    spec:
+      containers:
+      - args:
+        - serve
+        env:
+        - name: CONFIG_FILE_HASH
+          value: 2d50170ef9cbae09025b5aee5e9e11eb5f37f7c6115c81b350d8db5080f3db11
+        - name: DEPLOY_TYPE
+          value: datacenter
+        - name: LSP_PROXY
+          value: lsp-proxy:4388
+        - name: PGDATABASE
+          value: sg
+        - name: PGHOST
+          value: pgsql
+        - name: PGPORT
+          value: "5432"
+        - name: PGSSLMODE
+          value: disable
+        - name: PGUSER
+          value: sg
+        - name: PUBLIC_REPO_REDIRECTS
+          value: "true"
+        - name: QUERY_RUNNER_URL
+          value: http://query-runner
+        - name: REDIS_MASTER_ENDPOINT
+          value: redis-cache:6379
+        - name: REPO_UPDATER_URL
+          value: http://repo-updater:3182
+        - name: SEARCHER_URL
+          value: k8s+http://searcher:3181
+        - name: SOURCEGRAPH_CONFIG_FILE
+          value: /etc/sourcegraph/config.json
+        - name: SRC_APP_DISABLE_SUPPORT_SERVICES
+          value: "true"
+        - name: SRC_APP_URL
+          value: http://localhost:3080
+        - name: SRC_GIT_SERVERS
+          value: gitserver-1:3178
+        - name: SRC_INDEXER
+          value: indexer:3179
+        - name: SRC_LOG_LEVEL
+          value: dbug
+        - name: SRC_PROF_HTTP
+          value: :6060
+        - name: SRC_SESSION_STORE_REDIS
+          value: redis-store:6379
+        - name: SRC_SYNTECT_SERVER
+          value: http://syntect-server:9238
+        - name: SYMBOLS_URL
+          value: k8s+http://symbols:3184
+        - name: ZOEKT_HOST
+          value: indexed-search:80
+        image: docker.sourcegraph.com/frontend:16850_2018-06-12_53a9f8e
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        name: frontend
+        ports:
+        - containerPort: 3080
+          name: http
+        - containerPort: 3090
+          name: http-internal
+        - containerPort: 3443
+          name: https
+        resources:
+          limits:
+            cpu: "2"
+            memory: "2G"
+          requests:
+            cpu: "2"
+            memory: "1G"
+        volumeMounts:
+        - mountPath: /etc/sourcegraph
+          name: sg-config
+      - command:
+        - /go/bin/agent-linux
+        - --collector.host-port=jaeger-collector:14267
+        image: docker.sourcegraph.com/jaeger-agent
+        name: jaeger-agent
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+      securityContext:
+        runAsUser: 0
+      serviceAccountName: sourcegraph-frontend
+      volumes:
+      - configMap:
+          defaultMode: 464
+          name: config-file
+        name: sg-config

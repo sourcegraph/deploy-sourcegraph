@@ -1,0 +1,40 @@
+##---
+# Source: sourcegraph/templates/jaeger/jaeger-query.Deployment.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: Frontend for querying traces.
+  name: jaeger-query
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: jaeger-query
+    spec:
+      containers:
+      - command:
+        - /go/bin/query-linux
+        - --query.static-files=/go/jaeger-ui/
+        - --cassandra.servers=jaeger-cassandra
+        - --cassandra.keyspace=jaeger_v1_test
+        image: docker.sourcegraph.com/jaeger-query
+        name: jaeger-query
+        ports:
+        - containerPort: 16686
+          name: http
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi

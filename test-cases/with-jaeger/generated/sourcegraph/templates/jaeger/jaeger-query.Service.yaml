@@ -1,0 +1,16 @@
+##---
+# Source: sourcegraph/templates/jaeger/jaeger-query.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: jaeger-query
+  name: jaeger-query
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  selector:
+    app: jaeger-query
+  type: ClusterIP
