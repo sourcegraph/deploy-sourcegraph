@@ -311,9 +311,8 @@ securityContext:
 {{/* --------------- START OF TEMPLATE ------------- */}} 
 
 {{- define "jaeger" -}}
-{{- $useJaeger := . -}}
 
-{{- if $useJaeger -}}
+{{- if .Values.site.useJaeger -}}
 - command:
   - /go/bin/agent-linux
   - --collector.host-port=jaeger-collector:14267
