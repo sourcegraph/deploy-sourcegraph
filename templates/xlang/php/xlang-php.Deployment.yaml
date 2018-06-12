@@ -31,10 +31,10 @@ spec:
         - containerPort: 2088
           name: lsp
 {{- include "resourceRequirements" (list .Values "xlangPHP" "xlang-php") | nindent 8 }}
-{{- include "nodeSelector" (list .Values "xlangPHP") | nindent 6 | trimSuffix "\n      " }}
         volumeMounts:
         - mountPath: /tmp
           name: tmp
+{{- include "nodeSelector" (list .Values "xlangPHP") | nindent 6 | trimSuffix "\n      " }}
       volumes:
       - emptyDir: {}
         name: tmp
