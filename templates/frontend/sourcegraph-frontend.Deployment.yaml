@@ -30,8 +30,8 @@ spec:
       - args:
         - serve
         env:
-{{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
-{{- if (or .Values.site.tlsCert .Values.site.tlsKey) }}
+        {{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
+        {{- if (or .Values.site.tlsCert .Values.site.tlsKey) }}
         - name: TLS_CERT
           valueFrom:
             secretKeyRef:
@@ -42,7 +42,7 @@ spec:
             secretKeyRef:
               key: key
               name: tls
-{{- end }}
+        {{- end }}
         image: {{ .Values.const.frontend.image }}
         livenessProbe:
           httpGet:
@@ -59,13 +59,13 @@ spec:
           name: http-internal
         - containerPort: 3443
           name: https
-{{- include "resourceRequirements" (list .Values "frontend" "frontend") | nindent 8 }}
+        {{- include "resourceRequirements" (list .Values "frontend" "frontend") | nindent 8 }}
         volumeMounts:
         - mountPath: /etc/sourcegraph
           name: sg-config
-{{- include "jaeger" . | nindent 6 | trimSuffix "\n      " }}
-{{- include "nodeSelector" (list .Values "frontend") | nindent 6 | trimSuffix "\n      " }}
-{{- include "securityContext" . | nindent 6 }}
+      {{- include "jaeger" . | nindent 6 | trimSuffix "\n      " }}
+      {{- include "nodeSelector" (list .Values "frontend") | nindent 6 | trimSuffix "\n      " }}
+      {{- include "securityContext" . | nindent 6 }}
       serviceAccountName: sourcegraph-frontend
       volumes:
       - configMap:
