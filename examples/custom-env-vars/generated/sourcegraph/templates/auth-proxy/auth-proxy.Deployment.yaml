@@ -36,10 +36,15 @@ spec:
             cpu: 500m
             memory: 1Gi
         volumeMounts:
+        - mountPath: /etc/ssl
+          name: ssl
         - mountPath: /tls
           name: tls
           readOnly: true
       volumes:
+      - hostPath:
+          path: /etc/ssl
+        name: ssl
       - name: tls
         secret:
           secretName: tls

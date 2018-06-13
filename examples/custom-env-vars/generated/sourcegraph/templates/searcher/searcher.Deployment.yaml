@@ -62,6 +62,8 @@ spec:
             cpu: "500m"
             memory: "500M"
         volumeMounts:
+        - mountPath: /etc/ssl
+          name: ssl
         - mountPath: /etc/sourcegraph
           name: sg-config
         - mountPath: /mnt/cache
@@ -69,6 +71,9 @@ spec:
       securityContext:
         runAsUser: 0
       volumes:
+      - hostPath:
+          path: /etc/ssl
+        name: ssl
       - configMap:
           defaultMode: 464
           name: config-file

@@ -47,6 +47,8 @@ spec:
             cpu: "500m"
             memory: "2Gi"
         volumeMounts:
+        - mountPath: /etc/ssl
+          name: ssl
         - mountPath: /data
           name: disk
       - args:
@@ -77,11 +79,16 @@ spec:
             cpu: "500m"
             memory: "2Gi"
         volumeMounts:
+        - mountPath: /etc/ssl
+          name: ssl
         - mountPath: /data
           name: disk
       securityContext:
         runAsUser: 0
       volumes:
+      - hostPath:
+          path: /etc/ssl
+        name: ssl
       - name: disk
         persistentVolumeClaim:
           claimName: indexed-search

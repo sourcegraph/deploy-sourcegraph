@@ -38,12 +38,17 @@ spec:
             cpu: 50m
             memory: 10M
         volumeMounts:
+        - mountPath: /etc/ssl
+          name: ssl
         - mountPath: /etc/alertmanager
           name: config
           readOnly: true
         - mountPath: /alertmanager
           name: data
       volumes:
+      - hostPath:
+          path: /etc/ssl
+        name: ssl
       - configMap:
           name: alertmanager
         name: config

@@ -37,8 +37,13 @@ spec:
             cpu: "500m"
             memory: "2Gi"
         volumeMounts:
+        - mountPath: /etc/ssl
+          name: ssl
         - mountPath: /tmp
           name: tmp
       volumes:
+      - hostPath:
+          path: /etc/ssl
+        name: ssl
       - emptyDir: {}
         name: tmp

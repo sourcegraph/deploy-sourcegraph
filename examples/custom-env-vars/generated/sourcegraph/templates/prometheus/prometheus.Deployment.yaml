@@ -41,6 +41,8 @@ spec:
             cpu: 500m
             memory: 2Gi
         volumeMounts:
+        - mountPath: /etc/ssl
+          name: ssl
         - mountPath: /prometheus
           name: data
         - mountPath: /etc/prometheus
@@ -58,6 +60,8 @@ spec:
             cpu: 10m
             memory: 10Mi
         volumeMounts:
+        - mountPath: /etc/ssl
+          name: ssl
         - mountPath: /etc/prometheus
           name: config
           readOnly: true
@@ -65,6 +69,9 @@ spec:
         runAsUser: 0
       serviceAccountName: prometheus
       volumes:
+      - hostPath:
+          path: /etc/ssl
+        name: ssl
       - name: data
         persistentVolumeClaim:
           claimName: prometheus
