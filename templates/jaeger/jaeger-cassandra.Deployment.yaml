@@ -38,9 +38,11 @@ spec:
             cpu: 500m
             memory: 2Gi
         volumeMounts:
+        {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
         - mountPath: /var/lib/cassandra
           name: data
       volumes:
+      {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
       - name: data
         persistentVolumeClaim:
           claimName: jaeger

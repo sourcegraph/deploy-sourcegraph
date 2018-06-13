@@ -37,12 +37,14 @@ spec:
             cpu: 50m
             memory: 10M
         volumeMounts:
+        {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
         - mountPath: /etc/alertmanager
           name: config
           readOnly: true
         - mountPath: /alertmanager
           name: data
       volumes:
+      {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
       - configMap:
           name: alertmanager
         name: config

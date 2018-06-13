@@ -37,4 +37,8 @@ spec:
           requests:
             cpu: 500m
             memory: 1Gi
+        volumeMounts:
+        {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
+      volumes:
+      {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
 {{ end -}}

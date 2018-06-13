@@ -39,6 +39,7 @@ spec:
           periodSeconds: 1
 {{- include "resourceRequirements" (list .Values "indexedSearch" "zoekt-webserver") | nindent 8 }}
         volumeMounts:
+        {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
         - mountPath: /data
           name: disk
       - args:
@@ -64,11 +65,13 @@ spec:
           name: index-http
 {{- include "resourceRequirements" (list .Values "indexedSearch" "zoekt-indexserver") | nindent 8 }}
         volumeMounts:
+        {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
         - mountPath: /data
           name: disk
 {{- include "nodeSelector" (list .Values "indexedSearch") | nindent 6 | trimSuffix "\n      " }}
 {{- include "securityContext" . | nindent 6 }}
       volumes:
+      {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
       - name: disk
         persistentVolumeClaim:
           claimName: indexed-search

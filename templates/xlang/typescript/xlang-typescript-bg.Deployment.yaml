@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
       - env:
-{{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
+        {{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -51,15 +51,17 @@ spec:
         readinessProbe:
           tcpSocket:
             port: lsp
-{{- include "resourceRequirements" (list .Values "xlangJavascriptTypescript" "xlang-javascript-typescript") | nindent 8 }}
+        {{- include "resourceRequirements" (list .Values "xlangJavascriptTypescript" "xlang-javascript-typescript") | nindent 8 }}
         volumeMounts:
+        {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
         - mountPath: /yarn-config
           name: yarn-config
         - mountPath: /mnt/cache
           name: cache-ssd
-{{- include "nodeSelector" (list .Values "xlangJavascriptTypescript") | nindent 6 | trimSuffix "\n      " }}
+      {{- include "nodeSelector" (list .Values "xlangJavascriptTypescript") | nindent 6 | trimSuffix "\n      " }}
       volumes:
-{{- include "mountCacheVolume" (list .Values.site.nodeSSDPath) | nindent 6 }}
+      {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
+      {{- include "mountCacheVolume" (list .Values.site.nodeSSDPath) | nindent 6 }}
       - configMap:
           name: yarn-config
         name: yarn-config

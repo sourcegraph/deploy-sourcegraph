@@ -37,7 +37,7 @@ spec:
       - args:
         - run
         env:
-{{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
+        {{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
         image: {{ $global.Values.const.gitserver.image }}
         livenessProbe:
           initialDelaySeconds: 5
@@ -50,20 +50,22 @@ spec:
           name: rpc
         - containerPort: 3278
           name: rpcnew
-{{- include "resourceRequirements" (list $global.Values "gitserver" "gitserver") | nindent 8 }}
+        {{- include "resourceRequirements" (list $global.Values "gitserver" "gitserver") | nindent 8 }}
         volumeMounts:
+        {{- include "commonVolumeMounts" $global | indent 8 | trimPrefix (repeat 8 " ") }}
         - mountPath: /etc/sourcegraph
           name: sg-config
         - mountPath: /data/repos
           name: repos
-{{- if $global.Values.cluster.gitserver.ssh }}
+        {{- if $global.Values.cluster.gitserver.ssh }}
         - mountPath: /root/.ssh
           name: ssh
-{{ end }}
-{{- include "jaeger" $global | nindent 6 | trimSuffix "\n      " }}
-{{- include "nodeSelector" (list $global.Values "gitserver") | nindent 6 | trimSuffix "\n      " }}
-{{- include "securityContext" $global | nindent 6 | trimSuffix "\n      " }}
+        {{ end }}
+      {{- include "jaeger" $global | nindent 6 | trimSuffix "\n      " }}
+      {{- include "nodeSelector" (list $global.Values "gitserver") | nindent 6 | trimSuffix "\n      " }}
+      {{- include "securityContext" $global | nindent 6 | trimSuffix "\n      " }}
       volumes:
+      {{- include "commonVolumes" $global | indent 6 | trimPrefix (repeat 6 " ") }}
       - configMap:
           defaultMode: {{ $global.Values.cluster.configVolume.defaultMode }}
           name: config-file
@@ -71,10 +73,10 @@ spec:
       - name: repos
         persistentVolumeClaim:
           claimName: gitserver-{{ add1 $gitserverIndex }}
-{{- if $global.Values.cluster.gitserver.ssh }}
+      {{- if $global.Values.cluster.gitserver.ssh }}
       - name: ssh
         secret:
           defaultMode: 384
           secretName: gitserver-ssh
-{{ end }}
+      {{ end }}
 {{ end }}

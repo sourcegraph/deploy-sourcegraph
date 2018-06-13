@@ -35,10 +35,12 @@ spec:
             cpu: 500m
             memory: 1Gi
         volumeMounts:
+        {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
         - mountPath: /tls
           name: tls
           readOnly: true
       volumes:
+      {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
       - name: tls
         secret:
           secretName: tls

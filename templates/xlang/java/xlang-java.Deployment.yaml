@@ -35,18 +35,20 @@ spec:
     spec:
       containers:
       - env:
-{{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
+        {{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
         image: {{ .Values.const.xlangJava.image }}
         name: xlang-java
         ports:
         - containerPort: 2088
           name: lsp
-{{- include "resourceRequirements" (list .Values "xlangJava" "xlang-java") | nindent 8 }}
+        {{- include "resourceRequirements" (list .Values "xlangJava" "xlang-java") | nindent 8 }}
         volumeMounts:
+        {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
         - mountPath: /tmp
           name: tmp
-{{- include "nodeSelector" (list .Values "xlangJava") | nindent 6 | trimSuffix "\n      " }}
+      {{- include "nodeSelector" (list .Values "xlangJava") | nindent 6 | trimSuffix "\n      " }}
       volumes:
+      {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
       - emptyDir: {}
         name: tmp
 {{ end -}}

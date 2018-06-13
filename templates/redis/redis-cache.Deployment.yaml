@@ -43,6 +43,7 @@ spec:
             cpu: 250m
             memory: 500M
         volumeMounts:
+        {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
         - mountPath: /redis-data
           name: redis-data
         - mountPath: /etc/redis
@@ -60,9 +61,12 @@ spec:
           requests:
             cpu: 10m
             memory: 20Mi
-{{- include "securityContext" . | nindent 6 }}
-{{- include "nodeSelector" (list .Values "redis-cache") | nindent 6 | trimSuffix "\n      " }}
+        volumeMounts:
+        {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
+      {{- include "securityContext" . | nindent 6 }}
+      {{- include "nodeSelector" (list .Values "redis-cache") | nindent 6 | trimSuffix "\n      " }}
       volumes:
+      {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
       - name: redis-data
         persistentVolumeClaim:
           claimName: redis-cache

@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - env:
-{{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
+        {{- include "envVars" $envVars | indent 8 | trimPrefix (repeat 8 " ") }}
         image: {{ .Values.const.githubProxy.image }}
         name: github-proxy
         ports:
@@ -42,12 +42,14 @@ spec:
             cpu: 100m
             memory: 250M
         volumeMounts:
+        {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
         - mountPath: /etc/sourcegraph
           name: sg-config
-{{- include "jaeger" . | nindent 6 | trimSuffix "\n      " }}
-{{- include "securityContext" . | nindent 6 }}
-{{- include "nodeSelector" (list .Values "githubProxy") | nindent 6 | trimSuffix "\n      " }}
+      {{- include "jaeger" . | nindent 6 | trimSuffix "\n      " }}
+      {{- include "securityContext" . | nindent 6 }}
+      {{- include "nodeSelector" (list .Values "githubProxy") | nindent 6 | trimSuffix "\n      " }}
       volumes:
+      {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
       - configMap:
           defaultMode: {{ .Values.cluster.configVolume.defaultMode }}
           name: config-file

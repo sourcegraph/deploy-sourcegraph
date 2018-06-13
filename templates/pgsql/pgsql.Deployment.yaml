@@ -42,6 +42,7 @@ spec:
             cpu: 250m
             memory: 1G
         volumeMounts:
+        {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
         {{- include "volumeMounts" (list .Values "pgsql" "pgsql") | indent 8 | trimPrefix (repeat 8 " ") }}
         - mountPath: /data
           name: disk
@@ -57,9 +58,12 @@ spec:
           requests:
             cpu: 10m
             memory: 50Mi
-{{- include "securityContext" . | nindent 6 }}
-{{- include "nodeSelector" (list .Values "pgsql") | nindent 6 | trimSuffix "\n      " }}
+        volumeMounts:
+        {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
+      {{- include "securityContext" . | nindent 6 }}
+      {{- include "nodeSelector" (list .Values "pgsql") | nindent 6 | trimSuffix "\n      " }}
       volumes:
+      {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
       {{- include "expandedYAML" .Values.cluster.pgsql.volumes | indent 6 | trimPrefix (repeat 6 " ") }}
       - name: disk
         persistentVolumeClaim:

@@ -46,5 +46,9 @@ spec:
           requests:
             cpu: 250m
             memory: 512M
-{{- include "securityContext" . | nindent 6 }}
-{{- include "nodeSelector" (list .Values "syntect-server") | nindent 6 | trimSuffix "\n      " }}
+        volumeMounts:
+        {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
+      {{- include "securityContext" . | nindent 6 }}
+      {{- include "nodeSelector" (list .Values "syntect-server") | nindent 6 | trimSuffix "\n      " }}
+      volumes:
+      {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}

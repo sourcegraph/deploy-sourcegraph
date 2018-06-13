@@ -348,6 +348,20 @@ securityContext:
 
 {{/* --------------- START OF TEMPLATE ------------- */}}
 
+{{- define "commonVolumeMounts" -}}
+{{- include "expandedYAML" .Values.cluster.commonVolumeMounts -}}
+{{- end -}}
+
+
+{{/* --------------- START OF TEMPLATE ------------- */}}
+
+{{- define "commonVolumes" -}}
+{{- include "expandedYAML" .Values.cluster.commonVolumes -}}
+{{- end -}}
+
+
+{{/* --------------- START OF TEMPLATE ------------- */}}
+
 {{/* expands an object into pretty-printed YAML */}}
 {{- define "expandedYAML" -}}
 {{- if . }}{{ "\n" }}{{- include "_expandedYAML" . | trimSuffix "\n" -}}{{ end -}}
