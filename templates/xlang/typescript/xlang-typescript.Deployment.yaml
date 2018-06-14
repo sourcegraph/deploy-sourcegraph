@@ -57,6 +57,7 @@ spec:
           name: yarn-config
         - mountPath: /mnt/cache
           name: cache-ssd
+      {{- include "securityContext" . | nindent 6 }}
       {{- include "nodeSelector" (list .Values "xlangJavascriptTypescript") | nindent 6 | trimSuffix "\n      " }}
       volumes:
       {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}

@@ -41,6 +41,7 @@ spec:
         {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
         - mountPath: /cache
           name: npm-proxy-cache
+      {{- include "securityContext" . | nindent 6 }}
       {{- include "nodeSelector" (list .Values "npm-proxy") | nindent 6 | trimSuffix "\n      " }}
       volumes:
       {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}

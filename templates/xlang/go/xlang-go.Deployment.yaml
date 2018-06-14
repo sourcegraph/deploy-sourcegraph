@@ -67,6 +67,7 @@ spec:
         - mountPath: /mnt/cache
           name: cache-ssd
       {{- include "jaeger" . | nindent 6 | trimSuffix "\n      " }}
+      {{- include "securityContext" . | nindent 6 }}
       {{- include "nodeSelector" (list .Values "xlangGo") | nindent 6 | trimSuffix "\n      " }}
       volumes:
       {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
