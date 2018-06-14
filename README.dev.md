@@ -7,8 +7,11 @@
     updates the Docker image versions to be those currently deployed to dogfood.
 * Run `./generate.sh`.
 * Open a PR and wait for buildkite to pass and for your changes to be approved, then merge and check out master.
-* Run `./release.sh $VERSION`. If this is a release candidate, `$VERSION` should have the
-  suffix `-rcN` where `N` starts at 0 and increments as you test/cut new versions.
+* Run `./release.sh $VERSION`.
+  * If this is a patch version to a previous major/minor version, use `LATEST=false ./release.sh
+    $VERSION`.
+  * If this is a release candidate, run `LATEST=false ./release {$VERSION}-pre${N}` where `N` starts
+    at 0 and increments as you test/cut new versions.
 
 See `./release.sh --help` for information on what the script does.
 
