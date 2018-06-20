@@ -7,6 +7,11 @@
     updates the Docker image versions to be those currently deployed to dogfood.
 * Run `./generate.sh`.
 * Open a PR and wait for buildkite to pass and for your changes to be approved, then merge and check out master.
+* Test this release on dogfood before cutting a real release. If this release includes changes not
+  yet deployed to dogfood (generally if it includes k8s config changes, rather than merely Docker
+  image changes), cut a test release (`./release $TEST_VERSION`). Then go to the `infrastructure`
+  repository and follow the instructions in `datacenter/README.md` to update dogfood to the test
+  release.
 * Run `./release.sh $VERSION`.
   * If this is a patch version to a previous major/minor version, use `LATEST=false ./release.sh
     $VERSION`.
