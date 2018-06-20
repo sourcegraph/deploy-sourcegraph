@@ -64,7 +64,7 @@ spec:
         volumeMounts:
         {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
       {{- include "securityContext" . | nindent 6 }}
-      {{- include "nodeSelector" (list .Values "redis-store") | nindent 6 | trimSuffix "\n      " }}
+      {{- include "nodeSelector" (list .Values "redis") | nindent 6 | trimSuffix "\n      " }}
       volumes:
       {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
       - name: redis-data

@@ -39,6 +39,8 @@ spec:
         - mountPath: /tls
           name: tls
           readOnly: true
+      {{- include "securityContext" . | nindent 6 }}
+      {{- include "nodeSelector" (list .Values "authProxy") | nindent 6 | trimSuffix "\n      " }}
       volumes:
       {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
       - name: tls

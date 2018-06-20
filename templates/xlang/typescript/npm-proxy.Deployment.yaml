@@ -42,7 +42,7 @@ spec:
         - mountPath: /cache
           name: npm-proxy-cache
       {{- include "securityContext" . | nindent 6 }}
-      {{- include "nodeSelector" (list .Values "npm-proxy") | nindent 6 | trimSuffix "\n      " }}
+      {{- include "nodeSelector" (list .Values "npmProxy") | nindent 6 | trimSuffix "\n      " }}
       volumes:
       {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
       - name: npm-proxy-cache

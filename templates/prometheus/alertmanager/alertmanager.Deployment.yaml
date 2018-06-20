@@ -43,6 +43,8 @@ spec:
           readOnly: true
         - mountPath: /alertmanager
           name: data
+      {{- include "securityContext" . | nindent 6 }}
+      {{- include "nodeSelector" (list .Values "alertManager") | nindent 6 | trimSuffix "\n      " }}
       volumes:
       {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
       - configMap:

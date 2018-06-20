@@ -40,4 +40,6 @@ spec:
         {{- include "commonVolumeMounts" . | indent 8 | trimPrefix (repeat 8 " ") }}
       volumes:
       {{- include "commonVolumes" . | indent 6 | trimPrefix (repeat 6 " ") }}
+      {{- include "securityContext" . | nindent 6 }}
+      {{- include "nodeSelector" (list .Values "jaeger") | nindent 6 | trimSuffix "\n      " }}
 {{ end -}}
