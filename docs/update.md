@@ -9,6 +9,7 @@ To update to a new version, do the following:
 
 1. (Recommended) Check the diff the update will apply to your Kubernetes cluster:
    ```bash
+   # NOTE: use `./helm.sh` instead of `helm` if you migrated from `sourcegraph-server-gen`
    helm diff upgrade -f values.yaml sourcegraph https://github.com/sourcegraph/datacenter/archive/$VERSION.tar.gz | less -R
    ```
    You can find a list of all version releases here: https://github.com/sourcegraph/deploy-sourcegraph/releases.
@@ -18,6 +19,7 @@ To update to a new version, do the following:
    ```
 1. Apply the update:
    ```bash
+   # NOTE: use `./helm.sh` instead of `helm` if you migrated from `sourcegraph-server-gen`
    helm upgrade -f values.yaml sourcegraph https://github.com/sourcegraph/datacenter/archive/$VERSION.tar.gz
    ```
 1. Check the health of the cluster after upgrade:
