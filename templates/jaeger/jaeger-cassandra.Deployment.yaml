@@ -40,6 +40,8 @@ spec:
         volumeMounts:
         - mountPath: /var/lib/cassandra
           name: data
+      {{- include "securityContext" . | nindent 6 }}
+      {{- include "nodeSelector" (list .Values "jaeger") | nindent 6 | trimSuffix "\n      " }}
       volumes:
       - name: data
         persistentVolumeClaim:

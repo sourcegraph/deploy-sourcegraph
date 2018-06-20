@@ -37,4 +37,6 @@ spec:
           requests:
             cpu: 500m
             memory: 1Gi
+      {{- include "securityContext" . | nindent 6 }}
+      {{- include "nodeSelector" (list .Values "jaeger") | nindent 6 | trimSuffix "\n      " }}
 {{ end -}}

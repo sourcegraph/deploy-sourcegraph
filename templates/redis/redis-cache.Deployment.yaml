@@ -60,8 +60,8 @@ spec:
           requests:
             cpu: 10m
             memory: 20Mi
-{{- include "securityContext" . | nindent 6 }}
-{{- include "nodeSelector" (list .Values "redis-cache") | nindent 6 | trimSuffix "\n      " }}
+      {{- include "securityContext" . | nindent 6 }}
+      {{- include "nodeSelector" (list .Values "redis") | nindent 6 | trimSuffix "\n      " }}
       volumes:
       - name: redis-data
         persistentVolumeClaim:
