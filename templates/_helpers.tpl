@@ -71,9 +71,6 @@
 {{- $_ := set .envVars "OIDC_CLIENT_SECRET" .Values.site.oidcClientSecret -}}
 {{- $_ := set .envVars "OIDC_EMAIL_DOMAIN" .Values.site.oidcEmailDomain -}}
 {{- $_ := set .envVars "OIDC_OVERRIDE_TOKEN" .Values.site.oidcOverrideToken -}}
-{{- $_ := set .envVars "SAML_CERT" .Values.site.samlSPCert -}}
-{{- $_ := set .envVars "SAML_KEY" .Values.site.samlSPKey -}}
-{{- $_ := set .envVars "SAML_ID_PROVIDER_METADATA_URL" .Values.site.samlIDProviderMetadataURL -}}
 {{- $_ := set .envVars "MAX_REPOS_TO_SEARCH" .Values.site.maxReposToSearch -}}
 {{- if .Values.site.experimentIndexedSearch -}}
     {{- $_ := set .envVars "SEARCH_UNINDEXED_NOMISSING" "t" -}}
