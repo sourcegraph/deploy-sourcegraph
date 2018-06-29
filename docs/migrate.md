@@ -12,7 +12,7 @@ Ensure you have Helm 2.9.1 or later installed.
 
 1. Upgrade to Sourcegraph Data Center 2.8.14 using the legacy process:
    ```bash
-   sourcegraph-server-gen update 2.8.14
+   sourcegraph-server-gen update 2.8.14.f
    sourcegraph-server-gen config.json ./helm-chart
    helm upgrade sourcegraph ./helm-chart
    ```
