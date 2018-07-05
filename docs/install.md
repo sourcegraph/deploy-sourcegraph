@@ -63,13 +63,6 @@ sure you have [configured `kubectl` to access your cluster](https://kubernetes.i
      underlying disk type. For more info, see the section below on "creating a storage class
      manually".
 
-1. Examine the sample `values.yaml` in the `deploy-sourcegraph` repo for additional starting
-   configuration values. Do not copy fields in if you don't need to change them; the values
-   in your user-provided file are merged in on top of this file. The existing resource
-   allocations are probably a reasonable starting point.
-
-   If you find you've made errors, you can update `values.yaml` using `helm upgrade`; for
-   more information, read about [upgrading Sourcegraph Data Center](upgrade.md).
 
 1. Install the Helm chart to your cluster:
 
@@ -79,18 +72,8 @@ sure you have [configured `kubectl` to access your cluster](https://kubernetes.i
 
    If you see the error `could not find a ready tiller pod`, wait a minute and try again.
 
-1. Confirm that your deployment is launching by running `kubectl get pods`. If pods get stuck in `Pending` status, run
-   `kubectl get pv` to check if the necessary volumes have been provisioned (you should see at least 4). Google Cloud
-   Platform users may need to [request an increase in storage quota](https://cloud.google.com/compute/quotas).
-   If you have enough volumes, but pods are still stuck, `kubectl cluster-info dump` (very verbose, dump it to a file)
-   may have more information; for instance:
-   ```
-    "Reason": "FailedScheduling",
-    "Message": "0/3 nodes are available: 1 Insufficient memory, 3 Insufficient cpu.",
-   ```
-
-   That could indicate failing to specify `--machine-type=n1-standard-16`. Google's default is `n1-standard-1`;
-   this provides only single-CPU nodes, which are never able to satisfy requests for a 2-CPU node.
+1. Confirm that your deployment is launching by running `kubectl get pods`. If pods get stuck in `Pending`
+   status, see the [Troubleshooting page](troubleshoot.md).
 
 1. When the deployment completes, you need to make the main web server accessible over the network to external users. To
    do so, connect port 30080 (or the value of `httpNodePort` in the site config) on the nodes in the cluster to the
@@ -98,15 +81,24 @@ sure you have [configured `kubectl` to access your cluster](https://kubernetes.i
    one node
    (see
    [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html),
-   [Google Cloud Platform Firewall rules](https://cloud.google.com/compute/docs/vpc/using-firewalls)). Sourcegraph
-   should then be accessible at `$EXTERNAL_ADDR_OF_YOUR_NODE:30080`. If you have multiple nodes, all the addresses
-   should work interchangeably, because kube-proxy fakes that up for you. For production environments, we recommend using
+   [Google Cloud Platform Firewall rules](https://cloud.google.com/compute/docs/vpc/using-firewalls)).
+   Sourcegraph should then be accessible at `$EXTERNAL_ADDR:30080`, where `$EXTERNAL_ADDR` is the
+   address of *any* node in the cluster. For production environments, we recommend using
    an [Internet Gateway](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html) (or
    equivalent) and configuring a load balancer in Kubernetes.
 
 You will now see the Sourcegraph setup page when you visit the address of your instance. If you made your instance
 accessible on the public Internet, make sure you secure it before adding your private repositories.
 
+## Additional configuration
+
+For additional configuration options, examine the sample `values.yaml` in the `deploy-sourcegraph`
+repo for additional starting configuration values. Do not copy fields in if you don't need to change
+them; the values in your user-provided file are merged in on top of this file. The existing resource
+allocations are probably a reasonable starting point.
+
+If you find you've made errors, you can update your cluster to use an updated `values.yaml`
+using `helm upgrade`; for more information, read about [Updating Sourcegraph Data Center](update.md).
 
 ### Add language servers for code intelligence
 
