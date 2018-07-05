@@ -43,7 +43,9 @@ sure you have [configured `kubectl` to access your cluster](https://kubernetes.i
        create: {none,aws,gcp}
        name: $NAME
        zone: $ZONE
-   site: {}
+   site: {
+     "auth.providers": [{"type": "builtin", "allowSignup": false}],
+   }
    ```
 
    - If using Google Cloud, set `cluster.storageClass.create` to `gcp` and
@@ -60,6 +62,14 @@ sure you have [configured `kubectl` to access your cluster](https://kubernetes.i
      Kubernetes cluster with name "default". We recommend that the storage class use SSDs as the
      underlying disk type. For more info, see the section below on "creating a storage class
      manually".
+
+1. Examine the sample `values.yaml` in the `deploy-sourcegraph` repo for additional starting
+   configuration values. Do not copy fields in if you don't need to change them; the values
+   in your user-provided file are merged in on top of this file. The existing resource
+   allocations are probably a reasonable starting point.
+
+   If you find you've made errors, you can update `values.yaml` using `helm upgrade`; for
+   more information, read about [upgrading Sourcegraph Data Center](upgrade.md).
 
 1. Install the Helm chart to your cluster:
 
@@ -79,8 +89,8 @@ sure you have [configured `kubectl` to access your cluster](https://kubernetes.i
     "Message": "0/3 nodes are available: 1 Insufficient memory, 3 Insufficient cpu.",
    ```
 
-   That could indicate failing to specify `--machine-type=n1-standard-16`; Google's default is `n1-standard-1`,
-   which provides only single-CPU nodes, which are never able to satisfy requests for a 2-CPU node.
+   That could indicate failing to specify `--machine-type=n1-standard-16`. Google's default is `n1-standard-1`;
+   this provides only single-CPU nodes, which are never able to satisfy requests for a 2-CPU node.
 
 1. When the deployment completes, you need to make the main web server accessible over the network to external users. To
    do so, connect port 30080 (or the value of `httpNodePort` in the site config) on the nodes in the cluster to the
