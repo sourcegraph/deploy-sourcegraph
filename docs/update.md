@@ -27,6 +27,9 @@ To update to a new version, do the following:
    watch kubectl get pods -o wide
    ```
 
+If you just want to update site configuration (the `site` tag of your `values.yaml`), use the same procedure,
+specifying the version number of the version you're currently running instead of a newer version or `latest`.
+
 ### Rollback
 
 ```
