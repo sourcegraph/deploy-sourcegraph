@@ -72,6 +72,15 @@ sure you have [configured `kubectl` to access your cluster](https://kubernetes.i
 1. Confirm that your deployment is launching by running `kubectl get pods`. If pods get stuck in `Pending` status, run
    `kubectl get pv` to check if the necessary volumes have been provisioned (you should see at least 4). Google Cloud
    Platform users may need to [request an increase in storage quota](https://cloud.google.com/compute/quotas).
+   If you have enough volumes, but pods are still stuck, `kubectl cluster-info dump` (very verbose, dump it to a file)
+   may have more information; for instance:
+   ```
+    "Reason": "FailedScheduling",
+    "Message": "0/3 nodes are available: 1 Insufficient memory, 3 Insufficient cpu.",
+   ```
+
+   That could indicate failing to specify `--machine-type=n1-standard-16`; Google's default is `n1-standard-1`,
+   which provides only single-CPU nodes, which are never able to satisfy requests for a 2-CPU node.
 
 1. When the deployment completes, you need to make the main web server accessible over the network to external users. To
    do so, connect port 30080 (or the value of `httpNodePort` in the site config) on the nodes in the cluster to the
@@ -80,7 +89,8 @@ sure you have [configured `kubectl` to access your cluster](https://kubernetes.i
    (see
    [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html),
    [Google Cloud Platform Firewall rules](https://cloud.google.com/compute/docs/vpc/using-firewalls)). Sourcegraph
-   should then be accessible at `$EXTERNAL_ADDR_OF_YOUR_NODE:30080`. For production environments, we recommend using
+   should then be accessible at `$EXTERNAL_ADDR_OF_YOUR_NODE:30080`. If you have multiple nodes, all the addresses
+   should work interchangeably, because kube-proxy fakes that up for you. For production environments, we recommend using
    an [Internet Gateway](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html) (or
    equivalent) and configuring a load balancer in Kubernetes.
 
