@@ -181,7 +181,7 @@ data:
 
 {{- if .Values.site.prometheus.customRules }}
   extra.rules: |
-{{ include "expandedString" (dict "str" .Values.site.prometheus.customRules "Files" .Files) | trimSuffix "\n" | indent 4 }}
+{{ .Values.site.prometheus.customRules | indent 4 }}
 {{- else }}
   extra.rules: ""
 {{- end }}
