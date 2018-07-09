@@ -41,3 +41,7 @@ site:
       route:src_http_request_duration_seconds_bucket:rate5m = sum by (route, ns, le)(task:src_http_request_duration_seconds_bucket:rate5m)
       job:src_http_request_duration_seconds_bucket:rate5m = sum by (ns, le)(task:src_http_request_duration_seconds_bucket:rate5m)
       prod:src_http_request_duration_seconds_bucket:rate5m = sum by (le)(task:src_http_request_duration_seconds_bucket:rate5m)
+  useAlertManager: true
+  alertmanagerConfig: |
+    # example
+    # nothing
