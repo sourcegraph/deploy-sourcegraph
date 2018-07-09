@@ -58,6 +58,9 @@ spec:
           name: sg-config
         - mountPath: /data/repos
           name: repos
+        - mountPath: /root/.ssh
+          name: ssh
+        
       - command:
         - /go/bin/agent-linux
         - --collector.host-port=jaeger-collector:14267
@@ -80,4 +83,9 @@ spec:
       - name: repos
         persistentVolumeClaim:
           claimName: gitserver-1
+      - name: ssh
+        secret:
+          defaultMode: 384
+          secretName: gitserver-ssh
+      
 
