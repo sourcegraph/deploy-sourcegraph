@@ -1,8 +1,12 @@
 {{- if .Values.site.useAlertManager -}}
 apiVersion: v1
 data:
+{{- if .Values.site.alertmanagerConfig }}
   config.yml: |
-    {{- include "expandedString" (dict "str" .Values.site.alertmanagerConfig "Files" .Files) | nindent 4 }}
+    {{- .Values.site.alertmanagerConfig | nindent 4 }}
+{{- else }}
+  config.yml: ""
+{{- end }}
 kind: ConfigMap
 metadata:
   name: alertmanager
