@@ -3,9 +3,11 @@
 A new version of Sourcegraph is released every month (with patch releases in between, released as
 needed). Check the [Sourcegraph blog](https://about.sourcegraph.com/blog) for release announcements.
 
-## Update to a new version of Sourcegraph Data Center
+## Update Sourcegraph Data Center
 
-To update to a new version, do the following:
+To update configuration or update to a new version, do the following:
+
+1. Make whatever changes you want to your `values.yaml` file.
 
 1. (Recommended) Check the diff the update will apply to your Kubernetes cluster:
    ```bash
@@ -26,9 +28,6 @@ To update to a new version, do the following:
    ```bash
    watch kubectl get pods -o wide
    ```
-
-If you just want to update site configuration (the `site` tag of your `values.yaml`), use the same procedure,
-specifying the version number of the version you're currently running instead of a newer version or `latest`.
 
 ### Rollback
 
