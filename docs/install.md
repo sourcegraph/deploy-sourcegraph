@@ -90,16 +90,6 @@ sure you have [configured `kubectl` to access your cluster](https://kubernetes.i
 You will now see the Sourcegraph setup page when you visit the address of your instance. If you made your instance
 accessible on the public Internet, make sure you secure it before adding your private repositories.
 
-## Additional configuration
-
-For additional configuration options, examine the sample `values.yaml` in the `deploy-sourcegraph`
-repo for additional starting configuration values. Do not copy fields in if you don't need to change
-them; the values in your user-provided file are merged in on top of this file. The existing resource
-allocations are probably a reasonable starting point.
-
-If you find you've made errors, you can update your cluster to use an updated `values.yaml`
-using `helm upgrade`; for more information, read about [Updating Sourcegraph Data Center](update.md).
-
 ### Add language servers for code intelligence
 
 > Code intelligence is a [paid upgrade](https://about.sourcegraph.com/pricing/) on top of the Data
@@ -158,6 +148,9 @@ For common site configuration tasks, see:
 - "[Use a custom domain](https://about.sourcegraph.com/docs/config/custom-domain)"
 - "[Using TLS/SSL](https://about.sourcegraph.com/docs/config/tlsssl)"
 - "[Monitoring and tracing](https://about.sourcegraph.com/docs/config/monitoring-and-tracing)"
+
+After updating configuration, follow the [update instructions](./update.md) to apply the changes to
+your Sourcegraph Data Center instance.
 
 ### Troubleshooting
 
