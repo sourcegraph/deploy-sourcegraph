@@ -63,7 +63,6 @@ sure you have [configured `kubectl` to access your cluster](https://kubernetes.i
      underlying disk type. For more info, see the section below on "creating a storage class
      manually".
 
-
 1. Install the Helm chart to your cluster:
 
    ```bash
