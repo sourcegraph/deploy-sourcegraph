@@ -25,7 +25,7 @@ spec:
         - serve
         env:
         - name: CONFIG_FILE_HASH
-          value: 691e80e016fb90458ddbfb4ea767cbc6f0e683f9543c245692a5bd0fcace0c5a
+          value: 2528a0893ab486460532ebc49de296b3ffc523807eca4a53c6735ac99d0857a0
         - name: DEPLOY_TYPE
           value: datacenter
         - name: LSP_PROXY
@@ -74,6 +74,16 @@ spec:
           value: "123123123123"
         - name: ZOEKT_HOST
           value: indexed-search:80
+        - name: TLS_CERT
+          valueFrom:
+            secretKeyRef:
+              key: cert
+              name: tls
+        - name: TLS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: key
+              name: tls
         image: docker.sourcegraph.com/frontend:17750_2018-06-30_9391756
         livenessProbe:
           httpGet:
