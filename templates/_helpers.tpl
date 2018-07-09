@@ -112,10 +112,6 @@
     {{- $_ := set .envVars "HTML_HEAD_TOP" .Values.site.htmlHeadTop -}}
 {{ end -}}
 
-{{- if .Values.site.licenseKey -}}
-    {{- $_ := set .envVars "LICENSE_KEY" (include "expandedString" (dict "str" .Values.site.licenseKey "Files" .Files) | trimSuffix "\n" | printf "%q") -}}
-{{- end -}}
-
 {{- $_ := set .envVars "LSP_PROXY" "lsp-proxy:4388" -}}
 
 {{- $_ := set .envVars "PUBLIC_REPO_REDIRECTS" "\"true\"" -}}
@@ -170,7 +166,7 @@
 ]
 
 {{- else if (typeIsLike "string" .val) -}}
-    {{ include "expandedString" (dict "str" .val "Files" .Files) | printf "%q" }}
+    {{ if not .val }}""{{ else }}{{ printf "%q" .val }}{{ end }}
 {{- else if (typeIsLike "float64" .val) -}}
     {{ printf "%g" .val }}
 {{- else if (typeIsLike "bool" .val) -}}
@@ -181,22 +177,6 @@
     {{ call "error: unsupported JSON type" }}
 {{- end -}}
 
-{{- end -}}
-
-{{/* --------------- START OF TEMPLATE ------------- */}}
-
-{{/* If a string begins with "file!", emits the contents of the file named by everything after the "file!" prefix. */}}
-{{- define "expandedString" -}}
-{{- $str := .str -}}
-{{- $Files := .Files -}}
-
-{{- if not $str -}}
-    {{- "" -}}
-{{- else if (hasPrefix "file!" $str) -}}
-    {{ trimPrefix "file!" $str | $Files.Get }}
-{{- else -}}
-    {{ $str }}
-{{- end -}}
 {{- end -}}
 
 {{/* --------------- START OF TEMPLATE ------------- */}}
