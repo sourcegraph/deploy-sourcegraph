@@ -32,3 +32,12 @@ cluster:
 site:
   useJaeger: true
   siteID: "123123123123"
+  prometheus:
+    customRules: |
+      src_xlang_request_duration_seconds_bucket:rate1d = sum by (le, mode, method)(rate(src_xlang_request_duration_seconds_bucket{success="true"}[1d]))
+
+      # Duration (5m)
+      task:src_http_request_duration_seconds_bucket:rate5m = rate(src_http_request_duration_seconds_bucket{job=~"sourcegraph-.*"}[5m])
+      route:src_http_request_duration_seconds_bucket:rate5m = sum by (route, ns, le)(task:src_http_request_duration_seconds_bucket:rate5m)
+      job:src_http_request_duration_seconds_bucket:rate5m = sum by (ns, le)(task:src_http_request_duration_seconds_bucket:rate5m)
+      prod:src_http_request_duration_seconds_bucket:rate5m = sum by (le)(task:src_http_request_duration_seconds_bucket:rate5m)
