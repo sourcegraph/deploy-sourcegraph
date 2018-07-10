@@ -29,8 +29,8 @@ def main(params_path):
         content = fd.read()
     images = get_image_tags()
 
-    if 'docker.sourcegraph.com/dogfood-bot' not in images:
-        print('WARNING: dogfood-bot image is not present. Please ensure your kctx is pointing to dogfood')
+    if 'docker.sourcegraph.com/bitbucket-server' not in images:
+        print('WARNING: bitbucket-server image is not present. Please ensure your kctx is pointing to dogfood')
     for name, tag in images.items():
         content = re.sub(r'image\: ({})\:([A-Za-z0-9\-\._]+)'.format(name), r'image: \1:{}'.format(tag), content)
     with open(params_path, 'w') as fd:
