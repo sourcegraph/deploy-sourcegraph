@@ -42,8 +42,6 @@ spec:
           value: sg
         - name: PUBLIC_REPO_REDIRECTS
           value: "true"
-        - name: REDIS_MASTER_ENDPOINT
-          value: redis-cache:6379
         - name: SEARCHER_URL
           value: k8s+http://searcher:3181
         - name: SOURCEGRAPH_CONFIG_FILE
@@ -58,8 +56,6 @@ spec:
           value: dbug
         - name: SRC_PROF_HTTP
           value: :6060
-        - name: SRC_SESSION_STORE_REDIS
-          value: redis-store:6379
         - name: SRC_SYNTECT_SERVER
           value: http://syntect-server:9238
         - name: SYMBOLS_URL
@@ -78,7 +74,7 @@ spec:
             secretKeyRef:
               key: key
               name: tls
-        image: docker.sourcegraph.com/frontend:17750_2018-06-30_9391756
+        image: docker.sourcegraph.com/frontend:18005_2018-07-09_0bcc142
         livenessProbe:
           httpGet:
             path: /healthz
