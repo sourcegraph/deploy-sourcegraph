@@ -114,13 +114,11 @@
 {{- $_ := set .envVars "LSP_PROXY" "lsp-proxy:4388" -}}
 
 {{- $_ := set .envVars "PUBLIC_REPO_REDIRECTS" "\"true\"" -}}
-{{- $_ := set .envVars "REDIS_MASTER_ENDPOINT" "redis-cache:6379" -}}
 {{- $_ := set .envVars "SEARCHER_URL" "k8s+http://searcher:3181" -}}
 {{- $_ := set .envVars "SRC_GIT_SERVERS" (include "gitservers" .) -}}
 {{- $_ := set .envVars "SRC_INDEXER" "indexer:3179" -}}
 {{- $_ := set .envVars "SRC_LOG_LEVEL" "dbug" -}}
 {{- $_ := set .envVars "SRC_SESSION_COOKIE_KEY" .Values.site.sessionCookieKey -}}
-{{- $_ := set .envVars "SRC_SESSION_STORE_REDIS" "redis-store:6379" -}}
 {{- $_ := set .envVars "SRC_SYNTECT_SERVER" "http://syntect-server:9238" -}}
 {{- $_ := set .envVars "SRC_PROF_HTTP" ":6060" -}}
 {{- $_ := set .envVars "SYMBOLS_URL" "k8s+http://symbols:3184" -}}
