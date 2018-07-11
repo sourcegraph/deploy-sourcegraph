@@ -5,7 +5,6 @@
 {{- include "collectFrontendCommonEnv" (dict "envVars" $envVars "Values" .Values "Files" .Files) }}
 {{- include "collectPostgresEnv" (dict "envVars" $envVars "Values" .Values) -}}
 {{- include "collectEnv" (list $envVars .Values.cluster.frontend.containers.frontend.env) -}}
-{{- $_ := set $envVars "ZOEKT_HOST" "indexed-search:80" -}}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
