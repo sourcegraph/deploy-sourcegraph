@@ -60,7 +60,6 @@
 {{- $_ := set .envVars "DEPLOY_TYPE" "datacenter" -}}
 {{- $_ := set .envVars "CORS_ORIGIN" .Values.site.corsOrigin -}}
 {{- $_ := set .envVars "NO_GO_GET_DOMAINS" .Values.site.noGoGetDomains -}}
-{{- $_ := set .envVars "SRC_APP_DISABLE_SUPPORT_SERVICES" "\"true\"" -}}
 {{- $_ := set .envVars "SRC_APP_URL" .Values.site.appURL -}}
 {{- if .Values.site.siteID -}}
     {{- $_ := set .envVars "TRACKING_APP_ID" (quote .Values.site.siteID) -}}
