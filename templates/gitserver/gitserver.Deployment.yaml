@@ -48,8 +48,6 @@ spec:
         ports:
         - containerPort: 3178
           name: rpc
-        - containerPort: 3278
-          name: rpcnew
         {{- include "resourceRequirements" (list $global.Values "gitserver" "gitserver") | nindent 8 }}
         volumeMounts:
         {{- include "commonVolumeMounts" $global | indent 8 | trimPrefix (repeat 8 " ") }}
