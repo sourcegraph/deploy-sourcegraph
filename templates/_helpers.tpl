@@ -116,7 +116,6 @@
 
 {{- $_ := set .envVars "PUBLIC_REPO_REDIRECTS" "\"true\"" -}}
 {{- $_ := set .envVars "REDIS_MASTER_ENDPOINT" "redis-cache:6379" -}}
-{{- $_ := set .envVars "REPO_UPDATER_URL" "http://repo-updater:3182" -}}
 {{- $_ := set .envVars "SEARCHER_URL" "k8s+http://searcher:3181" -}}
 {{- $_ := set .envVars "SRC_GIT_SERVERS" (include "gitservers" .) -}}
 {{- $_ := set .envVars "SRC_INDEXER" "indexer:3179" -}}
