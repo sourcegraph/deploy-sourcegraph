@@ -114,7 +114,6 @@
 {{- $_ := set .envVars "LSP_PROXY" "lsp-proxy:4388" -}}
 
 {{- $_ := set .envVars "PUBLIC_REPO_REDIRECTS" "\"true\"" -}}
-{{- $_ := set .envVars "SEARCHER_URL" "k8s+http://searcher:3181" -}}
 {{- $_ := set .envVars "SRC_GIT_SERVERS" (include "gitservers" .) -}}
 {{- $_ := set .envVars "SRC_INDEXER" "indexer:3179" -}}
 {{- $_ := set .envVars "SRC_LOG_LEVEL" "dbug" -}}
