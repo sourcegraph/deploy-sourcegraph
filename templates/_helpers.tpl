@@ -116,7 +116,6 @@
 {{- $_ := set .envVars "PUBLIC_REPO_REDIRECTS" "\"true\"" -}}
 {{- $_ := set .envVars "SRC_GIT_SERVERS" (include "gitservers" .) -}}
 {{- $_ := set .envVars "SRC_SESSION_COOKIE_KEY" .Values.site.sessionCookieKey -}}
-{{- $_ := set .envVars "SRC_PROF_HTTP" ":6060" -}}
 
 {{- end -}}
 
