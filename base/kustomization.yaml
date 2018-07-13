@@ -1,7 +1,6 @@
 resources:
-# find . -name '*yaml' | sort | sed 's/^.\//- /'
+# find . -name '*yaml' | sort | sed 's/^.\//- /' | grep -v kustomization.yaml
 - backend.Service.yaml
-- config-file.ConfigMap.yaml
 - frontend/sourcegraph-frontend-internal.Service.yaml
 - frontend/sourcegraph-frontend.Deployment.yaml
 - frontend/sourcegraph-frontend.Role.yaml
@@ -10,15 +9,15 @@ resources:
 - frontend/sourcegraph-frontend.ServiceAccount.yaml
 - github-proxy/github-proxy.Deployment.yaml
 - github-proxy/github-proxy.Service.yaml
-- gitserver/gitserver.Deployment.yaml
-- gitserver/gitserver.PersistentVolumeClaim.yaml
+- gitserver/gitserver-1.Deployment.yaml
+- gitserver/gitserver-1.PersistentVolumeClaim.yaml
+- gitserver/gitserver-1.Service.yaml
 - gitserver/gitserver.Service.yaml
 - indexed-search/indexed-search.Deployment.yaml
 - indexed-search/indexed-search.PersistentVolumeClaim.yaml
 - indexed-search/indexed-search.Service.yaml
 - indexer/indexer.Deployment.yaml
 - indexer/indexer.Service.yaml
-- kustomization.yaml
 - lsp-proxy/lsp-proxy.Deployment.yaml
 - lsp-proxy/lsp-proxy.Service.yaml
 - pgsql/pgsql.Deployment.yaml
