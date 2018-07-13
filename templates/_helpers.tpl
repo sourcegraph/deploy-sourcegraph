@@ -81,12 +81,21 @@
 
 {{- define "collectPostgresEnv" -}}
 
-{{- $_ := set .envVars "PGDATABASE" "sg" -}}
-{{- $_ := set .envVars "PGHOST" "pgsql" -}}
-{{- $_ := set .envVars "PGPASSWORD" "" -}}
-{{- $_ := set .envVars "PGPORT" "\"5432\"" -}}
-{{- $_ := set .envVars "PGSSLMODE" "disable" -}}
-{{- $_ := set .envVars "PGUSER" "sg" -}}
+{{- if .Values.cluster.customPostgres -}}
+    {{- $_ := set .envVars "PGDATABASE" .Values.cluster.customPostgres.database -}}
+    {{- $_ := set .envVars "PGHOST" .Values.cluster.customPostgres.host -}}
+    {{- $_ := set .envVars "PGPASSWORD" .Values.cluster.customPostgres.password -}}
+    {{- $_ := set .envVars "PGPORT" .Values.cluster.customPostgres.port -}}
+    {{- $_ := set .envVars "PGSSLMODE" .Values.cluster.customPostgres.sslMode -}}
+    {{- $_ := set .envVars "PGUSER" .Values.cluster.customPostgres.user -}}
+{{- else -}}
+    {{- $_ := set .envVars "PGDATABASE" "sg" -}}
+    {{- $_ := set .envVars "PGHOST" "pgsql" -}}
+    {{- $_ := set .envVars "PGPASSWORD" "" -}}
+    {{- $_ := set .envVars "PGPORT" "\"5432\"" -}}
+    {{- $_ := set .envVars "PGSSLMODE" "disable" -}}
+    {{- $_ := set .envVars "PGUSER" "sg" -}}
+{{- end -}}
 
 {{- end -}}
 
