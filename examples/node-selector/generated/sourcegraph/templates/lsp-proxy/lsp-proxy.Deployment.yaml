@@ -54,15 +54,13 @@ spec:
           value: /etc/sourcegraph/config.json
         - name: SRC_GIT_SERVERS
           value: gitserver-1:3178
-        - name: SRC_PROF_HTTP
-          value: :6060
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: docker.sourcegraph.com/lsp-proxy:18028_2018-07-10_9a03f6a
+        image: docker.sourcegraph.com/lsp-proxy:18232_2018-07-12_21a0f96
         livenessProbe:
           initialDelaySeconds: 5
           tcpSocket:
