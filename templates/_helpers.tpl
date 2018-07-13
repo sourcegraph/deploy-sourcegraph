@@ -81,13 +81,13 @@
 
 {{- define "collectPostgresEnv" -}}
 
-{{- if .Values.cluster.postgres -}}
-    {{- $_ := set .envVars "PGDATABASE" .Values.cluster.postgres.database -}}
-    {{- $_ := set .envVars "PGHOST" .Values.cluster.postgres.host -}}
-    {{- $_ := set .envVars "PGPASSWORD" .Values.cluster.postgres.password -}}
-    {{- $_ := set .envVars "PGPORT" .Values.cluster.postgres.port -}}
-    {{- $_ := set .envVars "PGSSLMODE" .Values.cluster.postgres.sslMode -}}
-    {{- $_ := set .envVars "PGUSER" .Values.cluster.postgres.user -}}
+{{- if .Values.cluster.postgreSQL -}}
+    {{- $_ := set .envVars "PGDATABASE" .Values.cluster.postgreSQL.database -}}
+    {{- $_ := set .envVars "PGHOST" .Values.cluster.postgreSQL.host -}}
+    {{- $_ := set .envVars "PGPASSWORD" .Values.cluster.postgreSQL.password -}}
+    {{- $_ := set .envVars "PGPORT" .Values.cluster.postgreSQL.port -}}
+    {{- $_ := set .envVars "PGSSLMODE" .Values.cluster.postgreSQL.sslMode -}}
+    {{- $_ := set .envVars "PGUSER" .Values.cluster.postgreSQL.user -}}
 {{- else -}}
     {{- $_ := set .envVars "PGDATABASE" "sg" -}}
     {{- $_ := set .envVars "PGHOST" "pgsql" -}}
