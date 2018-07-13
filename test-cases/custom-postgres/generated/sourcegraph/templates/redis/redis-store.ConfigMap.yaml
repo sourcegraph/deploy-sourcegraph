@@ -1,0 +1,19 @@
+##---
+# Source: sourcegraph/templates/redis/redis-store.ConfigMap.yaml
+apiVersion: v1
+data:
+  redis.conf: |
+    # allow access from all instances
+    protected-mode no
+
+    # limit memory usage, return error when hitting limit
+    maxmemory 5gb
+    maxmemory-policy noeviction
+
+    # live commit log to disk, additionally snapshots every 10 minutes
+    dir /redis-data/
+    appendonly yes
+    save 600 1
+kind: ConfigMap
+metadata:
+  name: redis-store

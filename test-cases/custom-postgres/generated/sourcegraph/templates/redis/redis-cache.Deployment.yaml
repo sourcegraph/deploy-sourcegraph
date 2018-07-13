@@ -1,0 +1,74 @@
+##---
+# Source: sourcegraph/templates/redis/redis-cache.Deployment.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: Redis for storing short-lived caches.
+  name: redis-cache
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: redis-cache
+    spec:
+      containers:
+      - command:
+        - redis-server
+        - /etc/redis/redis.conf
+        image: docker.sourcegraph.com/redis:18-02-07_8205764_3.2-alpine
+        name: redis
+        ports:
+        - containerPort: 6379
+          name: redis
+        livenessProbe:
+          tcpSocket:
+            port: redis
+          initialDelaySeconds: 30
+        readinessProbe:
+          tcpSocket:
+            port: redis
+          initialDelaySeconds: 5
+        resources:
+          limits:
+            cpu: "1"
+            memory: 6Gi
+          requests:
+            cpu: 250m
+            memory: 500M
+        volumeMounts:
+        - mountPath: /redis-data
+          name: redis-data
+        - mountPath: /etc/redis
+          name: config
+          readOnly: true
+      - image: docker.sourcegraph.com/redis_exporter:18-02-07_bb60087_v0.15.0
+        name: redis-exporter
+        ports:
+        - containerPort: 9121
+          name: redisexp
+        resources:
+          limits:
+            cpu: 10m
+            memory: 20Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        volumeMounts:
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-cache
+      - configMap:
+          name: redis-cache
+        name: config
