@@ -1,3 +1,4 @@
+{{- if not (hasKey .Values.cluster "postgreSQL") -}}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -68,3 +69,4 @@ spec:
       - name: disk
         persistentVolumeClaim:
           claimName: pgsql
+{{- end -}}
