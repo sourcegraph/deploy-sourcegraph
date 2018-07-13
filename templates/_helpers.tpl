@@ -101,6 +101,20 @@
 
 {{/* --------------- START OF TEMPLATE ------------- */}}
 
+{{- define "collectRedisEnv" -}}
+
+{{- if .Values.cluster.customRedis -}}
+    {{- if .Values.cluster.customRedis.cache -}}
+        {{- $_ := set .envVars "REDIS_CACHE_ENDPOINT" .Values.cluster.customRedis.cache -}}
+    {{- end -}}
+    {{- if .Values.cluster.customRedis.store -}}
+        {{- $_ := set .envVars "REDIS_STORE_ENDPOINT" .Values.cluster.customRedis.store -}}
+    {{- end -}}
+{{- end -}}
+
+{{- end -}}
+
+{{/* --------------- START OF TEMPLATE ------------- */}}
 
 {{- define "collectFrontendCommonEnv" -}}
 

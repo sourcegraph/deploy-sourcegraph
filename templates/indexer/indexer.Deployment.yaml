@@ -1,6 +1,7 @@
 {{- $envVars := dict -}}
 {{- include "collectConfigEnv" (dict "envVars" $envVars "Values" .Values "Files" .Files) }}
 {{- include "collectPostgresEnv" (dict "envVars" $envVars "Values" .Values) }}
+{{- include "collectRedisEnv" (dict "envVars" $envVars "Values" .Values) -}}
 {{- include "collectTracingEnv" (dict "envVars" $envVars "Values" .Values) }}
 {{- $_ := set $envVars "LSP_PROXY" "lsp-proxy:4388" -}}
 {{- $_ := set $envVars "SRC_GIT_SERVERS" (include "gitservers" .) -}}

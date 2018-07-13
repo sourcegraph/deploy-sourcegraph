@@ -1,6 +1,7 @@
 {{- $envVars := dict -}}
 {{- include "collectConfigEnv" (dict "envVars" $envVars "Values" .Values "Files" .Files) }}
 {{- include "collectTracingEnv" (dict "envVars" $envVars "Values" .Values) }}
+{{- include "collectRedisEnv" (dict "envVars" $envVars "Values" .Values) -}}
 {{- $_ := set $envVars "SRC_GIT_SERVERS" (include "gitservers" .) -}}
 {{- $_ := set $envVars "SRC_PROF_HTTP" ":6060" -}}
 {{- $_ := set $envVars "REPO_LIST_UPDATE_INTERVAL" .Values.site.repoListUpdateInterval -}}
