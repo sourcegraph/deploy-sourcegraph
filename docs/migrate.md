@@ -46,12 +46,6 @@ Ensure you have Helm 2.9.1 or later installed.
 
    - If you do **NOT** have the `tlsKey` or `tlsCert` config fields set, the unnecessary `tls` Secret is removed.
 
-   - `indexed-search` deployment adds `ZOEKT_DELETE_REPOS_MIGRATION`:
-     ```diff
-     +         env:
-     +         - name: ZOEKT_DELETE_REPOS_MIGRATION
-     +           value: t
-     ```
    - `CONFIG_FILE_HASH` changes:
      ```diff
                env:
