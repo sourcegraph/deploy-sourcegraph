@@ -81,13 +81,13 @@
 
 {{- define "collectPostgresEnv" -}}
 
-{{- if .Values.cluster.customPostgres -}}
-    {{- $_ := set .envVars "PGDATABASE" .Values.cluster.customPostgres.database -}}
-    {{- $_ := set .envVars "PGHOST" .Values.cluster.customPostgres.host -}}
-    {{- $_ := set .envVars "PGPASSWORD" .Values.cluster.customPostgres.password -}}
-    {{- $_ := set .envVars "PGPORT" .Values.cluster.customPostgres.port -}}
-    {{- $_ := set .envVars "PGSSLMODE" .Values.cluster.customPostgres.sslMode -}}
-    {{- $_ := set .envVars "PGUSER" .Values.cluster.customPostgres.user -}}
+{{- if .Values.cluster.postgres -}}
+    {{- $_ := set .envVars "PGDATABASE" .Values.cluster.postgres.database -}}
+    {{- $_ := set .envVars "PGHOST" .Values.cluster.postgres.host -}}
+    {{- $_ := set .envVars "PGPASSWORD" .Values.cluster.postgres.password -}}
+    {{- $_ := set .envVars "PGPORT" .Values.cluster.postgres.port -}}
+    {{- $_ := set .envVars "PGSSLMODE" .Values.cluster.postgres.sslMode -}}
+    {{- $_ := set .envVars "PGUSER" .Values.cluster.postgres.user -}}
 {{- else -}}
     {{- $_ := set .envVars "PGDATABASE" "sg" -}}
     {{- $_ := set .envVars "PGHOST" "pgsql" -}}
@@ -103,12 +103,12 @@
 
 {{- define "collectRedisEnv" -}}
 
-{{- if .Values.cluster.customRedis -}}
-    {{- if .Values.cluster.customRedis.cache -}}
-        {{- $_ := set .envVars "REDIS_CACHE_ENDPOINT" .Values.cluster.customRedis.cache -}}
+{{- if .Values.cluster.redis -}}
+    {{- if .Values.cluster.redis.cache -}}
+        {{- $_ := set .envVars "REDIS_CACHE_ENDPOINT" .Values.cluster.redis.cache -}}
     {{- end -}}
-    {{- if .Values.cluster.customRedis.store -}}
-        {{- $_ := set .envVars "REDIS_STORE_ENDPOINT" .Values.cluster.customRedis.store -}}
+    {{- if .Values.cluster.redis.store -}}
+        {{- $_ := set .envVars "REDIS_STORE_ENDPOINT" .Values.cluster.redis.store -}}
     {{- end -}}
 {{- end -}}
 
