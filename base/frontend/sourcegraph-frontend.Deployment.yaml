@@ -57,13 +57,15 @@ spec:
         resources:
           limits:
             cpu: "2"
-            memory: 2G
+            memory: "2G"
           requests:
             cpu: "2"
-            memory: 1G
+            memory: "1G"
         volumeMounts:
         - mountPath: /etc/sourcegraph
           name: sg-config
+      securityContext:
+        runAsUser: 0
       serviceAccountName: sourcegraph-frontend
       volumes:
       - configMap:
