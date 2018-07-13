@@ -2,6 +2,7 @@
 {{- $envVars := dict -}}
 {{- include "collectConfigEnv" (dict "envVars" $envVars "Values" .Values "Files" .Files) }}
 {{- include "collectTracingEnv" (dict "envVars" $envVars "Values" .Values) }}
+{{- include "collectRedisEnv" (dict "envVars" $envVars "Values" .Values) -}}
 {{- range $ls := .Values.site.langservers -}}
   {{- if (hasKey $langserverMapping $ls.language) -}}
     {{- $langVars := (index $langserverMapping $ls.language) -}}

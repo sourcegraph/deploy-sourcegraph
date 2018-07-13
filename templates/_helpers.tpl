@@ -81,17 +81,40 @@
 
 {{- define "collectPostgresEnv" -}}
 
-{{- $_ := set .envVars "PGDATABASE" "sg" -}}
-{{- $_ := set .envVars "PGHOST" "pgsql" -}}
-{{- $_ := set .envVars "PGPASSWORD" "" -}}
-{{- $_ := set .envVars "PGPORT" "\"5432\"" -}}
-{{- $_ := set .envVars "PGSSLMODE" "disable" -}}
-{{- $_ := set .envVars "PGUSER" "sg" -}}
+{{- if .Values.cluster.postgreSQL -}}
+    {{- $_ := set .envVars "PGDATABASE" .Values.cluster.postgreSQL.database -}}
+    {{- $_ := set .envVars "PGHOST" .Values.cluster.postgreSQL.host -}}
+    {{- $_ := set .envVars "PGPASSWORD" .Values.cluster.postgreSQL.password -}}
+    {{- $_ := set .envVars "PGPORT" .Values.cluster.postgreSQL.port -}}
+    {{- $_ := set .envVars "PGSSLMODE" .Values.cluster.postgreSQL.sslMode -}}
+    {{- $_ := set .envVars "PGUSER" .Values.cluster.postgreSQL.user -}}
+{{- else -}}
+    {{- $_ := set .envVars "PGDATABASE" "sg" -}}
+    {{- $_ := set .envVars "PGHOST" "pgsql" -}}
+    {{- $_ := set .envVars "PGPASSWORD" "" -}}
+    {{- $_ := set .envVars "PGPORT" "\"5432\"" -}}
+    {{- $_ := set .envVars "PGSSLMODE" "disable" -}}
+    {{- $_ := set .envVars "PGUSER" "sg" -}}
+{{- end -}}
 
 {{- end -}}
 
 {{/* --------------- START OF TEMPLATE ------------- */}}
 
+{{- define "collectRedisEnv" -}}
+
+{{- if .Values.cluster.redis -}}
+    {{- if .Values.cluster.redis.cache -}}
+        {{- $_ := set .envVars "REDIS_CACHE_ENDPOINT" .Values.cluster.redis.cache -}}
+    {{- end -}}
+    {{- if .Values.cluster.redis.store -}}
+        {{- $_ := set .envVars "REDIS_STORE_ENDPOINT" .Values.cluster.redis.store -}}
+    {{- end -}}
+{{- end -}}
+
+{{- end -}}
+
+{{/* --------------- START OF TEMPLATE ------------- */}}
 
 {{- define "collectFrontendCommonEnv" -}}
 
