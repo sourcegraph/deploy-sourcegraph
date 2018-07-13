@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: pod-tmp-gc
+spec:
+  template:
+    metadata:
+      labels:
+        app: pod-tmp-gc
+      name: pod-tmp-gc
+    spec:
+      containers:
+      - args:
+        - $(NODE_NAME)
+        - /pod-tmp
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        image: docker.sourcegraph.com/pod-tmp-gc:latest
+        name: pod-tmp-gc
+        resources:
+          limits:
+            cpu: 10m
+            memory: 20M
+        volumeMounts:
+        - mountPath: /pod-tmp
+          name: pod-tmp
+      serviceAccountName: pod-tmp-gc
+      volumes:
+      - hostPath:
+          path: NODE_SSD_PATH/pod-tmp # TODO(you): replace NODE_SSD_PATH with the path to the locally mounted SSD (e.g. /mnt/disks/ssd0 on Google Cloud Platform)
+        name: pod-tmp
+  updateStrategy: {}

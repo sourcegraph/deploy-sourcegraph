@@ -1,0 +1,49 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: Handles repository metadata (not Git data) lookups and updates from
+      external code hosts and other similar services.
+  name: repo-updater
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: repo-updater
+    spec:
+      containers:
+      - env:
+        - name: SRC_GIT_SERVERS
+          value: gitserver-1:3178
+        image: docker.sourcegraph.com/repo-updater:17098_2018-06-15_786c9d4
+        name: repo-updater
+        ports:
+        - containerPort: 3182
+          name: http
+        - containerPort: 6060
+          name: debug
+        resources:
+          limits:
+            cpu: 100m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        volumeMounts:
+        - mountPath: /etc/sourcegraph
+          name: sg-config
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - configMap:
+          defaultMode: 464
+          name: config-file
+        name: sg-config

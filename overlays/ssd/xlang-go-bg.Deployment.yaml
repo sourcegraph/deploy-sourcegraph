@@ -1,0 +1,11 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: xlang-go-bg
+spec:
+  template:
+    spec:
+      volumes:
+      - hostPath:
+          path: NODE_SSD_PATH/pod-tmp # TODO(you): replace NODE_SSD_PATH with the path to the locally mounted SSD (e.g. /mnt/disks/ssd0 on Google Cloud Platform)
+        name: cache-ssd

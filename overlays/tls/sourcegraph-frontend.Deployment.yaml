@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sourcegraph-frontend
+spec:
+  template:
+    spec:
+      containers:
+      - name: frontend
+        env:
+        - name: TLS_CERT
+          valueFrom:
+            secretKeyRef:
+              key: cert
+              name: tls
+        - name: TLS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: key
+              name: tls
