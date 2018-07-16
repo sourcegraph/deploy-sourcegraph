@@ -19,3 +19,5 @@ type: Opaque
 ```
 
 If have configured more than one gitserver, then you will need to copy `gitserver-1` to create `gitserver-n` for each of your `n` gitservers in your overlay.
+
+Update `SRC_GIT_SERVERS` to be a space separated list of gitserver addresses.
