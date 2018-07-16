@@ -5,8 +5,19 @@ import os
 from ruamel.yaml import YAML
 
 
-def main():
+def configureGitserver():
+    gitserver = input("How many gitserver replicas? [1]")
+    if not gitserver:
+        gitserver = 1
+
+    for i in range(1, gitserver):
+        print(i)
+    return
+
+
+def configureConfigMap():
     yaml = YAML()
+    yaml.preserve_quotes = True
 
     with open("../base/config-file.ConfigMap.yaml", "r+") as baseconfig:
 
@@ -21,37 +32,36 @@ def main():
         yaml.dump(configmap, baseconfig)
         baseconfig.truncate()
 
-        # for root, _, files in os.walk("../base"):
-        #     # print((root, dirs, files))
-        #     for file in files:
-        #         with open(os.path.join(root, file), "w") as f:
-        #             y = yaml.load(f.read())
-        #             modified = False
-        #             for cm in find("configMap", y):
-        #                 name = cm["name"]
-        #                 if name.startswith("config-file"):
-        #                     modified = True
-        #                     cm["name"] = hashedname
-        #             if modified:
-        #                 yaml.dump(y, f)
-
-    # document = """
-    # a: 1
-    # b:
-    #     c: 3
-    #     d: 4
-    # """
-    # print(yaml.dump(yaml.load(document)))
-    # asdfadsf
+        for root, _, files in os.walk("../base"):
+            for file in files:
+                if not file.endswith(".yaml"):
+                    continue
+                with open(os.path.join(root, file), "r+") as f:
+                    y = yaml.load(f.read())
+                    modified = False
+                    for cm in find("configMap", y):
+                        name = cm["name"]
+                        if name.startswith("config-file"):
+                            modified = True
+                            cm["name"] = hashedname
+                    if modified:
+                        print("updated config-file in " + file)
+                        f.seek(0)
+                        yaml.dump(y, f)
+                        f.truncate()
 
 
 def find(target, thing):
     if isinstance(thing, dict):
         for key in thing:
             if key == target:
-                yield thing
+                yield thing[target]
             yield from find(target, thing[key])
+    elif isinstance(thing, list):
+        for entry in thing:
+            yield from find(target, entry)
 
 
 if __name__ == "__main__":
-    main()
+    configureGitserver()
+    # configureConfigMap()
