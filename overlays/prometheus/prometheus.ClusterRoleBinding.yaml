@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: 'prometheus'
+roleRef:
+  apiGroup: ""
+  kind: ClusterRole
+  name: prometheus
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  # If you are deploying Sourcegraph to a non-default namespace, configure this:
+  # namespace: ""

@@ -1,0 +1,13 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: 'pod-tmp-gc'
+roleRef:
+  apiGroup: ""
+  kind: ClusterRole
+  name: pod-tmp-gc
+subjects:
+- kind: ServiceAccount
+  name: pod-tmp-gc
+  # If you are deploying Sourcegraph to a non-default namespace, configure this:
+  # namespace: ""

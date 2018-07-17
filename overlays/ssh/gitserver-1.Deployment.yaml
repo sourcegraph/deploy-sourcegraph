@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: gitserver-1
+spec:
+  template:
+    spec:
+      containers:
+      - name: gitserver-1
+        volumeMounts:
+        - mountPath: /root/.ssh
+          name: ssh
+      volumes:
+      - name: ssh
+        secret:
+          defaultMode: 384
+          secretName: gitserver-ssh

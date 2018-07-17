@@ -1,0 +1,106 @@
+# On Google Cloud Platform, SSDs are mounted to /mnt/disks/ssd0
+# https://cloud.google.com/kubernetes-engine/docs/concepts/local-ssd
+
+# lsp-proxy
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: lsp-proxy
+spec:
+  template:
+    spec:
+      volumes:
+      - hostPath:
+          path: /mnt/disks/ssd0/pod-tmp
+        name: cache-ssd
+---
+# pod-tmp-gc
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  name: pod-tmp-gc
+spec:
+  template:
+    spec:
+      volumes:
+      - hostPath:
+          path: /mnt/disks/ssd0/pod-tmp
+        name: pod-tmp
+---
+# searcher
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: searcher
+spec:
+  template:
+    spec:
+      volumes:
+      - hostPath:
+          path: /mnt/disks/ssd0/pod-tmp
+        name: cache-ssd
+---
+# symbols
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: symbols
+spec:
+  template:
+    spec:
+      volumes:
+      - hostPath:
+          path: /mnt/disks/ssd0/pod-tmp
+        name: cache-ssd
+---
+# xlang-go-bg
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: xlang-go-bg
+spec:
+  template:
+    spec:
+      volumes:
+      - hostPath:
+          path: /mnt/disks/ssd0/pod-tmp
+        name: cache-ssd
+---
+# xlang-go
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: xlang-go
+spec:
+  template:
+    spec:
+      volumes:
+      - hostPath:
+          path: /mnt/disks/ssd0/pod-tmp
+        name: cache-ssd
+---
+# xlang-typescript-bg
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: xlang-typescript-bg
+spec:
+  template:
+    spec:
+      volumes:
+      - hostPath:
+          path: /mnt/disks/ssd0/pod-tmp
+        name: cache-ssd
+---
+# xlang-typescript
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: xlang-typescript
+spec:
+  template:
+    spec:
+      volumes:
+      - hostPath:
+          path: /mnt/disks/ssd0/pod-tmp
+        name: cache-ssd
