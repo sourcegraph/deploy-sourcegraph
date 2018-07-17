@@ -4,6 +4,10 @@ import hashlib
 import os
 from ruamel.yaml import YAML
 import glob
+import pathlib
+
+yaml = YAML()
+yaml.preserve_quotes = True
 
 
 def configureSSD():
@@ -12,8 +16,27 @@ def configureSSD():
         print("Not using SSDs")
         return
 
+    for root, _, files in os.walk("../base"):
+        for file in files:
+            if not file.endswith(".yaml"):
+                continue
+            with open(os.path.join(root, file), "r+") as f:
+                y = yaml.load(f.read())
+                modified = False
+                for cm in find("name", y):
+                    if cm["name"] in ("cache-ssd", "pod-tmp") and "emptyDir" in cm:
+                        cm.pop("emptyDir", None)
+                        cm["hostPath"] = {
+                            "path": str(pathlib.PurePosixPath(ssdpath, "pod-tmp"))
+                        }
+                        modified = True
+                if modified:
+                    print("updated cache-ssd in " + file)
+                    f.seek(0)
+                    yaml.dump(y, f)
+                    f.truncate()
+
     # 1. Copy pod-tmp-gc template files to output
-    # 2. Attach volume to necessary deployments
 
 
 def configureDefaultStorageClass():
@@ -21,9 +44,6 @@ def configureDefaultStorageClass():
     if not storageclass:
         print("Using default storage class")
         return
-
-    yaml = YAML()
-    yaml.preserve_quotes = True
 
     for pvc in glob.glob("../base/**/*.PersistentVolumeClaim.yaml"):
         with open(pvc, "r+") as f:
@@ -62,9 +82,6 @@ def configureGitserver():
             with open(newpath, "w") as newfile:
                 newfile.write(newcontents)
 
-    yaml = YAML()
-    yaml.preserve_quotes = True
-
     # Update SRC_GIT_SERVERS, use value from config map?
     for root, _, files in os.walk("../base"):
         for file in files:
@@ -93,9 +110,6 @@ def configureGitserver():
 
 
 def configureConfigMap():
-    yaml = YAML()
-    yaml.preserve_quotes = True
-
     with open("../base/config-file.ConfigMap.yaml", "r+") as baseconfig:
 
         configmap = yaml.load(baseconfig.read())
@@ -140,6 +154,7 @@ def find(target, thing):
 
 
 if __name__ == "__main__":
+    configureSSD()
     # configureDefaultStorageClass()
-    configureGitserver()
+    # configureGitserver()
     # configureConfigMap()
