@@ -2,9 +2,9 @@
 # Updates the name of the config-file ConfigMap to include a content hash.
 # This forces services that depend on the config-file ConfigMap to restart when the data changes.
 
-cd "$(dirname "${BASH_SOURCE[0]}")/.."
-
 set -e
+
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 CONFIG_FILE_HASH=$(cat base/config-file.ConfigMap.yaml | yj | jq --raw-output .data | md5 | cut -c1-10)
 
