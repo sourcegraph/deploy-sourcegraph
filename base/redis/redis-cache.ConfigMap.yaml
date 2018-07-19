@@ -1,0 +1,16 @@
+apiVersion: v1
+data:
+  redis.conf: |
+    # allow access from all instances
+    protected-mode no
+
+    # limit memory usage, discard unused keys when hitting limit
+    maxmemory 5gb
+    maxmemory-policy allkeys-lru
+
+    # snapshots on disk every minute
+    dir /redis-data/
+    save 60 1
+kind: ConfigMap
+metadata:
+  name: redis-cache

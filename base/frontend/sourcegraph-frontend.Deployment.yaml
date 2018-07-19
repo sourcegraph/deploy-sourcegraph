@@ -1,0 +1,74 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: Serves the frontend of Sourcegraph via HTTP(S).
+  name: sourcegraph-frontend
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: sourcegraph-frontend
+    spec:
+      containers:
+      - args:
+        - serve
+        env:
+        - name: PGDATABASE
+          value: sg
+        - name: PGHOST
+          value: pgsql
+        - name: PGPORT
+          value: "5432"
+        - name: PGSSLMODE
+          value: disable
+        - name: PGUSER
+          value: sg
+        - name: PUBLIC_REPO_REDIRECTS
+          value: "true"
+        - name: SRC_APP_URL
+          value: http://localhost:3080
+        - name: SRC_GIT_SERVERS
+          value: gitserver-1:3178
+        image: docker.sourcegraph.com/frontend:18282_2018-07-13_d76e9c6
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        name: frontend
+        ports:
+        - containerPort: 3080
+          name: http
+        - containerPort: 3090
+          name: http-internal
+        - containerPort: 3443
+          name: https
+        resources:
+          limits:
+            cpu: "2"
+            memory: 2G
+          requests:
+            cpu: "2"
+            memory: 1G
+        volumeMounts:
+        - mountPath: /etc/sourcegraph
+          name: sg-config
+      securityContext:
+        runAsUser: 0
+      serviceAccountName: sourcegraph-frontend
+      volumes:
+      - configMap:
+          defaultMode: 464
+          name: config-file-7b1673df5a
+        name: sg-config
