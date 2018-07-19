@@ -1,0 +1,61 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: LSP server for JavaScript and TypeScript (used for live requests).
+  name: xlang-typescript
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: xlang-typescript
+    spec:
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        image: docker.sourcegraph.com/xlang-javascript-typescript:00073_2018-06-21_90f79ed
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: lsp
+          timeoutSeconds: 5
+        name: xlang-typescript
+        ports:
+        - containerPort: 2088
+          name: lsp
+        readinessProbe:
+          tcpSocket:
+            port: lsp
+        resources:
+          limits:
+            cpu: "4"
+            memory: 5Gi
+          requests:
+            cpu: 500m
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /yarn-config
+          name: yarn-config
+        - mountPath: /mnt/cache
+          name: cache-ssd
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - emptyDir: {}
+        name: cache-ssd
+      - configMap:
+          name: yarn-config
+        name: yarn-config

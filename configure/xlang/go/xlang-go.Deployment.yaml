@@ -1,0 +1,69 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: LSP server for Go (used for live requests).
+  name: xlang-go
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 2
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: xlang-go
+    spec:
+      containers:
+      - args:
+        - -mode=tcp
+        - -addr=:4389
+        env:
+        - name: SRC_GIT_SERVERS
+          value: gitserver-1:3178
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        image: docker.sourcegraph.com/xlang-go:18237_2018-07-12_21a0f96
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: lsp
+          timeoutSeconds: 5
+        name: xlang-go
+        ports:
+        - containerPort: 4389
+          name: lsp
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          tcpSocket:
+            port: 4389
+        resources:
+          limits:
+            cpu: "4"
+            memory: 8Gi
+          requests:
+            cpu: 500m
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /etc/sourcegraph
+          name: sg-config
+        - mountPath: /mnt/cache
+          name: cache-ssd
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - configMap:
+          defaultMode: 464
+          name: config-file-7b1673df5a
+        name: sg-config
+      - emptyDir: {}
+        name: cache-ssd

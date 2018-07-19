@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: xlang-elixir
+  name: xlang-elixir
+spec:
+  ports:
+  - name: lsp
+    port: 8080
+    targetPort: lsp
+  selector:
+    app: xlang-elixir
+  type: ClusterIP
