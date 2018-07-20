@@ -2,89 +2,41 @@
 
 ## Requirements
 
-*   <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/" target="_blank">kubectl</a>, v1.8.6 or later
-*   <a href="https://docs.helm.sh/using_helm/#installing-helm" target="_blank">Helm</a>, v2.9.1 or later
-*   Access to server infrastructure on which you can create a Kubernetes cluster (see
-    [resource allocation guidelines](scale.md))
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/), v1.8.6 or later
+- [Python 3](https://www.python.org/getit/) if you wish to run our provided configuration scripts.
+- Access to server infrastructure on which you can create a Kubernetes cluster (see
+  [resource allocation guidelines](scale.md)).
 
 ## Install
 
 > **Note:** Sourcegraph sends performance and usage data to Sourcegraph to help us make our product
 > better for you. The data sent does NOT include any source code or file data (including URLs that
-> might implicitly contain this information).  You can view traces and disable telemetry in the site
+> might implicitly contain this information). You can view traces and disable telemetry in the site
 > admin area on the server.
 
 Sourcegraph Data Center is deployed using Kubernetes. Before proceeding with these
 instructions, [provision a Kubernetes](k8s.md) cluster on the infrastructure of your choice. Make
 sure you have [configured `kubectl` to access your cluster](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
 
+1.  The easiest way to start is to deploy our base yaml. No configuration required!
 
-1. Install Tiller with RBAC privileges (the server-side counterpart to Helm) on your cluster:
+    ```
+    git clone https://github.com/sourcegraph/deploy-sourcegraph.git
+    cd deploy-sourcegraph
+    kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+    ```
 
-   ```bash
-   # Give Helm privileges to create RBAC resources.
-   kubectl create serviceaccount --namespace kube-system tiller
-   kubectl create clusterrolebinding tiller --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-
-   # Add Helm to your cluster using the created service account.
-   helm init --service-account tiller
-   ```
-
-   * If installing Tiller is not an option, consult the instructions below
-     for [installing without Tiller](#install-without-tiller).
-   * If your Kubernetes environment does not permit RBAC, consult the instructions below
-     for [installing without RBAC](#install-without-rbac).
-
-1. Create a `values.yaml` file with the following contents:
-
-   ```
-   cluster:
-     storageClass:
-       create: {none,aws,gcp}
-       name: $NAME
-       zone: $ZONE
-   site: {
-     "auth.providers": [{"type": "builtin", "allowSignup": false}],
-   }
-   ```
-
-   - If using Google Cloud, set `cluster.storageClass.create` to `gcp` and
-     `cluster.storageClass.zone` to the zone of your cluster (e.g., `us-west1-a`). Delete the
-     `cluster.storageClass.name` line.
-   - If using AWS, set `cluster.storageClass.create` to `aws` and `cluster.storageClass.zone` to the
-     zone of your cluster (e.g., `us-east-1a`). Delete the `cluster.storageClass.name` line.
-   - If using Azure, set `cluster.storageClass.create` to `none` and set `cluster.storageClass.name`
-     to `managed-premium`. Delete the `cluster.storageClass.zone` line.
-   - If using anything else OR if you would prefer to provide your own storage class, set
-     `cluster.storageClass.create` to `none` and delete `cluster.storageClass.name` and
-     `cluster.storageClass.zone`. Now create
-     a [storage class](https://kubernetes.io/docs/concepts/storage/storage-classes/) in your
-     Kubernetes cluster with name "default". We recommend that the storage class use SSDs as the
-     underlying disk type. For more info, see the section below on "creating a storage class
-     manually".
-
-1. Install the Helm chart to your cluster:
-
-   ```bash
-   helm install --name sourcegraph -f values.yaml https://github.com/sourcegraph/datacenter/archive/latest.tar.gz
-   ```
-
-   If you see the error `could not find a ready tiller pod`, wait a minute and try again.
-
-1. Confirm that your deployment is launching by running `kubectl get pods`. If pods get stuck in `Pending`
-   status, see the [Troubleshooting page](troubleshoot.md).
-
-1. When the deployment completes, you need to make the main web server accessible over the network to external users. To
-   do so, connect port 30080 (or the value of `httpNodePort` in the site config) on the nodes in the cluster to the
-   Internet. The easiest way to do this is to add a network rule that allows ingress traffic to port 30080 on at least
-   one node
-   (see
-   [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html),
-   [Google Cloud Platform Firewall rules](https://cloud.google.com/compute/docs/vpc/using-firewalls)).
-   Sourcegraph should then be accessible at `$EXTERNAL_ADDR:30080`, where `$EXTERNAL_ADDR` is the
-   address of *any* node in the cluster. For production environments, we recommend using
-   an [Internet Gateway](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html) (or
-   equivalent) and configuring a load balancer in Kubernetes.
+1.  When the deployment completes, you need to make the main web server accessible over the network to external users. To
+    do so, connect port 30080 (or the value of `httpNodePort` in the site config) on the nodes in the cluster to the
+    Internet. The easiest way to do this is to add a network rule that allows ingress traffic to port 30080 on at least
+    one node
+    (see
+    [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html),
+    [Google Cloud Platform Firewall rules](https://cloud.google.com/compute/docs/vpc/using-firewalls)).
+    Sourcegraph should then be accessible at `$EXTERNAL_ADDR:30080`, where `$EXTERNAL_ADDR` is the
+    address of _any_ node in the cluster. For production environments, we recommend using
+    an [Internet Gateway](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html) (or
+    equivalent) and configuring a load balancer in Kubernetes.
 
 You will now see the Sourcegraph setup page when you visit the address of your instance. If you made your instance
 accessible on the public Internet, make sure you secure it before adding your private repositories.
@@ -123,11 +75,12 @@ helm upgrade -f values.yaml sourcegraph https://github.com/sourcegraph/datacente
 ```
 
 For more information,
-* Refer to the [examples](../examples) directory for an example of a cluster config with code
+
+- Refer to the [examples](../examples) directory for an example of a cluster config with code
   intelligence enabled.
-* See the [language-specific docs](https://about.sourcegraph.com/docs/code-intelligence) for
+- See the [language-specific docs](https://about.sourcegraph.com/docs/code-intelligence) for
   configuring specific languages.
-* [Contact us](mailto:support@sourcegraph.com) with questions or problems relating to code
+- [Contact us](mailto:support@sourcegraph.com) with questions or problems relating to code
   intelligence.
 
 ### Additional configuration
@@ -155,43 +108,18 @@ your Sourcegraph Data Center instance.
 
 See the [Troubleshooting page](troubleshoot.md).
 
-
 ### Install without RBAC
 
 Sourcegraph Data Center communicates with the Kubernetes API for service discovery. It also has some janitor DaemonSets
-that clean up temporary cache data. To do that we need to create RBAC resources. For details, see
-Helm's
-[Role-based Access Control documentation](https://github.com/kubernetes/helm/blob/v2.8.2/docs/rbac.md).
+that clean up temporary cache data. To do that we need to create RBAC resources.
 
-If using RBAC is not an option, then
-* Set `"site.rbac": "disabled"` in your `values.yaml`
-* Run `helm init` instead of `helm init --service-account tiller` to install Tiller.
+If using RBAC is not an option, then you will not want to apply `*.Role.yaml` and `*.RoleBinding.yaml` files.
 
+### Storage class
 
-### Install without Tiller
+Sourcegraph relies on the default storage class of your cluster.
 
-If installing Tiller is not an option, you can locally generate the Kubernetes configuration by running the following:
-
-```
-mkdir -p generated
-wget https://github.com/sourcegraph/datacenter/archive/latest.tar.gz
-helm template -f values.yaml latest.tar.gz --output-dir=generated
-kubectl apply -R -f generated/sourcegraph/templates
-```
-
-### Creating a storage class manually
-
-If `cluster.storageClass.create` is set to `none`, then you will need to create a storage class manually:
-
-1. Create a file called `storage-class.yaml` that meets
-   the [requirements described in the Kubernetes docs](https://kubernetes.io/docs/concepts/storage/storage-classes/).
-   The name of the storage class should match the name set in `cluster.storageClass.name` ("default" by default). We
-   recommend specifying SSDs as the disk type if possible.
-1. Run `kubectl apply -f storage-class.yaml`.
-1. You should see the storage class appear when you run `kubectl get storageclass`.
-
-After installing the Sourcegraph Helm chart, you should see persistent volume claims (`kubectl get pvc`) bound to
-volumes provisioned using this storage class.
+If you wish to use a different storage class, you can run `./configure/storage-class-name.sh` to configure the yaml with the name.
 
 ### Secrets
 
