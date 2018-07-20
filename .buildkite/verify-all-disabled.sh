@@ -28,3 +28,4 @@ STORAGE_CLASS_NAME= \
 ./configure/all.sh
 
 find generated -name '*.yaml' -exec kubeval {} +
+.buildkite/verify-label.sh

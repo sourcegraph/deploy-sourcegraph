@@ -173,9 +173,7 @@ data:
       ) / 2 / sum(rate(src_xlang_request_duration_seconds_count[1d])) by (mode, method)
 
 
-  # Additional prometheus recording rules.
   extra.rules: ""
-
   node.rules: |
     node:container_cpu_usage_seconds_total:ratio_rate5m =
       sum by (instance) (rate(container_cpu_usage_seconds_total{kubernetes_pod_name=""}[5m]))
@@ -474,4 +472,6 @@ data:
       sum by (le, mode, method)(rate(src_xlang_request_duration_seconds_bucket{success="true"}[1d]))
 kind: ConfigMap
 metadata:
+  labels:
+    deploy: sourcegraph
   name: prometheus
