@@ -39,12 +39,12 @@ def main():
     base = os.environ.get('BASE', 'base')
 
     if 'LANGUAGE_SERVERS' not in os.environ:
-        langservers = input('Language servers [none]: ')
+        langservers = input('Language servers (e.g. go,java,javascript,php,python,typescript) [none]: ')
     else:
         langservers = os.environ['LANGUAGE_SERVERS']
 
     if 'EXPERIMENTAL_LANGUAGE_SERVERS' not in os.environ:
-        experimental = input('Experimental language servers [none]: ')
+        experimental = input('Experimental language servers (e.g. bash,clojure,cpp,cs,css,dockerfile,elixir,html,lua,ocaml,r,ruby,rust) [none]: ')
     else:
         experimental = os.environ['EXPERIMENTAL_LANGUAGE_SERVERS']
 
@@ -97,6 +97,9 @@ def main():
         yq(lsp_proxy_deployment, '(.spec.template.spec.containers[] | select(.name == "lsp-proxy").env) += [{name: "LANGSERVER_'+lang.upper()+'", value: "tcp://xlang-'+lang+':8080"}]')
         
         print("> Configured " + lang)
+    
+    # Reconfigure in case Go was enabled because it needs the correct config-file name.
+    subprocess.check_call(['./configure/config-file.sh'])
         
 
 def yq(file, query):
