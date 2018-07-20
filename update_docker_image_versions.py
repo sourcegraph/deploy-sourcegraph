@@ -2,12 +2,20 @@
 
 """This program updates params.go to reflect the running versions on dogfood"""
 
-__author__ = "Keegan Carruthers-Smith <keegan@sourcegraph.com"
-__credits__ = ["Beyang Liu <beyang@sourcegraph.com>"]
-
 import os
 import re
 import subprocess
+
+def main():
+    images = get_image_tags()
+    if 'docker.sourcegraph.com/bitbucket-server' not in images:
+        print('WARNING: bitbucket-server image is not present. Please ensure your kctx is pointing to dogfood')
+
+    for dirpath, _, filenames in os.walk('base'):
+        replace_image_tags(dirpath, filenames, images)
+
+    for dirpath, _, filenames in os.walk('configure'):
+        replace_image_tags(dirpath, filenames, images)
 
 def get_image_tags():
     out = subprocess.check_output(['kubectl', 'get', 'deploy', '--no-headers', '-o=custom-columns=image:.spec.template.spec.containers[].image'])
@@ -24,18 +32,20 @@ def get_image_tags():
         d[name] = tag
     return d
 
-def main(params_path):
-    with open(params_path) as fd:
-        content = fd.read()
-    images = get_image_tags()
-
-    if 'docker.sourcegraph.com/bitbucket-server' not in images:
-        print('WARNING: bitbucket-server image is not present. Please ensure your kctx is pointing to dogfood')
-    for name, tag in images.items():
-        content = re.sub(r'image\: ({})\:([A-Za-z0-9\-\._]+)'.format(name), r'image: \1:{}'.format(tag), content)
-    with open(params_path, 'w') as fd:
-        fd.write(content)
+def replace_image_tags(dirpath, filenames, images):
+    for filename in filenames:
+        if not filename.endswith('.Deployment.yaml'):
+            continue
+            
+        file = os.path.join(dirpath, filename)
+        with open(file, 'r') as f:
+            contents = f.read()
+        
+        for image, tag in images.items():
+            contents = re.sub(image+':.*', image+':'+tag, contents)
+            
+        with open(file, 'w') as f:
+            f.write(contents)
 
 if __name__ == '__main__':
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    main(os.path.join(dir_path, 'values.yaml'))
+    main()
