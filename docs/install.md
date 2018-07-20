@@ -43,51 +43,10 @@ accessible on the public Internet, make sure you secure it before adding your pr
 
 ### Add language servers for code intelligence
 
-> Code intelligence is a [paid upgrade](https://about.sourcegraph.com/pricing/) on top of the Data
-> Center deployment option. After following these instructions to confirm it
-> works, [buy code intelligence](https://about.sourcegraph.com/contact/sales).
-
-[Code intelligence](https://about.sourcegraph.com/docs/code-intelligence) provides advanced code
-navigation and cross-references for your code on Sourcegraph.
-
-To enable code intelligence, add a `site.langservers` property to your `values.yaml` file specifying which
-language servers to run (omitting languages you don't want):
-
-```yaml
-# values.yaml
-
-site: {
-    "langservers": [
-        { "language": "go" },
-        { "language": "javascript" },
-        { "language": "typescript" },
-        { "language": "python" },
-        { "language": "java" },
-        { "language": "php" }
-    ]
-}
-```
-
-After modifying `values.yaml`, update your cluster:
-
-```bash
-helm upgrade -f values.yaml sourcegraph https://github.com/sourcegraph/datacenter/archive/$VERSION.tar.gz
-```
-
-For more information,
-
-- Refer to the [examples](../examples) directory for an example of a cluster config with code
-  intelligence enabled.
-- See the [language-specific docs](https://about.sourcegraph.com/docs/code-intelligence) for
-  configuring specific languages.
-- [Contact us](mailto:support@sourcegraph.com) with questions or problems relating to code
-  intelligence.
-
 ### Additional configuration
 
 You can set additional fields in `values.yaml` to configure your Sourcegraph instance. The `values.yaml` file is split into two top-level fields:
 
-- `site` defines Sourcegraph site configuration. For the full list of options, see "[Sourcegraph site configuration options](https://about.sourcegraph.com/docs/config/site)".
 - `cluster` defines settings specific to the configuration of the Kubernetes cluster, like replica counts and CPU/memory
   allocation. Refer to [`../values.yaml`](../values.yaml) in this repository to see which `cluster` fields can be overridden.
 
