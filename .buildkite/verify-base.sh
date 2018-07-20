@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 .buildkite/install-kubeval.sh

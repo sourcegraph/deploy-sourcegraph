@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 if find base configure -name "*.yaml" -exec sh -c "cat {} | yj | jq --raw-output '.metadata.labels.deploy'" \; | grep -v sourcegraph; then
