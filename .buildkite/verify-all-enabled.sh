@@ -35,6 +35,7 @@ GITSERVER_REPLICA_COUNT=3 \
 GITSERVER_SSH_PRIVATE_KEY_PATH=$FILEPATH \
 GITSERVER_SSH_KNOWN_HOSTS_PATH=$FILEPATH \
 STORAGE_CLASS_NAME=storageclassname \
+SITE_CONFIG_PATH=$FILEPATH \
 ./configure/all.sh
 
 find generated -name '*.yaml' -exec kubeval {} +

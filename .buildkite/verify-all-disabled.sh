@@ -25,6 +25,7 @@ GITSERVER_REPLICA_COUNT= \
 GITSERVER_SSH_PRIVATE_KEY_PATH= \
 GITSERVER_SSH_KNOWN_HOSTS_PATH= \
 STORAGE_CLASS_NAME= \
+SITE_CONFIG_PATH= \
 ./configure/all.sh
 
 find generated -name '*.yaml' -exec kubeval {} +
