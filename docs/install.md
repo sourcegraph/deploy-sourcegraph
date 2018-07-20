@@ -27,7 +27,7 @@ sure you have [configured `kubectl` to access your cluster](https://kubernetes.i
     ```
 
 1.  When the deployment completes, you need to make the main web server accessible over the network to external users. To
-    do so, connect port 30080 (or the value of `httpNodePort` in the site config) on the nodes in the cluster to the
+    do so, connect port 30080 on the nodes in the cluster to the
     Internet. The easiest way to do this is to add a network rule that allows ingress traffic to port 30080 on at least
     one node
     (see
