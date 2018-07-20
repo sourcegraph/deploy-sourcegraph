@@ -19,7 +19,7 @@ cp -r base/* generated/
 # so simply pass this script in.
 FILEPATH=.buildkite/verify-all-enabled.sh
 
-BASE=generated \
+BASEDIR=generated \
 KUBERNETES_NAMESPACE=kns \
 JAEGER_ENABLED=y \
 LANGUAGE_SERVERS=go,java,javascript,php,python,typescript \

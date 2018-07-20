@@ -13,7 +13,7 @@ mkdir -p generated
 cp -r base/* generated/
 
 # Test all configuration scripts disabled.
-BASE=generated \
+BASEDIR=generated \
 JAEGER_ENABLED=n \
 LANGUAGE_SERVERS= \
 EXPERIMENTAL_LANGUAGE_SERVERS= \

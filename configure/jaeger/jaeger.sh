@@ -5,7 +5,7 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 
-BASE=${BASE:-base}
+./configure/util/require-basedir.sh
 
 if [ -z ${JAEGER_ENABLED+x} ]; then
     read -p "Enable Jaeger [yN]: " JAEGER_ENABLED
@@ -23,17 +23,17 @@ COLLECTOR_DEPLOYMENTS=(
 )
 
 # Start clean.
-rm -rf $BASE/jaeger
-find $BASE -name 'gitserver-*.Deployment.yaml' -exec sh -c "cat {} | yj | jq '.spec.template.spec.containers |= del(.[] | select(.name == \"jaeger-agent\"))' | jy -o {}" \;
-find $BASE -name 'xlang-go*.Deployment.yaml' -exec sh -c "cat {} | yj | jq '.spec.template.spec.containers |= del(.[] | select(.name == \"jaeger-agent\"))' | jy -o {}" \;
+rm -rf $BASEDIR/jaeger
+find $BASEDIR -name 'gitserver-*.Deployment.yaml' -exec sh -c "cat {} | yj | jq '.spec.template.spec.containers |= del(.[] | select(.name == \"jaeger-agent\"))' | jy -o {}" \;
+find $BASEDIR -name 'xlang-go*.Deployment.yaml' -exec sh -c "cat {} | yj | jq '.spec.template.spec.containers |= del(.[] | select(.name == \"jaeger-agent\"))' | jy -o {}" \;
 for FILE in "${COLLECTOR_DEPLOYMENTS[@]}"; do
-    F="$BASE/$FILE"
+    F="$BASEDIR/$FILE"
     cat $F | yj | jq '.spec.template.spec.containers |= del(.[] | select(.name == "jaeger-agent"))' | jy -o $F
 done
 
 if [ "$JAEGER_ENABLED" == "y" ]; then
-    mkdir -p $BASE/jaeger
-    cp configure/jaeger/*.yaml $BASE/jaeger/
+    mkdir -p $BASEDIR/jaeger
+    cp configure/jaeger/*.yaml $BASEDIR/jaeger/
 
     COLLECTOR_PATCH=$(yj <<EOM
 command:
@@ -51,9 +51,9 @@ resources:
 EOM
 )
 
-    find $BASE -name 'gitserver-*.Deployment.yaml' -exec sh -c "cat {} | yj | jq '.spec.template.spec.containers += [$COLLECTOR_PATCH]' | jy -o {}" \;
+    find $BASEDIR -name 'gitserver-*.Deployment.yaml' -exec sh -c "cat {} | yj | jq '.spec.template.spec.containers += [$COLLECTOR_PATCH]' | jy -o {}" \;
     for FILE in "${COLLECTOR_DEPLOYMENTS[@]}"; do
-        F="$BASE/$FILE"
+        F="$BASEDIR/$FILE"
         cat $F | yj | jq ".spec.template.spec.containers += [$COLLECTOR_PATCH]" | jy -o $F
     done
 

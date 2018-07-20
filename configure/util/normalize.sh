@@ -4,6 +4,6 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 
-BASE=${BASE:-base}
+./configure/util/require-basedir.sh
 
-find $BASE -name "*.yaml" -exec sh -c "cat {} | yj | jy -o {}" \;
+find $BASEDIR -name "*.yaml" -exec sh -c "cat {} | yj | jy -o {}" \;

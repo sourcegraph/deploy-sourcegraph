@@ -5,7 +5,7 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-BASE=${BASE:-base}
+./configure/util/require-basedir.sh
 
 if [ -z ${FRONTEND_TLS_CERTIFICATE_PATH+x} ]; then
     read -p "Frontend TLS certificate path [none]: " FRONTEND_TLS_CERTIFICATE_PATH
@@ -16,15 +16,15 @@ if [ -z ${FRONTEND_TLS_PRIVATE_KEY_PATH+x} ]; then
 fi
 
 # Start clean
-rm -f $BASE/tls.Secret.yaml
-FE=$BASE/frontend/sourcegraph-frontend.Deployment.yaml
+rm -f $BASEDIR/tls.Secret.yaml
+FE=$BASEDIR/frontend/sourcegraph-frontend.Deployment.yaml
 cat $FE | yj | jq '(.spec.template.spec.containers[] | select(.name == "frontend") | .env) |= del(.[] | select(.name == "TLS_CERT" or .name == "TLS_KEY"))' | jy -o $FE
 
 if [ -n "$FRONTEND_TLS_CERTIFICATE_PATH" ] && [ -n "$FRONTEND_TLS_PRIVATE_KEY_PATH" ]; then
     CERT=$(cat $FRONTEND_TLS_CERTIFICATE_PATH | base64)
     PRIVATE_KEY=$(cat $FRONTEND_TLS_PRIVATE_KEY_PATH | base64)
 
-    cat > $BASE/frontend/tls.Secret.yaml <<EOM
+    cat > $BASEDIR/frontend/tls.Secret.yaml <<EOM
 apiVersion: v1
 data:
   cert: "$CERT"

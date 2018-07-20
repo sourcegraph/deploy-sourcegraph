@@ -5,7 +5,7 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-BASE=${BASE:-base}
+./configure/util/require-basedir.sh
 
 if [ -z ${GITSERVER_REPLICA_COUNT+x} ]; then
     read -p "Number of gitservers [1]: " GITSERVER_REPLICA_COUNT
@@ -16,7 +16,7 @@ if [ -z "$GITSERVER_REPLICA_COUNT" ]; then
 fi
 
 # Cleanup previous replicas.
-GITSERVER_BASE=$BASE/gitserver
+GITSERVER_BASE=$BASEDIR/gitserver
 GITSERVER_TMP=$GITSERVER_BASE/tmp
 mkdir -p $GITSERVER_TMP
 mv $GITSERVER_BASE/gitserver-1.*.yaml $GITSERVER_TMP
@@ -43,6 +43,6 @@ for i in $(seq 1 $GITSERVER_REPLICA_COUNT); do
 done
 
 # Update SRC_GIT_SERVERS to contain all replicas.
-find $BASE -name '*.Deployment.yaml' -exec sh -c "cat {} | yj | jq '(.spec.template.spec.containers[] | .env | select(. != null) | .[] | select(.name == \"SRC_GIT_SERVERS\")) |= (.value = \"$GITSERVERS\")' | jy -o {}" \;
+find $BASEDIR -name '*.Deployment.yaml' -exec sh -c "cat {} | yj | jq '(.spec.template.spec.containers[] | .env | select(. != null) | .[] | select(.name == \"SRC_GIT_SERVERS\")) |= (.value = \"$GITSERVERS\")' | jy -o {}" \;
 
 echo "> gitservers configured: $GITSERVER_REPLICA_COUNT"

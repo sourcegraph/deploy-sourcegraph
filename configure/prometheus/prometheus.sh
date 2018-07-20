@@ -5,7 +5,7 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 
-BASE=${BASE:-base}
+./configure/util/require-basedir.sh
 
 if [ -z ${PROMETHEUS_ENABLED+x} ]; then
     read -p "Enable Prometheus [yN]: " PROMETHEUS_ENABLED
@@ -30,14 +30,14 @@ if [ -z ${PROMETHEUS_ENABLED+x} ]; then
 fi
 
 # Start clean.
-rm -rf $BASE/prometheus
+rm -rf $BASEDIR/prometheus
 
 if [ "$PROMETHEUS_ENABLED" == "y" ]; then
-    mkdir -p $BASE/prometheus
-    cp configure/prometheus/*.yaml $BASE/prometheus
+    mkdir -p $BASEDIR/prometheus
+    cp configure/prometheus/*.yaml $BASEDIR/prometheus
 
     if [ -n "$KUBERNETES_NAMESPACE" ]; then
-        CRB=$BASE/prometheus/prometheus.ClusterRoleBinding.yaml
+        CRB=$BASEDIR/prometheus/prometheus.ClusterRoleBinding.yaml
         cat $CRB | yj | jq "(.subjects[] | select(.name == \"prometheus\")) |= (.namespace = \"$KUBERNETES_NAMESPACE\")" | jy -o $CRB
     fi
 
@@ -49,13 +49,13 @@ if [ "$PROMETHEUS_ENABLED" == "y" ]; then
         # might contain charaters that could be interpreted by the shell (e.g. $).
         JQARG=".data.\"extra.rules\" = \"""$EXTRA_RULES""\""
 
-        PCM=$BASE/prometheus/prometheus.ConfigMap.yaml
+        PCM=$BASEDIR/prometheus/prometheus.ConfigMap.yaml
         cat $PCM | yj | jq "$JQARG" | jy -o $PCM
     fi
 
     if [ -n "$ALERT_MANAGER_CONFIG_PATH" ] && [ -n "$ALERT_MANAGER_URL" ]; then
-        mkdir -p $BASE/prometheus/alertmanager
-        cp configure/prometheus/alertmanager/*.yaml $BASE/prometheus/alertmanager/
+        mkdir -p $BASEDIR/prometheus/alertmanager
+        cp configure/prometheus/alertmanager/*.yaml $BASEDIR/prometheus/alertmanager/
 
         # Defensively escape all backslashes and double quotes.
         ALERT_MANAGER_CONFIG=$(cat $ALERT_MANAGER_CONFIG_PATH | ./configure/util/sanitize.sh)
@@ -64,13 +64,13 @@ if [ "$PROMETHEUS_ENABLED" == "y" ]; then
         # might contain charaters that could be interpreted by the shell (e.g. $).
         JQARG=".data.\"config.yml\" = \"""$ALERT_MANAGER_CONFIG""\""
         
-        ACM=$BASE/prometheus/alertmanager/alertmanager.ConfigMap.yaml
+        ACM=$BASEDIR/prometheus/alertmanager/alertmanager.ConfigMap.yaml
         cat $ACM | yj | jq "$JQARG" | jy -o $ACM
 
-        AD=$BASE/prometheus/alertmanager/alertmanager.Deployment.yaml
+        AD=$BASEDIR/prometheus/alertmanager/alertmanager.Deployment.yaml
         cat $AD | yj | jq "(.spec.template.spec.containers[] | select(.name == \"alertmanager\") | .args) |= (. + [\"-web.external-url=$ALERT_MANAGER_URL\"] | unique)" | jy -o $AD
 
-        PD=$BASE/prometheus/prometheus.Deployment.yaml
+        PD=$BASEDIR/prometheus/prometheus.Deployment.yaml
         cat $PD | yj | jq "(.spec.template.spec.containers[] | select(.name == \"prometheus\") | .args) |= (. + [\"-web.external-url=$ALERT_MANAGER_URL\"] | unique)" | jy -o $PD
 
         echo "> Alert manager configured"

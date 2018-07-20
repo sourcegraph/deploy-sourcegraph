@@ -36,7 +36,9 @@ def main():
     cwd = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..', '..')
     os.chdir(cwd)
 
-    base = os.environ.get('BASE', 'base')
+    subprocess.check_call(['./configure/util/require-basedir.sh'])
+
+    basedir = os.environ['BASEDIR']
 
     if 'LANGUAGE_SERVERS' not in os.environ:
         langservers = input('Language servers (e.g. go,java,javascript,php,python,typescript) [none]: ')
@@ -48,10 +50,10 @@ def main():
     else:
         experimental = os.environ['EXPERIMENTAL_LANGUAGE_SERVERS']
 
-    lsp_proxy_deployment = os.path.join(base, 'lsp-proxy', 'lsp-proxy.Deployment.yaml')
+    lsp_proxy_deployment = os.path.join(basedir, 'lsp-proxy', 'lsp-proxy.Deployment.yaml')
 
     # Start clean
-    shutil.rmtree(os.path.join(base, 'xlang'), ignore_errors=True)
+    shutil.rmtree(os.path.join(basedir, 'xlang'), ignore_errors=True)
 
     # TODO(jq 1.6): should be able to do this with a single command, but there is a bug in jq 1.5 that prevents us from using startswith.
     # https://github.com/stedolan/jq/issues/1146
@@ -73,7 +75,7 @@ def main():
             lang = "typescript"
 
         # Install the language server
-        shutil.copytree(os.path.join('configure', 'xlang', lang), os.path.join(base, 'xlang', lang))
+        shutil.copytree(os.path.join('configure', 'xlang', lang), os.path.join(basedir, 'xlang', lang))
 
         # Update lsp-proxy configuration
         env_vars = lsp_proxy_env[lang]
@@ -91,7 +93,7 @@ def main():
             continue
 
         # Install the language server
-        shutil.copytree(os.path.join('configure', 'xlang', 'experimental', lang), os.path.join(base, 'xlang', 'experimental', lang))
+        shutil.copytree(os.path.join('configure', 'xlang', 'experimental', lang), os.path.join(basedir, 'xlang', 'experimental', lang))
 
         # Update lsp-proxy configuration
         yq(lsp_proxy_deployment, '(.spec.template.spec.containers[] | select(.name == "lsp-proxy").env) += [{name: "LANGSERVER_'+lang.upper()+'", value: "tcp://xlang-'+lang+':8080"}]')

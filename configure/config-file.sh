@@ -6,13 +6,13 @@ set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-BASE=${BASE:-base}
+./configure/util/require-basedir.sh
 
 if [ -z ${SITE_CONFIG_PATH+x} ]; then
     read -p "Path to site config.json [none]: " SITE_CONFIG_PATH
 fi
 
-CM=$BASE/config-file.ConfigMap.yaml
+CM=$BASEDIR/config-file.ConfigMap.yaml
 
 if [ -n "$SITE_CONFIG_PATH" ]; then
     SITE_CONFIG=$(cat $SITE_CONFIG_PATH | ./configure/util/sanitize.sh)
@@ -24,5 +24,5 @@ fi
 
 CONFIG_FILE_HASH=$(cat $CM | yj | jq --raw-output .data | md5sum | cut -c1-10)
 
-find $BASE -name "*yaml" -exec sed -i.sedibak -e "s/name: config-file.*/name: config-file-$CONFIG_FILE_HASH/g" {} +
-find $BASE -name "*.sedibak" -delete
+find $BASEDIR -name "*yaml" -exec sed -i.sedibak -e "s/name: config-file.*/name: config-file-$CONFIG_FILE_HASH/g" {} +
+find $BASEDIR -name "*.sedibak" -delete
