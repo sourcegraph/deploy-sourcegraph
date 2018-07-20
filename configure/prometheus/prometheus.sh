@@ -43,7 +43,7 @@ if [ "$PROMETHEUS_ENABLED" == "y" ]; then
 
     if [ -n "$PROMETHEUS_EXTRA_RULES_PATH" ]; then
         # Defensively escape all backslashes and double quotes.
-        EXTRA_RULES=$(cat $PROMETHEUS_EXTRA_RULES_PATH | sed -e 's/\\/\\\\/g' | sed -e 's/"/\\"/g')
+        EXTRA_RULES=$(cat $PROMETHEUS_EXTRA_RULES_PATH | ./configure/util/sanitize.sh)
 
         # Concat the environment variable instead of embedding since the file contents
         # might contain charaters that could be interpreted by the shell (e.g. $).
@@ -58,7 +58,7 @@ if [ "$PROMETHEUS_ENABLED" == "y" ]; then
         cp configure/prometheus/alertmanager/*.yaml $BASE/prometheus/alertmanager/
 
         # Defensively escape all backslashes and double quotes.
-        ALERT_MANAGER_CONFIG=$(cat $ALERT_MANAGER_CONFIG_PATH | sed -e 's/\\/\\\\/g' | sed -e 's/"/\\"/g')
+        ALERT_MANAGER_CONFIG=$(cat $ALERT_MANAGER_CONFIG_PATH | ./configure/util/sanitize.sh)
 
         # Concat the environment variable instead of embedding since the file contents
         # might contain charaters that could be interpreted by the shell (e.g. $).

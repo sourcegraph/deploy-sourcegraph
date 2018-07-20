@@ -107,7 +107,7 @@ def yq(file, query):
     env['INFILE'] = file
     env['OUTFILE'] = file
     env['QUERY'] = query
-    subprocess.check_call(['./configure/yq.sh'], env=env)
+    subprocess.check_call(['./configure/util/yq.sh'], env=env)
 
 if __name__ == '__main__':
     main()
