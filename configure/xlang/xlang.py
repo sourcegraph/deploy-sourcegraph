@@ -22,7 +22,7 @@ lsp_proxy_env = {
     },
     'python': {
         'LANGSERVER_PYTHON': 'tcp://xlang-python:2087',
-        'LANGSERVER_PYTHON_BG': 'tcp://xlang-python:2087'
+        'LANGSERVER_PYTHON_BG': 'tcp://xlang-python-bg:2087'
     },
     'typescript': {
         'LANGSERVER_JAVASCRIPT': 'tcp://xlang-typescript:2088',
