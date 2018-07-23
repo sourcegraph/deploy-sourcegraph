@@ -1,0 +1,32 @@
+additions:
+- files:
+  - jaeger*.yaml
+patches:
+- resources:
+  - files: 
+    - github-proxy/github-proxy.Deployment.yaml
+    - indexer/indexer.Deployment.yaml
+    - lsp-proxy/lsp-proxy.Deployment.yaml
+    - query-runner/query-runner.Deployment.yaml
+    - repo-updater/repo-updater.Deployment.yaml
+    - searcher/searcher.Deployment.yaml
+    - frontend/sourcegraph-frontend.Deployment.yaml
+    - symbols/symbols.Deployment.yaml
+    - gitserver/gitserver-*.Deployment.yaml
+    - xlang-go*.Deployment.yaml
+  edits:
+  - selector: .spec.template.spec.containers
+    mode: union
+    content:
+    - command:
+      - /go/bin/agent-linux
+      - --collector.host-port=jaeger-collector:14267
+      image: docker.sourcegraph.com/jaeger-agent
+      name: jaeger-agent
+      resources:
+        limits:
+          cpu: 100m
+          memory: 100Mi
+        requests:
+          cpu: 100m
+          memory: 100Mi

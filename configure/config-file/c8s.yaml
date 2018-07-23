@@ -1,0 +1,29 @@
+arguments:
+- name: site-config-json
+  description: JSON site configuration
+- name: site-config-json-content-hash
+  description: A content hash of site-config-json
+patches:
+- resources:
+  - files:
+    - config-file.ConfigMap.yaml
+  edits:
+  - selector: data
+    mode: union 
+    content: 
+      config.json: $(site-config-json)
+  - selector: metadata.name 
+    mode: replace 
+    content: config-file-$(site-config-json-content-hash)
+- resources:
+  - files:
+    - "*.Deployment.yaml"
+    - "*.StatefulSet.yaml"
+  edits:
+  - selector: spec.template.spec.volumes[name=sg-config]
+    mode: union
+    content:
+      configMap:
+        name: config-file-$(site-config-json-content-hash)
+
+

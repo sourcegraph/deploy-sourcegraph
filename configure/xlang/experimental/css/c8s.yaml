@@ -1,0 +1,15 @@
+additions:
+- files:
+  - "*.yaml"
+patches:
+- resources:
+  - files:
+    - lsp-proxy.Deployment.yaml
+  edits:
+  - selector: spec.template.spec.containers[name=lsp-proxy].env
+    mode: union
+    content:
+    - name: LANGSERVER_CSS
+      value: tcp://xlang-css:8080
+    - name: LANGSERVER_CSS_BG
+      value: tcp://xlang-css:8080

@@ -1,0 +1,37 @@
+arguments:
+  - name: ssd-path
+    description: The path where a SSD is mounted (e.g. /mnt/disks/ssd0 on Google Cloud Platform)
+  - name: kubernetes-namespace
+    description: The Kubernetes namespace that this will be deployed in
+additions:
+- files:
+  - pod-tmp-gc*.yaml
+patches:
+- resources:
+  - files:
+    - pod-tmp-gc.ClusterRoleBinding.yaml
+  edits:
+  - selector: subjects[name=pod-tmp-gc]
+    mode: union
+    content:
+      namespace: $(kubernetes-namespace)
+- resources:
+  - files:
+    - pod-tmp-gc.DaemonSet.yaml
+  edits:
+  - selector: spec.template.spec.volumes
+    mode: replace 
+    content:
+    - name: pod-tmp
+      hostPath:
+        path: $(ssd-path)/pod-tmp
+- resources:
+  - files:
+    - "*.Deployment.yaml"
+  edits:
+  - selector: spec.template.spec.volumes[name=cache-ssd]
+    mode: replace 
+    content:
+      name: cache-ssd
+      hostPath:
+        path: $(ssd-path)/cache-ssd

@@ -1,0 +1,15 @@
+additions:
+- files:
+  - "*.yaml"
+patches:
+- resources:
+  - files:
+    - lsp-proxy.Deployment.yaml
+  edits:
+  - selector: spec.template.spec.containers[name=lsp-proxy].env
+    mode: union
+    content:
+    - name: LANGSERVER_PYTHON
+      value: tcp://xlang-python:2087
+    - name: LANGSERVER_PYTHON_BG
+      value: tcp://xlang-python-bg:2087

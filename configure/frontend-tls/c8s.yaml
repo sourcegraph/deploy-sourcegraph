@@ -1,0 +1,18 @@
+arguments:
+- name: tls-cert-base64
+  description: Base 64 encoded TLS certificate
+- name: tls-private-key-base64
+  description: Base 64 encoded TLS private key
+additions:
+- files:
+  - "*.yaml"
+patches:
+- resources:
+  - files:
+    - tls.Secret.yaml
+  edits:
+  - selector: data
+    mode: replace 
+    content:
+      cert: $(tls-cert-base64)
+      key: $(tls-cert-base64)

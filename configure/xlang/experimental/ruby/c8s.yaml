@@ -1,0 +1,15 @@
+additions:
+- files:
+  - "*.yaml"
+patches:
+- resources:
+  - files:
+    - lsp-proxy.Deployment.yaml
+  edits:
+  - selector: spec.template.spec.containers[name=lsp-proxy].env
+    mode: union
+    content:
+    - name: LANGSERVER_RUBY
+      value: tcp://xlang-ruby:8080
+    - name: LANGSERVER_RUBY_BG
+      value: tcp://xlang-ruby:8080

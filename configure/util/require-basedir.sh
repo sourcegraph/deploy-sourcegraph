@@ -6,6 +6,7 @@ cd "$(dirname "${BASH_SOURCE[0]}")/../.."
 
 if [ -z ${BASEDIR+x} ]; then
     read -p "Directory that contains the Kubernetes config to be configured [required]: " BASEDIR
+    export BASEDIR
 fi
 
 if [ -z "$BASEDIR" ]; then

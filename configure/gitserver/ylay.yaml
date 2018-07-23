@@ -1,0 +1,43 @@
+vars:
+- name: gitserver-count
+  type: int
+  default: 1
+  description: Number of gitservers
+- name: gitserver-ssh-known-hosts
+  type: string
+  description: Base 64 encoded known_hosts file for gitserver SSH access to your code host
+- name: gitserver-ssh-private-key
+  type: string
+  description: Base 64 encoded private key for gitserver SSH access to your code host
+additions:
+- files:
+  - "*.yaml"
+patches:
+- resources:
+  - files:
+    - gitserver.StatefulSet.yaml
+  edits:
+  - selector: spec.replicas
+    mode: replace 
+    content: $(gitserver-count)
+  - selector: spec.template.spec.containers[name=gitserver].volumeMounts
+    mode: union
+    content:
+    - mountPath: /root/.ssh
+      name: ssh
+  - selector: spec.template.spec.volumes
+    mode: union
+    content:
+    - name: ssh
+      secret:
+        defaultMode: 384
+        secretName: gitserver-ssh
+- resources:
+  - files:
+    - gitserver-ssh.Secret.yaml
+  edits:
+  - selector: data
+    mode: replace 
+    content:
+      id_rsa: $(gitserver-ssh-private-key)
+      known_hosts: $(gitserver-ssh-known-hosts)

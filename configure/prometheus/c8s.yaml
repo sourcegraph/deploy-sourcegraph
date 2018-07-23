@@ -1,0 +1,17 @@
+arguments:
+  - name: kubernetes-namespace
+    description: The Kubernetes namespace that this will be deployed in
+additions:
+- files:
+  - prometheus*.yaml
+patches:
+- resources:
+  - files:
+    - prometheus.ClusterRoleBinding.yaml
+  edits:
+  - selector: subjects[name=prometheus]
+    mode: union
+    content:
+      namespace: $(kubernetes-namespace)
+
+

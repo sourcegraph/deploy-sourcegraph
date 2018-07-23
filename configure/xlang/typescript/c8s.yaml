@@ -1,0 +1,19 @@
+additions:
+- files:
+  - "*.yaml"
+patches:
+- resources:
+  - files:
+    - lsp-proxy.Deployment.yaml
+  edits:
+  - selector: spec.template.spec.containers[name=lsp-proxy].env
+    mode: union
+    content:
+    - name: LANGSERVER_JAVASCRIPT
+      value: tcp://xlang-typescript:2088
+    - name: LANGSERVER_JAVASCRIPT_BG
+      value: tcp://xlang-typescript-bg:2088
+    - name: LANGSERVER_TYPESCRIPT
+      value: tcp://xlang-typescript:2088
+    - name: LANGSERVER_TYPESCRIPT_BG
+      value: tcp://xlang-typescript-bg:2088

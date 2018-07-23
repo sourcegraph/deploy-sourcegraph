@@ -1,0 +1,11 @@
+arguments:
+- name: storage-class
+  description: Kubernetes storage class to use for all persistent volume claims
+patches:
+- resources:
+  - files:
+    - "*.PersistentVolumeClaim.yaml"
+  edits:
+  - selector: spec.storageClassName
+    mode: replace 
+    content: $(storage-class)

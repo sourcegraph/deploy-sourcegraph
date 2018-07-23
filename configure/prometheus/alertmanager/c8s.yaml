@@ -1,0 +1,23 @@
+arguments:
+  - name: alert-manager-url 
+    description: The url used in alert notifications
+additions:
+- files:
+  - alertmanager*.yaml
+patches:
+- resources:
+  - files:
+    - alertmanager.Deployment.yaml
+  edits:
+  - selector: .spec.template.spec.containers[name=alertmanager].args
+    mode: union
+    content:
+    - -web.external-url=$(alert-manager-url)
+- resources:
+  - files:
+    - prometheus.Deployment.yaml
+  edits:
+  - selector: .spec.template.spec.containers[name=prometheus].args
+    mode: union
+    content:
+    - -web.external-url=$(alert-manager-url)

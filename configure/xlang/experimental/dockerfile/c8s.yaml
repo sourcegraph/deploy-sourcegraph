@@ -1,0 +1,15 @@
+additions:
+- files:
+  - "*.yaml"
+patches:
+- resources:
+  - files:
+    - lsp-proxy.Deployment.yaml
+  edits:
+  - selector: spec.template.spec.containers[name=lsp-proxy].env
+    mode: union
+    content:
+    - name: LANGSERVER_DOCKERFILE
+      value: tcp://xlang-dockerfile:8080
+    - name: LANGSERVER_DOCKERFILE_BG
+      value: tcp://xlang-dockerfile:8080
