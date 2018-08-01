@@ -31,6 +31,15 @@ def main(params_path):
 
     if 'docker.sourcegraph.com/bitbucket-server' not in images:
         print('WARNING: bitbucket-server image is not present. Please ensure your kctx is pointing to dogfood')
+
+    # Override syntect_server version, since it is not automatically deployed
+    # to dogfood and as such we would be writing an outdated version by using
+    # the version found there.
+    syntect_server_name = 'docker.sourcegraph.com/syntect_server' 
+    if syntect_server_name not in images:
+        raise Exception("failed to find syntect_server in images, please report / fix this bug")
+    images[syntect_server_name] = '624a1a2'
+
     for name, tag in images.items():
         content = re.sub(r'image\: ({})\:([A-Za-z0-9\-\._]+)'.format(name), r'image: \1:{}'.format(tag), content)
     with open(params_path, 'w') as fd:
