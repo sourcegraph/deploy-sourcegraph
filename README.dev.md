@@ -2,12 +2,10 @@
 
 ## Cutting a release
 
-* Make the desired changes to this repository. Most commonly, this involves updating the Docker image versions in `values.yaml`.
-  * A convenience script [`update_docker_image_versions.py`](update_docker_image_versions.py)
-    updates the Docker image versions to be those currently deployed to dogfood.
+* Make the desired changes to this repository. Most commonly, this involves updating the Docker image versions in `values.yaml` to match the tagged version you are releasing.
 * Run `./generate.sh`.
 * Open a PR and wait for buildkite to pass and for your changes to be approved, then merge and check out master.
-* Test this release on dogfood before cutting a real release. If this release includes changes not
+* Test this release on a fresh cluster cutting a real release. If this release includes changes not
   yet deployed to dogfood (generally if it includes k8s config changes, rather than merely Docker
   image changes), cut a test release (`LATEST=false ./release $TEST_VERSION`). Then go to the
   `infrastructure` repository and follow the instructions in `datacenter/README.md` to update
