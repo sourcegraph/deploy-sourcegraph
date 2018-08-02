@@ -2,7 +2,9 @@
 
 ## Cutting a release
 
-- Make the desired changes to this repository. Most commonly, this involves updating the Docker image versions in `values.yaml` to match the tagged version you are releasing.
+- Make the desired changes to this repository. Most commonly, this involves updating the Docker image versions in `values.yaml` to match the tagged version you are releasing. For images like language servers, you can look at our
+  [container registry](https://console.cloud.google.com/gcr/images/sourcegraph-dev?project=sourcegraph-dev) to see what the latest versions are.
+
 - Run `./generate.sh`.
 - Open a PR and wait for buildkite to pass and for your changes to be approved, then merge and check out master.
 - Test this release on a fresh cluster before cutting a real release. Cut a test release (`LATEST=false ./release $TEST_VERSION`), then use the instructions [in this installation doc](docs/install.md) to set up a new cluster. (Make sure that you use the helm charts located at https://github.com/sourcegraph/datacenter/archive/$TEST_VERSION.tar.gz).
