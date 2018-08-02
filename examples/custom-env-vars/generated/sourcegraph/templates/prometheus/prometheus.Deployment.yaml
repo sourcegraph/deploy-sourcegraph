@@ -28,7 +28,7 @@ spec:
         - -web.console.templates=/etc/prometheus/consoles
         - -web.external-url=
         - -alertmanager.url=http://alertmanager
-        image: docker.sourcegraph.com/prometheus:v1.4.1
+        image: sourcegraph/prometheus:v1.4.1
         name: prometheus
         ports:
         - containerPort: 9090
@@ -50,7 +50,7 @@ spec:
       - args:
         - --volume-dir=/etc/prometheus
         - --webhook-url=http://localhost:9090/-/reload
-        image: docker.sourcegraph.com/configmap-reload:v0.1
+        image: sourcegraph/configmap-reload:v0.1
         name: configmap-reload
         resources:
           limits:

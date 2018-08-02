@@ -32,7 +32,7 @@ spec:
           value: /etc/sourcegraph/config.json
         - name: SRC_REPOS_DIR
           value: /data/repos
-        image: docker.sourcegraph.com/gitserver:2.10.0
+        image: sourcegraph/gitserver:2.10.0
         livenessProbe:
           initialDelaySeconds: 5
           tcpSocket:
@@ -60,7 +60,7 @@ spec:
       - command:
         - /go/bin/agent-linux
         - --collector.host-port=jaeger-collector:14267
-        image: docker.sourcegraph.com/jaeger-agent
+        image: sourcegraph/jaeger-agent
         name: jaeger-agent
         resources:
           limits:

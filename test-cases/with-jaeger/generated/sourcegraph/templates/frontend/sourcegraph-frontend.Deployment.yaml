@@ -60,7 +60,7 @@ spec:
             secretKeyRef:
               key: key
               name: tls
-        image: docker.sourcegraph.com/frontend:2.10.0
+        image: sourcegraph/frontend:2.10.0
         livenessProbe:
           httpGet:
             path: /healthz
@@ -89,7 +89,7 @@ spec:
       - command:
         - /go/bin/agent-linux
         - --collector.host-port=jaeger-collector:14267
-        image: docker.sourcegraph.com/jaeger-agent
+        image: sourcegraph/jaeger-agent
         name: jaeger-agent
         resources:
           limits:
