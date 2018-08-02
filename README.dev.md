@@ -2,7 +2,7 @@
 
 ## Cutting a release
 
-- Make the desired changes to this repository. Most commonly, this involves updating the Docker image versions in `values.yaml` to match the tagged version you are releasing. For images like language servers, you can look at our
+- Make the desired changes to this repository. Most commonly, this involves updating the Docker image versions in `values.yaml` to match the tagged version you are releasing. For images like language servers, you should look at our
   [container registry](https://console.cloud.google.com/gcr/images/sourcegraph-dev?project=sourcegraph-dev) to see what the latest versions are.
 
 - Run `./generate.sh`.
