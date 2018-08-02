@@ -34,7 +34,7 @@ spec:
           value: http://localhost:3080
         - name: TRACKING_APP_ID
           value: "123123123123"
-        image: docker.sourcegraph.com/query-runner:2.10.0
+        image: sourcegraph/query-runner:2.10.0
         name: query-runner
         ports:
         - containerPort: 3183
@@ -52,7 +52,7 @@ spec:
       - command:
         - /go/bin/agent-linux
         - --collector.host-port=jaeger-collector:14267
-        image: docker.sourcegraph.com/jaeger-agent
+        image: sourcegraph/jaeger-agent
         name: jaeger-agent
         resources:
           limits:

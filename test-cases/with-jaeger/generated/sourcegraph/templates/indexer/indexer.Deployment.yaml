@@ -40,7 +40,7 @@ spec:
           value: /etc/sourcegraph/config.json
         - name: SRC_GIT_SERVERS
           value: gitserver-1:3178
-        image: docker.sourcegraph.com/indexer:2.10.0
+        image: sourcegraph/indexer:2.10.0
         name: indexer
         ports:
         - containerPort: 3179
@@ -58,7 +58,7 @@ spec:
       - command:
         - /go/bin/agent-linux
         - --collector.host-port=jaeger-collector:14267
-        image: docker.sourcegraph.com/jaeger-agent
+        image: sourcegraph/jaeger-agent
         name: jaeger-agent
         resources:
           limits:
