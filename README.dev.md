@@ -12,8 +12,10 @@
   - If this is a patch version to a previous major/minor version, use `LATEST=false ./release.sh $VERSION`.
   - If this is a release candidate, run `LATEST=false ./release {$VERSION}-pre${N}` where `N` starts
     at 0 and increments as you test/cut new versions.
-
+- [Update the `latestReleaseDataCenterBuild` value in `sourcegraph/sourcegraph`](https://sourcegraph.sgdev.org/github.com/sourcegraph/sourcegraph/-/blob/cmd/server/README.md#5-notify-existing-instances-that-an-update-is-available)
 See `./release.sh --help` for information on what the script does.
+
+
 
 ## Development tips
 
