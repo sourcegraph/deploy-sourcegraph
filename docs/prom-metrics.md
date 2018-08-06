@@ -16,147 +16,147 @@ you can [import these dashboards directly from JSON](/docs/grafana/).
 
 1.  frontend QPS, by HTTP code (5m avg):
 
-```
-sum(label_replace(job:src_http_request_count:rate5m, \"c\", \"00s\", \"code\", \"([0-9]).*\")) by (c)
-```
+    ```
+    sum(label_replace(job:src_http_request_count:rate5m, \"c\", \"00s\", \"code\", \"([0-9]).*\")) by (c)
+    ```
 
 1.  frontend QPS, by route (5m avg):
 
-```
-sum(route:src_http_request_count:rate5m{route=~\"blob|graphql|home|page.def.landing|page.repo.landing|repo|repo-branches|search|settings|sign-in|site-admin|tree|xlang\"}) by (route)
-```
+    ```
+    sum(route:src_http_request_count:rate5m{route=~\"blob|graphql|home|page.def.landing|page.repo.landing|repo|repo-branches|search|settings|sign-in|site-admin|tree|xlang\"}) by (route)
+    ```
 
 1.  frontend 90th-percentile request duration (5m avg):
 
-```
-histogram_quantile(0.90, route:src_http_request_duration_seconds_bucket:rate5m{route=~\"blob|graphql|home|page.def.landing|page.repo.landing|repo|repo-branches|search|settings|sign-in|site-admin|tree|xlang\"})
-```
+    ```
+    histogram_quantile(0.90, route:src_http_request_duration_seconds_bucket:rate5m{route=~\"blob|graphql|home|page.def.landing|page.repo.landing|repo|repo-branches|search|settings|sign-in|site-admin|tree|xlang\"})
+    ```
 
 1.  frontend 75th-percentile request duration (5m avg):
 
-```
-histogram_quantile(0.75, route:src_http_request_duration_seconds_bucket:rate5m{route=~\"blob|graphql|home|page.def.landing|page.repo.landing|repo|repo-branches|search|settings|sign-in|site-admin|tree|xlang\"})
-```
+    ```
+    histogram_quantile(0.75, route:src_http_request_duration_seconds_bucket:rate5m{route=~\"blob|graphql|home|page.def.landing|page.repo.landing|repo|repo-branches|search|settings|sign-in|site-admin|tree|xlang\"})
+    ```
 
 1.  frontend CPU usage, by pod (%)
 
-```
-label_replace( irate(process_cpu_seconds_total{app=\"sourcegraph-frontend\"}[10m]), \"inst\", \"\", \"instance\", \"[a-z0-9\\-]+\\-([a-z0-9]+)\" ) * 100
-```
+    ```
+    label_replace( irate(process_cpu_seconds_total{app=\"sourcegraph-frontend\"}[10m]), \"inst\", \"\", \"instance\", \"[a-z0-9\\-]+\\-([a-z0-9]+)\" ) * 100
+    ```
 
 1.  frontend resident memory, by pod (GB)
 
-```
-label_replace( process_resident_memory_bytes{app=\"sourcegraph-frontend\"}, \"inst\", \"\", \"instance\", \"[a-z0-9\\-]+\\-([a-z0-9]+)\" ) / 1024 / 1024 / 1024
-```
+    ```
+    label_replace( process_resident_memory_bytes{app=\"sourcegraph-frontend\"}, \"inst\", \"\", \"instance\", \"[a-z0-9\\-]+\\-([a-z0-9]+)\" ) / 1024 / 1024 / 1024
+    ```
 
 1.  frontend virtual memory, by pod (GB)
 
-```
-label_replace( process_virtual_memory_bytes{app=\"sourcegraph-frontend\"}, \"inst\", \"\", \"instance\", \"[a-z0-9\\-]+\\-([a-z0-9]+)\" ) / 1024 / 1024 / 1024
-```
+    ```
+    label_replace( process_virtual_memory_bytes{app=\"sourcegraph-frontend\"}, \"inst\", \"\", \"instance\", \"[a-z0-9\\-]+\\-([a-z0-9]+)\" ) / 1024 / 1024 / 1024
+    ```
 
 ### Dashboard: gitserver
 
 1.  gitserver total QPS (10m avg):
 
-```
-sum(rate(src_gitserver_exec_duration_seconds_count{status=~\"[0-9]+\"}[10m])) by (job)"
-```
+    ```
+    sum(rate(src_gitserver_exec_duration_seconds_count{status=~\"[0-9]+\"}[10m])) by (job)"
+    ```
 
 1.  gitserver QPS, by operation (10m avg):
 
-```
-sum(rate(src_gitserver_exec_duration_seconds_count{status=~\"[0-9]+\"}[10m])) by (cmd, job)"
-```
+    ```
+    sum(rate(src_gitserver_exec_duration_seconds_count{status=~\"[0-9]+\"}[10m])) by (cmd, job)"
+    ```
 
 1.  gitserver p90 request duration, by operation (10m avg):
 
-```
-histogram_quantile(0.9, sum(rate(src_gitserver_exec_duration_seconds_bucket{status=~\"[0-9]+\"}[10m])) by (le, cmd, job))"
-```
+    ```
+    histogram_quantile(0.9, sum(rate(src_gitserver_exec_duration_seconds_bucket{status=~\"[0-9]+\"}[10m])) by (le, cmd, job))"
+    ```
 
 1.  gitserver p75 request duration, by operation (10m avg):
 
-```
-histogram_quantile(0.75, sum(rate(src_gitserver_exec_duration_seconds_bucket{status=~\"[0-9]+\"}[10m])) by (le, cmd, job))"
-```
+    ```
+    histogram_quantile(0.75, sum(rate(src_gitserver_exec_duration_seconds_bucket{status=~\"[0-9]+\"}[10m])) by (le, cmd, job))"
+    ```
 
 1.  git execs running
 
-```
-sum by (job)(src_gitserver_exec_running)"
-```
+    ```
+    sum by (job)(src_gitserver_exec_running)"
+    ```
 
 1.  exit status QPS, by operation (10m avg):
 
-```
-sum by (status, cmd)(rate(src_gitserver_exec_duration_seconds_count{status!=\"\"}[10m]))"
-```
+    ```
+    sum by (status, cmd)(rate(src_gitserver_exec_duration_seconds_count{status!=\"\"}[10m]))"
+    ```
 
 1.  free disk space (TB):
 
-```
-min(src_gitserver_disk_space_available) BY (job) / 1000 / 1000 / 1000"
-```
+    ```
+    min(src_gitserver_disk_space_available) BY (job) / 1000 / 1000 / 1000"
+    ```
 
 ### Dashboard: lang
 
 1.  open workspaces, by language:
 
-```
-avg by (mode)(src_xlang_open_lsp_server_connections{mode!=\"\"})
-```
+    ```
+    avg by (mode)(src_xlang_open_lsp_server_connections{mode!=\"\"})
+    ```
 
 1.  QPS, by language (5m avg):
 
-```
-prod:xlang_requests:rate5m
-```
+    ```
+    prod:xlang_requests:rate5m
+    ```
 
 1.  request error ratio, by language:
 
-```
-prod:xlang_errors:ratio5m
-```
+    ```
+    prod:xlang_errors:ratio5m
+    ```
 
 1.  restarts, by service:
 
-```
-sum by (container)(increase(kube_pod_container_status_restarts{container=~\"(lsp|xlang).*\"}[10m]))
-```
+    ```
+    sum by (container)(increase(kube_pod_container_status_restarts{container=~\"(lsp|xlang).*\"}[10m]))
+    ```
 
 1.  max CPU, by service:
 
-```
-max by (container_name)(task:container_cpu_usage_seconds_total:sum{container_name=~\"(lsp|xlang).*\"})
-```
+    ```
+    max by (container_name)(task:container_cpu_usage_seconds_total:sum{container_name=~\"(lsp|xlang).*\"})
+    ```
 
 1.  max RAM, by service:
 
-```
-max by (container_name)(container_memory_rss{container_name=~\"(xlang|lsp).*\"}) / 1024 / 1024 / 1024
-```
+    ```
+    max by (container_name)(container_memory_rss{container_name=~\"(xlang|lsp).*\"}) / 1024 / 1024 / 1024
+    ```
 
 ### Dashboard: resources
 
 1.  max CPU, by service
 
-```
-(max by (job)(irate(process_cpu_seconds_total[5m]))) * 100
-```
+    ```
+    (max by (job)(irate(process_cpu_seconds_total[5m]))) * 100
+    ```
 
 1.  max resident memory, by service (GB):
 
-```
-(max by (job)(process_resident_memory_bytes)) / 1024 / 1024 / 1024
-```
+    ```
+    (max by (job)(process_resident_memory_bytes)) / 1024 / 1024 / 1024
+    ```
 
 1.  max virtual memory, by service (GB):
 
-```
-max by (job)(process_virtual_memory_bytes) / 1024 / 1024 / 1024
-```
+    ```
+    max by (job)(process_virtual_memory_bytes) / 1024 / 1024 / 1024
+    ```
 
 ## All metrics
 
