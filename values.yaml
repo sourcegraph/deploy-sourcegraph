@@ -239,6 +239,15 @@ cluster:
     containers:
       pgsql:
         volumeMounts: []
+  jaeger:
+    containers:
+      agent:
+        limits:
+          cpu: 100m
+          memory: 100Mi
+        requests:
+          cpu: 100m
+          memory: 100Mi
   storageClass:
     # name is the name of the storage class used by the persistent volumes generated in this chart. This should be
     # left as is, unless you are using an already existing storage class.

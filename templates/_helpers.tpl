@@ -312,11 +312,11 @@ securityContext:
   name: jaeger-agent
   resources:
     limits:
-      cpu: 100m
-      memory: 100Mi
+      cpu: {{ .Values.cluster.jaeger.containers.agent.limits.cpu }}
+      memory: {{ .Values.cluster.jaeger.containers.agent.limits.memory }}
     requests:
-      cpu: 100m
-      memory: 100Mi
+      cpu: {{ .Values.cluster.jaeger.containers.agent.requests.cpu }}
+      memory: {{ .Values.cluster.jaeger.containers.agent.requests.memory }}
 {{- end -}}
 
 {{- end -}}
