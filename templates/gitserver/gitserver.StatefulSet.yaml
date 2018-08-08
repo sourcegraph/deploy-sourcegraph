@@ -78,8 +78,8 @@ spec:
         volume.beta.kubernetes.io/storage-class: {{ $global.Values.cluster.storageClass.name }}
       name: gitserver
     spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: {{ required ".Values.cluster.gitserver.diskSize is required" $global.Values.cluster.gitserver.diskSize }}
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ required ".Values.cluster.gitserver.diskSize is required" $global.Values.cluster.gitserver.diskSize }}
