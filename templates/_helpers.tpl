@@ -153,8 +153,8 @@
 
 {{/* joinFmt accepts a dictionary specifying "count", "fmt", and "sep" to prints out the joined formatted list string */}}
 {{- define "joinFmt" -}}
-{{- range $i, $v := (until (int (sub .count 1))) -}}{{- printf $.fmt (add $i 1) }}{{$.sep}}{{ end -}}
-{{- printf .fmt .count -}}
+{{- range $i, $v := (until (int (sub .count 1))) -}}{{- printf $.fmt $i }}{{$.sep}}{{ end -}}
+{{- printf .fmt (sub .count 1) -}}
 {{- end -}}
 
 {{/* --------------- START OF TEMPLATE ------------- */}}
