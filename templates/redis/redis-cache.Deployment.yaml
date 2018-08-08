@@ -1,4 +1,4 @@
-{{- if not (hasKey .Values.cluster "redis") -}}
+{{- if not ( and (hasKey .Values.cluster "redis") (hasKey (index .Values.cluster "redis") "cache") ) -}}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -74,4 +74,4 @@ spec:
       - configMap:
           name: redis-cache
         name: config
-{{end}}
+{{end -}}

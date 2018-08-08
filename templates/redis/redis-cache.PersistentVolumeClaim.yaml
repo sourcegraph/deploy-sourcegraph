@@ -1,4 +1,4 @@
-{{- if not (hasKey .Values.cluster "redis") -}}
+{{- if not ( and (hasKey .Values.cluster "redis") (hasKey (index .Values.cluster "redis") "cache") ) -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -11,4 +11,4 @@ spec:
   resources:
     requests:
       storage: 100Gi
-{{end}}
+{{end -}}

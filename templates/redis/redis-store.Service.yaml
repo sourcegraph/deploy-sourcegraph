@@ -1,4 +1,4 @@
-{{- if not (hasKey .Values.cluster "redis") -}}
+{{- if not ( and (hasKey .Values.cluster "redis") (hasKey (index .Values.cluster "redis") "store") ) -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -16,4 +16,4 @@ spec:
   selector:
     app: redis-store
   type: ClusterIP
-{{end}}
+{{end -}}
