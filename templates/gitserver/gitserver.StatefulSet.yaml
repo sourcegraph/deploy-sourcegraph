@@ -17,9 +17,6 @@ spec:
   replicas: {{ required ".Values.cluster.gitserver.shards required" .Values.cluster.gitserver.shards | int }}
   revisionHistoryLimit: 10
   updateStrategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
     type: RollingUpdate
   template:
     metadata:
