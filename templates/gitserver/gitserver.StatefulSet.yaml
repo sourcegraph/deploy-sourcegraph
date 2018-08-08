@@ -6,19 +6,15 @@
 {{- $_ := set $envVars "ORIGIN_MAP" $global.Values.site.gitOriginMap -}}
 {{- include "collectEnv" (list $envVars .Values.cluster.gitserver.containers.gitserver.env) -}}
 
-{{- range $index, $gitserverIndex := until (required ".Values.cluster.gitserver.shards required" .Values.cluster.gitserver.shards | int) }}
-{{- if eq $index 0 | not }}
----
-{{ end -}}
-apiVersion: extensions/v1beta1
-kind: Deployment
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   annotations:
     description: Stores clones of repositories to perform Git operations.
-  name: gitserver-{{ add1 $gitserverIndex }}
+  name: gitserver
 spec:
   minReadySeconds: 10
-  replicas: 1
+  replicas: {{ required ".Values.cluster.gitserver.shards required" .Values.cluster.gitserver.shards | int }}
   revisionHistoryLimit: 10
   strategy:
     rollingUpdate:
@@ -28,7 +24,7 @@ spec:
   template:
     metadata:
       labels:
-        app: gitserver-{{ add1 $gitserverIndex }}
+        app: gitserver
         group: backend
         type: gitserver
     spec:
@@ -43,7 +39,7 @@ spec:
           tcpSocket:
             port: rpc
           timeoutSeconds: 5
-        name: gitserver-{{ add1 $gitserverIndex }}
+        name: gitserver
         ports:
         - containerPort: 3178
           name: rpc
@@ -69,11 +65,21 @@ spec:
         name: sg-config
       - name: repos
         persistentVolumeClaim:
-          claimName: gitserver-{{ add1 $gitserverIndex }}
+          claimName: gitserver
       {{- if $global.Values.cluster.gitserver.ssh }}
       - name: ssh
         secret:
           defaultMode: 384
           secretName: gitserver-ssh
       {{ end }}
-{{ end }}
+  volumeClaimTemplate:
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-class: {{ $global.Values.cluster.storageClass.name }}
+      name: gitserver
+    spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ required ".Values.cluster.gitserver.diskSize is required" $global.Values.cluster.gitserver.diskSize }}
