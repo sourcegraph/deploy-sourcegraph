@@ -17,7 +17,7 @@ spec:
   minReadySeconds: 10
   replicas: {{ required ".Values.cluster.gitserver.shards required" .Values.cluster.gitserver.shards | int }}
   revisionHistoryLimit: 10
-  strategy:
+  updateStrategy:
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 1
