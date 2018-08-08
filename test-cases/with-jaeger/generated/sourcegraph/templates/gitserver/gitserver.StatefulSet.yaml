@@ -1,11 +1,11 @@
 ##---
-# Source: sourcegraph/templates/gitserver/gitserver.Deployment.yaml
-apiVersion: extensions/v1beta1
-kind: Deployment
+# Source: sourcegraph/templates/gitserver/gitserver.StatefulSet.yaml
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   annotations:
     description: Stores clones of repositories to perform Git operations.
-  name: gitserver-1
+  name: gitserver
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -18,7 +18,7 @@ spec:
   template:
     metadata:
       labels:
-        app: gitserver-1
+        app: gitserver
         group: backend
         type: gitserver
     spec:
@@ -27,7 +27,7 @@ spec:
         - run
         env:
         - name: CONFIG_FILE_HASH
-          value: 30b2283b452d5fb50293f1dc0c2993e1bec0497663b10667df336bfad5ba4757
+          value: 2528a0893ab486460532ebc49de296b3ffc523807eca4a53c6735ac99d0857a0
         - name: SOURCEGRAPH_CONFIG_FILE
           value: /etc/sourcegraph/config.json
         - name: SRC_REPOS_DIR
@@ -38,7 +38,7 @@ spec:
           tcpSocket:
             port: rpc
           timeoutSeconds: 5
-        name: gitserver-1
+        name: gitserver
         ports:
         - containerPort: 3178
           name: rpc
@@ -54,14 +54,44 @@ spec:
           name: sg-config
         - mountPath: /data/repos
           name: repos
+        - mountPath: /root/.ssh
+          name: ssh
+        
+      - command:
+        - /go/bin/agent-linux
+        - --collector.host-port=jaeger-collector:14267
+        image: sourcegraph/jaeger-agent
+        name: jaeger-agent
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
       securityContext:
         runAsUser: 0
       volumes:
       - configMap:
-          defaultMode: 464
+          defaultMode: 384
           name: config-file
         name: sg-config
       - name: repos
         persistentVolumeClaim:
-          claimName: gitserver-1
-
+          claimName: gitserver
+      - name: ssh
+        secret:
+          defaultMode: 384
+          secretName: gitserver-ssh
+      
+  volumeClaimTemplate:
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-class: default
+      name: gitserver
+    spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi

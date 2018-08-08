@@ -1,11 +1,11 @@
 ##---
-# Source: sourcegraph/templates/gitserver/gitserver.Deployment.yaml
-apiVersion: extensions/v1beta1
-kind: Deployment
+# Source: sourcegraph/templates/gitserver/gitserver.StatefulSet.yaml
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   annotations:
     description: Stores clones of repositories to perform Git operations.
-  name: gitserver-1
+  name: gitserver
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -18,7 +18,7 @@ spec:
   template:
     metadata:
       labels:
-        app: gitserver-1
+        app: gitserver
         group: backend
         type: gitserver
     spec:
@@ -27,7 +27,7 @@ spec:
         - run
         env:
         - name: CONFIG_FILE_HASH
-          value: ad622f4e70f7edc1056a270559e8ca07bba00abd81c1bea1e8940c7156532081
+          value: ba3e71237fb5a564f99cfbec06bb58ce28f415901995d308fff5547a9b314f78
         - name: SOURCEGRAPH_CONFIG_FILE
           value: /etc/sourcegraph/config.json
         - name: SRC_REPOS_DIR
@@ -38,7 +38,7 @@ spec:
           tcpSocket:
             port: rpc
           timeoutSeconds: 5
-        name: gitserver-1
+        name: gitserver
         ports:
         - containerPort: 3178
           name: rpc
@@ -54,8 +54,6 @@ spec:
           name: sg-config
         - mountPath: /data/repos
           name: repos
-      nodeSelector:
-        beta.kubernetes.io/instance-type: m4.4xlarge
       securityContext:
         runAsUser: 0
       volumes:
@@ -65,5 +63,15 @@ spec:
         name: sg-config
       - name: repos
         persistentVolumeClaim:
-          claimName: gitserver-1
-
+          claimName: gitserver
+  volumeClaimTemplate:
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-class: default
+      name: gitserver
+    spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi

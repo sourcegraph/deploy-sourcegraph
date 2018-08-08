@@ -1,11 +1,11 @@
 ##---
-# Source: sourcegraph/templates/gitserver/gitserver.Deployment.yaml
-apiVersion: extensions/v1beta1
-kind: Deployment
+# Source: sourcegraph/templates/gitserver/gitserver.StatefulSet.yaml
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   annotations:
     description: Stores clones of repositories to perform Git operations.
-  name: gitserver-1
+  name: gitserver
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -18,7 +18,7 @@ spec:
   template:
     metadata:
       labels:
-        app: gitserver-1
+        app: gitserver
         group: backend
         type: gitserver
     spec:
@@ -38,7 +38,7 @@ spec:
           tcpSocket:
             port: rpc
           timeoutSeconds: 5
-        name: gitserver-1
+        name: gitserver
         ports:
         - containerPort: 3178
           name: rpc
@@ -63,5 +63,15 @@ spec:
         name: sg-config
       - name: repos
         persistentVolumeClaim:
-          claimName: gitserver-1
-
+          claimName: gitserver
+  volumeClaimTemplate:
+    metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-class: default
+      name: gitserver
+    spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
