@@ -1,6 +1,3 @@
-> Note to existing customers: if you are migrating from the old version of Data Center (configured
-> using `sourcegraph-server-gen`), see [docs/migrate.md](docs/migrate.md).
-
 # Sourcegraph Data Center
 
 Sourcegraph Data Center is for organizations that need highly scalable and available code search and
@@ -13,14 +10,13 @@ or [contact us](https://about.sourcegraph.com/contact/sales) for more informatio
 starting out, we recommend installing [Sourcegraph](https://about.sourcegraph.com/docs) on a single
 node first. Migrating to Data Center is easy when you're ready.
 
-* [Installation](docs/install.md)
-* [Updating](docs/update.md)
-* [Scaling](/docs/scale.md)
-* [Troubleshooting](/docs/troubleshoot.md)
-* [Admin guide](/docs/admin-guide.md) - useful guide for Sourcegraph admins
-  * [Prometheus metrics](/docs/prom-metrics.md) - list of all Prometheus metrics that can be used for
+- [Installation](docs/install.md)
+- [Updating](docs/update.md)
+- [Scaling](/docs/scale.md)
+- [Troubleshooting](/docs/troubleshoot.md)
+- [Admin guide](/docs/admin-guide.md) - useful guide for Sourcegraph admins
+  - [Prometheus metrics](/docs/prom-metrics.md) - list of all Prometheus metrics that can be used for
     application performance monitoring
-
 
 ## Contributing
 
