@@ -34,4 +34,4 @@ kubectl get pvc -o json | jq --raw-output ".items | map(select(.metadata.name | 
 kubectl get pv -o json | jq --raw-output ".items | map(select(.spec.claimRef.name | contains(\"gitserver-\"))) | .[] | \"kubectl patch pv -p '{\\\"spec\\\":{\\\"claimRef\\\":{\\\"uid\\\":null,\\\"name\\\":\\\"repos-gitserver-\\(.spec.claimRef.name | ltrimstr(\"gitserver-\") | tonumber - 1)\\\"}}}' \\(.metadata.name)\"" | bash
 ```
 
-5. (**downtime ends here**) [Proceed with the normal upgrade steps](./update.md)
+5. [Proceed with the normal upgrade steps](./update.md) (**downtime ends here**)
