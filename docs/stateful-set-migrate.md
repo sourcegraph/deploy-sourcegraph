@@ -30,6 +30,8 @@ kubectl get pvc -o json | jq --raw-output ".items | map(select(.metadata.name | 
 
 4. Update `gitserver`'s persistent volumes so they can be reused by the new StatefulSet
 
+This step transforms the the old `claimRef.name`s that looked like `gitserver-1, gitserver-2, ...` into `repos-gitserver-0, repos-gitserver-1, ...`.
+
 ```bash
 kubectl get pv -o json | jq --raw-output ".items | map(select(.spec.claimRef.name | contains(\"gitserver-\"))) | .[] | \"kubectl patch pv -p '{\\\"spec\\\":{\\\"claimRef\\\":{\\\"uid\\\":null,\\\"name\\\":\\\"repos-gitserver-\\(.spec.claimRef.name | ltrimstr(\"gitserver-\") | tonumber - 1)\\\"}}}' \\(.metadata.name)\"" | bash
 ```
