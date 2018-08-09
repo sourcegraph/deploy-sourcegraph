@@ -36,4 +36,4 @@ This step transforms the the old `claimRef.name`s that looked like `gitserver-1,
 kubectl get pv -o json | jq --raw-output ".items | map(select(.spec.claimRef.name | contains(\"gitserver-\"))) | .[] | \"kubectl patch pv -p '{\\\"spec\\\":{\\\"claimRef\\\":{\\\"uid\\\":null,\\\"name\\\":\\\"repos-gitserver-\\(.spec.claimRef.name | ltrimstr(\"gitserver-\") | tonumber - 1)\\\"}}}' \\(.metadata.name)\"" | bash
 ```
 
-5. [Proceed with the normal upgrade steps](./update.md) (**downtime ends here**)
+5. [Proceed with the normal upgrade steps](./update.md) (**downtime ends once upgrade is complete**)
