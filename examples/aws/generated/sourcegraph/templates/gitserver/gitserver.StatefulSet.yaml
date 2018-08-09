@@ -62,13 +62,11 @@ spec:
           name: config-file
         name: sg-config
       - name: repos
-        persistentVolumeClaim:
-          claimName: gitserver
   volumeClaimTemplates:
   - metadata:
       annotations:
         volume.beta.kubernetes.io/storage-class: default
-      name: gitserver
+      name: repos
     spec:
       accessModes:
       - ReadWriteOnce

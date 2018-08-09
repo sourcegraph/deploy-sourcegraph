@@ -77,8 +77,6 @@ spec:
           name: config-file
         name: sg-config
       - name: repos
-        persistentVolumeClaim:
-          claimName: gitserver
       - name: ssh
         secret:
           defaultMode: 384
@@ -88,7 +86,7 @@ spec:
   - metadata:
       annotations:
         volume.beta.kubernetes.io/storage-class: default
-      name: gitserver
+      name: repos
     spec:
       accessModes:
       - ReadWriteOnce
