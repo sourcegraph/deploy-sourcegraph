@@ -145,7 +145,7 @@
 {{/* --------------- START OF TEMPLATE ------------- */}}
 
 {{- define "gitservers" -}}
-{{- include "joinFmt" (dict "count" (int (default 1 .Values.cluster.gitserver.shards)) "fmt" "gitserver-%d.gitserver.default.svc.cluster.local:3178" "sep" " ") -}}
+{{- include "joinFmt" (dict "count" (int (default 1 .Values.cluster.gitserver.shards)) "fmt" "gitserver-%d.gitserver:3178" "sep" " ") -}}
 {{- end -}}
 
 {{/* --------------- START OF TEMPLATE ------------- */}}
