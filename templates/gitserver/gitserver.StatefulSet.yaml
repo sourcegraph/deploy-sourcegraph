@@ -69,14 +69,14 @@ spec:
           defaultMode: 384
           secretName: gitserver-ssh
       {{ end }}
-  volumeClaimTemplate:
-    metadata:
+  volumeClaimTemplates:
+  - metadata:
       annotations:
         volume.beta.kubernetes.io/storage-class: {{ $global.Values.cluster.storageClass.name }}
       name: gitserver
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: {{ required ".Values.cluster.gitserver.diskSize is required" $global.Values.cluster.gitserver.diskSize }}
+   spec:
+     accessModes:
+     - ReadWriteOnce
+     resources:
+       requests:
+         storage: {{ required ".Values.cluster.gitserver.diskSize is required" $global.Values.cluster.gitserver.diskSize }}

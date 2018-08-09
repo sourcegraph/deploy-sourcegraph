@@ -81,14 +81,14 @@ spec:
           defaultMode: 384
           secretName: gitserver-ssh
       
-  volumeClaimTemplate:
-    metadata:
+  volumeClaimTemplates:
+  - metadata:
       annotations:
         volume.beta.kubernetes.io/storage-class: default
       name: gitserver
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: 200Gi
+   spec:
+     accessModes:
+     - ReadWriteOnce
+     resources:
+       requests:
+         storage: 200Gi
