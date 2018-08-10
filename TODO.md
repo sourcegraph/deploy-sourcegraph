@@ -15,3 +15,5 @@
 - communicate that you have to manually copy environment variables to each deployment
 
 - `xlang-java` - `"EXECUTE_GRADLE_ORIGINAL_ROOT_PATHS"`, `"PRIVATE_ARTIFACT_REPO_ID"`, `"PRIVATE_ARTIFACT_REPO_URL"`, `"PRIVATE_ARTIFACT_REPO_USERNAME"`, `"PRIVATE_ARTIFACT_REPO_PASSWORD"` are all generate from site configuration as env vars - config map? communicate with front end?
+
+- how to communicate `loadSelector`?
