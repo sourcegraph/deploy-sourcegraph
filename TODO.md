@@ -41,6 +41,7 @@
 
   - write documentation saying how to add these manually if you need them
   - cc @beyang
+  - issue https://github.com/sourcegraph/sourcegraph/issues/12805
 
 - [x] `xlang-go`, `xlang-typescript` all have [`mountCacheVolume`](https://sourcegraph.com/search?q=repo:%5Egithub%5C.com/sourcegraph/deploy-sourcegraph%24+mountCacheVolume) that reads from the site config. Is this necessary? (another instance of needing to parse the site config)
 
