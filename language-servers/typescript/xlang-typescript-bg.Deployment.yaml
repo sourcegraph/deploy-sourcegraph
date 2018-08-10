@@ -1,10 +1,9 @@
-##---
-# Source: sourcegraph/templates/xlang/typescript/xlang-typescript-bg.Deployment.yaml
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    description: LSP server for JavaScript and TypeScript (used for background indexing
+    description:
+      LSP server for JavaScript and TypeScript (used for background indexing
       jobs).
   name: xlang-typescript-bg
 spec:
@@ -22,43 +21,43 @@ spec:
         app: xlang-typescript-bg
     spec:
       containers:
-      - env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: CACHE_DIR
-          value: /mnt/cache/$(POD_NAME)
-        image: sourcegraph/xlang-javascript-typescript:00081_2018-07-20_09dabb1
-        livenessProbe:
-          initialDelaySeconds: 30
-          tcpSocket:
-            port: lsp
-          timeoutSeconds: 5
-        name: xlang-typescript-bg
-        ports:
-        - containerPort: 2088
-          name: lsp
-        readinessProbe:
-          tcpSocket:
-            port: lsp
-        resources:
-          limits:
-            cpu: "4"
-            memory: "5Gi"
-          requests:
-            cpu: "500m"
-            memory: "2Gi"
-        volumeMounts:
-        - mountPath: /yarn-config
-          name: yarn-config
-        - mountPath: /mnt/cache
-          name: cache-ssd
+        - env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CACHE_DIR
+              value: /mnt/cache/$(POD_NAME)
+          image: sourcegraph/xlang-javascript-typescript:00081_2018-07-20_09dabb1
+          livenessProbe:
+            initialDelaySeconds: 30
+            tcpSocket:
+              port: lsp
+            timeoutSeconds: 5
+          name: xlang-typescript-bg
+          ports:
+            - containerPort: 2088
+              name: lsp
+          readinessProbe:
+            tcpSocket:
+              port: lsp
+          resources:
+            limits:
+              cpu: "4"
+              memory: "5Gi"
+            requests:
+              cpu: "500m"
+              memory: "2Gi"
+          volumeMounts:
+            - mountPath: /yarn-config
+              name: yarn-config
+            - mountPath: /mnt/cache
+              name: cache-ssd
       securityContext:
         runAsUser: 0
       volumes:
-      - emptyDir: {}
-        name: cache-ssd
-      - configMap:
+        - emptyDir: {}
+          name: cache-ssd
+        - configMap:
+            name: yarn-config
           name: yarn-config
-        name: yarn-config

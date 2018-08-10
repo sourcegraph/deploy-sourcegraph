@@ -1,5 +1,3 @@
-##---
-# Source: sourcegraph/templates/xlang/java/xlang-java.Deployment.yaml
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -21,28 +19,28 @@ spec:
         app: xlang-java
     spec:
       containers:
-      - env:
-        - name: JVM_OPT
-          value: -Xms8000m -Xmx8000m -XX:+PrintFlagsFinal -Dsun.zip.disableMemoryMapping=true -agentlib:jdwp=transport=dt_socket,address=127.0.0.1:8001,suspend=n,server=y
-        - name: LS_OPT
-          value: -l INFO
-        image: sourcegraph/xlang-java-skinny:2018-05-10-1621
-        name: xlang-java
-        ports:
-        - containerPort: 2088
-          name: lsp
-        resources:
-          limits:
-            cpu: "4"
-            memory: "8Gi"
-          requests:
-            cpu: "500m"
-            memory: "2Gi"
-        volumeMounts:
-        - mountPath: /tmp
-          name: tmp
+        - env:
+            - name: JVM_OPT
+              value: -Xms8000m -Xmx8000m -XX:+PrintFlagsFinal -Dsun.zip.disableMemoryMapping=true -agentlib:jdwp=transport=dt_socket,address=127.0.0.1:8001,suspend=n,server=y
+            - name: LS_OPT
+              value: -l INFO
+          image: sourcegraph/xlang-java-skinny:2018-05-10-1621
+          name: xlang-java
+          ports:
+            - containerPort: 2088
+              name: lsp
+          resources:
+            limits:
+              cpu: "4"
+              memory: "8Gi"
+            requests:
+              cpu: "500m"
+              memory: "2Gi"
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmp
       securityContext:
         runAsUser: 0
       volumes:
-      - emptyDir: {}
-        name: tmp
+        - emptyDir: {}
+          name: tmp
