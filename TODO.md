@@ -32,7 +32,7 @@
     for the java language server in data center (these have no effect on server)
   - deprecate the site config for those var names
   - document the fact that these environment variables exist for xlang-java's deployment
-  - cc @stephen
+  - cc @slimsag
 
 * [x] how to communicate `nodeSelector`?
   - document this in the readme, but this is standard k8s
