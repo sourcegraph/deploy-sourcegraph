@@ -17,3 +17,5 @@
 - `xlang-java` - `"EXECUTE_GRADLE_ORIGINAL_ROOT_PATHS"`, `"PRIVATE_ARTIFACT_REPO_ID"`, `"PRIVATE_ARTIFACT_REPO_URL"`, `"PRIVATE_ARTIFACT_REPO_USERNAME"`, `"PRIVATE_ARTIFACT_REPO_PASSWORD"` are all generate from site configuration as env vars - config map? communicate with front end?
 
 - how to communicate `loadSelector`?
+
+- [`commonVolumeMounts/commonVolumes` is used all over the the place](https://sourcegraph.com/search?q=repo:%5Egithub%5C.com/sourcegraph/deploy-sourcegraph%24+commonVolumeMounts%7CcommonVolume) - why? do I need to do anything special for this
