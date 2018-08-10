@@ -19,3 +19,5 @@
 - how to communicate `loadSelector`?
 
 - [`commonVolumeMounts/commonVolumes` is used all over the the place](https://sourcegraph.com/search?q=repo:%5Egithub%5C.com/sourcegraph/deploy-sourcegraph%24+commonVolumeMounts%7CcommonVolume) - why? do I need to do anything special for this
+
+- `xlang-go`, `xlang-typescript` all have [`mountCacheVolume`](https://sourcegraph.com/search?q=repo:%5Egithub%5C.com/sourcegraph/deploy-sourcegraph%24+mountCacheVolume) that reads from the site config. Is this necessary? (another instance of needing to parse the site config)
