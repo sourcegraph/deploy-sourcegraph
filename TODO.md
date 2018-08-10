@@ -5,3 +5,5 @@
 - [] `cache-ssd` is there any special configuration that's missing?
 
 - `lightstep` information comes from site config?: https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph/-/blob/templates/_helpers.tpl#L48-55
+
+- write documentation about writing security context? https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph/-/blob/templates/_helpers.tpl#L285
