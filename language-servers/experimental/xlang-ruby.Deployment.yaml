@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: LSP server for ruby (used for live requests).
+  name: xlang-ruby
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: xlang-ruby
+    spec:
+      containers:
+      - image: sourcegraph/codeintel-ruby:00239_2018-05-31_6b6cac4
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: lsp
+          timeoutSeconds: 5
+        name: xlang-ruby
+        ports:
+        - containerPort: 8080
+          name: lsp
+        readinessProbe:
+          tcpSocket:
+            port: lsp
+      securityContext:
+        runAsUser: 0

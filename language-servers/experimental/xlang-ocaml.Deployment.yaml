@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: LSP server for ocaml (used for live requests).
+  name: xlang-ocaml
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: xlang-ocaml
+    spec:
+      containers:
+      - image: sourcegraph/codeintel-ocaml:00239_2018-05-31_6b6cac4
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: lsp
+          timeoutSeconds: 5
+        name: xlang-ocaml
+        ports:
+        - containerPort: 8080
+          name: lsp
+        readinessProbe:
+          tcpSocket:
+            port: lsp
+      securityContext:
+        runAsUser: 0
