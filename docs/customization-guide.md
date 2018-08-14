@@ -103,4 +103,4 @@ For example, on Google Cloud Platform, add Local SSDs to the nodes running the s
 
 ## Assigning Resource-Hungry Pods to Larger Nodes
 
-If you a heterogeneous cluster where you need to ensure certain more resource-hungry pods (e.g., `indexedSearch`), you can [refer to the Kubernetes documentation to see how to specify node constraints (such as `nodeSelector`, etc.)](https://kubernetes.io/docs/concepts/configuration/assign-pod-node).
+If you have a heterogeneous cluster where you need to ensure certain more resource-hungry pods (e.g., `indexedSearch`), you can [refer to the Kubernetes documentation to see how to specify node constraints (such as `nodeSelector`, etc.)](https://kubernetes.io/docs/concepts/configuration/assign-pod-node).
