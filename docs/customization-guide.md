@@ -46,3 +46,19 @@ Lightstep is a closed-source distributed tracing and performance monitoring tool
 ```
 
 To enable, you must first purchase Lightstep and create a project corresponding to the Sourcegraph instance. Then, add the above environment to each deployment.
+
+## Custom Redis Cache and Store
+
+Sourcegraph supports specifying a custom Redis server for:
+
+- caching information (specified via the `REDIS_CACHE_ENDPOINT` environment variable)
+- storing information (session data) (specified via the `REDIS_STORE_ENDPOINT` environment variable)
+
+If you want to specify a custom Redis server, you'll need specify the corresponding environment variable for each of the following deployments:
+
+- `sourcegraph-frontend`
+- `indexer`
+- `lsp-proxy`
+- `repo-updater`
+- `xlang-go`
+- `xlang-go-bg`
