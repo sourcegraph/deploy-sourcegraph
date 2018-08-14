@@ -1,24 +1,24 @@
 ##---
-# Source: sourcegraph/templates/gitserver/gitserver.Deployment.yaml
-apiVersion: extensions/v1beta1
-kind: Deployment
+# Source: sourcegraph/templates/gitserver/gitserver.StatefulSet.yaml
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   annotations:
     description: Stores clones of repositories to perform Git operations.
-  name: gitserver-1
+  name: gitserver
 spec:
-  minReadySeconds: 10
+  serviceName: gitserver
+  selector:
+    matchLabels:
+      app: gitserver
   replicas: 1
   revisionHistoryLimit: 10
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
+  updateStrategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        app: gitserver-1
+        app: gitserver
         group: backend
         type: gitserver
     spec:
@@ -27,20 +27,18 @@ spec:
         - run
         env:
         - name: CONFIG_FILE_HASH
-          value: 9544ecc0711a4760bcba46a59afea8cb5916017f667fe43b618ec4dae9a25687
+          value: 718c4d051e11d962879e2ae21662749b816d897dc692f1bc593557616e61cc21
         - name: SOURCEGRAPH_CONFIG_FILE
           value: /etc/sourcegraph/config.json
         - name: SRC_REPOS_DIR
           value: /data/repos
-        - name: VAR
-          value: val
         image: sourcegraph/gitserver:2.10.1
         livenessProbe:
           initialDelaySeconds: 5
           tcpSocket:
             port: rpc
           timeoutSeconds: 5
-        name: gitserver-1
+        name: gitserver
         ports:
         - containerPort: 3178
           name: rpc
@@ -52,8 +50,6 @@ spec:
             cpu: "500m"
             memory: "1G"
         volumeMounts:
-        - mountPath: /etc/ssl
-          name: ssl
         - mountPath: /etc/sourcegraph
           name: sg-config
         - mountPath: /data/repos
@@ -61,14 +57,19 @@ spec:
       securityContext:
         runAsUser: 0
       volumes:
-      - hostPath:
-          path: /etc/ssl
-        name: ssl
       - configMap:
           defaultMode: 464
           name: config-file
         name: sg-config
       - name: repos
-        persistentVolumeClaim:
-          claimName: gitserver-1
-
+  volumeClaimTemplates:
+  - metadata:
+      annotations:
+        volume.beta.kubernetes.io/storage-class: default
+      name: repos
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 200Gi
