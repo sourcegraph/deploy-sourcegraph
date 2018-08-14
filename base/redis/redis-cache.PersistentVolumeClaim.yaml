@@ -3,10 +3,12 @@ kind: PersistentVolumeClaim
 metadata:
   labels:
     deploy: sourcegraph
+  annotations:
+    volume.beta.kubernetes.io/storage-class: default
   name: redis-cache
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       storage: 100Gi

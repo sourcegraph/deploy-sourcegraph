@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   annotations:
     description: Saved search query runner / notification service.
-  labels:
-    deploy: sourcegraph
+    labels:
+      deploy: sourcegraph
   name: query-runner
 spec:
   minReadySeconds: 10
@@ -21,28 +21,34 @@ spec:
         app: query-runner
     spec:
       containers:
-      - env:
-        - name: SRC_APP_URL
-          value: http://localhost:3080
-        image: docker.sourcegraph.com/query-runner:18233_2018-07-12_21a0f96
-        name: query-runner
-        ports:
-        - containerPort: 3183
-          name: http
-        resources:
-          limits:
-            cpu: "1"
-            memory: 1G
-          requests:
-            cpu: 500m
-            memory: 1G
-        volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
+        - env:
+            - name: CONFIG_FILE_HASH
+              value: c382e72e1a7278843803db4ea55ff0bdb2dafe8200247c120189c04ceb01d280
+            - name: DEPLOY_TYPE
+              value: datacenter
+            - name: SOURCEGRAPH_CONFIG_FILE
+              value: /etc/sourcegraph/config.json
+            - name: SRC_APP_URL
+              value: http://localhost:3080
+          image: sourcegraph/query-runner:2.10.1
+          name: query-runner
+          ports:
+            - containerPort: 3183
+              name: http
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1G
+            requests:
+              cpu: 500m
+              memory: 1G
+          volumeMounts:
+            - mountPath: /etc/sourcegraph
+              name: sg-config
       securityContext:
         runAsUser: 0
       volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file-818d68ae92
-        name: sg-config
+        - configMap:
+            defaultMode: 464
+            name: config-file
+          name: sg-config

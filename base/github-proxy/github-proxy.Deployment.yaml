@@ -21,28 +21,32 @@ spec:
         app: github-proxy
     spec:
       containers:
-      - env:
-        - name: LOG_REQUESTS
-          value: "true"
-        image: docker.sourcegraph.com/github-proxy:18450_2018-07-18_3b2667f
-        name: github-proxy
-        ports:
-        - containerPort: 3180
-          name: http
-        resources:
-          limits:
-            cpu: "1"
-            memory: 1G
-          requests:
-            cpu: 100m
-            memory: 250M
-        volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
+        - env:
+            - name: CONFIG_FILE_HASH
+              value: c382e72e1a7278843803db4ea55ff0bdb2dafe8200247c120189c04ceb01d280
+            - name: LOG_REQUESTS
+              value: "true"
+            - name: SOURCEGRAPH_CONFIG_FILE
+              value: /etc/sourcegraph/config.json
+          image: sourcegraph/github-proxy:2.10.1
+          name: github-proxy
+          ports:
+            - containerPort: 3180
+              name: http
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1G
+            requests:
+              cpu: 100m
+              memory: 250M
+          volumeMounts:
+            - mountPath: /etc/sourcegraph
+              name: sg-config
       securityContext:
         runAsUser: 0
       volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file-818d68ae92
-        name: sg-config
+        - configMap:
+            defaultMode: 464
+            name: config-file
+          name: sg-config

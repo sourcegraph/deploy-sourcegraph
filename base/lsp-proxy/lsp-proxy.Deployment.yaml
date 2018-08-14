@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   annotations:
     description: Multiplexer between frontend and LSP servers.
-  labels:
-    deploy: sourcegraph
+    labels:
+      deploy: sourcegraph
   name: lsp-proxy
 spec:
   minReadySeconds: 10
@@ -21,50 +21,54 @@ spec:
         app: lsp-proxy
     spec:
       containers:
-      - args:
-        - -addr=:4388
-        env:
-        - name: SRC_GIT_SERVERS
-          value: gitserver-1:3178
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: CACHE_DIR
-          value: /mnt/cache/$(POD_NAME)
-        image: docker.sourcegraph.com/lsp-proxy:18370_2018-07-16_b65e3d3
-        livenessProbe:
-          initialDelaySeconds: 5
-          tcpSocket:
-            port: lsp
-          timeoutSeconds: 5
-        name: lsp-proxy
-        ports:
-        - containerPort: 4388
-          name: lsp
-        - containerPort: 6060
-          name: debug
-        readinessProbe:
-          tcpSocket:
-            port: 4388
-        resources:
-          limits:
-            cpu: "1"
-            memory: 8Gi
-          requests:
-            cpu: 500m
-            memory: 2Gi
-        volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
-        - mountPath: /mnt/cache
-          name: cache-ssd
+        - args:
+            - -addr=:4388
+          env:
+            - name: CONFIG_FILE_HASH
+              value: c382e72e1a7278843803db4ea55ff0bdb2dafe8200247c120189c04ceb01d280
+            - name: SOURCEGRAPH_CONFIG_FILE
+              value: /etc/sourcegraph/config.json
+            - name: SRC_GIT_SERVERS
+              value: gitserver-0.gitserver:3178
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CACHE_DIR
+              value: /mnt/cache/$(POD_NAME)
+          image: sourcegraph/lsp-proxy:2.10.1
+          livenessProbe:
+            initialDelaySeconds: 5
+            tcpSocket:
+              port: lsp
+            timeoutSeconds: 5
+          name: lsp-proxy
+          ports:
+            - containerPort: 4388
+              name: lsp
+            - containerPort: 6060
+              name: debug
+          readinessProbe:
+            tcpSocket:
+              port: 4388
+          resources:
+            limits:
+              cpu: "1"
+              memory: "8Gi"
+            requests:
+              cpu: "500m"
+              memory: "2Gi"
+          volumeMounts:
+            - mountPath: /etc/sourcegraph
+              name: sg-config
+            - mountPath: /mnt/cache
+              name: cache-ssd
       securityContext:
         runAsUser: 0
       volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file-818d68ae92
-        name: sg-config
-      - emptyDir: {}
-        name: cache-ssd
+        - configMap:
+            defaultMode: 464
+            name: config-file
+          name: sg-config
+        - emptyDir: {}
+          name: cache-ssd

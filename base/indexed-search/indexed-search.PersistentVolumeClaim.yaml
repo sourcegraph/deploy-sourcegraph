@@ -1,12 +1,14 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  #annotations:
+  #volume.beta.kubernetes.io/storage-class: default
   labels:
     deploy: sourcegraph
   name: indexed-search
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       # The size of disk to used for search indexes.

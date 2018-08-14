@@ -21,32 +21,32 @@ spec:
         app: syntect-server
     spec:
       containers:
-      - env:
-        - name: ROCKET_LIMITS
-          value: '{json=10485760}'
-        - name: ROCKET_PORT
-          value: "9238"
-        image: docker.sourcegraph.com/syntect_server:d4be6b90
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: http
-            scheme: HTTP
-          initialDelaySeconds: 5
-          timeoutSeconds: 5
-        name: syntect-server
-        ports:
-        - containerPort: 9238
-          name: http
-        readinessProbe:
-          tcpSocket:
-            port: http
-        resources:
-          limits:
-            cpu: "4"
-            memory: 512M
-          requests:
-            cpu: 250m
-            memory: 512M
+        - env:
+            - name: ROCKET_LIMITS
+              value: "{json=10485760}"
+            - name: ROCKET_PORT
+              value: "9238"
+          image: sourcegraph/syntect_server:624a1a2
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          name: syntect-server
+          ports:
+            - containerPort: 9238
+              name: http
+          readinessProbe:
+            tcpSocket:
+              port: http
+          resources:
+            limits:
+              cpu: "4"
+              memory: 512M
+            requests:
+              cpu: 250m
+              memory: 512M
       securityContext:
         runAsUser: 0
