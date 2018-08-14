@@ -8,21 +8,21 @@ cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 ./configure/util/require-basedir.sh
 
-if [ -z ${SITE_CONFIG_PATH+x} ]; then
-    read -p "Path to site config.json [none]: " SITE_CONFIG_PATH
-fi
+# if [ -z ${SITE_CONFIG_PATH+x} ]; then
+#     read -p "Path to site config.json [none]: " SITE_CONFIG_PATH
+# fi
 
-CM=$BASEDIR/config-file.ConfigMap.yaml
+CM=/Users/ggilmore/dev/go/src/github.com/sourcegraph/deploy-sourcegraph/base/config-file.ConfigMap.yaml
 
-if [ -n "$SITE_CONFIG_PATH" ]; then
-    SITE_CONFIG=$(cat $SITE_CONFIG_PATH | ./configure/util/sanitize.sh)
-    # Concat the environment variable instead of embedding since the file contents
-    # might contain charaters that could be interpreted by the shell (e.g. $).
-    JQARG=".data.\"config.json\" = \"""$SITE_CONFIG""\""
-    cat $CM | yj | jq "$JQARG" | jy -o $CM
-fi
+# if [ -n "$SITE_CONFIG_PATH" ]; then
+#     SITE_CONFIG=$(cat $SITE_CONFIG_PATH | ./configure/util/sanitize.sh)
+#     # Concat the environment variable instead of embedding since the file contents
+#     # might contain charaters that could be interpreted by the shell (e.g. $).
+#     JQARG=".data.\"config.json\" = \"""$SITE_CONFIG""\""
+#     cat $CM | yj | jq "$JQARG" | jy -o $CM
+# fi
 
-CONFIG_FILE_HASH=$(cat $CM | yj | jq --raw-output .data | md5sum | cut -c1-10)
+CONFIG_FILE_HASH=$(cat $CM | yj | jq --raw-output .data | md5 | cut -c1-10)
 
-find $BASEDIR -name "*yaml" -exec sed -i.sedibak -e "s/name: config-file.*/name: config-file-$CONFIG_FILE_HASH/g" {} +
-find $BASEDIR -name "*.sedibak" -delete
+find /Users/ggilmore/dev/go/src/github.com/sourcegraph/deploy-sourcegraph/base/ -name "*yaml" -exec sed -i.sedibak -e "s/name: config-file.*/name: config-file-$CONFIG_FILE_HASH/g" {} +
+find /Users/ggilmore/dev/go/src/github.com/sourcegraph/deploy-sourcegraph/base/ -name "*.sedibak" -delete
