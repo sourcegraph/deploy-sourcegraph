@@ -34,3 +34,15 @@ gitserver-0.gitserver:3178 gitserver-1.gitserver:3178 ... gitserver-${n-1}:3178
 ```
 
 For each file in the output of step 1, change the value of `SRC_GIT_SERVERS` as stated above.
+
+## Lightstep Tracing
+
+Lightstep is a closed-source distributed tracing and performance monitoring tool created by some of the authors of Dapper. Every Sourcegraph deployment supports Lightstep, and it can be configured via the following environment variables:
+
+```bash
+"LIGHTSTEP_PROJECT"
+"LIGHTSTEP_ACCESS_TOKEN"
+"LIGHTSTEP_INCLUDE_SENSITIVE"
+```
+
+To enable, you must first purchase Lightstep and create a project corresponding to the Sourcegraph instance. Then, add the above environment to each deployment.
