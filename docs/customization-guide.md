@@ -45,7 +45,7 @@ Lightstep is a closed-source distributed tracing and performance monitoring tool
 "LIGHTSTEP_INCLUDE_SENSITIVE"
 ```
 
-To enable, you must first purchase Lightstep and create a project corresponding to the Sourcegraph instance. Then, add the above environment to each deployment.
+To enable this, you must first purchase Lightstep and create a project corresponding to the Sourcegraph instance. Then, add the above environment to each deployment.
 
 ## Custom Redis Cache and Store
 
