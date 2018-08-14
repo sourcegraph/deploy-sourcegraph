@@ -10,7 +10,7 @@ _Note that these steps will cause a small amount of unavoidable downtime._
 
 _The following steps assume that you have [jq](https://stedolan.github.io/jq/) installed._
 
-1. Make sure that the persistent volumes for your existing `gitserver` deployment are marked as `retained`
+1. Set the reclaim policy for your existing `gitserver` deployments to `retained`
 
    ```bash
    kubectl get pv -o json | jq --raw-output  ".items | map(select(.spec.claimRef.name | contains(\"gitserver-\"))) | .[] | \"kubectl patch pv -p '{\\\"spec\\\":{\\\"persistentVolumeReclaimPolicy\\\":\\\"Retain\\\"}}' \\(.metadata.name)\"" | bash
