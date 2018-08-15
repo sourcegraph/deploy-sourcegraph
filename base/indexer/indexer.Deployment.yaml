@@ -22,6 +22,8 @@ spec:
     spec:
       containers:
       - env:
+        - name: LSP_PROXY
+          value: lsp-proxy:4388
         - name: PGDATABASE
           value: sg
         - name: PGHOST
@@ -33,8 +35,8 @@ spec:
         - name: PGUSER
           value: sg
         - name: SRC_GIT_SERVERS
-          value: gitserver-1:3178
-        image: docker.sourcegraph.com/indexer:18231_2018-07-12_21a0f96
+          value: gitserver-0.gitserver:3178
+        image: sourcegraph/indexer:2.10.1
         name: indexer
         ports:
         - containerPort: 3179
@@ -54,5 +56,5 @@ spec:
       volumes:
       - configMap:
           defaultMode: 464
-          name: config-file-818d68ae92
+          name: config-file-be3a0864d4
         name: sg-config

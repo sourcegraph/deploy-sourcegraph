@@ -24,7 +24,7 @@ spec:
       - command:
         - redis-server
         - /etc/redis/redis.conf
-        image: docker.sourcegraph.com/redis:18-02-07_8205764_3.2-alpine
+        image: sourcegraph/redis:18-02-07_8205764_3.2-alpine
         livenessProbe:
           initialDelaySeconds: 30
           tcpSocket:
@@ -50,7 +50,7 @@ spec:
         - mountPath: /etc/redis
           name: config
           readOnly: true
-      - image: docker.sourcegraph.com/redis_exporter:18-02-07_bb60087_v0.15.0
+      - image: sourcegraph/redis_exporter:18-02-07_bb60087_v0.15.0
         name: redis-exporter
         ports:
         - containerPort: 9121
@@ -58,10 +58,10 @@ spec:
         resources:
           limits:
             cpu: 10m
-            memory: 20Mi
+            memory: 100Mi
           requests:
             cpu: 10m
-            memory: 20Mi
+            memory: 100Mi
       securityContext:
         runAsUser: 0
       volumes:

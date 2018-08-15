@@ -1,24 +1,22 @@
-apiVersion: extensions/v1beta1
-kind: Deployment
+apiVersion: apps/v1
+kind: StatefulSet
 metadata:
   annotations:
     description: Stores clones of repositories to perform Git operations.
   labels:
     deploy: sourcegraph
-  name: gitserver-1
+  name: gitserver
 spec:
-  minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: gitserver
+  serviceName: gitserver
   template:
     metadata:
       labels:
-        app: gitserver-1
+        app: gitserver
         group: backend
         type: gitserver
     spec:
@@ -28,13 +26,13 @@ spec:
         env:
         - name: SRC_REPOS_DIR
           value: /data/repos
-        image: docker.sourcegraph.com/gitserver:18261_2018-07-13_07cdbb4
+        image: sourcegraph/gitserver:2.10.1
         livenessProbe:
           initialDelaySeconds: 5
           tcpSocket:
             port: rpc
           timeoutSeconds: 5
-        name: gitserver-1
+        name: gitserver
         ports:
         - containerPort: 3178
           name: rpc
@@ -55,8 +53,19 @@ spec:
       volumes:
       - configMap:
           defaultMode: 464
-          name: config-file-818d68ae92
+          name: config-file-be3a0864d4
         name: sg-config
       - name: repos
-        persistentVolumeClaim:
-          claimName: gitserver-1
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: repos
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          # The size of disk used to mirror your git repositories.
+          # If you change this, also change indexed-search's disk size.
+          storage: 200Gi

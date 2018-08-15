@@ -22,9 +22,11 @@ spec:
     spec:
       containers:
       - env:
+        - name: DEPLOY_TYPE
+          value: datacenter
         - name: SRC_APP_URL
           value: http://localhost:3080
-        image: docker.sourcegraph.com/query-runner:18233_2018-07-12_21a0f96
+        image: sourcegraph/query-runner:2.10.1
         name: query-runner
         ports:
         - containerPort: 3183
@@ -44,5 +46,5 @@ spec:
       volumes:
       - configMap:
           defaultMode: 464
-          name: config-file-818d68ae92
+          name: config-file-be3a0864d4
         name: sg-config
