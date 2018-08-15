@@ -5,3 +5,5 @@
   - I think that this should replace everything in install.md
 
 - write customization info for the site settings config map
+
+- verify that language servers will still work without specifying the environment variables (notably the BG ones)
