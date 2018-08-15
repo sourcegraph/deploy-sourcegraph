@@ -19,25 +19,25 @@ spec:
         app: xlang-python
     spec:
       containers:
-        - image: sourcegraph/xlang-python:18892_2018-07-27_ddc9943
-          livenessProbe:
-            initialDelaySeconds: 5
-            tcpSocket:
-              port: lsp
-            timeoutSeconds: 5
-          name: xlang-python
-          ports:
-            - containerPort: 2087
-              name: lsp
-          readinessProbe:
-            tcpSocket:
-              port: lsp
-          resources:
-            limits:
-              cpu: "500m"
-              memory: "1G"
-            requests:
-              cpu: "500m"
-              memory: "1G"
-          ? volumeMounts
-      ? volumes
+      - image: sourcegraph/xlang-python:18892_2018-07-27_ddc9943
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: lsp
+          timeoutSeconds: 5
+        name: xlang-python
+        ports:
+        - containerPort: 2087
+          name: lsp
+        readinessProbe:
+          tcpSocket:
+            port: lsp
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1G
+          requests:
+            cpu: 500m
+            memory: 1G
+        volumeMounts:
+      volumes:

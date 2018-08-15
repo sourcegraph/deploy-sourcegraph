@@ -19,24 +19,24 @@ spec:
         app: npm-proxy
     spec:
       containers:
-        - image: sourcegraph/npm-proxy:9d593e267b6f5e86caeb29da37f140c5f5f4c8b2
-          name: npm-proxy
-          ports:
-            - containerPort: 8080
-              name: http
-          resources:
-            limits:
-              cpu: "1"
-              memory: 1Gi
-            requests:
-              cpu: 500m
-              memory: 1Gi
-          volumeMounts:
-            - mountPath: /cache
-              name: npm-proxy-cache
+      - image: sourcegraph/npm-proxy:9d593e267b6f5e86caeb29da37f140c5f5f4c8b2
+        name: npm-proxy
+        ports:
+        - containerPort: 8080
+          name: http
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        volumeMounts:
+        - mountPath: /cache
+          name: npm-proxy-cache
       securityContext:
         runAsUser: 0
       volumes:
-        - name: npm-proxy-cache
-          persistentVolumeClaim:
-            claimName: npm-proxy
+      - name: npm-proxy-cache
+        persistentVolumeClaim:
+          claimName: npm-proxy

@@ -19,26 +19,26 @@ spec:
         app: xlang-php
     spec:
       containers:
-        - env:
-            - name: COMPOSER_AUTH
-              value: '{"github-oauth": {"github.com": ""}}'
-          image: sourcegraph/xlang-php:00037_2018-07-11_faea319
-          name: xlang-php
-          ports:
-            - containerPort: 2088
-              name: lsp
-          resources:
-            limits:
-              cpu: "4"
-              memory: "8Gi"
-            requests:
-              cpu: "500m"
-              memory: "2Gi"
-          volumeMounts:
-            - mountPath: /tmp
-              name: tmp
+      - env:
+        - name: COMPOSER_AUTH
+          value: '{"github-oauth": {"github.com": ""}}'
+        image: sourcegraph/xlang-php:00037_2018-07-11_faea319
+        name: xlang-php
+        ports:
+        - containerPort: 2088
+          name: lsp
+        resources:
+          limits:
+            cpu: "4"
+            memory: 8Gi
+          requests:
+            cpu: 500m
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmp
       securityContext:
         runAsUser: 0
       volumes:
-        - emptyDir: {}
-          name: tmp
+      - emptyDir: {}
+        name: tmp
