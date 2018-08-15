@@ -3,8 +3,6 @@ kind: Deployment
 metadata:
   annotations:
     description: LSP server for Go (used for background indexing jobs).
-  labels:
-    deploy: sourcegraph
   name: xlang-go-bg
 spec:
   minReadySeconds: 10
@@ -21,51 +19,60 @@ spec:
         app: xlang-go-bg
     spec:
       containers:
-      - args:
-        - -mode=tcp
-        - -addr=:4389
-        env:
-        - name: SRC_GIT_SERVERS
-          value: gitserver-0.gitserver:3178
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: CACHE_DIR
-          value: /mnt/cache/$(POD_NAME)
-        image: docker.sourcegraph.com/xlang-go:18575_2018-07-20_a470dcb
-        livenessProbe:
-          initialDelaySeconds: 5
-          tcpSocket:
-            port: lsp
-          timeoutSeconds: 5
-        name: xlang-go-bg
-        ports:
-        - containerPort: 4389
-          name: lsp
-        - containerPort: 6060
-          name: debug
-        readinessProbe:
-          tcpSocket:
-            port: 4389
-        resources:
-          limits:
-            cpu: "4"
-            memory: 8Gi
-          requests:
-            cpu: 500m
-            memory: 2Gi
-        volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
-        - mountPath: /mnt/cache
-          name: cache-ssd
+        - args:
+            - -mode=tcp
+            - -addr=:4389
+          env:
+            - name: CONFIG_FILE_HASH
+              value: ad622f4e70f7edc1056a270559e8ca07bba00abd81c1bea1e8940c7156532081
+            - name: SOURCEGRAPH_CONFIG_FILE
+              value: /etc/sourcegraph/config.json
+            # SRC_GIT_SERVERS must be kept in sync with the specified replica count in
+            # gitserver.Statefulset.yaml
+            # See ../../docs/customization-guide.md for more information.
+            - name: SRC_GIT_SERVERS
+              value: gitserver-1:3178
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CACHE_DIR
+              value: /mnt/cache/$(POD_NAME)
+          image: sourcegraph/xlang-go:18575_2018-07-20_a470dcb
+          livenessProbe:
+            initialDelaySeconds: 5
+            tcpSocket:
+              port: lsp
+            timeoutSeconds: 5
+          name: xlang-go-bg
+          ports:
+            - containerPort: 4389
+              name: lsp
+            - containerPort: 6060
+              name: debug
+          readinessProbe:
+            tcpSocket:
+              port: 4389
+          resources:
+            limits:
+              cpu: "4"
+              memory: "8Gi"
+            requests:
+              cpu: "500m"
+              memory: "2Gi"
+          volumeMounts:
+            - mountPath: /etc/sourcegraph
+              name: sg-config
+            - mountPath: /mnt/cache
+              name: cache-ssd
       securityContext:
         runAsUser: 0
       volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file-818d68ae92
-        name: sg-config
-      - emptyDir: {}
-        name: cache-ssd
+        - configMap:
+            defaultMode: 464
+            name: config-file
+          name: sg-config
+        # See ../../docs/customization-guide.md for more information about how to increase the
+        # performance of this delpoyment by using an SSD.
+        - emptyDir: {}
+          name: cache-ssd
