@@ -21,53 +21,53 @@ spec:
         app: redis-store
     spec:
       containers:
-        - command:
-            - redis-server
-            - /etc/redis/redis.conf
-          image: sourcegraph/redis:18-02-07_8205764_3.2-alpine
+      - command:
+        - redis-server
+        - /etc/redis/redis.conf
+        image: sourcegraph/redis:18-02-07_8205764_3.2-alpine
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: redis
+        name: redis
+        ports:
+        - containerPort: 6379
           name: redis
-          ports:
-            - containerPort: 6379
-              name: redis
-          livenessProbe:
-            tcpSocket:
-              port: redis
-            initialDelaySeconds: 30
-          readinessProbe:
-            tcpSocket:
-              port: redis
-            initialDelaySeconds: 5
-          resources:
-            limits:
-              cpu: "1"
-              memory: 6Gi
-            requests:
-              cpu: 250m
-              memory: 500M
-          volumeMounts:
-            - mountPath: /redis-data
-              name: redis-data
-            - mountPath: /etc/redis
-              name: config
-              readOnly: true
-        - image: sourcegraph/redis_exporter:18-02-07_bb60087_v0.15.0
-          name: redis-exporter
-          ports:
-            - containerPort: 9121
-              name: redisexp
-          resources:
-            limits:
-              cpu: 10m
-              memory: 100Mi
-            requests:
-              cpu: 10m
-              memory: 100Mi
+        readinessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: redis
+        resources:
+          limits:
+            cpu: "1"
+            memory: 6Gi
+          requests:
+            cpu: 250m
+            memory: 500M
+        volumeMounts:
+        - mountPath: /redis-data
+          name: redis-data
+        - mountPath: /etc/redis
+          name: config
+          readOnly: true
+      - image: sourcegraph/redis_exporter:18-02-07_bb60087_v0.15.0
+        name: redis-exporter
+        ports:
+        - containerPort: 9121
+          name: redisexp
+        resources:
+          limits:
+            cpu: 10m
+            memory: 100Mi
+          requests:
+            cpu: 10m
+            memory: 100Mi
       securityContext:
         runAsUser: 0
       volumes:
-        - name: redis-data
-          persistentVolumeClaim:
-            claimName: redis-store
-        - configMap:
-            name: redis-store
-          name: config
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-store
+      - configMap:
+          name: redis-store
+        name: config

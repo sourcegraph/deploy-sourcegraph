@@ -21,60 +21,60 @@ spec:
         app: sourcegraph-frontend
     spec:
       containers:
-        - args:
-            - serve
-          env:
-            - name: DEPLOY_TYPE
-              value: datacenter
-            - name: LSP_PROXY
-              value: lsp-proxy:4388
-            - name: PGDATABASE
-              value: sg
-            - name: PGHOST
-              value: pgsql
-            - name: PGPORT
-              value: "5432"
-            - name: PGSSLMODE
-              value: disable
-            - name: PGUSER
-              value: sg
-            - name: PUBLIC_REPO_REDIRECTS
-              value: "true"
-            - name: SRC_APP_URL
-              value: http://localhost:3080
-            - name: SRC_GIT_SERVERS
-              value: gitserver-0.gitserver:3178
-          image: sourcegraph/frontend:2.10.1
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: http
-              scheme: HTTP
-            initialDelaySeconds: 5
-            timeoutSeconds: 5
-          name: frontend
-          ports:
-            - containerPort: 3080
-              name: http
-            - containerPort: 3090
-              name: http-internal
-            - containerPort: 3443
-              name: https
-          resources:
-            limits:
-              cpu: "2"
-              memory: "2G"
-            requests:
-              cpu: "2"
-              memory: "1G"
-          volumeMounts:
-            - mountPath: /etc/sourcegraph
-              name: sg-config
+      - args:
+        - serve
+        env:
+        - name: DEPLOY_TYPE
+          value: datacenter
+        - name: LSP_PROXY
+          value: lsp-proxy:4388
+        - name: PGDATABASE
+          value: sg
+        - name: PGHOST
+          value: pgsql
+        - name: PGPORT
+          value: "5432"
+        - name: PGSSLMODE
+          value: disable
+        - name: PGUSER
+          value: sg
+        - name: PUBLIC_REPO_REDIRECTS
+          value: "true"
+        - name: SRC_APP_URL
+          value: http://localhost:3080
+        - name: SRC_GIT_SERVERS
+          value: gitserver-0.gitserver:3178
+        image: sourcegraph/frontend:2.10.1
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        name: frontend
+        ports:
+        - containerPort: 3080
+          name: http
+        - containerPort: 3090
+          name: http-internal
+        - containerPort: 3443
+          name: https
+        resources:
+          limits:
+            cpu: "2"
+            memory: 2G
+          requests:
+            cpu: "2"
+            memory: 1G
+        volumeMounts:
+        - mountPath: /etc/sourcegraph
+          name: sg-config
       securityContext:
         runAsUser: 0
       serviceAccountName: sourcegraph-frontend
       volumes:
-        - configMap:
-            defaultMode: 464
-            name: config-file-be3a0864d4
-          name: sg-config
+      - configMap:
+          defaultMode: 464
+          name: config-file-be3a0864d4
+        name: sg-config

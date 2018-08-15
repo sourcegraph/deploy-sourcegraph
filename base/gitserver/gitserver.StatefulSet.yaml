@@ -7,14 +7,12 @@ metadata:
     deploy: sourcegraph
   name: gitserver
 spec:
-  serviceName: gitserver
+  replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: gitserver
-  replicas: 1
-  revisionHistoryLimit: 10
-  updateStrategy:
-    type: RollingUpdate
+  serviceName: gitserver
   template:
     metadata:
       labels:
@@ -23,49 +21,51 @@ spec:
         type: gitserver
     spec:
       containers:
-        - args:
-            - run
-          env:
-            - name: SRC_REPOS_DIR
-              value: /data/repos
-          image: sourcegraph/gitserver:2.10.1
-          livenessProbe:
-            initialDelaySeconds: 5
-            tcpSocket:
-              port: rpc
-            timeoutSeconds: 5
-          name: gitserver
-          ports:
-            - containerPort: 3178
-              name: rpc
-          resources:
-            limits:
-              cpu: "4"
-              memory: "8G"
-            requests:
-              cpu: "500m"
-              memory: "1G"
-          volumeMounts:
-            - mountPath: /etc/sourcegraph
-              name: sg-config
-            - mountPath: /data/repos
-              name: repos
+      - args:
+        - run
+        env:
+        - name: SRC_REPOS_DIR
+          value: /data/repos
+        image: sourcegraph/gitserver:2.10.1
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: rpc
+          timeoutSeconds: 5
+        name: gitserver
+        ports:
+        - containerPort: 3178
+          name: rpc
+        resources:
+          limits:
+            cpu: "4"
+            memory: 8G
+          requests:
+            cpu: 500m
+            memory: 1G
+        volumeMounts:
+        - mountPath: /etc/sourcegraph
+          name: sg-config
+        - mountPath: /data/repos
+          name: repos
       securityContext:
         runAsUser: 0
       volumes:
-        - configMap:
-            defaultMode: 464
-            name: config-file-be3a0864d4
-          name: sg-config
-        - name: repos
+      - configMap:
+          defaultMode: 464
+          name: config-file-be3a0864d4
+        name: sg-config
+      - name: repos
+  updateStrategy:
+    type: RollingUpdate
   volumeClaimTemplates:
-    - metadata:
-        name: repos
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            # The size of disk used to mirror your git repositories.
-            # If you change this, also change indexed-search's disk size.
-            storage: 200Gi
+  - metadata:
+      name: repos
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          # The size of disk used to mirror your git repositories.
+          # If you change this, also change indexed-search's disk size.
+          storage: 200Gi

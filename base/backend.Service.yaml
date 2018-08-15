@@ -2,8 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    description:
-      Dummy service that prevents backend pods from being scheduled on
+    description: Dummy service that prevents backend pods from being scheduled on
       the same node if possible.
   labels:
     deploy: sourcegraph
@@ -12,9 +11,9 @@ metadata:
 spec:
   clusterIP: None
   ports:
-    - name: unused
-      port: 10811
-      targetPort: 10811
+  - name: unused
+    port: 10811
+    targetPort: 10811
   selector:
     group: backend
   type: ClusterIP

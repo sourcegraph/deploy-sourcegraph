@@ -21,50 +21,50 @@ spec:
         app: lsp-proxy
     spec:
       containers:
-        - args:
-            - -addr=:4388
-          env:
-            - name: SRC_GIT_SERVERS
-              value: gitserver-0.gitserver:3178
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: CACHE_DIR
-              value: /mnt/cache/$(POD_NAME)
-          image: sourcegraph/lsp-proxy:2.10.1
-          livenessProbe:
-            initialDelaySeconds: 5
-            tcpSocket:
-              port: lsp
-            timeoutSeconds: 5
-          name: lsp-proxy
-          ports:
-            - containerPort: 4388
-              name: lsp
-            - containerPort: 6060
-              name: debug
-          readinessProbe:
-            tcpSocket:
-              port: 4388
-          resources:
-            limits:
-              cpu: "1"
-              memory: "8Gi"
-            requests:
-              cpu: "500m"
-              memory: "2Gi"
-          volumeMounts:
-            - mountPath: /etc/sourcegraph
-              name: sg-config
-            - mountPath: /mnt/cache
-              name: cache-ssd
+      - args:
+        - -addr=:4388
+        env:
+        - name: SRC_GIT_SERVERS
+          value: gitserver-0.gitserver:3178
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        image: sourcegraph/lsp-proxy:2.10.1
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: lsp
+          timeoutSeconds: 5
+        name: lsp-proxy
+        ports:
+        - containerPort: 4388
+          name: lsp
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          tcpSocket:
+            port: 4388
+        resources:
+          limits:
+            cpu: "1"
+            memory: 8Gi
+          requests:
+            cpu: 500m
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /etc/sourcegraph
+          name: sg-config
+        - mountPath: /mnt/cache
+          name: cache-ssd
       securityContext:
         runAsUser: 0
       volumes:
-        - configMap:
-            defaultMode: 464
-            name: config-file-be3a0864d4
-          name: sg-config
-        - emptyDir: {}
-          name: cache-ssd
+      - configMap:
+          defaultMode: 464
+          name: config-file-be3a0864d4
+        name: sg-config
+      - emptyDir: {}
+        name: cache-ssd

@@ -2,8 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    description:
-      Handles repository metadata (not Git data) lookups and updates from
+    description: Handles repository metadata (not Git data) lookups and updates from
       external code hosts and other similar services.
   labels:
     deploy: sourcegraph
@@ -23,30 +22,30 @@ spec:
         app: repo-updater
     spec:
       containers:
-        - env:
-            - name: SRC_GIT_SERVERS
-              value: gitserver-0.gitserver:3178
-          image: sourcegraph/repo-updater:2.10.1
-          name: repo-updater
-          ports:
-            - containerPort: 3182
-              name: http
-            - containerPort: 6060
-              name: debug
-          resources:
-            limits:
-              cpu: 100m
-              memory: 500Mi
-            requests:
-              cpu: 100m
-              memory: 500Mi
-          volumeMounts:
-            - mountPath: /etc/sourcegraph
-              name: sg-config
+      - env:
+        - name: SRC_GIT_SERVERS
+          value: gitserver-0.gitserver:3178
+        image: sourcegraph/repo-updater:2.10.1
+        name: repo-updater
+        ports:
+        - containerPort: 3182
+          name: http
+        - containerPort: 6060
+          name: debug
+        resources:
+          limits:
+            cpu: 100m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        volumeMounts:
+        - mountPath: /etc/sourcegraph
+          name: sg-config
       securityContext:
         runAsUser: 0
       volumes:
-        - configMap:
-            defaultMode: 464
-            name: config-file-be3a0864d4
-          name: sg-config
+      - configMap:
+          defaultMode: 464
+          name: config-file-be3a0864d4
+        name: sg-config
