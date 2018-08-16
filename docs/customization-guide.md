@@ -138,3 +138,20 @@ find . -name "*yaml" -exec sed -i.sedibak -e "s/name: config-file.*/name: config
 # delete sed's backup files
 find . -name "*.sedibak" -delete
 ```
+
+## Configuring SSL
+
+If you intend to make your Sourcegraph instance accessible on the Internet or another untrusted network, you should use TLS so that all traffic will be served over HTTPS.
+
+You can configure TLS by adding the following environment variables to the `sourcegraph-frontend` deployment:
+
+```yaml
+env:
+  - name: TLS_CERT
+    value: "-----BEGIN CERTIFICATE-----\nMIIFdTCCBF2gAWiB..."
+
+  - name: TLS_KEY
+    value: "-----BEGIN RSA PRIVATE KEY-----\nMII..."
+```
+
+You can also refer to the [official Kubernetes documentation about secrets](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables), which let you avoid specifying the TLS certificate and key verbatim.

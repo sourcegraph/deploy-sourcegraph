@@ -16,8 +16,6 @@
 
 - add a section about language servers that also links to specific language server instructions (e.g. environment variables for Java)
 
-- write about configuring TLS
-
 - write about configuring SSH
 
 - write about configuring storage classes
@@ -35,3 +33,5 @@
 - [x] write customization info for the site settings config map
 
 - [x] yaml example for lightstep tokens
+
+- [x] write about configuring TLS
