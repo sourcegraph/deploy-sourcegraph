@@ -37,6 +37,10 @@
 
 * documentation about how to scale things without templates
 
+* document upgrade process for customers using new pure yaml deployment strategy
+
+* document migration process from previous version for existig users
+
 ## Completed
 
 - [x] write about SSDs
