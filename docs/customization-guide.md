@@ -90,7 +90,7 @@ to:
 
 Replace `${SSD_MOUNT_PATH}` with the absolute directory path on the node where the local SSD is mounted.
 
-For example, on Google Cloud Platform, add Local SSDs to the nodes running the searcher pods. Then add the following to your site config:
+For example, on Google Cloud Platform, add Local SSDs to the nodes running the searcher pods. Then change the following fields in your deployment :
 
 ```yaml
  volumes:
