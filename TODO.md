@@ -34,6 +34,9 @@
 
 - is there any public documentation about `pod-tmp-gc`?
 
+- according to https://kubernetes.io/docs/reference/access-authn-authz/rbac/, `ClusterRoleBindings` can't be `namespace`d since
+  they apply to the cluster as a whole, why does `configure/ssd/ssd.sh` specify one?
+
 ## Completed
 
 - [x] write about configuring SSH
