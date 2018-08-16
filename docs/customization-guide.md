@@ -1,5 +1,32 @@
 # Common Customizations
 
+## Make Sourcegraph accessbile to external users
+
+TODO: needs cleanup
+
+When the deployment completes, you need to make the main web server accessible over the network to external users. To do so, connect port 30080 on the nodes in the cluster to the internet. The easiest way to do this is to add a network rule that allows ingress traffic to port 30080 on at least one node
+(see
+[AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html),
+[Google Cloud Platform Firewall rules](https://cloud.google.com/compute/docs/vpc/using-firewalls)).
+Sourcegraph should then be accessible at `$EXTERNAL_ADDR:30080`, where `$EXTERNAL_ADDR` is the
+address of _any_ node in the cluster. For production environments, we recommend using
+an [Internet Gateway](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html) (or
+equivalent) and configuring a load balancer in Kubernetes.
+
+## Install without RBAC
+
+Sourcegraph Data Center communicates with the Kubernetes API for service discovery. It also has some janitor DaemonSets that clean up temporary cache data. To do that we need to create RBAC resources.
+
+If using RBAC is not an option, then you will not want to apply `*.Role.yaml` and `*.RoleBinding.yaml` files.
+
+## Storage class
+
+Sourcegraph relies on the default storage class of your cluster. If your cluster does not have a default storage class or if you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class.
+
+```bash
+find . -name "*PersistentVolumeClaim.yaml" -exec sh -c "cat {} | yj | jq '.spec.storageClassName = \"$STORAGE_CLASS_NAME\"' | jy -o {}" \;
+```
+
 ## Gitserver Replica Count
 
 Increasing the `replica` count of the `gitserver` Stateful Set increases the scalability of your deployment. Repository clones are consistently striped across all `giterver` replicas, so other services need to be aware of how many `gitserver` replicas have been specified in order to know how to a resolve an individual repo.
