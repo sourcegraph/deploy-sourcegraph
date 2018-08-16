@@ -18,26 +18,22 @@
 
 - write about configuring storage classes
 
-- write about prometheus
+* write about what actually comes in the base deployment, and any enhancements that you'd like to make from there
 
-- write about jager
+* think more about if we should have stubbed-out references in the actual deployment files to the customization guide - this could get messy the more that we add
 
-- write about what actually comes in the base deployment, and any enhancements that you'd like to make from there
+* should we all the documentation in one doc, or should we have readmes in each folder
 
-- think more about if we should have stubbed-out references in the actual deployment files to the customization guide - this could get messy the more that we add
+* why is the `/pod-tmp` suffix necessary for `cache-ssd`?
 
-- should we all the documentation in one doc, or should we have readmes in each folder
+* is there any public documentation about `pod-tmp-gc`?
 
-- why is the `/pod-tmp` suffix necessary for `cache-ssd`?
-
-- is there any public documentation about `pod-tmp-gc`?
-
-- according to https://kubernetes.io/docs/reference/access-authn-authz/rbac/, `ClusterRoleBindings` can't be `namespace`d since
+* according to https://kubernetes.io/docs/reference/access-authn-authz/rbac/, `ClusterRoleBindings` can't be `namespace`d since
   they apply to the cluster as a whole, why does `configure/ssd/ssd.sh` specify one?
 
-- add `jq` script for SSD config?
+* add `jq` script for SSD config?
 
-- actually test the steps in the customization guide
+* actually test the steps in the customization guide
 
 ## Completed
 
@@ -50,3 +46,9 @@
 - [x] yaml example for lightstep tokens
 
 - [x] write about configuring TLS
+
+## Deprioritized
+
+- write about prometheus
+
+- write about jager

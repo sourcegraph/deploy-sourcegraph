@@ -18,9 +18,15 @@ Sourcegraph Data Center is deployed using Kubernetes. Before proceeding with the
 instructions, [provision a Kubernetes](k8s.md) cluster on the infrastructure of your choice. Make
 sure you have [configured `kubectl` to access your cluster](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
 
+## Components
+
+Sourcegraph Data Center consists of our base deployment along with additional addons that you can configure separately.
+
+### Base Deployment
+
 1.  The easiest way to start is to deploy our base yaml. No configuration required!
 
-    ```
+    ```bash
     git clone https://github.com/sourcegraph/deploy-sourcegraph.git
     cd deploy-sourcegraph
     kubectl apply --prune -l deploy=sourcegraph -f base --recursive
