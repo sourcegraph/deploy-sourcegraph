@@ -16,7 +16,9 @@
 
 - add a section about language servers that also links to specific language server instructions (e.g. environment variables for Java)
 
-- [] - write about configuring storage classes in the migration document
+- write about configuring storage classes in the migration document
+
+- file issue about changing namespace stuff about clusterrolebindings in master
 
 * write about what actually comes in the base deployment, and any enhancements that you'd like to make from there
 
