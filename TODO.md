@@ -9,3 +9,9 @@
 - verify that language servers will still work without specifying the environment variables (notably the BG ones)
 
 - investigate https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically to see if people actually need to handle updating each deployment when updating the site config
+
+- yaml example for lightstep tokens
+
+- `find . -exec yj | jq | jy` example for redis
+
+- add a section about language servers that also links to specific language server instructions (e.g. environment variables for Java)
