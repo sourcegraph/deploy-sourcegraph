@@ -141,26 +141,46 @@ find . -name "*.sedibak" -delete
 
 ## Configuring SSL
 
-If you intend to make your Sourcegraph instance accessible on the Internet or another untrusted network, you should use TLS so that all traffic will be served over HTTPS.
+If you intend to make your Sourcegraph instance accessible on the Internet or another untrusted network, you should use TLS so that all traffic will be served over HTTPS. You can configure Sourcegraph to use TLS by providing the `TLS_CERT` and `TLS_KEY` environment variables variables to the `sourcegraph-frontend` deployment.
 
-You can configure TLS by adding the following environment variables to the `sourcegraph-frontend` deployment:
+One way of doing this is to create a secret object (see the official documentation)[https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables] that contains your TLS credentials:
+
+`tls.Secret.yaml`
+
+```yaml
+apiVersion: v1
+data:
+  cert: "-----BEGIN CERTIFICATE-----\nMIIFdTCCBF2gAWiB..."
+  key: "-----BEGIN RSA PRIVATE KEY-----\nMII..."
+kind: Secret
+metadata:
+  name: tls
+type: Opaque
+```
+
+and refer to it in your `sourcegraph-frontend` deployment when adding the `TLS_CERT` and `TLS_KEY` evironment variables:
+
+`sourcegraph-frontend.Deployment.yaml`
 
 ```yaml
 env:
   - name: TLS_CERT
-    value: "-----BEGIN CERTIFICATE-----\nMIIFdTCCBF2gAWiB..."
-
+    valueFrom:
+      secretKeyRef:
+        key: cert
+        name: tls
   - name: TLS_KEY
-    value: "-----BEGIN RSA PRIVATE KEY-----\nMII..."
+    valueFrom:
+      secretKeyRef:
+        key: cert
+        name: tls
 ```
-
-You can also refer to the [official Kubernetes documentation about secrets](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables), which let you avoid specifying the TLS certificate and key verbatim.
 
 ## Gitserver SSH
 
 `gitserver` can be configured to clone repos with a SSH key. It will use the SSH credentials located at `/root/.ssh`, if present.
 
-One way of doing this is to create a secrets object (see the offical documentation)[https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables] that contains your SSH credentials
+One way of doing this is to create a secrets object (see the official documentation)[https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables] that contains your SSH credentials
 
 `gitserver-ssh.Secret.yaml`
 
