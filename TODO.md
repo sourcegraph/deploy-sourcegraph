@@ -30,6 +30,10 @@
 
 - should we all the documentation in one doc, or should we have readmes in each folder
 
+- why is the `/pod-tmp` suffix necessary for `cache-ssd`?
+
+- is there any public documentation about `pod-tmp-gc`?
+
 ## Completed
 
 - [x] write about configuring SSH
