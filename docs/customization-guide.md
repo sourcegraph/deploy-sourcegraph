@@ -37,12 +37,21 @@ For each file in the output of step 1, change the value of `SRC_GIT_SERVERS` as 
 
 ## Lightstep Tracing
 
-Lightstep is a closed-source distributed tracing and performance monitoring tool created by some of the authors of Dapper. Every Sourcegraph deployment supports Lightstep, and it can be configured via the following environment variables:
+Lightstep is a closed-source distributed tracing and performance monitoring tool created by some of the authors of Dapper. Every Sourcegraph deployment supports Lightstep, and it can be configured via the following environment variables (with example values):
 
-```bash
-"LIGHTSTEP_PROJECT"
-"LIGHTSTEP_ACCESS_TOKEN"
-"LIGHTSTEP_INCLUDE_SENSITIVE"
+```yaml
+env:
+  # https://about.sourcegraph.com/docs/config/site/#lightstepproject-string
+  - name: LIGHTSTEP_PROJECT
+    value: my_project
+
+  # https://about.sourcegraph.com/docs/config/site/#lightstepaccesstoken-string
+  - name: LIGHTSTEP_ACCESS_TOKEN
+    value: M3WKBuqsCnRYz1c
+
+  # TODO: Is there any documenation for this?
+  - name: LIGHTSTEP_INCLUDE_SENSITIVE
+    value: true
 ```
 
 To enable this, you must first purchase Lightstep and create a project corresponding to the Sourcegraph instance. Then, add the above environment to each deployment.

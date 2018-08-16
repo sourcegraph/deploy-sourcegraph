@@ -10,7 +10,9 @@
 
 - investigate https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically to see if people actually need to handle updating each deployment when updating the site config
 
-- yaml example for lightstep tokens
+- [x] yaml example for lightstep tokens
+
+- find/write documentation for `LIGHTSTEP_INCLUDE_SENSITIVE`
 
 - `find . -exec yj | jq | jy` example for redis
 
