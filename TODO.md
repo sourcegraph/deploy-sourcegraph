@@ -6,8 +6,6 @@
 
   - I think that this should replace everything in install.md
 
-- verify that language servers will still work without specifying the environment variables (notably the BG ones)
-
 - investigate https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically to see if people actually need to handle updating each deployment when updating the site config
 
 - find/write documentation for `LIGHTSTEP_INCLUDE_SENSITIVE`
@@ -43,7 +41,11 @@
 
 * document migration process from previous version for existig users
 
+* write `BG` documentation for other language servers besides go
+
 ## Completed
+
+- [x] verify that language servers will still work without specifying the environment variables (notably the BG ones)
 
 - [x] write about SSDs
 
