@@ -35,6 +35,8 @@
 
 * actually test the steps in the customization guide
 
+* documentation about how to scale things without templates
+
 ## Completed
 
 - [x] write about SSDs
