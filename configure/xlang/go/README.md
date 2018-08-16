@@ -11,7 +11,7 @@ This folder contains the deployment files for the Go Language server. You can en
     "langservers": [
         {
             "language": "go",
-            "address": "tcp://xlang-go:3178"
+            "address": "tcp://xlang-go:4389"
         }
     ]
 }
