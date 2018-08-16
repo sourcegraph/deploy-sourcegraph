@@ -104,3 +104,28 @@ For example, on Google Cloud Platform, add Local SSDs to the nodes running the s
 ## Assigning Resource-Hungry Pods to Larger Nodes
 
 If you have a heterogeneous cluster where you need to ensure certain more resource-hungry pods (e.g., `indexedSearch`), you can [refer to the Kubernetes documentation to see how to specify node constraints (such as `nodeSelector`, etc.)](https://kubernetes.io/docs/concepts/configuration/assign-pod-node).
+
+## Site Configuration ConfigMap
+
+Many services need to reference the site configuration. The configuration is stored inside a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume), which is mounted inside every deployment that needs it.
+
+Whenever you update the configuration, you'll also need to update the deployments that reference it so that your changes will be visible. One way of accomplishing this is to change the name of the config map every time that you make changes.
+
+The following script (provided for your convenience):
+
+- changes the name of the config map by appending the current date and time
+- updates all references to the site configuration to the newly named config map
+
+```bash
+#!/bin/bash
+
+# e.g. 2018-08-15T23:42:08Z
+CONFIG_DATE=$(date -u +"%Y-%m-%dT%H-%M-%SZ")
+
+# update all references to the site config's ConfigMap
+# from: 'config-file.*' , to:' config-file-$CONFIG_DATE'
+find . -name "*yaml" -exec sed -i.sedibak -e "s/name: config-file.*/name: config-file-$CONFIG_DATE/g" {} +
+
+# delete sed's backup files
+find . -name "*.sedibak" -delete
+```
