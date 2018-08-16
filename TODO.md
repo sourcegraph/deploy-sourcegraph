@@ -37,6 +37,8 @@
 
 - add `jq` script for SSD config?
 
+- actually test the steps in the customization guide
+
 ## Completed
 
 - [x] write about SSDs
