@@ -16,8 +16,6 @@
 
 - add a section about language servers that also links to specific language server instructions (e.g. environment variables for Java)
 
-- write about configuring SSH
-
 - write about configuring storage classes
 
 - write about SSDs
@@ -29,6 +27,8 @@
 - write about what actually comes in the base deployment, and any enhancements that you'd like to make from there
 
 ## Completed
+
+- [x] write about configuring SSH
 
 - [x] write customization info for the site settings config map
 
