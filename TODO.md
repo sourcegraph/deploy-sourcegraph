@@ -26,6 +26,8 @@
 
 - write about what actually comes in the base deployment, and any enhancements that you'd like to make from there
 
+- think more about if we should have stubbed-out references in the actual deployment files to the customization guide - this could get messy the more that we add
+
 ## Completed
 
 - [x] write about configuring SSH
