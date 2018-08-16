@@ -72,43 +72,9 @@ If you want to specify a custom Redis server, you'll need specify the correspond
 - `xlang-go`
 - `xlang-go-bg`
 
-## SSD Cache
+## Using SSD Caches to Boost Performance
 
-Many parts of Sourcegraph's infrastructure benefit from using SSDs for caches. This is especially important for search / language server performance. By default, disk caches will use the Kubernetes `hostPath` and will be the same IO speed as the underlying node's disk. Even if the node's default disk is a SSD, however, it is likely network-mounted rather than local.
-
-The deployments that refer to the `cache-ssd` volume are capable of using SSDs to boost their performance. Some cloud providers optionally mount local SSDs. If you mount local SSDs on your nodes, you can change the `cache-ssd` volume from:
-
-```yaml
- volumes:
-    ...
-
-    - emptyDir: {}
-    name: cache-ssd
-```
-
-to:
-
-```yaml
- volumes:
-    ...
-
-    - hostPath:
-        path: ${SSD_MOUNT_PATH}/pod-tmp
-    name: cache-ssd
-```
-
-Replace `${SSD_MOUNT_PATH}` with the absolute directory path on the node where the local SSD is mounted.
-
-For example, on Google Cloud Platform, add Local SSDs to the nodes running the searcher pods. Then change the following fields in your deployment :
-
-```yaml
- volumes:
-    ...
-
-    - hostPath:
-        path: /mnt/disks/ssd0/pod-tmp
-    name: cache-ssd
-```
+See [ssd/README.md](../configure/ssd/README.md).
 
 ## Assigning Resource-Hungry Pods to Larger Nodes
 

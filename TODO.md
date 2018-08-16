@@ -18,8 +18,6 @@
 
 - write about configuring storage classes
 
-- write about SSDs
-
 - write about prometheus
 
 - write about jager
@@ -37,7 +35,11 @@
 - according to https://kubernetes.io/docs/reference/access-authn-authz/rbac/, `ClusterRoleBindings` can't be `namespace`d since
   they apply to the cluster as a whole, why does `configure/ssd/ssd.sh` specify one?
 
+- add `jq` script for SSD config?
+
 ## Completed
+
+- [x] write about SSDs
 
 - [x] write about configuring SSH
 

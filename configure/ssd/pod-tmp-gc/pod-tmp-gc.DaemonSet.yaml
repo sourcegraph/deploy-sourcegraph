@@ -20,14 +20,18 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        image: docker.sourcegraph.com/pod-tmp-gc:latest
+        image: sourcegraph/pod-tmp-gc:latest
         name: pod-tmp-gc
         resources:
           limits:
             cpu: 10m
             memory: 20M
-        volumeMounts:
-        - mountPath: /pod-tmp
-          name: pod-tmp
+        # Replace ${SSD_MOUNT_PATH} with the with the absolute directory path 
+        # on the node where the local SSD is mounted.
+        # See ../README.md for more information.
+        # 
+        # volumeMounts:
+        # - mountPath: ${SSD_MOUNT_PATH}/pod-tmp
+        #   name: pod-tmp
       serviceAccountName: pod-tmp-gc
   updateStrategy: {}
