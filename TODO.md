@@ -28,6 +28,8 @@
 
 - think more about if we should have stubbed-out references in the actual deployment files to the customization guide - this could get messy the more that we add
 
+- should we all the documentation in one doc, or should we have readmes in each folder
+
 ## Completed
 
 - [x] write about configuring SSH
