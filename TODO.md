@@ -6,13 +6,9 @@
 
   - I think that this should replace everything in install.md
 
-- investigate https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically to see if people actually need to handle updating each deployment when updating the site config
+* find/write documentation for `LIGHTSTEP_INCLUDE_SENSITIVE`
 
-- find/write documentation for `LIGHTSTEP_INCLUDE_SENSITIVE`
-
-- `find . -exec yj | jq | jy` example for redis
-
-- add a section about language servers that also links to specific language server instructions (e.g. environment variables for Java)
+* `find . -exec yj | jq | jy` example for redis
 
 - write about configuring storage classes in the migration document
 
@@ -39,26 +35,28 @@
 
 * document upgrade process for customers using new pure yaml deployment strategy
 
-* document migration process from previous version for existig users
-
-* write `BG` documentation for other language servers besides go
+* document migration process from previous version for existing users
 
 ## Completed
 
-- [x] verify that language servers will still work without specifying the environment variables (notably the BG ones)
+- [x] add a section about language servers that also links to specific language server instructions (e.g. environment variables for Java)
 
-- [x] write about SSDs
+* [x] verify that language servers will still work without specifying the environment variables (notably the BG ones)
 
-- [x] write about configuring SSH
+* [x] write about SSDs
 
-- [x] write customization info for the site settings config map
+* [x] write about configuring SSH
 
-- [x] yaml example for lightstep tokens
+* [x] write customization info for the site settings config map
 
-- [x] write about configuring TLS
+* [x] yaml example for lightstep tokens
+
+* [x] write about configuring TLS
 
 ## Deprioritized
 
 - write about prometheus
 
 - write about jager
+
+- investigate https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically to see if people actually need to handle updating each deployment when updating the site config
