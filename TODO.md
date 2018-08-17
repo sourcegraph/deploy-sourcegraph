@@ -6,8 +6,6 @@
 
   - I think that this should replace everything in install.md
 
-* find/write documentation for `LIGHTSTEP_INCLUDE_SENSITIVE`
-
 * `find . -exec yj | jq | jy` example for everything
 
 - write about configuring storage classes in the migration document
@@ -39,6 +37,8 @@
 * [x] yaml example for lightstep tokens
 
 * [x] write about configuring TLS
+
+- [x] find/write documentation for `LIGHTSTEP_INCLUDE_SENSITIVE`
 
 ## Deprioritized
 
