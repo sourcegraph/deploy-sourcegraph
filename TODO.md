@@ -8,34 +8,21 @@
 
 * find/write documentation for `LIGHTSTEP_INCLUDE_SENSITIVE`
 
-* `find . -exec yj | jq | jy` example for redis
+* `find . -exec yj | jq | jy` example for everything
 
 - write about configuring storage classes in the migration document
 
-- file issue about changing namespace stuff about clusterrolebindings in master
-
 * write about what actually comes in the base deployment, and any enhancements that you'd like to make from there
 
-* think more about if we should have stubbed-out references in the actual deployment files to the customization guide - this could get messy the more that we add
+- add `jq` script for SSD config?
 
-* should we all the documentation in one doc, or should we have readmes in each folder
+- actually test the steps in the customization guide
 
-* why is the `/pod-tmp` suffix necessary for `cache-ssd`?
+- documentation about how to scale things without templates
 
-* is there any public documentation about `pod-tmp-gc`?
+- document upgrade process for customers using new pure yaml deployment strategy
 
-* according to https://kubernetes.io/docs/reference/access-authn-authz/rbac/, `ClusterRoleBindings` can't be `namespace`d since
-  they apply to the cluster as a whole, why does `configure/ssd/ssd.sh` specify one?
-
-* add `jq` script for SSD config?
-
-* actually test the steps in the customization guide
-
-* documentation about how to scale things without templates
-
-* document upgrade process for customers using new pure yaml deployment strategy
-
-* document migration process from previous version for existing users
+- document migration process from previous version for existing users
 
 ## Completed
 
@@ -60,3 +47,16 @@
 - write about jager
 
 - investigate https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically to see if people actually need to handle updating each deployment when updating the site config
+
+* why is the `/pod-tmp` suffix necessary for `cache-ssd`?
+
+* is there any public documentation about `pod-tmp-gc`?
+
+* according to https://kubernetes.io/docs/reference/access-authn-authz/rbac/, `ClusterRoleBindings` can't be `namespace`d since
+  they apply to the cluster as a whole, why does `configure/ssd/ssd.sh` specify one?
+
+* should we all the documentation in one doc, or should we have readmes in each folder
+
+- think more about if we should have stubbed-out references in the actual deployment files to the customization guide - this could get messy the more that we add
+
+- file issue about changing namespace stuff about clusterrolebindings in master
