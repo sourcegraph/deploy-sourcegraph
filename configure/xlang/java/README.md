@@ -6,7 +6,7 @@ This folder contains the deployment files for the Java Language server.
 
 You can enable it by:
 
-1. Running `kubectl apply -f configure/xlang/java/ --recursive` to apply the deployment files to your cluster
+1. Running `kubectl apply -f configure/xlang/java/ --recursive` to apply the deployment files to your cluster:
 
 ```shell
 > kubectl apply -f configure/xlang/java/ --recursive

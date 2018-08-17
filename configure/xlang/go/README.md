@@ -4,7 +4,7 @@ This folder contains the deployment files for the Go Language server.
 
 You can enable it by:
 
-1. Running `kubectl apply -f configure/xlang/go/ --recursive` to apply the dpeloyment files to your cluster
+1. Running `kubectl apply -f configure/xlang/go/ --recursive` to apply the deployment files to your cluster:
 
 ```shell
 > kubectl apply -f configure/xlang/go/ --recursive
