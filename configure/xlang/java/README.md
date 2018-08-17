@@ -1,28 +1,21 @@
-# Java Language Server
+# Java language server
 
-This folder contains the deployment files for the Java Language server.
+This folder contains the deployment files for the Java language server.
 
-## How to Deploy
+## How to deploy
 
 You can enable it by:
 
-1. Running `kubectl apply -f configure/xlang/java/ --recursive` to apply the deployment files to your cluster:
+1. Apply the deployment files to your cluster.
 
-```shell
-> kubectl apply -f configure/xlang/java/ --recursive
+   ```shell
+   kubectl apply -f configure/xlang/java/ --recursive
+   ```
 
-deployment "xlang-java-bg" created
-service "xlang-java-bg" created
-deployment "xlang-java" created
-service "xlang-java" created
-```
-
-2. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the
-   Java language server's existence:
-
-`base/lsp-proxy/lsp-proxy.Deployment.yaml`:
+2. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the Java language server's existence.
 
 ```yaml
+# base/lsp-proxy/lsp-proxy.Deployment.yaml
 env:
   - name: LANGSERVER_JAVA
     value: tcp://xlang-java:2088
@@ -30,7 +23,7 @@ env:
     value: tcp://xlang-java-bg:2088
 ```
 
-## Gradle and Aritfactory Configuration
+## Gradle and Aritfactory configuration
 
 The `xlang-java` and `xlang-java-bg` deployments support configuring Gradle and Artifactory via the following environment variables:
 
