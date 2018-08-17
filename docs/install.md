@@ -17,7 +17,7 @@
 
 1. [Provision a Kubernetes cluster](k8s.md) on the infrastructure of your choice.
 2. Make sure you have configured `kubectl` to [access your cluster](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
-3. Deploy Sourcegraph to your Kubernetes cluster:
+3. Deploy the desired version of Sourcegraph to your Kubernetes cluster:
 
    ```bash
    git clone https://github.com/sourcegraph/deploy-sourcegraph
@@ -26,8 +26,13 @@
    kubectl apply --prune -l deploy=sourcegraph -f base --recursive
    ```
 
-4. Wait for the deployment to complete.
-5. Verify the deployment:
+4. Monitor the status of the deployment.
+
+   ```bash
+   watch kubectl get pods -o wide
+   ```
+
+5. Once the deployment completes, verify Sourcegraph works:
 
    - Setup port forwarding to the frontend
      ```
@@ -35,20 +40,9 @@
      ```
    - Open http://localhost:30080 in your browser and you will see a setup page.
 
+6. [Customize your deployment](cusomization.md).
+
 You have Sourcegraph up and running!
-
-There are probably
-See the [Customization docs](cusomization.md).
-
-### Updating
-
-Updating your cluster to the latest version of Sourcegraph is easy:
-
-```
-git clone https://github.com/sourcegraph/deploy-sourcegraph
-cd deploy-sourcegraph
-kubectl apply --prune -l deploy=sourcegraph -f base --recursive
-```
 
 ### Troubleshooting
 

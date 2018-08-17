@@ -1,46 +1,34 @@
 # Updating
 
-🚨 **If you are upgrading from Sourcegraph `2.10` or earlier, please follow the steps in [`stateful-set-migrate.md`](./stateful-set-migrate.md) before proceeding with the rest of this document.** 🚨
+> 🚨 If you are updating from a 2.10.x or previous deployment, follow the migration steps in [docs/migrate.md](docs/migrate.md) before updating.
 
 A new version of Sourcegraph is released every month (with patch releases in between, released as
 needed). Check the [Sourcegraph blog](https://about.sourcegraph.com/blog) for release announcements.
 
-## Update Sourcegraph Data Center
+## Steps
 
-To update configuration or update to a new version, do the following:
+1. Deploy the desired version of Sourcegraph to your Kubernetes cluster:
 
-1. Make whatever changes you want to your `values.yaml` file.
+   ```bash
+   git clone https://github.com/sourcegraph/deploy-sourcegraph
+   cd deploy-sourcegraph
+   git checkout $VERSION # Choose which version you want to deploy
+   kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+   ```
 
-1. (Recommended) Check the diff the update will apply to your Kubernetes cluster:
-   ```bash
-   # NOTE: use `./helm.sh` instead of `helm` if you migrated from `sourcegraph-server-gen`
-   helm diff upgrade -f values.yaml sourcegraph https://github.com/sourcegraph/datacenter/archive/$VERSION.tar.gz | less -R
-   ```
-   You can find a list of all version releases here: https://github.com/sourcegraph/deploy-sourcegraph/releases.
-   You may first need to install the Helm diff plugin:
-   ```bash
-   helm plugin install https://github.com/databus23/helm-diff
-   ```
-1. Apply the update:
-   ```bash
-   # NOTE: use `./helm.sh` instead of `helm` if you migrated from `sourcegraph-server-gen`
-   helm upgrade -f values.yaml sourcegraph https://github.com/sourcegraph/datacenter/archive/$VERSION.tar.gz
-   ```
-1. Check the health of the cluster after upgrade:
+2. Monitor the status of the deployment.
+
    ```bash
    watch kubectl get pods -o wide
    ```
 
-### Rollback
+## Rollback
 
-```
-helm history sourcegraph
-helm rollback sourcegraph [REVISION]
-```
+You can rollback by performing the [update steps](#steps) with the previous version.
 
-Note: if an update includes a database migration, rollback will require some manual DB
+_If an update includes a database migration, rollback will require some manual DB
 modifications. We plan to eliminate these in the near future, but for now,
-email <mailto:support@sourcegraph.com> if you have concerns before updating to a new release.
+email <mailto:support@sourcegraph.com> if you have concerns before updating to a new release._
 
 ## Improving update reliability and latency with node selectors
 

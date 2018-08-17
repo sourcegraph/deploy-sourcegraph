@@ -2,23 +2,58 @@
 
 Two things have changed in 2.11.x that require migration:
 
-- Gitserver is now configured using StatefulSet. To avoid losing all cached git data some [manual steps are required](#StatefulSet-migration) to preserve the PersistentVolumes that this data is stored on.
+- Gitserver is now configured using [StatefulSet](#StatefulSet-migration).
 - We have a [new deployment strategy](#Deployment-migration).
 
-There are two migration paths:
+## Defering migration
 
-1. Update directly to 2.11.x and perform both migrations at once.
-2. First update to 2.11.x-deprecated-helm to perform the [StatefulSet migration](#StatefulSet-migration), then update to 2.11.x to use the [new deployment strategy](#Deployment-migration).
+If you want to update to 2.11.x without performing any migrations, you can use 2.11.x-no-migration tags.
 
-2.12.x will only be available using the new deployment strategy.
+2.12.x will require both migrations.
 
 ## StatefulSet migration
 
-_Required when deploying 2.11.x or 2.11.x-deprecated-helm_
+`gitserver`'s configuration has been migrated to use [StatefulSet](https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/) instead of having multiple deployments and associated services.
+
+In order be able to re-use your existing `gitserver`'s persistent volumes with [StatefulSet](https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/) (so that you can avoid re-cloning existing repositories), you will need to run the following manual steps before upgrading to 2.11.x ([click here to read more about why this is necessary](https://github.com/kubernetes/kubernetes/issues/48609#issuecomment-314066616)):
+
+_Note that these steps will cause a small amount of unavoidable downtime._
+
+_The following steps assume that you have [jq](https://stedolan.github.io/jq/) installed._
+
+1. Set the reclaim policy for your existing `gitserver` deployments to `retained`
+
+   ```bash
+   kubectl get pv -o json | jq --raw-output  ".items | map(select(.spec.claimRef.name | contains(\"gitserver-\"))) | .[] | \"kubectl patch pv -p '{\\\"spec\\\":{\\\"persistentVolumeReclaimPolicy\\\":\\\"Retain\\\"}}' \\(.metadata.name)\"" | bash
+   ```
+
+2. **Downtime starts here**
+
+   Delete the `gitserver` deployment
+
+   ```bash
+   kubectl delete deploy -l type=gitserver
+   ```
+
+3. Delete the old `gitserver`'s persistent volume claims
+
+   ```bash
+   kubectl get pvc -o json | jq --raw-output ".items | map(select(.metadata.name | contains(\"gitserver-\"))) | .[] | \"kubectl delete pvc \\(.metadata.name)\"" | bash
+   ```
+
+4. Update `gitserver` persistent volumes so they can be reused by the new StatefulSet
+
+   This step transforms the the old `claimRef.name`s that looked like `gitserver-1, gitserver-2, ...` into `repos-gitserver-0, repos-gitserver-1, ...`.
+
+   ```bash
+   kubectl get pv -o json | jq --raw-output ".items | map(select(.spec.claimRef.name | contains(\"gitserver-\"))) | .[] | \"kubectl patch pv -p '{\\\"spec\\\":{\\\"claimRef\\\":{\\\"uid\\\":null,\\\"name\\\":\\\"repos-gitserver-\\(.spec.claimRef.name | ltrimstr(\"gitserver-\") | tonumber - 1)\\\"}}}' \\(.metadata.name)\"" | bash
+   ```
+
+5. Proceed with the normal [update steps](update.md).
+
+   **Downtime ends once upgrade is complete**
 
 ## Deployment migration
-
-_Required when deploying 2.11.x_
 
 ### The old way
 
@@ -39,6 +74,6 @@ Our new approach is simpler and more flexible.
 - Our base config is pure yaml which can be deployed directly to a cluster. It is easier for you to use, and also easier for us to maintain.
 - You can configure our base yaml using whatever process best for you (Git ops, [Kustomize](https://github.com/kubernetes-sigs/kustomize), custom scripts, etc.). We provide [documentation and recipies for common customizations](customization.md).
 
-### Steps to migrate
+### Steps
 
 TODO(nick,geoffrey)
