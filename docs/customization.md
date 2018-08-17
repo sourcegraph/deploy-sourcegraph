@@ -141,11 +141,13 @@ find . -name "*yaml" -exec sed -i.sedibak -e "s/name: config-file.*/name: config
 find . -name "*.sedibak" -delete
 ```
 
-## Configuring SSL
+## Configuring TLS/SSL
 
 If you intend to make your Sourcegraph instance accessible on the Internet or another untrusted network, you should use TLS so that all traffic will be served over HTTPS. You can configure Sourcegraph to use TLS by providing the `TLS_CERT` and `TLS_KEY` environment variables variables to the `sourcegraph-frontend` deployment.
 
-One way of doing this is to create a secret object (see the official documentation)[https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables] that contains your TLS credentials:
+One way of doing this is to:
+
+1. Create a [secret object](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains your TLS credentials:
 
 `tls.Secret.yaml`
 
@@ -160,7 +162,7 @@ metadata:
 type: Opaque
 ```
 
-and refer to it in your `sourcegraph-frontend` deployment when adding the `TLS_CERT` and `TLS_KEY` evironment variables:
+2. Refer to it in your `sourcegraph-frontend` deployment when adding the `TLS_CERT` and `TLS_KEY` evironment variables:
 
 `sourcegraph-frontend.Deployment.yaml`
 
@@ -177,6 +179,20 @@ env:
         key: cert
         name: tls
 ```
+
+3. Change your `appURL` in the site configuration
+
+`base/config-file.ConfigMap.yaml`:
+
+```json
+{
+    ...
+    "appURL": "https://example.com:3443" // Must begin with "https"; replace with the public IP or hostname of your machine
+    ...
+}
+```
+
+_You'll need to follow the steps in [Updating the Site Configuration](#Updating-the-Site-Configuration) so that all your deployments will see the updated site configuration._
 
 ## Gitserver SSH
 
