@@ -116,7 +116,7 @@ See [ssd/README.md](../configure/ssd/README.md).
 
 If you have a heterogeneous cluster where you need to ensure certain more resource-hungry pods (e.g., `indexedSearch`), you can [refer to the Kubernetes documentation to see how to specify node constraints (such as `nodeSelector`, etc.)](https://kubernetes.io/docs/concepts/configuration/assign-pod-node).
 
-## Site Configuration ConfigMap
+## Updating the Site Configuration
 
 Many services need to reference the site configuration. The configuration is stored inside a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume), which is mounted inside every deployment that needs it.
 
