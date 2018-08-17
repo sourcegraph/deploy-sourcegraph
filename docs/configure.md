@@ -175,7 +175,7 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
            secretName: gitserver-ssh
    ```
 
-## Configure Language servers
+## Configure language servers
 
 > Code intelligence is a paid upgrade on top of the Data Center deployment option. After following these instructions to confirm it works, [buy code intelligence](https://about.sourcegraph.com/pricing).
 
