@@ -21,11 +21,9 @@ service "xlang-go" created
 `base/lsp-proxy/lsp-proxy.Deployment.yaml`:
 
 ```yaml
-...
-
 env:
-- name: LANGSERVER_GO
+  - name: LANGSERVER_GO
     value: tcp://xlang-go:4389
-- name: LANGSERVER_GO_BG
+  - name: LANGSERVER_GO_BG
     value: tcp://xlang-go-bg:4389
 ```
