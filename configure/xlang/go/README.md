@@ -1,35 +1,22 @@
-# `xlang-go`
+# Go Language Server
 
 This folder contains the deployment files for the Go Language server.
 
 You can enable it by:
 
-1. Add the go language server to your site configuration:
+1. Running `kubectl apply -f configure/xlang/go/ --recursive` to apply the dpeloyment files to your cluster
 
-```json
-{
-    ...
+```shell
+> kubectl apply -f configure/xlang/go/ --recursive
 
-    "langservers": [
-        {
-            "language": "go",
-            "address": "tcp://xlang-go:4389"
-        }
-    ]
-}
+deployment "xlang-go-bg" created
+service "xlang-go-bg" created
+deployment "xlang-go" created
+service "xlang-go" created
 ```
 
-2. Run `kubectl apply -f xlang-go --recursive` to apply the deployment files to your cluster
-
-## `xlang-go-bg`
-
-The Go language server also has an optional "background" deployment, `xlang-go-bg`, which can improve performance by offloading background indexing jobs from the existing `xlang-go` deployment.
-
-You can enable it by:
-
-1. Run `kubectl apply -f xlang-go-bg --recursive` to apply the deployment files to your cluster
-
-2. Add the following environment variables to your `lsp-proxy` deployment to make it aware of `xlang-go-bg`'s existence:
+2. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the
+   Go language server's existence:
 
 `base/lsp-proxy/lsp-proxy.Deployment.yaml`:
 
