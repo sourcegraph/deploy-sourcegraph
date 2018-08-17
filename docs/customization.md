@@ -129,7 +129,7 @@ The following script (provided for your convenience):
 ```bash
 #!/bin/bash
 
-# e.g. 2018-08-15T23:42:08Z
+# e.g. 2018-08-15t23-42-08z
 CONFIG_DATE=$(date -u +"%Y-%m-%dt%H-%M-%Sz")
 
 # update all references to the site config's ConfigMap
