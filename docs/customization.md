@@ -84,7 +84,8 @@ env:
   - name: LIGHTSTEP_ACCESS_TOKEN
     value: M3WKBuqsCnRYz1c
 
-  # If false, any logs from spans will be omitted from the spans sent to Lightstep.
+  # If false, any logs (https://github.com/opentracing/specification/blob/master/specification.md#log-structured-data)
+  # from spans will be omitted from the spans sent to Lightstep.
   - name: LIGHTSTEP_INCLUDE_SENSITIVE
     value: true
 ```
