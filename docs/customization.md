@@ -1,5 +1,13 @@
 # Common Customizations
 
+TODO: write index:
+
+- Expose port
+- Site config
+- Enable language servers
+- TLS
+- Gitserver ssh
+
 ## Make Sourcegraph accessbile to external users
 
 TODO: needs cleanup

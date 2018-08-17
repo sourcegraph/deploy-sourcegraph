@@ -9,6 +9,7 @@
 
 - [Kubernetes](https://kubernetes.io/) v1.8.7 or later
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) v1.10.0 or later
+  - At the time of writing, `gcloud` bundles `kubectl` 1.9.7, so you will want to install `kubectl` separately.
 - Access to server infrastructure on which you can create a Kubernetes cluster (see
   [resource allocation guidelines](scale.md)).
 
@@ -18,9 +19,10 @@
 2. Make sure you have configured `kubectl` to [access your cluster](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
 3. Deploy Sourcegraph to your Kubernetes cluster:
 
-   ```
+   ```bash
    git clone https://github.com/sourcegraph/deploy-sourcegraph
    cd deploy-sourcegraph
+   git checkout $VERSION # Choose which version you want to deploy
    kubectl apply --prune -l deploy=sourcegraph -f base --recursive
    ```
 
@@ -36,7 +38,7 @@
 You have Sourcegraph up and running!
 
 There are probably
-See the [Customization docs](customization-guide.md).
+See the [Customization docs](cusomization.md).
 
 ### Updating
 

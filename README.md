@@ -1,4 +1,4 @@
-> Note to existing customers: if you are migrating from a 2.10.x deployment (configured
+> Note to existing customers: if you are updating from a 2.10.x or previous deployment (configured
 > using `values.yaml`), see [docs/migrate.md](docs/migrate.md).
 
 # Sourcegraph Data Center
