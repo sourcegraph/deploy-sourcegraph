@@ -181,9 +181,11 @@ env:
 
 `gitserver` can be configured to clone repos with a SSH key. It will use the SSH credentials located at `/root/.ssh`, if present.
 
-One way of doing this is to create a secrets object (see the official documentation)[https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables] that contains your SSH credentials
+One way to add SSH credentials is to:
 
-`gitserver-ssh.Secret.yaml`
+1. Create a secrets object (see the official documentation)[https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables] that contains your SSH credentials
+
+`gitserver-ssh.Secret.yaml`:
 
 ```yaml
 apiVersion: v1
@@ -196,9 +198,9 @@ metadata:
 type: Opaque
 ```
 
-and refer to it in your `gitserver` deployment by adding the appropriate `volume` and `volumeMount`:
+2. Refer to the secret inside your `gitserver` deployment by adding a `volume` and `volumeMount`:
 
-`gitserver.StatefulSet.yaml`
+`base/gitserver/gitserver.StatefulSet.yaml`:
 
 ```yaml
 spec:
