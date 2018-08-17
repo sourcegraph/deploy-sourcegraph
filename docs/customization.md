@@ -8,18 +8,62 @@ TODO: write index:
 - TLS
 - Gitserver ssh
 
-## Make Sourcegraph accessbile to external users
+## Configure network access to Sourcegraph
 
-TODO: needs cleanup
+You need to make the main web server accessible over the network to external users.
 
-When the deployment completes, you need to make the main web server accessible over the network to external users. To do so, connect port 30080 on the nodes in the cluster to the internet. The easiest way to do this is to add a network rule that allows ingress traffic to port 30080 on at least one node
-(see
-[AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html),
-[Google Cloud Platform Firewall rules](https://cloud.google.com/compute/docs/vpc/using-firewalls)).
-Sourcegraph should then be accessible at `$EXTERNAL_ADDR:30080`, where `$EXTERNAL_ADDR` is the
-address of _any_ node in the cluster. For production environments, we recommend using
-an [Internet Gateway](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html) (or
-equivalent) and configuring a load balancer in Kubernetes.
+#### Load balancer
+
+For production environments, we recommend using a [load balancer](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/).
+
+- HTTP
+  ```
+  kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=80 --target-port=3080
+  ```
+- HTTPS (requires you to [configure TLS]())
+  ```
+  kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=443 --target-port=3443
+  ```
+
+Once the load balancer has acquired an external IP address, you should be able to access Sourcegraph using that. You can check the external IP addressby running the following command:
+
+```
+kubectl get service sourcegraph-frontend-loadbalancer -o=custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip
+```
+
+#### Ingress controller
+
+You can also potentially use an [Ingress controller](https://kubernetes.io/docs/concepts/services-networking/ingress/). We haven't tested this.
+
+#### Network rule
+
+You can expose Kubernetes nodes directly to avoid provisioning/paying for a load balancer (but honestly you probably want a load balancer).
+
+Add a network rule that allows ingress traffic to port 30080 (HTTP) and/or 30081 (HTTPS) on at least one node.
+
+- [Google Cloud Platform Firewall rules](https://cloud.google.com/compute/docs/vpc/using-firewalls).
+
+  1. Expose the necessary ports.
+
+     ```bash
+     gcloud compute --project=$PROJECT firewall-rules create sourcegraph-frontend-http --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:30080
+     gcloud compute --project=$PROJECT firewall-rules create sourcegraph-frontend-https --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:30081
+     ```
+
+  2. Find a node name.
+
+     ```bash
+     kubectl get pods -l app=sourcegraph-frontend -o=custom-columns=NODE:.spec.nodeName
+     ```
+
+  3. Get the EXTERNAL-IP address (will be ephemeral unless you [make it static](https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address#promote_ephemeral_ip)).
+     ```bash
+     kubectl get node $NODE -o wide
+     ```
+
+* [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html).
+
+Sourcegraph should then be accessible at `$EXTERNAL_ADDR:30080` and/or `$EXTERNAL_ADDR:30081`, where `$EXTERNAL_ADDR` is the address of _any_ node in the cluster.
 
 ## Install without RBAC
 
