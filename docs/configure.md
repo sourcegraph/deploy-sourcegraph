@@ -1,4 +1,4 @@
-# Customizations
+# Configure
 
 Common customizations:
 

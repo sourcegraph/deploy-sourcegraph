@@ -40,7 +40,7 @@
      ```
    - Open http://localhost:30080 in your browser and you will see a setup page.
 
-6. [Customize your deployment](cusomization.md).
+6. [Configure your deployment](configure.md).
 
 You have Sourcegraph up and running!
 
