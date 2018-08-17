@@ -220,3 +220,17 @@ spec:
         defaultMode: 384
         secretName: gitserver-ssh
 ```
+
+## Language Servers
+
+> Code intelligence is a paid upgrade on top of the Data Center deployment option. After following these instructions to confirm it works, buy code intelligence.
+
+Code intelligence provides advanced code navigation and cross-references for your code on Sourcegraph.
+
+After setting up the base Sourcegraph deployment, refer to the following docs for each language for instructions about how to deploy / configure each language server:
+
+- [Go](../configure/xlang/go/README.md)
+- [Java](../configure/xlang/java/README.md)
+- [PHP](../configure/xlang/php/README.md)
+- [Python](../configure/xlang/python/README.md)
+- [Javascript / Typescript](../configure/xlang/typescript/README.md)
