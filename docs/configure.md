@@ -32,7 +32,7 @@ For production environments, we recommend using a [load balancer](https://kubern
   ```
   kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=80 --target-port=3080
   ```
-- HTTPS (requires you to [configure TLS]())
+- HTTPS (requires you to [configure TLS/SSL](#Configure-TLS%2FSSL))
   ```
   kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=443 --target-port=3443
   ```
@@ -108,21 +108,21 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 
 ### Steps
 
-1. Create a [secret object](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains your TLS credentials.
+1. Create a [secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains your base64 encoded contents of your certificate and private key.
 
    ```yaml
    # tls.Secret.yaml
    apiVersion: v1
    data:
-     cert: "-----BEGIN CERTIFICATE-----\nMIIFdTCCBF2gAWiB..."
-     key: "-----BEGIN RSA PRIVATE KEY-----\nMII..."
+     cert: "" # base64 certificate
+     key: "" # base64 private key
    kind: Secret
    metadata:
      name: tls
    type: Opaque
    ```
 
-2. Refer to it in your `sourcegraph-frontend` deployment when adding the `TLS_CERT` and `TLS_KEY` evironment variables.
+2. Add `TLS_CERT` and `TLS_KEY` environment variables to `sourcegraph-frontend.Deployment.yaml`.
 
    ```yaml
    # base/frontend/sourcegraph-frontend.Deployment.yaml
@@ -137,6 +137,11 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
          secretKeyRef:
            key: cert
            name: tls
+   ```
+
+   ```bash
+   FE=base/frontend/sourcegraph-frontend.Deployment.yaml
+   cat $FE | yj | jq '(.spec.template.spec.containers[] | select(.name == "frontend") | .env) += [{name: "TLS_CERT", valueFrom: {secretKeyRef: {key: "cert", name: "tls"}}}, {name: "TLS_KEY", valueFrom: {secretKeyRef: {key: "key", name: "tls"}}}]' | jy -o $FE
    ```
 
 3. Change your `appURL` in the site configuration stored in `base/config-file.ConfigMap.yaml`.
