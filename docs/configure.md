@@ -8,11 +8,23 @@ Common customizations:
 - [Configure repository cloning via SSH](#Configure-repository-cloning-via-SSH)
 - [Configure language servers](#Configure-language-servers)
 
+Other customizations:
+
+- [Install without RBAC](#Install-without-RBAC)
+- [Configure a storage class](#Configure-a-storage-class)
+- [Configure gitserver replica count](#Configure-gitserver-replica-count)
+- [Configure Lightstep tracing](#Configure-lightstep-tracing)
+- [Configure custom redis](#Configure-custom-redis)
+- [Configure SSDs to boost performance](#Configure-SSDs-to-boost-performance)
+- [Assign resource-hungry pods to larger nodes](#Assign-resource-hungry-pods-to-larger-nodes)
+
 ## Configure network access
 
 You need to make the main web server accessible over the network to external users.
 
-### Load balancer
+There are a few approaches, but using a load balancer is recommended.
+
+### Load balancer (recommended)
 
 For production environments, we recommend using a [load balancer](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/).
 
@@ -114,7 +126,6 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 
    ```yaml
    # base/frontend/sourcegraph-frontend.Deployment.yaml
-
    env:
      - name: TLS_CERT
        valueFrom:
@@ -162,7 +173,6 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
 
    ```yaml
    # base/gitserver/gitserver.StatefulSet.yaml
-
    spec:
      containers:
        volumeMounts:
@@ -195,7 +205,7 @@ Sourcegraph Data Center communicates with the Kubernetes API for service discove
 
 If using RBAC is not an option, then you will not want to apply `*.Role.yaml` and `*.RoleBinding.yaml` files.
 
-## Configuring a storage class
+## Configure a storage class
 
 Sourcegraph relies on the default storage class of your cluster. If your cluster does not have a default storage class or if you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class.
 
@@ -203,42 +213,34 @@ Sourcegraph relies on the default storage class of your cluster. If your cluster
 find . -name "*PersistentVolumeClaim.yaml" -exec sh -c "cat {} | yj | jq '.spec.storageClassName = \"$STORAGE_CLASS_NAME\"' | jy -o {}" \;
 ```
 
-## Gitserver replica count
+## Configure gitserver replica count
 
-Increasing the `replica` count of the `gitserver` Stateful Set increases the scalability of your deployment. Repository clones are consistently striped across all `giterver` replicas, so other services need to be aware of how many `gitserver` replicas have been specified in order to know how to a resolve an individual repo.
+Increasing the `replica` count of the `gitserver` StatefulSet increases the scalability of your deployment. Repository clones are consistently striped across all `giterver` replicas, so other services need to be aware of how many `gitserver` replicas have been specified in order to know how to a resolve an individual repo.
 
 Services that talk to `gitserver` are passed a list of `gitserver` addresses via the `SRC_GIT_SERVERS` environment variable. You'll need to update this environment variable for each deployment if you change `gitserver`'s `replica` count.
 
-1. Get all the deployments which use `SRC_GIT_SERVERS`
+1. Get all the deployments which use `SRC_GIT_SERVERS`.
 
-```bash
-> grep SRC_GIT_SERVERVS -l
+   ```bash
+   grep SRC_GIT_SERVERVS -l
+   ```
 
-language-servers/go/xlang-go.Deployment.yaml
-language-servers/go/xlang-go-bg.Deployment.yaml
-...
-```
+2. For each one of those files, change the value of `SRC_GIT_SERVERS` to be a space separated list of addresses like the following:
 
-2. For each one of those files, change the value of `SRC_GIT_SERVERS`
+   ```bash
+   # $REPLICA_COUNT = 1
+   gitserver-0.gitserver:3178
 
-The `SRC_GIT_SERVER` variable is a space separated list of addresses that look like the following:
+   # $REPLICA_COUNT = 2
+   gitserver-0.gitserver:3178 gitserver-1.gitserver:3178
 
-```bash
-# $REPLICA_COUNT = 1
-gitserver-0.gitserver:3178
+   # ...
 
-# $REPLICA_COUNT = 2
-gitserver-0.gitserver:3178 gitserver-1.gitserver:3178
+   # $REPLICA_COUNT = n
+   gitserver-0.gitserver:3178 gitserver-1.gitserver:3178 ... gitserver-${n-1}:3178
+   ```
 
-# ...
-
-# $REPLICA_COUNT = n
-gitserver-0.gitserver:3178 gitserver-1.gitserver:3178 ... gitserver-${n-1}:3178
-```
-
-For each file in the output of step 1, change the value of `SRC_GIT_SERVERS` as stated above.
-
-## Lightstep tracing
+## Configure Lightstep tracing
 
 Lightstep is a closed-source distributed tracing and performance monitoring tool created by some of the authors of Dapper. Every Sourcegraph deployment supports Lightstep, and it can be configured via the following environment variables (with example values):
 
@@ -260,7 +262,7 @@ env:
 
 To enable this, you must first purchase Lightstep and create a project corresponding to the Sourcegraph instance. Then, add the above environment to each deployment.
 
-## Custom Redis
+## Configure custom Redis
 
 Sourcegraph supports specifying a custom Redis server for:
 
@@ -276,10 +278,10 @@ If you want to specify a custom Redis server, you'll need specify the correspond
 - `xlang-go`
 - `xlang-go-bg`
 
-## Using SSDs to boost performance
+## Configure SSDs to boost performance
 
 See [ssd/README.md](../configure/ssd/README.md).
 
-## Assigning resource-hungry pods to larger nodes
+## Assign resource-hungry pods to larger nodes
 
-If you have a heterogeneous cluster where you need to ensure certain more resource-hungry pods are assigned to more powerful nodes (e.g. `indexedSearch`), you can [refer to the Kubernetes documentation to see how to specify node constraints (such as `nodeSelector`, etc.)](https://kubernetes.io/docs/concepts/configuration/assign-pod-node).
+If you have a heterogeneous cluster where you need to ensure certain more resource-hungry pods are assigned to more powerful nodes (e.g. `indexedSearch`), you can [specify node constraints](https://kubernetes.io/docs/concepts/configuration/assign-pod-node) (such as `nodeSelector`, etc.).
