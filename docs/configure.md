@@ -79,28 +79,35 @@ Sourcegraph should then be accessible at `$EXTERNAL_ADDR:30080` and/or `$EXTERNA
 
 ## Update site configuration
 
-Many services need to reference the site configuration. The configuration is stored inside a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume), which is mounted inside every deployment that needs it.
+The site configuration is stored inside a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume), which is mounted inside every deployment that needs it.
 
-Whenever you update the configuration, you'll also need to update the deployments that reference it so that your changes will be visible. One way of accomplishing this is to change the name of the config map every time that you make changes.
+Updates to the site configuration are [eventually propogated](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically) to all services, but it take on the order of 1 minute. [Future Kubernetes versions may improve this behavior](https://github.com/kubernetes/kubernetes/pull/64752).
 
-The following script (provided for your convenience):
+To have site configuration changes take effect immediately, you need to restart the relevant pods.
 
-- changes the name of the config map by appending the current date and time
-- updates all references to the site configuration to the newly named config map
+Recommended steps:
 
-```bash
-#!/bin/bash
+1. Change the name of the ConfigMap in all deployments.
 
-# e.g. 2018-08-15t23-42-08z
-CONFIG_DATE=$(date -u +"%Y-%m-%dt%H-%M-%Sz")
+   ```bash
+   #!/bin/bash
 
-# update all references to the site config's ConfigMap
-# from: 'config-file.*' , to:' config-file-$CONFIG_DATE'
-find . -name "*yaml" -exec sed -i.sedibak -e "s/name: config-file.*/name: config-file-$CONFIG_DATE/g" {} +
+   # e.g. 2018-08-15t23-42-08z
+   CONFIG_DATE=$(date -u +"%Y-%m-%dt%H-%M-%Sz")
 
-# delete sed's backup files
-find . -name "*.sedibak" -delete
-```
+   # update all references to the site config's ConfigMap
+   # from: 'config-file.*' , to:' config-file-$CONFIG_DATE'
+   find . -name "*yaml" -exec sed -i.sedibak -e "s/name: config-file.*/name: config-file-$CONFIG_DATE/g" {} +
+
+   # delete sed's backup files
+   find . -name "*.sedibak" -delete
+   ```
+
+2. Apply the new configuration to your Kubernetes cluster.
+
+   ```bash
+   kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+   ```
 
 ## Configure TLS/SSL
 
