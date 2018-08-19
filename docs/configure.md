@@ -122,15 +122,13 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 
 ### Steps
 
-1. Create a [secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains the your TLS certificate and private key.
+1. Create a [secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains your TLS certificate and private key.
 
    ```bash
     kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY
    ```
 
 2. Add the `TLS_CERT` and `TLS_KEY` environment variables to `sourcegraph-frontend.Deployment.yaml`.
-
-   For example:
 
    ```yaml
    # base/frontend/sourcegraph-frontend.Deployment.yaml
