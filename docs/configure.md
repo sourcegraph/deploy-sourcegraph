@@ -90,6 +90,8 @@ Recommended steps:
 
 1. Change the name of the ConfigMap in all deployments.
 
+   Convenience script:
+
    ```bash
    #!/bin/bash
 
@@ -136,6 +138,8 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 
 2. Add `TLS_CERT` and `TLS_KEY` environment variables to `sourcegraph-frontend.Deployment.yaml`.
 
+   For example:
+
    ```yaml
    # base/frontend/sourcegraph-frontend.Deployment.yaml
    env:
@@ -150,6 +154,8 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
            key: cert
            name: tls
    ```
+
+   Convenience script:
 
    ```bash
    FE=base/frontend/sourcegraph-frontend.Deployment.yaml
@@ -172,21 +178,17 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
 
 ### Steps
 
-1. [Create a secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains the base64 encoded contents of your SSH private key and known_hosts file.
+1. [Create a secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains the base64 encoded contents of your SSH private key (_make sure it doesn't require a password_) and known_hosts file.
 
-   ```yaml
-   # gitserver-ssh.Secret.yaml
-   apiVersion: v1
-   data:
-     id_rsa: "" # base64 encoded contents of SSH private key file
-     known_hosts: "" # base64 encoded contents of SSH known_hosts file
-   kind: Secret
-   metadata:
-     name: gitserver-ssh
-   type: Opaque
+   ```bash
+   kubectl create secret generic gitserver-ssh \
+    --from-file id_rsa=~/.ssh/id_rsa \
+    --from-file known_hosts=~/.ssh/known_hosts
    ```
 
-2. Refer to the secret inside your `gitserver` deployment by adding a `volume` and `volumeMount`.
+2. Mount the [secret as a volume](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-files-from-a-pod) in [gitserver.StatefulSet.yaml](../base/gitserver/gitserver.StatefulSet.yaml).
+
+   For example:
 
    ```yaml
    # base/gitserver/gitserver.StatefulSet.yaml
@@ -200,6 +202,14 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
          secret:
            defaultMode: 384
            secretName: gitserver-ssh
+   ```
+
+   Convenience script:
+
+   ```bash
+   GS=base/gitserver/gitserver.StatefulSet.yaml
+   cat $GS | yj | jq '.spec.template.spec.containers[].volumeMounts += [{mountPath: "/root/.ssh", name: "ssh"}]' | jy -o $GS
+   cat $GS | yj | jq '.spec.template.spec.volumes += [{name: "ssh", secret: {defaultMode: 384, secretName:"gitserver-ssh"}}]' | jy -o $GS
    ```
 
 3. Apply the updated `gitserver` configuration to your cluster.
