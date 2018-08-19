@@ -122,21 +122,13 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 
 ### Steps
 
-1. Create a [secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains the base64 encoded contents of your TLS certificate and private key.
+1. Create a [secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains the your TLS certificate and private key.
 
-   ```yaml
-   # tls.Secret.yaml
-   apiVersion: v1
-   data:
-     cert: "" # base64 encoded contents of TLS certificate
-     key: "" # base64 encoded contents of TLS private key
-   kind: Secret
-   metadata:
-     name: tls
-   type: Opaque
+   ```bash
+    kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY
    ```
 
-2. Add `TLS_CERT` and `TLS_KEY` environment variables to `sourcegraph-frontend.Deployment.yaml`.
+2. Add the `TLS_CERT` and `TLS_KEY` environment variables to `sourcegraph-frontend.Deployment.yaml`.
 
    For example:
 
@@ -151,7 +143,7 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
      - name: TLS_KEY
        valueFrom:
          secretKeyRef:
-           key: cert
+           key: key
            name: tls
    ```
 
@@ -171,6 +163,8 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
    ```
 
 _You'll need to [update the site configuration](#update-site-configuration) so that all your deployments will see the updated site configuration._
+
+4. Refer to the [Configure network access](#Configure-network-access) section to make sure that `sourcegraph-frontend`'s port `3443` is properly exposed.
 
 ## Configure repository cloning via SSH
 
