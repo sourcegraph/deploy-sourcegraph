@@ -79,7 +79,8 @@ Sourcegraph should then be accessible at `$EXTERNAL_ADDR:30080` and/or `$EXTERNA
 
 ## Update site configuration
 
-The site configuration is stored inside a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume), which is mounted inside every deployment that needs it.
+The site configuration is stored inside a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume), which is mounted inside every deployment that needs it. You can change the site configuration by editing
+[`base/config-file.ConfigMap.yaml`](../base/config-file.ConfigMap.yaml).
 
 Updates to the site configuration are [eventually propogated](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically) to all services, but it take on the order of 1 minute. [Future Kubernetes versions may improve this behavior](https://github.com/kubernetes/kubernetes/pull/64752).
 
@@ -199,6 +200,12 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
          secret:
            defaultMode: 384
            secretName: gitserver-ssh
+   ```
+
+3. Apply the updated `gitserver` configuration to your cluster.
+
+   ```bash
+   kubectl apply --prune -l deploy=sourcegraph -f base --recursive
    ```
 
 ## Configure language servers
