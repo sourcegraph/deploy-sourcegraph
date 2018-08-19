@@ -39,7 +39,7 @@ For production environments, we recommend using a [load balancer](https://kubern
 
 Once the load balancer has acquired an external IP address, you should be able to access Sourcegraph using that. You can check the external IP addressby running the following command:
 
-```
+```bash
 kubectl get service sourcegraph-frontend-loadbalancer -o=custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip
 ```
 
