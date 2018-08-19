@@ -120,14 +120,14 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 
 ### Steps
 
-1. Create a [secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains your base64 encoded contents of your certificate and private key.
+1. Create a [secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains the base64 encoded contents of your TLS certificate and private key.
 
    ```yaml
    # tls.Secret.yaml
    apiVersion: v1
    data:
-     cert: "" # base64 certificate
-     key: "" # base64 private key
+     cert: "" # base64 encoded contents of TLS certificate
+     key: "" # base64 encoded contents of TLS private key
    kind: Secret
    metadata:
      name: tls
@@ -172,14 +172,14 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
 
 ### Steps
 
-1. [Create a secrets object](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains your SSH credentials.
+1. [Create a secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains the base64 encoded contents of your SSH private key and known_hosts file.
 
    ```yaml
    # gitserver-ssh.Secret.yaml
    apiVersion: v1
    data:
-     id_rsa: "-----BEGIN RSA PRIVATE KEY-----\nMII..."
-     known_hosts: "github.com,192.30.255.113 ssh-rsa AAAA..."
+     id_rsa: "" # base64 encoded contents of SSH private key file
+     known_hosts: "" # base64 encoded contents of SSH known_hosts file
    kind: Secret
    metadata:
      name: gitserver-ssh
