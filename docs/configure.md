@@ -37,7 +37,7 @@ For production environments, we recommend using a [load balancer](https://kubern
   kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=443 --target-port=3443
   ```
 
-Once the load balancer has acquired an external IP address, you should be able to access Sourcegraph using that. You can check the external IP addressby running the following command:
+Once the load balancer has acquired an external IP address, you should be able to access Sourcegraph using that. You can check the external IP address by running the following command:
 
 ```bash
 kubectl get service sourcegraph-frontend-loadbalancer -o=custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip
@@ -107,6 +107,10 @@ Recommended steps:
 
    ```bash
    kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+
+   # The Go language server also reads from the site configuration.
+   # If you have it enabled, you'll also need to apply the changes to its deployment:
+   # kubectl apply -f configure/xlang/go/ --recursive
    ```
 
 ## Configure TLS/SSL
