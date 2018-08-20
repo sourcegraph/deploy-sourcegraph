@@ -51,7 +51,7 @@ You can also potentially use an [Ingress controller](https://kubernetes.io/docs/
 
 ### Network rule
 
-You can expose Kubernetes nodes directly to avoid provisioning/paying for a load balancer (but honestly you probably want a load balancer).
+You can expose Kubernetes nodes directly to avoid provisioning/paying for a load balancer, but you probably need to pay for a static IP, and honestly you probably want a load balancer anyway.
 
 Add a network rule that allows ingress traffic to port 30080 (HTTP) and/or 30081 (HTTPS) on at least one node.
 
