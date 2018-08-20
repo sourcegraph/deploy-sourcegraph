@@ -2,21 +2,21 @@
 
 Common customizations:
 
-- [Configure network access](#Configure-network-access)
-- [Update site configuration](#Update-site-configuration)
-- [Configure TLS/SSL](#Configure-TLS%2FSSL)
-- [Configure repository cloning via SSH](#Configure-repository-cloning-via-SSH)
-- [Configure language servers](#Configure-language-servers)
+- [Configure network access](#configure-network-access)
+- [Update site configuration](#update-site-configuration)
+- [Configure TLS/SSL](#configure-TLS%2FSSL)
+- [Configure repository cloning via SSH](#configure-repository-cloning-via-SSH)
+- [Configure language servers](#configure-language-servers)
 
 Other customizations:
 
-- [Install without RBAC](#Install-without-RBAC)
-- [Configure a storage class](#Configure-a-storage-class)
-- [Configure gitserver replica count](#Configure-gitserver-replica-count)
-- [Configure Lightstep tracing](#Configure-lightstep-tracing)
-- [Configure custom redis](#Configure-custom-redis)
-- [Configure SSDs to boost performance](#Configure-SSDs-to-boost-performance)
-- [Assign resource-hungry pods to larger nodes](#Assign-resource-hungry-pods-to-larger-nodes)
+- [Install without RBAC](#install-without-RBAC)
+- [Configure a storage class](#configure-a-storage-class)
+- [Configure gitserver replica count](#configure-gitserver-replica-count)
+- [Configure Lightstep tracing](#configure-lightstep-tracing)
+- [Configure custom redis](#configure-custom-redis)
+- [Configure SSDs to boost performance](#configure-SSDs-to-boost-performance)
+- [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
 
 ## Configure network access
 
