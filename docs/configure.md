@@ -240,30 +240,38 @@ find . -name "*PersistentVolumeClaim.yaml" -exec sh -c "cat {} | yj | jq '.spec.
 
 ## Configure gitserver replica count
 
-Increasing the `replica` count of the `gitserver` StatefulSet increases the scalability of your deployment. Repository clones are consistently striped across all `giterver` replicas, so other services need to be aware of how many `gitserver` replicas have been specified in order to know how to a resolve an individual repo.
+Repository clones are consistently striped across all `gitserver` replicas. Other services need to be aware of how many `gitserver` replicas exist so they can resolve an individual repo.
 
-Services that talk to `gitserver` are passed a list of `gitserver` addresses via the `SRC_GIT_SERVERS` environment variable. You'll need to update this environment variable for each deployment if you change `gitserver`'s `replica` count.
+To change the number of `gitserver` replicas:
 
-1. Get all the deployments which use `SRC_GIT_SERVERS`.
+1. Update the `replicas` field in [gitserver.StatefulSet.yaml](../base/gitserver/gitserver.StatefulSet.yaml).
+2. Update the `SRC_GIT_SERVERS` environment variable in all services to reflect the number of replicas.
 
-   ```bash
-   grep SRC_GIT_SERVERVS -l
+   For example, if there are 2 gitservers then `SRC_GIT_SERVERS` should have the value `gitserver-0.gitserver:3178 gitserver-1.gitserver:3178`.
+
+   ```yaml
+   - env:
+       - name: SRC_GIT_SERVERS
+         value: gitserver-0.gitserver:3178 gitserver-1.gitserver:3178
    ```
 
-2. For each one of those files, change the value of `SRC_GIT_SERVERS` to be a space separated list of addresses like the following:
+Here is a convenience script that performs both steps:
 
-   ```bash
-   # $REPLICA_COUNT = 1
-   gitserver-0.gitserver:3178
+```bash
+REPLICA_COUNT=2 # number of gitserver replicas
 
-   # $REPLICA_COUNT = 2
-   gitserver-0.gitserver:3178 gitserver-1.gitserver:3178
+# Update gitserver replica count
+cat $GS | yj | jq ".spec.replicas = \"$REPLICA_COUNT\"" | jy -o $GS
 
-   # ...
+# Compute all gitserver names
+GITSERVERS=$(for i in `seq 0 $(($REPLICA_COUNT-1))`; do echo -n "gitserver-$i.gitserver:3178 "; done)
 
-   # $REPLICA_COUNT = n
-   gitserver-0.gitserver:3178 gitserver-1.gitserver:3178 ... gitserver-${n-1}:3178
-   ```
+# Update SRC_GIT_SERVERS environment variable in other services
+find . -name "*yaml" -exec sed -i.sedibak -e "s/value: gitserver-0.gitserver:3178.*/value: $GITSERVERS/g" {} +
+
+# Delete sed's backup files
+find . -name "*.sedibak" -delete
+```
 
 ## Configure Lightstep tracing
 
