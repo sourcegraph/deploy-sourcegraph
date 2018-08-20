@@ -12,7 +12,8 @@ or [contact us](https://about.sourcegraph.com/contact/sales) for more informatio
 starting out, we recommend installing [Sourcegraph](https://about.sourcegraph.com/docs) on a single
 node first. Migrating to Data Center is easy when you're ready.
 
-- [Installation](docs/install.md)
+- [Installing](docs/install.md)
+- [Configuring](docs/configure.md)
 - [Updating](docs/update.md)
 - [Scaling](docs/scale.md)
 - [Troubleshooting](docs/troubleshoot.md)

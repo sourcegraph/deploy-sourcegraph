@@ -1,22 +1,24 @@
-# Configure
+# Configuring Sourcegraph
 
-Common customizations:
+Common:
 
 - [Configure network access](#configure-network-access)
 - [Update site configuration](#update-site-configuration)
-- [Configure TLS/SSL](#configure-TLS%2FSSL)
-- [Configure repository cloning via SSH](#configure-repository-cloning-via-SSH)
+- [Configure TLS/SSL](#configure-tls%2Fssl)
+- [Configure repository cloning via SSH](#configure-repository-cloning-via-ssh)
 - [Configure language servers](#configure-language-servers)
+- [Configure SSDs to boost performance](#configure-ssds-to-boost-performance)
 
-Other customizations:
+Other:
 
-- [Configure SSDs to boost performance](#configure-SSDs-to-boost-performance)
 - [Configure gitserver replica count](#configure-gitserver-replica-count)
 - [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
 - [Configure a storage class](#configure-a-storage-class)
 - [Configure Lightstep tracing](#configure-lightstep-tracing)
 - [Configure custom redis](#configure-custom-redis)
-- [Install without RBAC](#install-without-RBAC)
+- [Install without RBAC](#install-without-rbac)
+
+_Example scripts in this file depend on [yj](https://github.com/sourcegraph/yj) and [jy](https://github.com/sourcegraph/jy)._
 
 ## Configure network access
 

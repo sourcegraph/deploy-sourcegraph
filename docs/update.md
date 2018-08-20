@@ -1,4 +1,4 @@
-# Updating
+# Updating Sourcegraph
 
 > 🚨 If you are updating from a 2.10.x or previous deployment, follow the migration steps in [docs/migrate.md](docs/migrate.md) before updating.
 

@@ -1,4 +1,4 @@
-# Installation
+# Installing Sourcegraph
 
 > **Note:** Sourcegraph sends performance and usage data to Sourcegraph to help us make our product
 > better for you. The data sent does NOT include any source code or file data (including URLs that
@@ -13,7 +13,7 @@
 - Access to server infrastructure on which you can create a Kubernetes cluster (see
   [resource allocation guidelines](scale.md)).
 
-## Install
+## Steps
 
 1. [Provision a Kubernetes cluster](k8s.md) on the infrastructure of your choice.
 2. Make sure you have configured `kubectl` to [access your cluster](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
