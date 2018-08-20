@@ -10,13 +10,13 @@ Common customizations:
 
 Other customizations:
 
-- [Install without RBAC](#install-without-RBAC)
-- [Configure a storage class](#configure-a-storage-class)
+- [Configure SSDs to boost performance](#configure-SSDs-to-boost-performance)
 - [Configure gitserver replica count](#configure-gitserver-replica-count)
+- [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
+- [Configure a storage class](#configure-a-storage-class)
 - [Configure Lightstep tracing](#configure-lightstep-tracing)
 - [Configure custom redis](#configure-custom-redis)
-- [Configure SSDs to boost performance](#configure-SSDs-to-boost-performance)
-- [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
+- [Install without RBAC](#install-without-RBAC)
 
 ## Configure network access
 
@@ -224,19 +224,9 @@ After setting up the base Sourcegraph deployment, refer to the following docs fo
 - [Python](../configure/xlang/python/README.md)
 - [Javascript / Typescript](../configure/xlang/typescript/README.md)
 
-## Install without RBAC
+## Configure SSDs to boost performance
 
-Sourcegraph Data Center communicates with the Kubernetes API for service discovery. It also has some janitor DaemonSets that clean up temporary cache data. To do that we need to create RBAC resources.
-
-If using RBAC is not an option, then you will not want to apply `*.Role.yaml` and `*.RoleBinding.yaml` files.
-
-## Configure a storage class
-
-Sourcegraph relies on the default storage class of your cluster. If your cluster does not have a default storage class or if you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class.
-
-```bash
-find . -name "*PersistentVolumeClaim.yaml" -exec sh -c "cat {} | yj | jq '.spec.storageClassName = \"$STORAGE_CLASS_NAME\"' | jy -o {}" \;
-```
+See [ssd/README.md](../configure/ssd/README.md).
 
 ## Configure gitserver replica count
 
@@ -271,6 +261,18 @@ find . -name "*yaml" -exec sed -i.sedibak -e "s/value: gitserver-0.gitserver:317
 
 # Delete sed's backup files
 find . -name "*.sedibak" -delete
+```
+
+## Assign resource-hungry pods to larger nodes
+
+If you have a heterogeneous cluster where you need to ensure certain more resource-hungry pods are assigned to more powerful nodes (e.g. `indexedSearch`), you can [specify node constraints](https://kubernetes.io/docs/concepts/configuration/assign-pod-node) (such as `nodeSelector`, etc.).
+
+## Configure a storage class
+
+Sourcegraph relies on the default storage class of your cluster. If your cluster does not have a default storage class or if you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class.
+
+```bash
+find . -name "*PersistentVolumeClaim.yaml" -exec sh -c "cat {} | yj | jq '.spec.storageClassName = \"$STORAGE_CLASS_NAME\"' | jy -o {}" \;
 ```
 
 ## Configure Lightstep tracing
@@ -311,10 +313,8 @@ If you want to specify a custom Redis server, you'll need specify the correspond
 - `xlang-go`
 - `xlang-go-bg`
 
-## Configure SSDs to boost performance
+## Install without RBAC
 
-See [ssd/README.md](../configure/ssd/README.md).
+Sourcegraph Data Center communicates with the Kubernetes API for service discovery. It also has some janitor DaemonSets that clean up temporary cache data. To do that we need to create RBAC resources.
 
-## Assign resource-hungry pods to larger nodes
-
-If you have a heterogeneous cluster where you need to ensure certain more resource-hungry pods are assigned to more powerful nodes (e.g. `indexedSearch`), you can [specify node constraints](https://kubernetes.io/docs/concepts/configuration/assign-pod-node) (such as `nodeSelector`, etc.).
+If using RBAC is not an option, then you will not want to apply `*.Role.yaml` and `*.RoleBinding.yaml` files.
