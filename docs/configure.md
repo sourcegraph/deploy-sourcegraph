@@ -4,7 +4,7 @@ Common:
 
 - [Configure network access](#configure-network-access)
 - [Update site configuration](#update-site-configuration)
-- [Configure TLS/SSL](#configure-tls%2Fssl)
+- [Configure TLS/SSL](#configure-tlsssl)
 - [Configure repository cloning via SSH](#configure-repository-cloning-via-ssh)
 - [Configure language servers](#configure-language-servers)
 - [Configure SSDs to boost performance](#configure-ssds-to-boost-performance)
@@ -35,7 +35,7 @@ For production environments, we recommend using a [load balancer](https://kubern
   ```
   kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=80 --target-port=3080
   ```
-- HTTPS (requires you to [configure TLS/SSL](#Configure-TLS%2FSSL))
+- HTTPS (requires you to [configure TLS/SSL](#configure-tlsssl))
   ```
   kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=443 --target-port=3443
   ```
