@@ -1,58 +1,38 @@
 # SSDs
 
-Many parts of Sourcegraph's infrastructure benefit from using SSDs for caches. This is especially important for search / language server performance. By default, disk caches will use the Kubernetes `hostPath` and will be the same IO speed as the underlying node's disk. Even if the node's default disk is a SSD, however, it is likely network-mounted rather than local.
+Using local SSDs dramatically speeds up many of Sourcegraph's services. Read your cloud provider's documentation for mouting local SSDs.
 
-## Using SSDs with Deployments
+- [GCP](https://cloud.google.com/compute/docs/disks/local-ssd)
+- [AWS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ssd-instance-store.html)
 
-The deployments that refer to the `cache-ssd` volume are capable of using SSDs to boost their performance. Some cloud providers optionally mount local SSDs. If you mount local SSDs on your nodes, you can change the `cache-ssd` volume from:
+If you mount local SSDs on your nodes:
 
-```yaml
- volumes:
-    ...
+1. Change the `cache-ssd` volume to point to the absolute path of the SSD on each node.
 
-    - emptyDir: {}
-    name: cache-ssd
+   For example, GCP mounts the first SSD disk to `/mnt/disks/ssd0`, so the `cache-ssd` volume would be configured like this:
+
+   ```yaml
+   volumes:
+     - hostPath:
+         path: /mnt/disks/ssd0/pod-tmp
+       name: cache-ssd
+   ```
+
+2. Deploy the provided `pod-tmp-gc` [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) to periodically clean up files in the SSD on each node. This is necessary because files on the SSDs are not automatically cleaned up if pods crash or are rescheduled which can cause the SSDs to fill up.
+
+Here is a convenience script:
+
+```bash
+SSD_NODE_PATH=/mnt/disks/ssd0 # update this to reflect the absolute path where SSDs are mounted on each node
+
+# Mount the SSDs path in each deployment
+find . -name "*Deployment.yaml" -exec sh -c "cat {} | yj | jq '(.spec.template.spec.volumes | select(. != null) | .[] | select(.name == \"cache-ssd\")) |= (del(.emptyDir) + {hostPath: {path: \"$SSD_NODE_PATH/pod-tmp\"}})' | jy -o {}" \;
+
+# Update pod-tmp-gc.DaemonSet.yaml with SSD_NODE_PATH
+DS=configure/ssd/pod-tmp-gc.DaemonSet.yaml
+cat $DS | yj | jq ".spec.template.spec.volumes = [{name: \"pod-tmp\", hostPath: {path: \"$SSD_NODE_PATH/pod-tmp\"}}]" | jy -o $DS
+
+# Deploy everything
+kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+kubectl apply --prune -l deploy=pod-tmp-gc -f configure/ssd --recursive
 ```
-
-to:
-
-```yaml
- volumes:
-    ...
-
-    - hostPath:
-        path: ${SSD_MOUNT_PATH}/pod-tmp
-    name: cache-ssd
-```
-
-Replace `${SSD_MOUNT_PATH}` with the absolute directory path on the node where the local SSD is mounted.
-
-For example, on Google Cloud Platform, add Local SSDs to the nodes running the searcher pods. Then change the following fields in your deployment :
-
-```yaml
- volumes:
-    ...
-
-    - hostPath:
-        path: /mnt/disks/ssd0/pod-tmp
-    name: cache-ssd
-```
-
-## `pod-tmp-gc`
-
-Sometimes, the pods that access the SSD aren't able to clean up after themselves. This can
-lead to filling up the disk. We offer a [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) `pod-tmp-gc` that runs on each node and periodically cleans up those files.
-
-You can deploy it to your cluster by:
-
-1. Replacing `${SSD_MOUNT_PATH}` in [`pod-tmp-gc.DaemonSet.yaml`](pod-tmp-gc/pod-tmp-gc.DaemonSet.yaml) with with the absolute directory path on the node where the local SSD is mounted.
-
-For example you'd specify the following for a cluster running on GCP:
-
-```yaml
-volumeMounts:
-  - mountPath: /mnt/disks/ssd0/pod-tmp
-    name: pod-tmp
-```
-
-2. Runnning `kubectl apply -R -f ./pod-tmp-gc/` to deploy it to your cluster
