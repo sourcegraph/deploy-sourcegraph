@@ -149,6 +149,7 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
    Convenience script:
 
    ```bash
+   # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
    FE=base/frontend/sourcegraph-frontend.Deployment.yaml
    cat $FE | yj | jq '(.spec.template.spec.containers[] | select(.name == "frontend") | .env) += [{name: "TLS_CERT", valueFrom: {secretKeyRef: {key: "cert", name: "tls"}}}, {name: "TLS_KEY", valueFrom: {secretKeyRef: {key: "key", name: "tls"}}}]' | jy -o $FE
    ```
@@ -198,6 +199,7 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
    Convenience script:
 
    ```bash
+   # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
    GS=base/gitserver/gitserver.StatefulSet.yaml
    cat $GS | yj | jq '.spec.template.spec.containers[].volumeMounts += [{mountPath: "/root/.ssh", name: "ssh"}]' | jy -o $GS
    cat $GS | yj | jq '.spec.template.spec.volumes += [{name: "ssh", secret: {defaultMode: 384, secretName:"gitserver-ssh"}}]' | jy -o $GS
@@ -247,6 +249,8 @@ To change the number of `gitserver` replicas:
 Here is a convenience script that performs both steps:
 
 ```bash
+# This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
+
 REPLICA_COUNT=2 # number of gitserver replicas
 
 # Update gitserver replica count
@@ -271,6 +275,7 @@ If you have a heterogeneous cluster where you need to ensure certain more resour
 Sourcegraph relies on the default storage class of your cluster. If your cluster does not have a default storage class or if you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class.
 
 ```bash
+# This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
 find . -name "*PersistentVolumeClaim.yaml" -exec sh -c "cat {} | yj | jq '.spec.storageClassName = \"$STORAGE_CLASS_NAME\"' | jy -o {}" \;
 ```
 

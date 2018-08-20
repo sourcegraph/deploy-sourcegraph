@@ -23,6 +23,8 @@ If you mount local SSDs on your nodes:
 Here is a convenience script:
 
 ```bash
+# This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
+
 SSD_NODE_PATH=/mnt/disks/ssd0 # update this to reflect the absolute path where SSDs are mounted on each node
 
 # Mount the SSDs path in each deployment
