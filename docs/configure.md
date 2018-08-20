@@ -83,7 +83,7 @@ Sourcegraph should then be accessible at `$EXTERNAL_ADDR:30080` and/or `$EXTERNA
 ## Update site configuration
 
 The site configuration is stored inside a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume), which is mounted inside every deployment that needs it. You can change the site configuration by editing
-[`base/config-file.ConfigMap.yaml`](../base/config-file.ConfigMap.yaml).
+[base/config-file.ConfigMap.yaml](../base/config-file.ConfigMap.yaml).
 
 Updates to the site configuration are [eventually propogated](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically) to all services, but it take on the order of 1 minute. [Future Kubernetes versions may improve this behavior](https://github.com/kubernetes/kubernetes/pull/64752).
 
@@ -121,9 +121,7 @@ Recommended steps:
 
 ## Configure TLS/SSL
 
-If you intend to make your Sourcegraph instance accessible on the Internet or another untrusted network, you should use TLS so that all traffic will be served over HTTPS. You can configure Sourcegraph to use TLS by providing the `TLS_CERT` and `TLS_KEY` environment variables variables to the `sourcegraph-frontend` deployment.
-
-### Steps
+If you intend to make your Sourcegraph instance accessible on the Internet or another untrusted network, you should use TLS so that all traffic will be served over HTTPS.
 
 1. Create a [secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains your TLS certificate and private key.
 
@@ -131,7 +129,7 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
     kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY
    ```
 
-2. Add the `TLS_CERT` and `TLS_KEY` environment variables to `sourcegraph-frontend.Deployment.yaml`.
+2. Add the `TLS_CERT` and `TLS_KEY` environment variables to [base/frontend/sourcegraph-frontend.Deployment.yaml](../base/frontend/sourcegraph-frontend.Deployment.yaml).
 
    ```yaml
    # base/frontend/sourcegraph-frontend.Deployment.yaml
@@ -170,8 +168,6 @@ _You'll need to [update the site configuration](#update-site-configuration) so t
 ## Configure repository cloning via SSH
 
 Sourcegraph will clone repositories using SSH credentials if they are mounted at `/root/.ssh` in the `gitserver` deployment.
-
-### Steps
 
 1. [Create a secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains the base64 encoded contents of your SSH private key (_make sure it doesn't require a password_) and known_hosts file.
 
