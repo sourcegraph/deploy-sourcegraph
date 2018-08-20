@@ -15,7 +15,8 @@ Other:
 - [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
 - [Configure a storage class](#configure-a-storage-class)
 - [Configure Lightstep tracing](#configure-lightstep-tracing)
-- [Configure custom redis](#configure-custom-redis)
+- [Configure custom Redis](#configure-custom-redis)
+- [Configure custom PostgreSQL](#configure-custom-redis)
 - [Install without RBAC](#install-without-rbac)
 
 _Example scripts in this file depend on [yj](https://github.com/sourcegraph/yj) and [jy](https://github.com/sourcegraph/jy)._
@@ -314,6 +315,12 @@ If you want to specify a custom Redis server, you'll need specify the correspond
 - `repo-updater`
 - `xlang-go`
 - `xlang-go-bg`
+
+## Configure custom PostgreSQL
+
+You may prefer to configure Sourcegraph to store data in an external PostgreSQL instance if you already have existing database management or backup infrastructure.
+
+Simply edit the relevant PostgreSQL environment variables (e.g. PGHOST, PGPORT, PGUSER, [etc.](http://www.postgresql.org/docs/current/static/libpq-envars.html)) in [base/frontend/sourcegraph-frontend.Deployment.yaml](../base/frontend/sourcegraph-frontend.Deployment.yaml) to point to your existing PostgreSQL instance.
 
 ## Install without RBAC
 
