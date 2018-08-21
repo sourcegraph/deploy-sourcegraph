@@ -77,3 +77,6 @@ Our new approach is simpler and more flexible.
 ### Steps
 
 TODO(nick,geoffrey)
+
+- uninstall tiller (or if you want to keep using tiller)
+- old cluster services doesn't have `deploy: sourcegraph` labels
