@@ -3,6 +3,7 @@ kind: Service
 metadata:
   labels:
     type: gitserver
+    deploy: sourcegraph
   name: gitserver
 spec:
   clusterIP: None
@@ -24,6 +25,7 @@ metadata:
     prometheus.io/port: "6060"
     prometheus.io/scrape: "true"
   labels:
+    deploy: sourcegraph
     app: gitserver-{{ add1 $gitserverIndex }}
   name: gitserver-{{ add1 $gitserverIndex }}
 spec:
