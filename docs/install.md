@@ -8,8 +8,7 @@
 ## Requirements
 
 - [Kubernetes](https://kubernetes.io/) v1.8.7 or later
-- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) v1.10.0 or later
-  - At the time of writing, `gcloud` bundles `kubectl` 1.9.7, so you will want to install `kubectl` separately.
+- [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) v1.9.7 or later
 - Access to server infrastructure on which you can create a Kubernetes cluster (see
   [resource allocation guidelines](scale.md)).
 
@@ -35,9 +34,18 @@
 5. Once the deployment completes, verify Sourcegraph works:
 
    - Setup port forwarding to the frontend
+
+     ```bash
+     POD=$(kubectl get pod -l app=sourcegraph-frontend -o template --template="{{(index .items 0).metadata.name}}")
+     kubectl port-forward $POD 3080
+     ```
+
+     kubectl 1.10.0 or later:
+
      ```
      kubectl port-forward svc/sourcegraph-frontend 30080
      ```
+
    - Open http://localhost:30080 in your browser and you will see a setup page.
 
 6. [Configure your deployment](configure.md).
