@@ -37,7 +37,7 @@
 
      ```bash
      POD=$(kubectl get pod -l app=sourcegraph-frontend -o template --template="{{(index .items 0).metadata.name}}")
-     kubectl port-forward $POD 3080
+     kubectl port-forward $POD 30080:3080
      ```
 
      kubectl 1.10.0 or later:
