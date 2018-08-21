@@ -80,3 +80,4 @@ TODO(nick,geoffrey)
 
 - uninstall tiller (or if you want to keep using tiller)
 - old cluster services doesn't have `deploy: sourcegraph` labels
+- https://github.com/sourcegraph/sourcegraph/issues/12810#issuecomment-414776591
