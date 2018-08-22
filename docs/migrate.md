@@ -76,8 +76,40 @@ Our new approach is simpler and more flexible.
 
 ### Steps
 
+1. Set the reclaim policy for your existing deployments to `retained`.
+
+   ```bash
+   kubectl get pv -o json | jq --raw-output  ".items | map(select(.spec.claimRef.name)) | .[] | \"kubectl patch pv -p '{\\\"spec\\\":{\\\"persistentVolumeReclaimPolicy\\\":\\\"Retain\\\"}}' \\(.metadata.name)\"" | bash
+   ```
+
+2. (**Downtime starts here**) Delete the `sourcegraph` release from your cluster.
+
+   ```bash
+   helm del --purge sourcegraph
+   ```
+
+3. Remove `tiller` from your cluster
+
+   ```bash
+   helm reset
+   ```
+
+4. Update the old persistent volumes so they can be reused by the new deployment
+
+   ```bash
+   # mark all persistent volumes as claimable by the new deployments
+
+   kubectl get pv -o json | jq --raw-output ".items | map(select(.spec.claimRef.name)) | .[] | \"kubectl patch pv -p '{\\\"spec\\\":{\\\"claimRef\\\":{\\\"uid\\\":null}}}' \\(.metadata.name)\"" | bash
+
+   # rename the `gitserver` persistent volumes so that the new `gitserver` stateful set can re-use it
+
+   kubectl get pv -o json | jq --raw-output ".items | map(select(.spec.claimRef.name | contains(\"gitserver-\"))) | .[] | \"kubectl patch pv -p '{\\\"spec\\\":{\\\"claimRef\\\":{\\\"name\\\":\\\"repos-gitserver-\\(.spec.claimRef.name | ltrimstr(\"gitserver-\") | tonumber - 1)\\\"}}}' \\(.metadata.name)\""  | bash
+   ```
+
+5. Proceed with the normal [installation steps](install.md).
+
+   **Downtime ends once installation is complete**
+
 TODO(nick,geoffrey)
 
-- uninstall tiller (or if you want to keep using tiller)
-- old cluster services doesn't have `deploy: sourcegraph` labels
 - https://github.com/sourcegraph/sourcegraph/issues/12810#issuecomment-414776591
