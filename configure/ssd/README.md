@@ -7,7 +7,7 @@ Using local SSDs dramatically speeds up many of Sourcegraph's services. Read you
 
 If you mount local SSDs on your nodes:
 
-1. Change the `cache-ssd` volume to point to the absolute path of the SSD on each node.
+1. Change the `cache-ssd` volume to point to `${SSD_NODE_PATH}/pod-tmp` where `${SSD_NODE_PATH}` is the absolute path of the SSD on each node.
 
    For example, GCP mounts the first SSD disk to `/mnt/disks/ssd0`, so the `cache-ssd` volume would be configured like this:
 
