@@ -72,7 +72,7 @@ Our new approach is simpler and more flexible.
 
 ### Java Language Server
 
-If you were previously configuring Gradle and Articfactory for the Java Language Server, you'll now need to set those options via environment variables instead of just the site configuration. The [`xlang-java` `README.md`](../configure/xlang/java/README.md#Gradle-and-Aritfactory-configuration) contains information about the environment variables that you'll need to set.
+If you were previously configuring Gradle and Articfactory for the Java Language Server, you'll now need to set those options via environment variables instead of just the site configuration. [configure/xlang/java/README.md](../configure/xlang/java/README.md#Gradle-and-Aritfactory-configuration) contains information about the environment variables that you'll need to set.
 
 TODO(nick,geoffrey)
 
