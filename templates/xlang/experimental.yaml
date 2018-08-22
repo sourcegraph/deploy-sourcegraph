@@ -13,6 +13,7 @@ kind: Service
 metadata:
   labels:
     app: xlang-{{ $langserver.language }}
+    deploy: sourcegraph
   name: xlang-{{ $langserver.language }}
 spec:
   ports:
@@ -30,6 +31,8 @@ kind: Deployment
 metadata:
   annotations:
     description: LSP server for {{ $langserver.language }} (used for live requests).
+  labels:
+    deploy: sourcegraph
   name: xlang-{{ $langserver.language }}
 spec:
   minReadySeconds: 10

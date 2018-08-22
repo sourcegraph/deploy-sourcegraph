@@ -5,6 +5,7 @@ kind: Service
 metadata:
   labels:
     app: xlang-html
+    deploy: sourcegraph
   name: xlang-html
 spec:
   ports:
@@ -22,6 +23,8 @@ kind: Deployment
 metadata:
   annotations:
     description: LSP server for html (used for live requests).
+  labels:
+    deploy: sourcegraph
   name: xlang-html
 spec:
   minReadySeconds: 10

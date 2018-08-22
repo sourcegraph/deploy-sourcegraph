@@ -8,6 +8,8 @@ kind: PersistentVolumeClaim
 metadata:
   annotations:
     volume.beta.kubernetes.io/storage-class: {{ $global.Values.cluster.storageClass.name }}
+  labels:   
+    deploy: sourcegraph
   name: gitserver-{{ add1 $gitserverIndex }}
 spec:
   accessModes:
