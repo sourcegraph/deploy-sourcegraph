@@ -166,7 +166,7 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
    }
    ```
 
-_You'll need to [update the site configuration](#update-site-configuration) so that all your deployments will see the updated site configuration._
+   _You'll need to [update the site configuration](#update-site-configuration) so that all your deployments will see the updated site configuration._
 
 4. Refer to the [Configure network access](#Configure-network-access) section to make sure that `sourcegraph-frontend`'s port `3443` is properly exposed.
 
