@@ -5,53 +5,11 @@ Two things have changed in 2.11.x that require migration:
 - Gitserver is now configured using [StatefulSet](#StatefulSet-migration).
 - We have a [new deployment strategy](#Deployment-migration).
 
-## Defering migration
+## Deferring migration
 
 If you want to update to 2.11.x without performing any migrations, you can use 2.11.x-no-migration tags.
 
-2.12.x will require both migrations.
-
-## StatefulSet migration
-
-`gitserver`'s configuration has been migrated to use [StatefulSet](https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/) instead of having multiple deployments and associated services.
-
-In order be able to re-use your existing `gitserver`'s persistent volumes with [StatefulSet](https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/) (so that you can avoid re-cloning existing repositories), you will need to run the following manual steps before upgrading to 2.11.x ([click here to read more about why this is necessary](https://github.com/kubernetes/kubernetes/issues/48609#issuecomment-314066616)):
-
-_Note that these steps will cause a small amount of unavoidable downtime._
-
-_The following steps assume that you have [jq](https://stedolan.github.io/jq/) installed._
-
-1. Set the reclaim policy for your existing `gitserver` deployments to `retained`
-
-   ```bash
-   kubectl get pv -o json | jq --raw-output  ".items | map(select(.spec.claimRef.name | contains(\"gitserver-\"))) | .[] | \"kubectl patch pv -p '{\\\"spec\\\":{\\\"persistentVolumeReclaimPolicy\\\":\\\"Retain\\\"}}' \\(.metadata.name)\"" | bash
-   ```
-
-2. **Downtime starts here**
-
-   Delete the `gitserver` deployment
-
-   ```bash
-   kubectl delete deploy -l type=gitserver
-   ```
-
-3. Delete the old `gitserver`'s persistent volume claims
-
-   ```bash
-   kubectl get pvc -o json | jq --raw-output ".items | map(select(.metadata.name | contains(\"gitserver-\"))) | .[] | \"kubectl delete pvc \\(.metadata.name)\"" | bash
-   ```
-
-4. Update `gitserver` persistent volumes so they can be reused by the new StatefulSet
-
-   This step transforms the the old `claimRef.name`s that looked like `gitserver-1, gitserver-2, ...` into `repos-gitserver-0, repos-gitserver-1, ...`.
-
-   ```bash
-   kubectl get pv -o json | jq --raw-output ".items | map(select(.spec.claimRef.name | contains(\"gitserver-\"))) | .[] | \"kubectl patch pv -p '{\\\"spec\\\":{\\\"claimRef\\\":{\\\"uid\\\":null,\\\"name\\\":\\\"repos-gitserver-\\(.spec.claimRef.name | ltrimstr(\"gitserver-\") | tonumber - 1)\\\"}}}' \\(.metadata.name)\"" | bash
-   ```
-
-5. Proceed with the normal [update steps](update.md).
-
-   **Downtime ends once upgrade is complete**
+2.12.x will require this migration.
 
 ## Deployment migration
 
