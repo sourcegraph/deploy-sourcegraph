@@ -19,7 +19,12 @@ Other:
 - [Configure custom PostgreSQL](#configure-custom-redis)
 - [Install without RBAC](#install-without-rbac)
 
-_Example scripts in this file depend on [yj](https://github.com/sourcegraph/yj) and [jy](https://github.com/sourcegraph/jy)._
+_We provide example scripts in this file for some of these customizations. They use the following basic utilities:_
+
+- [`jq`](https://stedolan.github.io/jq/) - _like [`sed`](https://en.wikipedia.org/wiki/Sed) for JSON data_
+- [`yj`](https://github.com/sourcegraph/yj), [`jy`](https://github.com/sourcegraph/jy) - _converts YAML to JSON and vice versa for [`jq`](https://stedolan.github.io/jq/)_
+- [`find`](<https://en.wikipedia.org/wiki/Find_(Unix)>)
+- [`cat`](<https://en.wikipedia.org/wiki/Cat_(Unix)>)
 
 ## Configure network access
 
