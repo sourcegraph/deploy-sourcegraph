@@ -229,6 +229,22 @@ After setting up the base Sourcegraph deployment, refer to the following docs fo
 - [Python](../configure/xlang/python/README.md)
 - [Javascript / Typescript](../configure/xlang/typescript/README.md)
 
+We also have the following experimental language servers (please [read about the caveats](https://about.sourcegraph.com/docs/code-intelligence/experimental-language-servers/#caveats-of-experimental-language-servers) before enabling them):
+
+- [Bash](../configure/xlang/experimental/bash/README.md)
+- [Clojure](../configure/xlang/experimental/clojure/README.md)
+- [C++](../configure/xlang/experimental/cpp/README.md)
+- [C#](../configure/xlang/experimental/cs/README.md)
+- [CSS](../configure/xlang/experimental/css/README.md)
+- [Dockerfile](../configure/xlang/experimental/dockerfile/README.md)
+- [Elixir](../configure/xlang/experimental/elixir/README.md)
+- [HTML](../configure/xlang/experimental/html/README.md)
+- [Lua](../configure/xlang/experimental/lua/README.md)
+- [OCaml](../configure/xlang/experimental/ocaml/README.md)
+- [R](../configure/xlang/experimental/r/README.md)
+- [Ruby](../configure/xlang/experimental/ruby/README.md)
+- [Rust](../configure/xlang/experimental/rust/README.md)
+
 ## Configure SSDs to boost performance
 
 See [ssd/README.md](../configure/ssd/README.md).
