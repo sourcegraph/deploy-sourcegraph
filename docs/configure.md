@@ -1,5 +1,11 @@
 # Configuring Sourcegraph
 
+Sourcegraph's base configuration is pure yaml that can be deployed directly to a Kubernetes cluster. This document describes how to configure the base yaml in common ways. We provide example scripts, but you can configure the base yaml using whatever process best for you (Git ops, [Kustomize](https://github.com/kubernetes-sigs/kustomize), custom scripts, etc.).
+
+Example scripts in this file depend on [jq](https://stedolan.github.io/jq/), [yj](https://github.com/sourcegraph/yj) and [jy](https://github.com/sourcegraph/jy).
+
+## Index
+
 Common:
 
 - [Configure network access](#configure-network-access)
@@ -18,10 +24,6 @@ Other:
 - [Configure custom Redis](#configure-custom-redis)
 - [Configure custom PostgreSQL](#configure-custom-redis)
 - [Install without RBAC](#install-without-rbac)
-
-_Sourcegraph's base configuration is pure yaml that can be deployed directly to a cluster. You are free to customize it, and we provide documentation and example recipes/scripts for how to do so here. You can configure our base yaml using whatever process best for you (Git ops, [Kustomize](https://github.com/kubernetes-sigs/kustomize), custom scripts, etc.)_
-
-_Example scripts in this file depend on [jq](https://stedolan.github.io/jq/), [yj](https://github.com/sourcegraph/yj) and [jy](https://github.com/sourcegraph/jy)._
 
 ## Configure network access
 
