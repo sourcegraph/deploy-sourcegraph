@@ -34,6 +34,9 @@ You can enable it by:
 The `xlang-java` and `xlang-java-bg` deployments support configuring Gradle and Artifactory via the following environment variables:
 
 ```yaml
+# configure/xlang/java/xlang-java.Deployment.yaml
+# configure/xlang/java/xlang-java-bg.Deployment.yaml
+
 env:
   # A comma-delimited list of patterns that selects repository revisions
   # for which to execute Gradle scripts,rather than extracting Gradle metadata statically.
