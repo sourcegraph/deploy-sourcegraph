@@ -5,7 +5,7 @@
 1.  Apply the Jaeger services to your cluster.
 
     ```bash
-    kubectl apply --prune -l deploy=sourcegraph -f configure/jaeger --recursive
+    kubectl apply --prune -l deploy=jaeger -f configure/jaeger --recursive
     ```
 
 2.  Add the Jager collector agent to supported services.
