@@ -291,18 +291,9 @@ Then navigate to http://localhost:16686.
 
 ### Lightstep
 
-Lightstep is a closed-source distributed tracing and performance monitoring tool created by some of the authors of
-Dapper.
+Lightstep is a closed-source distributed tracing and performance monitoring tool created by some of the authors of Dapper.
 
-To enable, you must first purchase Lightstep and create a project corresponding to the Sourcegraph instance. Then add
-the following to `values.yaml`:
-
-```
-site: {
-  "lightstepAccessToken": "${LIGHTSTEP_TOKEN}",
-  "lightstepProject": "${LIGHTSTEP_PROJECT}",
-}
-```
+Follow the [steps to deploy Lightstep](../configure/configure.md#configure-lightstep-tracing).
 
 ## Snapshots
 
