@@ -319,7 +319,7 @@ env:
 
   # https://about.sourcegraph.com/docs/config/site/#lightstepaccesstoken-string
   - name: LIGHTSTEP_ACCESS_TOKEN
-    value: M3WKBuqsCnRYz1c
+    value: abcdefg
 
   # If false, any logs (https://github.com/opentracing/specification/blob/master/specification.md#log-structured-data)
   # from spans will be omitted from the spans sent to Lightstep.
