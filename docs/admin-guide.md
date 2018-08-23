@@ -4,8 +4,6 @@ This guide is intended for system administrators and operations engineers who ar
 Sourcegraph Data Center installation. Each section covers a topic or tool that may be helpful in managing a Data Center
 cluster.
 
----
-
 ## Debugging
 
 The following commands are useful to gain visibility into cluster status.
