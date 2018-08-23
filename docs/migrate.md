@@ -17,10 +17,10 @@ These steps will uninstall Sourcegraph from your cluster while preserving your d
 
 **Please read through all instructions first before starting the migration so you know what is involved**
 
-1. Make a backup of the yaml deployed to your cluster
+1. Make a backup of the yaml deployed to your cluster.
 
    ```bash
-
+   kubectl get all --export -o yaml > backup.yaml
    ```
 
 2. Set the reclaim policy for your existing deployments to `retained`.
