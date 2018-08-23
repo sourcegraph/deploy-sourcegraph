@@ -1,6 +1,6 @@
 # Jaeger
 
-[Jaeger](https://github.com/jaegertracing/jaeger) is a request tracing system that can runs inside of the Kubernetes cluster.
+[Jaeger](https://github.com/jaegertracing/jaeger) is an open-source request tracing system that can run inside of your Kubernetes cluster.
 
 1.  Apply the Jaeger services to your cluster.
 

@@ -68,40 +68,8 @@ Distributed tracing tools are useful when debugging performance issues such as h
 [OpenTracing standard](http://opentracing.io/) and can be made to work with any tracing tool that satisfies that
 standard. Currently, two tracing tools are supported by Sourcegraph configuration:
 
-- [Lightstep](https://lightstep.com/)
-- [Jaeger](http://jaegertracing.io/)
-
----
-
-### Jaeger
-
-Jaeger is an open-source distributed tracing system created by Uber that was inspired by Dapper and OpenZipkin. Follow the [steps to deploy Jaeger](../configure/jaeger/README.md).
-
-After applying the config change, some additional manual setup is required to initialize the Jaeger Cassandra DB:
-
-- Clone https://github.com/jaegertracing/jaeger.
-- Install [cqlsh](http://cassandra.apache.org/doc/latest/tools/cqlsh.html).
-- Forward port 9042:
-  ```bash
-  kubectl port-forward $(kubectl get pods -l app=jaeger-cassandra -o jsonpath='{.items[0].metadata.name}') 9042
-  ```
-- In the root directory of the jaeger repositiory, run `env MODE=test sh ./plugin/storage/cassandra/schema/create.sh | cqlsh`
-
-To access the Jaeger UI, forward port 16686:
-
-```bash
-kubectl port-forward $(kubectl get pods -l app=jaeger-query -o jsonpath='{.items[0].metadata.name}') 16686
-```
-
-Then navigate to http://localhost:16686.
-
----
-
-### Lightstep
-
-Lightstep is a closed-source distributed tracing and performance monitoring tool created by some of the authors of Dapper.
-
-Follow the [steps to deploy Lightstep](../configure/configure.md#configure-lightstep-tracing).
+- [Lightstep](../configure/configure.md#configure-lightstep-tracing)
+- [Jaeger](../configure/jaeger/README.md)
 
 ## Snapshots
 
