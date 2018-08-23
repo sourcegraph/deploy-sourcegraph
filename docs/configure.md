@@ -50,10 +50,6 @@ Once the load balancer has acquired an external IP address, you should be able t
 kubectl get service sourcegraph-frontend-loadbalancer -o=custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip
 ```
 
-### Ingress controller
-
-You can also potentially use an [Ingress controller](https://kubernetes.io/docs/concepts/services-networking/ingress/). We haven't tested this.
-
 ### Network rule
 
 You can expose Kubernetes nodes directly to avoid provisioning/paying for a load balancer, but you probably need to pay for a static IP, and honestly you probably want a load balancer anyway.
@@ -83,6 +79,10 @@ Add a network rule that allows ingress traffic to port 30080 (HTTP) and/or 30081
 * [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html).
 
 Sourcegraph should then be accessible at `$EXTERNAL_ADDR:30080` and/or `$EXTERNAL_ADDR:30081`, where `$EXTERNAL_ADDR` is the address of _any_ node in the cluster.
+
+### Ingress controller
+
+You can also use an [Ingress controller](https://kubernetes.io/docs/concepts/services-networking/ingress/).
 
 ## Update site configuration
 
