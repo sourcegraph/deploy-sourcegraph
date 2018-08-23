@@ -68,7 +68,7 @@ Our new approach is simpler and more flexible.
 
    **Downtime ends once installation is complete**
 
-Note that Sourcegraph's base deployment doesn't come with services such as language servers, Jager, and Prometheus set up by default. If you'd like to use these services, see: (docs/configure.md)[configure.md#Index] for instructions.
+Note that Sourcegraph's base deployment doesn't come with services such as language servers, Jager, and Prometheus set up by default. If you'd like to use these services, see: [docs/configure.md](configure.md#Index) for instructions.
 
 ## Assorted Notes
 
