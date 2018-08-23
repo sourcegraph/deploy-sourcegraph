@@ -30,14 +30,6 @@ Less frequently used commands:
   Check that a storage class named "default" exists via `kubectl get storageclass`. If one does exist, run `kubectl get storageclass default -o=yaml` and verify that the zone indicated in the output matches the zone of your cluster.
   Google Cloud Platform users may need to [request an increase in storage quota](https://cloud.google.com/compute/quotas).
 
-- `Error: release sourcegraph failed: namespaces "default" is forbidden: User "system:serviceaccount:kube-system:default" cannot get namespaces in the namespace "default": Unknown user "system:serviceaccount:kube-system:default"`. Ensure you have created the RBAC resources and helm is using them. A common reason for it to fail is you are already using Helm, so `helm init --service-account tiller` does not work correctly. To fix this for your existing Helm installation, run:
-
-  ```bash
-  kubectl apply -f https://about.sourcegraph.com/k8s/rbac-config.yml
-  kubectl patch deploy --namespace kube-system tiller-deploy -p '{"spec":{"template":{"spec":{"serviceAccount":"tiller"}}}}'
-  helm init --service-account tiller --upgrade
-  ```
-
 - Many pods are stuck in Pending status. Use `kubectl cluster-info dump > dump.txt` to obtain a dump of
   the logs. One thing to check for is insufficient resources:
 
