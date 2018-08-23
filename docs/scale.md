@@ -134,15 +134,4 @@ Kubernetes cluster, based on the number of users in your organization:
 
 ## Using heterogeneous node pools with `nodeSelector`
 
-If you're using multiple node pools in your Kubernetes cluster with different underlying node types,
-you can use
-[node constraints such as `nodeSelector`](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/)
-to ensure that the cluster schedules pods on the most appropriate nodes.
-
-This is useful if, for example, you have a very large monorepo that performs best when `gitserver`
-and `searcher` are on very large nodes, but you want to use smaller nodes for
-`sourcegraph-frontend`, `repo-updater`, etc. Node constraints can also be useful to ensure fast
-updates by ensuring certain pods are assigned to specific nodes, preventing the need for manual pod
-shuffling.
-
-See [the official documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) for instructions about applying node constraints.
+See ["Assign resource-hungry pods to larger nodes" in docs/configure.md](configure.md#Assign-resource-hungry-pods-to-larger-nodes).

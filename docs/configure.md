@@ -290,6 +290,14 @@ find . -name "*.sedibak" -delete
 
 If you have a heterogeneous cluster where you need to ensure certain more resource-hungry pods are assigned to more powerful nodes (e.g. `indexedSearch`), you can [specify node constraints](https://kubernetes.io/docs/concepts/configuration/assign-pod-node) (such as `nodeSelector`, etc.).
 
+This is useful if, for example, you have a very large monorepo that performs best when `gitserver`
+and `searcher` are on very large nodes, but you want to use smaller nodes for
+`sourcegraph-frontend`, `repo-updater`, etc. Node constraints can also be useful to ensure fast
+updates by ensuring certain pods are assigned to specific nodes, preventing the need for manual pod
+shuffling.
+
+See [the official documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) for instructions about applying node constraints.
+
 ## Configure a storage class
 
 Sourcegraph relies on the default storage class of your cluster. If your cluster does not have a default storage class or if you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class.
