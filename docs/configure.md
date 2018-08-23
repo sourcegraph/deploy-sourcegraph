@@ -13,13 +13,16 @@ Common:
 - [Configure TLS/SSL](#configure-tlsssl)
 - [Configure repository cloning via SSH](#configure-repository-cloning-via-ssh)
 - [Configure language servers](#configure-language-servers)
-- [Configure SSDs to boost performance](#configure-ssds-to-boost-performance)
+- [Configure SSDs to boost performance](../configure/ssd/README.md).
 
 Other:
 
 - [Configure gitserver replica count](#configure-gitserver-replica-count)
 - [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
 - [Configure a storage class](#configure-a-storage-class)
+- [Configure Prometheus](../configure/prometheus/README.md)
+  - [Configure Alertmanager](../configure/prometheus/alertmanager/README.md)
+- [Configure Jaeger tracing](../configure/jaeger/README.md)
 - [Configure Lightstep tracing](#configure-lightstep-tracing)
 - [Configure custom Redis](#configure-custom-redis)
 - [Configure custom PostgreSQL](#configure-custom-redis)
@@ -244,10 +247,6 @@ We also have the following experimental language servers (please [read about the
 - [R](../configure/xlang/experimental/r/README.md)
 - [Ruby](../configure/xlang/experimental/ruby/README.md)
 - [Rust](../configure/xlang/experimental/rust/README.md)
-
-## Configure SSDs to boost performance
-
-See [ssd/README.md](../configure/ssd/README.md).
 
 ## Configure gitserver replica count
 
