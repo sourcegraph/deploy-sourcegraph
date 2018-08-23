@@ -2,8 +2,8 @@
 
 Two things have changed in 2.11.x that require migration:
 
-- Gitserver is now configured using [StatefulSet](#StatefulSet-migration).
-- We have a [new deployment strategy](#Deployment-migration).
+- Gitserver is now configured using [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).
+- We have [a new deployment strategy](#why-is-there-a-new-deployment-strategy).
 
 ## Deferring migration
 
@@ -11,48 +11,37 @@ If you want to update to 2.11.x without performing any migrations, you can use 2
 
 2.12.x will require this migration.
 
-## Deployment migration
+## Migrating
 
-### The old way
+These steps will uninstall Sourcegraph from your cluster while preserving your data. Then you will be able to deploy Sourcegraph using the new process. If you would like help with this process, please reach out to support@sourcegraph.com.
 
-2.10.x and prior was deployed by configuring `values.yaml` and using `helm` to generate the final yaml to deploy to a cluster.
+**Please read through all instructions first before starting the migration so you know what is involved**
 
-There were a few downsides with this approach:
+1. Make a backup of the yaml deployed to your cluster
 
-- `values.yaml` was a custom configuration format defined by us which implicitly made configuring certain Kubernetes settings special cases. We didn't want this to grow over time into an unmaintainable/unusable mess.
-- If customers wanted to configure things not supported in `values.yaml`, then we would either need to add support or the customer would need to make further modifications to the generated yaml.
-- Writing Go templates inside of yaml was error prone and hard to maintain. It was too easy to make a silly mistake and generate invalid yaml. Our editors could not help us because Go template logic made the yaml templates not valid yaml.
-- It required using `helm` to generate templates even though some customers don't care to use `helm` to deploy the yaml.
+   ```bash
 
-### The new way
+   ```
 
-Our new approach is simpler and more flexible.
-
-- We have removed our dependency on `helm`. It is no longer needed to generate templates, and we no longer recommend it as the easiest way to deploy our yaml to a cluster. You are still free to use `helm` to deploy to your cluster if you wish.
-- Our base config is pure yaml which can be deployed directly to a cluster. It is easier for you to use, and also easier for us to maintain.
-- You can configure our base yaml using whatever process best for you (Git ops, [Kustomize](https://github.com/kubernetes-sigs/kustomize), custom scripts, etc.). We provide [documentation and recipies for common customizations](configure.md).
-
-### Steps
-
-1. Set the reclaim policy for your existing deployments to `retained`.
+2. Set the reclaim policy for your existing deployments to `retained`.
 
    ```bash
    kubectl get pv -o json | jq --raw-output  ".items | map(select(.spec.claimRef.name)) | .[] | \"kubectl patch pv -p '{\\\"spec\\\":{\\\"persistentVolumeReclaimPolicy\\\":\\\"Retain\\\"}}' \\(.metadata.name)\"" | bash
    ```
 
-2. (**Downtime starts here**) Delete the `sourcegraph` release from your cluster.
+3. (**Downtime starts here**) Delete the `sourcegraph` release from your cluster.
 
    ```bash
    helm del --purge sourcegraph
    ```
 
-3. Remove `tiller` from your cluster
+4. Remove `tiller` from your cluster
 
    ```bash
    helm reset
    ```
 
-4. Update the old persistent volumes so they can be reused by the new deployment
+5. Update the old persistent volumes so they can be reused by the new deployment
 
    ```bash
    # mark all persistent volumes as claimable by the new deployments
@@ -64,14 +53,27 @@ Our new approach is simpler and more flexible.
    kubectl get pv -o json | jq --raw-output ".items | map(select(.spec.claimRef.name | contains(\"gitserver-\"))) | .[] | \"kubectl patch pv -p '{\\\"spec\\\":{\\\"claimRef\\\":{\\\"name\\\":\\\"repos-gitserver-\\(.spec.claimRef.name | ltrimstr(\"gitserver-\") | tonumber - 1)\\\"}}}' \\(.metadata.name)\""  | bash
    ```
 
-5. Proceed with the normal [installation steps](install.md).
+6. Proceed with the normal [installation steps](install.md).
 
-   **Downtime ends once installation is complete**
+7. The previous step produces a fresh base state, so you will need to reconfigure your cluster by following the relevant steps in [configure.md](configure.md) (e.g. exposing ports, applying your site config, enabling other services like language servers, Prometheus, Alertmanager, Jaeger, etc.).
 
-Note that Sourcegraph's base deployment doesn't come with services such as language servers, Jager, and Prometheus set up by default. If you'd like to use these services, see: [docs/configure.md](configure.md#Index) for instructions.
+   If you were previously configuring Gradle and Artifactory for the Java Language Server, you'll now need to set those options via environment variables instead of just the site configuration. [configure/xlang/java/README.md](../configure/xlang/java/README.md#Gradle-and-Aritfactory-configuration) contains information about the environment variables that you'll need to set.
 
-## Assorted Notes
+   **Downtime ends once installation and configuration is complete**
 
-### Java Language Server
+## Why is there a new deployment strategy?
 
-If you were previously configuring Gradle and Artifactory for the Java Language Server, you'll now need to set those options via environment variables instead of just the site configuration. [configure/xlang/java/README.md](../configure/xlang/java/README.md#Gradle-and-Aritfactory-configuration) contains information about the environment variables that you'll need to set.
+2.10.x and prior was deployed by configuring `values.yaml` and using `helm` to generate the final yaml to deploy to a cluster.
+
+There were a few downsides with this approach:
+
+- `values.yaml` was a custom configuration format defined by us which implicitly made configuring certain Kubernetes settings special cases. We didn't want this to grow over time into an unmaintainable/unusable mess.
+- If customers wanted to configure things not supported in `values.yaml`, then we would either need to add support or the customer would need to make further modifications to the generated yaml.
+- Writing Go templates inside of yaml was error prone and hard to maintain. It was too easy to make a silly mistake and generate invalid yaml. Our editors could not help us because Go template logic made the yaml templates not valid yaml.
+- It required using `helm` to generate templates even though some customers don't care to use `helm` to deploy the yaml.
+
+Our new approach is simpler and more flexible.
+
+- We have removed our dependency on `helm`. It is no longer needed to generate templates, and we no longer recommend it as the easiest way to deploy our yaml to a cluster. You are still free to use `helm` to deploy to your cluster if you wish.
+- Our base config is pure yaml which can be deployed directly to a cluster. It is easier for you to use, and also easier for us to maintain.
+- You can configure our base yaml using whatever process best for you (Git ops, [Kustomize](https://github.com/kubernetes-sigs/kustomize), custom scripts, etc.). We provide [documentation and recipies for common customizations](configure.md).
