@@ -94,13 +94,14 @@ The site configuration is stored inside a [ConfigMap](https://kubernetes.io/docs
 
 Updates to the site configuration are [eventually propogated](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically) to all services, but it take on the order of 1 minute. [Future Kubernetes versions may improve this behavior](https://github.com/kubernetes/kubernetes/pull/64752).
 
-To have site configuration changes take effect immediately, you need to restart the relevant pods.
+To site configuration changes take effect immediately, you can change the name of the ConfigMap and all of its references in the deployment files. `kubectl` applying these changes will force all the relevant pods to restart, which will immediately make your changes visible.
 
 Recommended steps:
 
 1. Change the name of the ConfigMap in all deployments.
 
-   Convenience script:
+   The following convenience script changes the name of the site configuration's ConfigMap (and all references to it) by appending the current date and time. This script should be run
+   at the root of your `deploy-sourcegraph-$VERSION` folder.
 
    ```bash
    #!/bin/bash
