@@ -10,7 +10,7 @@ needed). Check the [Sourcegraph blog](https://about.sourcegraph.com/blog) for re
 1. Deploy the desired version of Sourcegraph to your Kubernetes cluster:
 
    ```bash
-   wget https://github.com/sourcegraph/deploy-sourcegraph/archive/${VERSION}.zip # Choose which version you want to deploy
+   wget https://github.com/sourcegraph/deploy-sourcegraph/archive/${VERSION}.zip # Choose which version you want to deploy from https://github.com/sourcegraph/deploy-sourcegraph/releases
    unzip ${VERSION}.zip
    cd deploy-sourcegraph-${VERSION}
    kubectl apply --prune -l deploy=sourcegraph -f base --recursive
