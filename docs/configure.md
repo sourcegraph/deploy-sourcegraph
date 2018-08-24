@@ -1,12 +1,38 @@
 # Configuring Sourcegraph
 
-Sourcegraph's base configuration is pure yaml that can be deployed directly to a Kubernetes cluster. This document describes how to configure the base yaml in common ways. We provide example scripts, but you can configure the base yaml using whatever process best for you (Git ops, [Kustomize](https://github.com/kubernetes-sigs/kustomize), custom scripts, etc.).
+## Fork this repository
 
-Example scripts in this file depend on [jq](https://stedolan.github.io/jq/), [yj](https://github.com/sourcegraph/yj) and [jy](https://github.com/sourcegraph/jy).
+Sourcegraph Data Center is configured by applying Kubernetes YAML files and simple `kubectl` commands.
 
-## Index
+Since everything is vanilla Kubernetes, you can configure Sourcegraph as flexibly as you need to
+meet the requirements of your deployment environment. We provide simple instructions for common
+things like setting up TLS, enabling code intelligence, and exposing Sourcegraph to external traffic
+below.
 
-Common:
+We **strongly** recommend you fork this repository to track your configuration changes in Git. This
+will make upgrades far easier and is a good practice not just for Sourcegraph, but for any
+Kubernetes-based application.
+
+1. Create a fork of this repository.
+
+1. Create a branch that tracks the currently deployed version of Sourcegraph.
+
+   ```bash
+   git checkout HEAD -b mycompany
+   ```
+
+   If you followed the installation instructions, `HEAD` should point at the Git tag you've deployed
+   to your running Kubernetes cluster.
+
+
+## Dependencies
+
+Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
+[yj](https://github.com/sourcegraph/yj) and [jy](https://github.com/sourcegraph/jy).
+
+## Table of contents
+
+### Common configuration
 
 - [Configure network access](#configure-network-access)
 - [Update site configuration](#update-site-configuration)
@@ -15,7 +41,7 @@ Common:
 - [Configure language servers](#configure-language-servers)
 - [Configure SSDs to boost performance](../configure/ssd/README.md).
 
-Other:
+### Less common configuration
 
 - [Configure gitserver replica count](#configure-gitserver-replica-count)
 - [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
@@ -27,6 +53,7 @@ Other:
 - [Configure custom Redis](#configure-custom-redis)
 - [Configure custom PostgreSQL](#configure-custom-redis)
 - [Install without RBAC](#install-without-rbac)
+
 
 ## Configure network access
 

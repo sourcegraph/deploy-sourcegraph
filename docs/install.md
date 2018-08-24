@@ -15,7 +15,7 @@
 ## Steps
 
 1. [Provision a Kubernetes cluster](k8s.md) on the infrastructure of your choice.
-2. Make sure you have configured `kubectl` to [access your cluster](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
+1. Make sure you have configured `kubectl` to [access your cluster](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
 
    - If you are using GCP, you'll need to give your user the ability to create roles in Kubernetes [(see GCP's documentation)](https://cloud.google.com/kubernetes-engine/docs/how-to/role-based-access-control#prerequisites_for_using_role-based_access_control):
 
@@ -23,41 +23,45 @@
      kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user $USER_EMAIL_ADDRESS
      ```
 
-3. Deploy the desired version of Sourcegraph to your Kubernetes cluster:
+1. Clone this repository and check out the version tag you wish to deploy.
 
    ```bash
-   wget https://github.com/sourcegraph/deploy-sourcegraph/archive/${VERSION}.zip # Choose which version you want to deploy from https://github.com/sourcegraph/deploy-sourcegraph/releases
-   unzip ${VERSION}.zip
-   cd deploy-sourcegraph-${VERSION}
+   # Go to https://github.com/sourcegraph/deploy-sourcegraph/tags and select the latest version tag
+   git clone https://github.com/sourcegraph/deploy-sourcegraph && cd deploy-sourcegraph && git checkout ${VERSION}
+   ```
+
+
+1. Deploy the desired version of Sourcegraph to your cluster:
+
+   ```bash
    kubectl apply --prune -l deploy=sourcegraph -f base --recursive
    ```
 
-4. Monitor the status of the deployment.
+1. Monitor the status of the deployment.
 
    ```bash
    watch kubectl get pods -o wide
    ```
 
-5. Once the deployment completes, verify Sourcegraph works:
+1. Once the deployment completes, verify Sourcegraph is running by temporarily making the frontend port accessible:
 
-   - Setup port forwarding to the frontend
+   kubectl 1.9.x:
 
-     ```bash
-     POD=$(kubectl get pod -l app=sourcegraph-frontend -o template --template="{{(index .items 0).metadata.name}}")
-     kubectl port-forward $POD 30080:3080
-     ```
+   ```bash
+   kubectl port-forward $(kubectl get pod -l app=sourcegraph-frontend -o template --template="{{(index .items 0).metadata.name}}") 30080:3080
+   ```
 
-     kubectl 1.10.0 or later:
+   kubectl 1.10.0 or later:
 
-     ```
-     kubectl port-forward svc/sourcegraph-frontend 30080
-     ```
+   ```
+   kubectl port-forward svc/sourcegraph-frontend 30080
+   ```
 
-   - Open http://localhost:30080 in your browser and you will see a setup page.
+   Open http://localhost:30080 in your browser and you will see a setup page. Congrats, you have Sourcegraph up and running!
 
-6. [Configure your deployment](configure.md).
+1. Now [configure your deployment](configure.md).
 
-You have Sourcegraph up and running!
+
 
 ### Troubleshooting
 
