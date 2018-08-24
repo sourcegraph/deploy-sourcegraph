@@ -337,6 +337,8 @@ find . -name "*yaml" -exec sed -i.sedibak -e "s/value: gitserver-0.gitserver:317
 find . -name "*.sedibak" -delete
 ```
 
+Commit the outstanding changes.
+
 ## Assign resource-hungry pods to larger nodes
 
 If you have a heterogeneous cluster where you need to ensure certain more resource-hungry pods are assigned to more powerful nodes (e.g. `indexedSearch`), you can [specify node constraints](https://kubernetes.io/docs/concepts/configuration/assign-pod-node) (such as `nodeSelector`, etc.).
