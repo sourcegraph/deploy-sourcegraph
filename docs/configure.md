@@ -192,7 +192,8 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 
    ```bash
    # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
-   cat $(base/frontend/sourcegraph-frontend.Deployment.yaml) | yj | jq '(.spec.template.spec.containers[] | select(.name == "frontend") | .env) += [{name: "TLS_CERT", valueFrom: {secretKeyRef: {key: "cert", name: "tls"}}}, {name: "TLS_KEY", valueFrom: {secretKeyRef: {key: "key", name: "tls"}}}]' | jy -o $FE
+   FE=base/frontend/sourcegraph-frontend.Deployment.yaml
+   cat $FE | yj | jq '(.spec.template.spec.containers[] | select(.name == "frontend") | .env) += [{name: "TLS_CERT", valueFrom: {secretKeyRef: {key: "cert", name: "tls"}}}, {name: "TLS_KEY", valueFrom: {secretKeyRef: {key: "key", name: "tls"}}}]' | jy -o $FE
    ```
 
 3. Change your `appURL` in the site configuration stored in `base/config-file.ConfigMap.yaml`.
