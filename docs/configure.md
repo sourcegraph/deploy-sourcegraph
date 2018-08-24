@@ -1,47 +1,41 @@
 # Configuring Sourcegraph
 
-## Fork this repository
-
 Sourcegraph Data Center is configured by applying Kubernetes YAML files and simple `kubectl` commands.
 
-Since everything is vanilla Kubernetes, you can configure Sourcegraph as flexibly as you need to
-meet the requirements of your deployment environment. We provide simple instructions for common
-things like setting up TLS, enabling code intelligence, and exposing Sourcegraph to external traffic
-below.
+Since everything is vanilla Kubernetes, you can configure Sourcegraph as flexibly as you need to meet the requirements of your deployment environment.
+We provide simple instructions for common things like setting up TLS, enabling code intelligence, and exposing Sourcegraph to external traffic below.
 
-We **strongly** recommend you fork this repository to track your configuration changes in Git. This
-will make upgrades far easier and is a good practice not just for Sourcegraph, but for any
-Kubernetes-based application.
+## Fork this repository
 
-1. Create a fork of this repository. The fork can be public **unless** you plan to store secrets in
-   the repository, itself. (These instructions allow for storing secrets outside version control.)
+We **strongly** recommend you fork this repository to track your configuration changes in Git.
+This will make upgrades far easier and is a good practice not just for Sourcegraph, but for any Kubernetes-based application.
 
-1. Create a branch that tracks the currently deployed version of Sourcegraph.
+1. Create a fork of this repository.
+
+   - The fork can be public **unless** you plan to store secrets in the repository itself.
+   - We recommend not storing secrets in the repository itself and these instructions document how.
+
+1. Create a branch that tracks the currently deployed version of Sourcegraph at your company.
 
    ```bash
    git checkout HEAD -b mycompany
    ```
 
-   If you followed the installation instructions, `HEAD` should point at the Git tag you've deployed
-   to your running Kubernetes cluster.
+   If you followed the installation instructions, `HEAD` should point at the Git tag you've deployed to your running Kubernetes cluster.
 
-   The `mycompany` branch is your development branch. Commit all your configuration changes to this
-   branch. When you upgrade Sourcegraph Data Center, you will rebase this branch on top of the tag
-   corresponding to the new version.
+   The `mycompany` branch is your development branch. Commit all your configuration changes to this branch. When you upgrade Sourcegraph Data Center, you will rebase this branch on top of the tag corresponding to the new version.
 
 1. Track the following changes in this repository:
 
-   * Modifications to Kubernetes YAML files.
-   * New Kubernetes YAML files that are `kubectl apply`d to the cluster.
-   * Standalone `kubectl` commands (e.g., `kubectl create secret`, `kubectl expose`) should be added
+   - Modifications to Kubernetes YAML files.
+   - New Kubernetes YAML files that are `kubectl apply`d to the cluster.
+   - Standalone `kubectl` commands (e.g., `kubectl create secret`, `kubectl expose`) should be added
      to `configure/create-immutable-and-secrets.sh`.
-
 
 ## Dependencies
 
 Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 [yj](https://github.com/sourcegraph/yj) and [jy](https://github.com/sourcegraph/jy).
-
 
 ## Table of contents
 
@@ -67,7 +61,6 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 - [Configure custom Redis](#configure-custom-redis)
 - [Configure custom PostgreSQL](#configure-custom-redis)
 - [Install without RBAC](#install-without-rbac)
-
 
 ## Configure network access
 
@@ -268,7 +261,6 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
 your fork is private **and** you are okay with storing secrets in it).
 
 Add the `kubectl create secret ...` command to `configure/create-immutable-and-secrets.sh` and commit the outstanding changes.
-
 
 ## Configure language servers
 
