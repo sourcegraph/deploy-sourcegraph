@@ -13,7 +13,8 @@ We **strongly** recommend you fork this repository to track your configuration c
 will make upgrades far easier and is a good practice not just for Sourcegraph, but for any
 Kubernetes-based application.
 
-1. Create a fork of this repository.
+1. Create a fork of this repository. The fork can be public **unless** you plan to store secrets in
+   the repository, itself. (These instructions allow for storing secrets outside version control.)
 
 1. Create a branch that tracks the currently deployed version of Sourcegraph.
 
@@ -27,6 +28,13 @@ Kubernetes-based application.
    The `mycompany` branch is your development branch. Commit all your configuration changes to this
    branch. When you upgrade Sourcegraph Data Center, you will rebase this branch on top of the tag
    corresponding to the new version.
+
+1. Track the following changes in this repository:
+
+   * Modifications to Kubernetes YAML files.
+   * New Kubernetes YAML files that are `kubectl apply`d to the cluster.
+   * Standalone `kubectl` commands (e.g., `kubectl create secret`, `kubectl expose`) should be added
+     to `configure/create-immutable-and-secrets.sh`.
 
 
 ## Dependencies
@@ -126,11 +134,9 @@ You can also use an [Ingress controller](https://kubernetes.io/docs/concepts/ser
 The site configuration is stored inside a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume), which is mounted inside every deployment that needs it. You can change the site configuration by editing
 [base/config-file.ConfigMap.yaml](../base/config-file.ConfigMap.yaml).
 
-Updates to the site configuration are [eventually propogated](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically) to all services, but it take on the order of 1 minute. [Future Kubernetes versions may improve this behavior](https://github.com/kubernetes/kubernetes/pull/64752).
+Updates to the site configuration are [propagated to the relevant services](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically) in about 1 minute. ([Future Kubernetes versions will decrease this latency.](https://github.com/kubernetes/kubernetes/pull/64752))
 
-To site configuration changes take effect immediately, you can change the name of the ConfigMap and all of its references in the deployment files. `kubectl` applying these changes will force all the relevant pods to restart, which will immediately make your changes visible.
-
-Recommended steps:
+For the impatient, site configuration changes can be applied immediately by changing the name of the ConfigMap. `kubectl apply`ing these changes will force the relevant pods to restart immediately with the new config:
 
 1. Change the name of the ConfigMap in all deployments.
 
@@ -192,8 +198,7 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 
    ```bash
    # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
-   FE=base/frontend/sourcegraph-frontend.Deployment.yaml
-   cat $FE | yj | jq '(.spec.template.spec.containers[] | select(.name == "frontend") | .env) += [{name: "TLS_CERT", valueFrom: {secretKeyRef: {key: "cert", name: "tls"}}}, {name: "TLS_KEY", valueFrom: {secretKeyRef: {key: "key", name: "tls"}}}]' | jy -o $FE
+   cat $(base/frontend/sourcegraph-frontend.Deployment.yaml) | yj | jq '(.spec.template.spec.containers[] | select(.name == "frontend") | .env) += [{name: "TLS_CERT", valueFrom: {secretKeyRef: {key: "cert", name: "tls"}}}, {name: "TLS_KEY", valueFrom: {secretKeyRef: {key: "key", name: "tls"}}}]' | jy -o $FE
    ```
 
 3. Change your `appURL` in the site configuration stored in `base/config-file.ConfigMap.yaml`.
@@ -207,6 +212,11 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 4. Deploy the changes by following the [instructions to update to the site configuration](#update-site-configuration).
 
 5. Refer to the [Configure network access](#configure-network-access) section to make sure that `sourcegraph-frontend`'s port `3443` is properly exposed.
+
+**WARNING:** Do NOT commit the actual TLS cert and key files to this repository (unless your fork is
+private **and** you are okay with storing secrets in it).
+
+Add the `kubectl create secret ...` command to `configure/create-immutable-and-secrets.sh` and commit the outstanding changes.
 
 ## Configure repository cloning via SSH
 
@@ -252,6 +262,12 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
    ```bash
    kubectl apply --prune -l deploy=sourcegraph -f base --recursive
    ```
+
+**WARNING:** Do NOT commit the actual `id_rsa` and `known_hosts` files to this repository (unless
+your fork is private **and** you are okay with storing secrets in it).
+
+Add the `kubectl create secret ...` command to `configure/create-immutable-and-secrets.sh` and commit the outstanding changes.
+
 
 ## Configure language servers
 
