@@ -30,7 +30,6 @@
    git clone https://github.com/sourcegraph/deploy-sourcegraph && cd deploy-sourcegraph && git checkout ${VERSION}
    ```
 
-
 1. Deploy the desired version of Sourcegraph to your cluster:
 
    ```bash
@@ -60,8 +59,6 @@
    Open http://localhost:30080 in your browser and you will see a setup page. Congrats, you have Sourcegraph up and running!
 
 1. Now [configure your deployment](configure.md).
-
-
 
 ### Troubleshooting
 
