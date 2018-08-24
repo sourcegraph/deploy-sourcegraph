@@ -25,7 +25,7 @@ This will make upgrades far easier and is a good practice not just for Sourcegra
 
    The `mycompany` branch is your development branch. Commit all your configuration changes to this branch. When you upgrade Sourcegraph Data Center, you will rebase this branch on top of the tag corresponding to the new version.
 
-1. Track the following changes in this repository:
+1. Track the following changes in your fork:
 
    - Modifications to Kubernetes YAML files.
    - New Kubernetes YAML files that are `kubectl apply`d to the cluster.
@@ -208,7 +208,7 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 
 5. Refer to the [Configure network access](#configure-network-access) section to make sure that `sourcegraph-frontend`'s port `3443` is properly exposed.
 
-**WARNING:** Do NOT commit the actual TLS cert and key files to this repository (unless your fork is
+**WARNING:** Do NOT commit the actual TLS cert and key files to your fork (unless your fork is
 private **and** you are okay with storing secrets in it).
 
 Add the `kubectl create secret ...` command to `configure/create-immutable-and-secrets.sh` and commit the outstanding changes.
@@ -258,7 +258,7 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
    kubectl apply --prune -l deploy=sourcegraph -f base --recursive
    ```
 
-**WARNING:** Do NOT commit the actual `id_rsa` and `known_hosts` files to this repository (unless
+**WARNING:** Do NOT commit the actual `id_rsa` and `known_hosts` files to your fork (unless
 your fork is private **and** you are okay with storing secrets in it).
 
 Add the `kubectl create secret ...` command to `configure/create-immutable-and-secrets.sh` and commit the outstanding changes.
