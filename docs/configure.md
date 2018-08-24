@@ -7,7 +7,7 @@ We provide simple instructions for common things like setting up TLS, enabling c
 
 ## Fork this repository
 
-We **strongly** recommend you fork this repository to track your configuration changes in Git.
+We recommend you fork this repository to track your configuration changes in Git.
 This will make upgrades far easier and is a good practice not just for Sourcegraph, but for any Kubernetes-based application.
 
 1. Create a fork of this repository.
