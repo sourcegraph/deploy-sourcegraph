@@ -7,6 +7,30 @@ needed). Check the [Sourcegraph blog](https://about.sourcegraph.com/blog) for re
 
 ## Steps
 
+1. Rebase your configuration modifications against the Git tag corresponding to the upgrade version.
+
+   ```bash
+   git checkout deploy      # check out the `deploy` branch where you've made your configuration changes
+   git fetch origin --tags  # origin should point to https://github.com/sourcegraph/deploy-sourcegraph
+   git rebase
+   ```
+
+
+   If you have made NO modifications to the configuration in this repository, you can instead just
+   check out the version tag.
+   
+   
+
+   If you have made modifications to the configuration and tracked these changes in your fork, do the following:
+
+
+   If you've installed Sourcegraph without modifying the default configuration, you can 
+   ```bash
+   git checkout 
+   ```
+
+## Steps (OLD)
+
 1. Deploy the desired version of Sourcegraph to your Kubernetes cluster:
 
    ```bash
@@ -15,6 +39,8 @@ needed). Check the [Sourcegraph blog](https://about.sourcegraph.com/blog) for re
    cd deploy-sourcegraph-${VERSION}
    kubectl apply --prune -l deploy=sourcegraph -f base --recursive
    ```
+
+   If relevant, update the other configuration YAML TODO
 
 2. Monitor the status of the deployment.
 

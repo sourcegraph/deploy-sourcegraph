@@ -16,16 +16,22 @@ Kubernetes-based application.
 1. Create a fork of this repository. The fork can be public **unless** you plan to store secrets in
    the repository, itself. (These instructions allow for storing secrets outside version control.)
 
+   ```bash
+   # Create the remote repository that will contain the fork and then run the following:
+   git remote add fork ${REMOTE_GIT_URL_OF_YOUR_FORK}
+   ```
+
 1. Create a branch that tracks the currently deployed version of Sourcegraph.
 
    ```bash
-   git checkout HEAD -b mycompany
+   git checkout HEAD -b deploy
+   git push -u fork deploy
    ```
 
    If you followed the installation instructions, `HEAD` should point at the Git tag you've deployed
    to your running Kubernetes cluster.
 
-   The `mycompany` branch is your development branch. Commit all your configuration changes to this
+   The `deploy` branch is your deployment branch. Commit all your configuration changes to this
    branch. When you upgrade Sourcegraph Data Center, you will rebase this branch on top of the tag
    corresponding to the new version.
 
