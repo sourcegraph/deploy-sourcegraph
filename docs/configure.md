@@ -24,11 +24,16 @@ Kubernetes-based application.
    If you followed the installation instructions, `HEAD` should point at the Git tag you've deployed
    to your running Kubernetes cluster.
 
+   The `mycompany` branch is your development branch. Commit all your configuration changes to this
+   branch. When you upgrade Sourcegraph Data Center, you will rebase this branch on top of the tag
+   corresponding to the new version.
+
 
 ## Dependencies
 
 Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 [yj](https://github.com/sourcegraph/yj) and [jy](https://github.com/sourcegraph/jy).
+
 
 ## Table of contents
 
@@ -65,6 +70,8 @@ There are a few approaches, but using a load balancer is recommended.
 
 For production environments, we recommend using a [load balancer](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/).
 
+Run one of the following commands depending on your desired transport protocol:
+
 - HTTP
   ```
   kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=80 --target-port=3080
@@ -74,6 +81,8 @@ For production environments, we recommend using a [load balancer](https://kubern
   kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=443 --target-port=3443
   ```
 
+Add the command you ran to `configure/create-immutable-and-secrets.sh` and commit the change.
+
 Once the load balancer has acquired an external IP address, you should be able to access Sourcegraph using that. You can check the external IP address by running the following command:
 
 ```bash
@@ -81,8 +90,6 @@ kubectl get service sourcegraph-frontend-loadbalancer -o=custom-columns=EXTERNAL
 ```
 
 ### Network rule
-
-You can expose Kubernetes nodes directly to avoid provisioning/paying for a load balancer, but you probably need to pay for a static IP, and honestly you probably want a load balancer anyway.
 
 Add a network rule that allows ingress traffic to port 30080 (HTTP) and/or 30081 (HTTPS) on at least one node.
 
@@ -106,9 +113,9 @@ Add a network rule that allows ingress traffic to port 30080 (HTTP) and/or 30081
      kubectl get node $NODE -o wide
      ```
 
-* [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html).
+- [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html).
 
-Sourcegraph should then be accessible at `$EXTERNAL_ADDR:30080` and/or `$EXTERNAL_ADDR:30081`, where `$EXTERNAL_ADDR` is the address of _any_ node in the cluster.
+Sourcegraph should now be accessible at `$EXTERNAL_ADDR:30080` and/or `$EXTERNAL_ADDR:30081`, where `$EXTERNAL_ADDR` is the address of _any_ node in the cluster.
 
 ### Ingress controller
 
@@ -161,7 +168,7 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 1. Create a [secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains your TLS certificate and private key.
 
    ```bash
-    kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY
+   kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY
    ```
 
 2. Add the `TLS_CERT` and `TLS_KEY` environment variables to [base/frontend/sourcegraph-frontend.Deployment.yaml](../base/frontend/sourcegraph-frontend.Deployment.yaml).
