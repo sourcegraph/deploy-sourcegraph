@@ -6,10 +6,11 @@ This folder contains the deployment files for the Java language server.
 
 You can enable it by:
 
-1. Apply the deployment files to your cluster.
+1. Append the `kubectl apply` command for the Java language server deployment to `configure/kubectl-apply-all.sh`.
 
-   ```shell
-   kubectl apply -f configure/xlang/java/ --recursive
+   ```bash
+   # configure/kubectl-apply-all.sh
+   kubectl apply --prune -l deploy=xlang-java -f configure/xlang/java/ --recursive
    ```
 
 2. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the Java language server's existence.
@@ -23,10 +24,10 @@ You can enable it by:
        value: tcp://xlang-java-bg:2088
    ```
 
-3. `kubectl apply` your changes so that the `lsp-proxy` deployment sees the new environment variables.
+3. Apply your changes to `lsp-proxy` and the Java language server to the cluster.
 
    ```bash
-   kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+   ./configure/kubectl-apply-all.sh
    ```
 
 ## Gradle and Aritfactory configuration
