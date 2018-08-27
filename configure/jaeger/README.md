@@ -2,17 +2,16 @@
 
 [Jaeger](https://github.com/jaegertracing/jaeger) is an open-source request tracing system that can run inside of your Kubernetes cluster.
 
-1.  Append the `kubectl apply` command for the Jaeger resources to `configure/kubectl-apply-all.sh`.
+1.  Append the `kubectl apply` command for the Jaeger resources to `kubectl-apply-all.sh.
 
     ```bash
-    # configure/kubectl-apply-all.sh
-    kubectl apply --prune -l deploy=jaeger -f configure/jaeger --recursive
+    echo kubectl apply --prune -l deploy=jaeger -f configure/jaeger --recursive >> kubectl-apply-all.sh
     ```
 
 1.  Apply your changes to Jaeger to the cluster.
 
     ```bash
-    ./configure/kubectl-apply-all.sh
+    ./kubectl-apply-all.sh
     ```
 
 1.  Add the Jaeger collector agent to supported services.

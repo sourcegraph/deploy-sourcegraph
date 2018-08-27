@@ -27,14 +27,13 @@
 1. Append the `kubectl apply` command for the Prometheus resources to your cluster.
 
    ```bash
-   # configure/kubectl-apply-all.sh
-   kubectl apply --prune -l deploy=prometheus -f configure/prometheus --recursive
+   echo kubectl apply --prune -l deploy=prometheus -f configure/prometheus --recursive >> kubectl-apply-all.sh
    ```
 
 1. Apply your changes to Prometheus to the cluster.
 
    ```bash
-   ./configure/kubectl-apply-all.sh
+   ./kubectl-apply-all.sh
    ```
 
 ## Making Prometheus accessible
