@@ -4,13 +4,13 @@ This folder contains the deployment files for the Go language server.
 
 You can enable it by:
 
-1. Apply the deployment files to your cluster.
+1. Append the `kubectl apply` command for the Go language server deployment to `kubectl-apply-all.sh.
 
-   ```shell
-   kubectl apply -f configure/xlang/go/ --recursive
+   ```bash
+   echo kubectl apply --prune -l deploy=xlang-go -f configure/xlang/go/ --recursive >> kubectl-apply-all.sh
    ```
 
-2. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the Go language server's existence.
+2. Add the following environment variables to the `lsp-proxy` deployment to make it aware of the Go language server's existence.
 
    ```yaml
    # base/lsp-proxy/lsp-proxy.Deployment.yaml
@@ -21,8 +21,8 @@ You can enable it by:
        value: tcp://xlang-go-bg:4389
    ```
 
-3. `kubectl apply` your changes so that the `lsp-proxy` deployment sees the new environment variables.
+3. Apply your changes to `lsp-proxy` and the Go language server to the cluster.
 
    ```bash
-   kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+   ./kubectl-apply-all.sh
    ```

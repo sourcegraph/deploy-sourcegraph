@@ -4,10 +4,10 @@ This folder contains the deployment files for the PHP language server.
 
 You can enable it by:
 
-1. Apply the deployment files to your cluster:
+1. Append the `kubectl apply` command for the PHP language server deployment to `kubectl-apply-all.sh.
 
-   ```shell
-   kubectl apply -f configure/xlang/php/ --recursive
+   ```bash
+   echo kubectl apply --prune -l deploy=xlang-php -f configure/xlang/php/ --recursive >> kubectl-apply-all.sh
    ```
 
 2. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the PHP language server's existence:
@@ -19,8 +19,8 @@ You can enable it by:
        value: tcp://xlang-php:2088
    ```
 
-3. `kubectl apply` your changes so that the `lsp-proxy` deployment sees the new environment variables.
+3. Apply your changes to `lsp-proxy` and the PHP language server to the cluster.
 
    ```bash
-   kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+   ./kubectl-apply-all.sh
    ```

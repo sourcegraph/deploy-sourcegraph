@@ -28,9 +28,9 @@ This will make upgrades far easier and is a good practice not just for Sourcegra
 1. Track the following changes in your fork:
 
    - Modifications to Kubernetes YAML files.
-   - New Kubernetes YAML files that are `kubectl apply`d to the cluster.
+   - `kubect apply` commands that are used for adding a new deployment (beyond the base deployment) or another Kubernetes YAML file to the cluster should be added to `./kubectl-apply-all.sh`
    - Standalone `kubectl` commands (e.g., `kubectl create secret`, `kubectl expose`) should be added
-     to `configure/create-immutable-and-secrets.sh`.
+     to `./create-immutable-and-secrets.sh`.
 
 ## Dependencies
 
@@ -154,11 +154,7 @@ For the impatient, site configuration changes can be applied immediately by chan
 2. Apply the new configuration to your Kubernetes cluster.
 
    ```bash
-   kubectl apply --prune -l deploy=sourcegraph -f base --recursive
-
-   # The Go language server also reads from the site configuration.
-   # If you have it enabled, you'll also need to apply the changes to its deployment:
-   # kubectl apply -f configure/xlang/go/ --recursive
+   ./kubectl-apply-all.sh
    ```
 
 ## Configure TLS/SSL
@@ -255,7 +251,7 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
 3. Apply the updated `gitserver` configuration to your cluster.
 
    ```bash
-   kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+    ./kubectl-apply-all.sh
    ```
 
 **WARNING:** Do NOT commit the actual `id_rsa` and `known_hosts` files to your fork (unless
