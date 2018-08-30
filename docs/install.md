@@ -33,7 +33,7 @@
 1. Deploy the desired version of Sourcegraph to your cluster:
 
    ```bash
-   kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+   ./kubectl-apply-all.sh
    ```
 
 1. Monitor the status of the deployment.
