@@ -6,7 +6,7 @@ This folder contains the deployment files for the Lua language server.
 
 You can enable it by:
 
-1. Append the `kubectl apply` command for the Lua language server deployment to `kubectl-apply-all.sh.
+1. Append the `kubectl apply` command for the Lua language server deployment to `kubectl-apply-all.sh`.
 
    ```bash
    echo kubectl apply --prune -l deploy=xlang-lua -f configure/experimental/lua --recursive >> kubectl-apply-all.sh

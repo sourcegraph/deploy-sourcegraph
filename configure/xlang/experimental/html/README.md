@@ -6,7 +6,7 @@ This folder contains the deployment files for the HTML language server.
 
 You can enable it by:
 
-1. Append the `kubectl apply` command for the HTML language server deployment to `kubectl-apply-all.sh.
+1. Append the `kubectl apply` command for the HTML language server deployment to `kubectl-apply-all.sh`.
 
    ```bash
    echo kubectl apply --prune -l deploy=xlang-html -f configure/experimental/html --recursive >> kubectl-apply-all.sh

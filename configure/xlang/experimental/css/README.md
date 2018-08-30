@@ -6,7 +6,7 @@ This folder contains the deployment files for the CSS language server.
 
 You can enable it by:
 
-1. Append the `kubectl apply` command for the CSS language server deployment to `kubectl-apply-all.sh.
+1. Append the `kubectl apply` command for the CSS language server deployment to `kubectl-apply-all.sh`.
 
    ```bash
    echo kubectl apply --prune -l deploy=xlang-css -f configure/experimental/css --recursive >> kubectl-apply-all.sh

@@ -6,7 +6,7 @@ This folder contains the deployment files for the Clojure language server.
 
 You can enable it by:
 
-1. Append the `kubectl apply` command for the Clojure language server deployment to `kubectl-apply-all.sh.
+1. Append the `kubectl apply` command for the Clojure language server deployment to `kubectl-apply-all.sh`.
 
    ```bash
    echo kubectl apply --prune -l deploy=xlang-clojure -f configure/experimental/clojure --recursive >> kubectl-apply-all.sh

@@ -4,7 +4,7 @@ This folder contains the deployment files for the Python language server.
 
 You can enable it by:
 
-1. Append the `kubectl apply` command for the Python language server deployment to `kubectl-apply-all.sh.
+1. Append the `kubectl apply` command for the Python language server deployment to `kubectl-apply-all.sh`.
 
    ```bash
    echo kubectl apply --prune -l deploy=xlang-python -f configure/xlang/python/ --recursive >> kubectl-apply-all.sh

@@ -4,7 +4,7 @@ This folder contains the deployment files for the Javascript / Typescript langua
 
 You can enable it by:
 
-1. Append the `kubectl apply` command for the Javascript / Typescript language server deployment to `kubectl-apply-all.sh.
+1. Append the `kubectl apply` command for the Javascript / Typescript language server deployment to `kubectl-apply-all.sh`.
 
    ```bash
    echo kubectl apply --prune -l deploy=xlang-typescript -f configure/xlang/typescript/ --recursive >> kubectl-apply-all.sh

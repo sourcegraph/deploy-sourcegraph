@@ -4,7 +4,7 @@ This folder contains the deployment files for the Go language server.
 
 You can enable it by:
 
-1. Append the `kubectl apply` command for the Go language server deployment to `kubectl-apply-all.sh.
+1. Append the `kubectl apply` command for the Go language server deployment to `kubectl-apply-all.sh`.
 
    ```bash
    echo kubectl apply --prune -l deploy=xlang-go -f configure/xlang/go/ --recursive >> kubectl-apply-all.sh

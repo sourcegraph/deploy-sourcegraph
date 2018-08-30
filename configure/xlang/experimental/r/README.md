@@ -6,7 +6,7 @@ This folder contains the deployment files for the R language server.
 
 You can enable it by:
 
-1. Append the `kubectl apply` command for the R language server deployment to `kubectl-apply-all.sh.
+1. Append the `kubectl apply` command for the R language server deployment to `kubectl-apply-all.sh`.
 
    ```bash
    echo kubectl apply --prune -l deploy=xlang-r -f configure/experimental/r --recursive >> kubectl-apply-all.sh

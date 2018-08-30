@@ -18,7 +18,7 @@ If you mount local SSDs on your nodes:
        name: cache-ssd
    ```
 
-1. Append the `kubectl apply` command for the provided `pod-tmp-gc` [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) to `kubectl-apply-all.sh to periodically clean up files in the SSD on each node. This is necessary because files on the SSDs are not automatically cleaned up if pods crash or are rescheduled which can cause the SSDs to fill up.
+1. Append the `kubectl apply` command for the provided `pod-tmp-gc` [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) to `kubectl-apply-all.sh` to periodically clean up files in the SSD on each node. This is necessary because files on the SSDs are not automatically cleaned up if pods crash or are rescheduled which can cause the SSDs to fill up.
 
    ```bash
    echo kubectl apply --prune -l deploy=pod-tmp-gc -f configure/ssd --recursive >> kubectl-apply-all.sh

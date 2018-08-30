@@ -6,7 +6,7 @@ This folder contains the deployment files for the C# language server.
 
 You can enable it by:
 
-1. Append the `kubectl apply` command for the C# language server deployment to `kubectl-apply-all.sh.
+1. Append the `kubectl apply` command for the C# language server deployment to `kubectl-apply-all.sh`.
 
    ```bash
    echo kubectl apply --prune -l deploy=xlang-cs -f configure/experimental/cs --recursive >> kubectl-apply-all.sh

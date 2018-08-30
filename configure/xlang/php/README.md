@@ -4,7 +4,7 @@ This folder contains the deployment files for the PHP language server.
 
 You can enable it by:
 
-1. Append the `kubectl apply` command for the PHP language server deployment to `kubectl-apply-all.sh.
+1. Append the `kubectl apply` command for the PHP language server deployment to `kubectl-apply-all.sh`.
 
    ```bash
    echo kubectl apply --prune -l deploy=xlang-php -f configure/xlang/php/ --recursive >> kubectl-apply-all.sh

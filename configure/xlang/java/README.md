@@ -6,7 +6,7 @@ This folder contains the deployment files for the Java language server.
 
 You can enable it by:
 
-1. Append the `kubectl apply` command for the Java language server deployment to `kubectl-apply-all.sh.
+1. Append the `kubectl apply` command for the Java language server deployment to `kubectl-apply-all.sh`.
 
    ```bash
    echo kubectl apply --prune -l deploy=xlang-java -f configure/xlang/java/ --recursive >> kubectl-apply-all.sh

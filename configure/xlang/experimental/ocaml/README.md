@@ -6,7 +6,7 @@ This folder contains the deployment files for the OCaml language server.
 
 You can enable it by:
 
-1. Append the `kubectl apply` command for the OCaml language server deployment to `kubectl-apply-all.sh.
+1. Append the `kubectl apply` command for the OCaml language server deployment to `kubectl-apply-all.sh`.
 
    ```bash
    echo kubectl apply --prune -l deploy=xlang-ocaml -f configure/experimental/ocaml --recursive >> kubectl-apply-all.sh

@@ -6,7 +6,7 @@ This folder contains the deployment files for the Rust language server.
 
 You can enable it by:
 
-1. Append the `kubectl apply` command for the Rust language server deployment to `kubectl-apply-all.sh.
+1. Append the `kubectl apply` command for the Rust language server deployment to `kubectl-apply-all.sh`.
 
    ```bash
    echo kubectl apply --prune -l deploy=xlang-rust -f configure/experimental/rust --recursive >> kubectl-apply-all.sh
