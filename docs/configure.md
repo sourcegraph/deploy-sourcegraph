@@ -1,12 +1,45 @@
 # Configuring Sourcegraph
 
-Sourcegraph's base configuration is pure yaml that can be deployed directly to a Kubernetes cluster. This document describes how to configure the base yaml in common ways. We provide example scripts, but you can configure the base yaml using whatever process best for you (Git ops, [Kustomize](https://github.com/kubernetes-sigs/kustomize), custom scripts, etc.).
+Sourcegraph Data Center is configured by applying Kubernetes YAML files and simple `kubectl` commands.
 
-Example scripts in this file depend on [jq](https://stedolan.github.io/jq/), [yj](https://github.com/sourcegraph/yj) and [jy](https://github.com/sourcegraph/jy).
+Since everything is vanilla Kubernetes, you can configure Sourcegraph as flexibly as you need to meet the requirements of your deployment environment.
+We provide simple instructions for common things like setting up TLS, enabling code intelligence, and exposing Sourcegraph to external traffic below.
 
-## Index
+## Fork this repository
 
-Common:
+We recommend you fork this repository to track your configuration changes in Git.
+This will make upgrades far easier and is a good practice not just for Sourcegraph, but for any Kubernetes-based application.
+
+1. Create a fork of this repository.
+
+   - The fork can be public **unless** you plan to store secrets in the repository itself.
+   - We recommend not storing secrets in the repository itself and these instructions document how.
+
+1. Create a branch that tracks the currently deployed version of Sourcegraph at your company.
+
+   ```bash
+   git checkout HEAD -b mycompany
+   ```
+
+   If you followed the installation instructions, `HEAD` should point at the Git tag you've deployed to your running Kubernetes cluster.
+
+   The `mycompany` branch is your development branch. Commit all your configuration changes to this branch. When you upgrade Sourcegraph Data Center, you will rebase this branch on top of the tag corresponding to the new version.
+
+1. Track the following changes in your fork:
+
+   - Modifications to Kubernetes YAML files.
+   - `kubect apply` commands that are used for adding a new deployment (beyond the base deployment) or another Kubernetes YAML file to the cluster should be added to `./kubectl-apply-all.sh`
+   - Standalone `kubectl` commands (e.g., `kubectl create secret`, `kubectl expose`) should be added
+     to `./create-immutable-and-secrets.sh`.
+
+## Dependencies
+
+Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
+[yj](https://github.com/sourcegraph/yj) and [jy](https://github.com/sourcegraph/jy).
+
+## Table of contents
+
+### Common configuration
 
 - [Configure network access](#configure-network-access)
 - [Update site configuration](#update-site-configuration)
@@ -14,8 +47,9 @@ Common:
 - [Configure repository cloning via SSH](#configure-repository-cloning-via-ssh)
 - [Configure language servers](#configure-language-servers)
 - [Configure SSDs to boost performance](../configure/ssd/README.md).
+- TODO: [Increase memory or CPU limits](TODO)
 
-Other:
+### Less common configuration
 
 - [Configure gitserver replica count](#configure-gitserver-replica-count)
 - [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
@@ -38,6 +72,8 @@ There are a few approaches, but using a load balancer is recommended.
 
 For production environments, we recommend using a [load balancer](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/).
 
+Run one of the following commands depending on your desired transport protocol:
+
 - HTTP
   ```
   kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=80 --target-port=3080
@@ -47,6 +83,8 @@ For production environments, we recommend using a [load balancer](https://kubern
   kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=443 --target-port=3443
   ```
 
+Add the command you ran to `configure/create-immutable-and-secrets.sh` and commit the change.
+
 Once the load balancer has acquired an external IP address, you should be able to access Sourcegraph using that. You can check the external IP address by running the following command:
 
 ```bash
@@ -54,8 +92,6 @@ kubectl get service sourcegraph-frontend-loadbalancer -o=custom-columns=EXTERNAL
 ```
 
 ### Network rule
-
-You can expose Kubernetes nodes directly to avoid provisioning/paying for a load balancer, but you probably need to pay for a static IP, and honestly you probably want a load balancer anyway.
 
 Add a network rule that allows ingress traffic to port 30080 (HTTP) and/or 30081 (HTTPS) on at least one node.
 
@@ -79,9 +115,9 @@ Add a network rule that allows ingress traffic to port 30080 (HTTP) and/or 30081
      kubectl get node $NODE -o wide
      ```
 
-* [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html).
+- [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html).
 
-Sourcegraph should then be accessible at `$EXTERNAL_ADDR:30080` and/or `$EXTERNAL_ADDR:30081`, where `$EXTERNAL_ADDR` is the address of _any_ node in the cluster.
+Sourcegraph should now be accessible at `$EXTERNAL_ADDR:30080` and/or `$EXTERNAL_ADDR:30081`, where `$EXTERNAL_ADDR` is the address of _any_ node in the cluster.
 
 ### Ingress controller
 
@@ -92,11 +128,9 @@ You can also use an [Ingress controller](https://kubernetes.io/docs/concepts/ser
 The site configuration is stored inside a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume), which is mounted inside every deployment that needs it. You can change the site configuration by editing
 [base/config-file.ConfigMap.yaml](../base/config-file.ConfigMap.yaml).
 
-Updates to the site configuration are [eventually propogated](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically) to all services, but it take on the order of 1 minute. [Future Kubernetes versions may improve this behavior](https://github.com/kubernetes/kubernetes/pull/64752).
+Updates to the site configuration are [propagated to the relevant services](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically) in about 1 minute. ([Future Kubernetes versions will decrease this latency.](https://github.com/kubernetes/kubernetes/pull/64752))
 
-To site configuration changes take effect immediately, you can change the name of the ConfigMap and all of its references in the deployment files. `kubectl` applying these changes will force all the relevant pods to restart, which will immediately make your changes visible.
-
-Recommended steps:
+For the impatient, site configuration changes can be applied immediately by changing the name of the ConfigMap. `kubectl apply`ing these changes will force the relevant pods to restart immediately with the new config:
 
 1. Change the name of the ConfigMap in all deployments.
 
@@ -120,11 +154,7 @@ Recommended steps:
 2. Apply the new configuration to your Kubernetes cluster.
 
    ```bash
-   kubectl apply --prune -l deploy=sourcegraph -f base --recursive
-
-   # The Go language server also reads from the site configuration.
-   # If you have it enabled, you'll also need to apply the changes to its deployment:
-   # kubectl apply -f configure/xlang/go/ --recursive
+   ./kubectl-apply-all.sh
    ```
 
 ## Configure TLS/SSL
@@ -134,7 +164,7 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 1. Create a [secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains your TLS certificate and private key.
 
    ```bash
-    kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY
+   kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY
    ```
 
 2. Add the `TLS_CERT` and `TLS_KEY` environment variables to [base/frontend/sourcegraph-frontend.Deployment.yaml](../base/frontend/sourcegraph-frontend.Deployment.yaml).
@@ -173,6 +203,11 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 4. Deploy the changes by following the [instructions to update to the site configuration](#update-site-configuration).
 
 5. Refer to the [Configure network access](#configure-network-access) section to make sure that `sourcegraph-frontend`'s port `3443` is properly exposed.
+
+**WARNING:** Do NOT commit the actual TLS cert and key files to your fork (unless your fork is
+private **and** you are okay with storing secrets in it).
+
+Add the `kubectl create secret ...` command to `configure/create-immutable-and-secrets.sh` and commit the outstanding changes.
 
 ## Configure repository cloning via SSH
 
@@ -216,8 +251,13 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
 3. Apply the updated `gitserver` configuration to your cluster.
 
    ```bash
-   kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+    ./kubectl-apply-all.sh
    ```
+
+**WARNING:** Do NOT commit the actual `id_rsa` and `known_hosts` files to your fork (unless
+your fork is private **and** you are okay with storing secrets in it).
+
+Add the `kubectl create secret ...` command to `configure/create-immutable-and-secrets.sh` and commit the outstanding changes.
 
 ## Configure language servers
 
@@ -286,6 +326,8 @@ find . -name "*yaml" -exec sed -i.sedibak -e "s/value: gitserver-0.gitserver:317
 find . -name "*.sedibak" -delete
 ```
 
+Commit the outstanding changes.
+
 ## Assign resource-hungry pods to larger nodes
 
 If you have a heterogeneous cluster where you need to ensure certain more resource-hungry pods are assigned to more powerful nodes (e.g. `indexedSearch`), you can [specify node constraints](https://kubernetes.io/docs/concepts/configuration/assign-pod-node) (such as `nodeSelector`, etc.).
@@ -299,6 +341,8 @@ shuffling.
 See [the official documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/) for instructions about applying node constraints.
 
 ## Configure a storage class
+
+TODO: the default storage class is typically spinny disks, not SSDs. Up until now, install instructions have instructed to use SSDs. This could have perf implications. This might be important enough to include in the main install instructions.
 
 Sourcegraph relies on the default storage class of your cluster. If your cluster does not have a default storage class or if you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class.
 

@@ -18,7 +18,17 @@ If you mount local SSDs on your nodes:
        name: cache-ssd
    ```
 
-2. Deploy the provided `pod-tmp-gc` [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) to periodically clean up files in the SSD on each node. This is necessary because files on the SSDs are not automatically cleaned up if pods crash or are rescheduled which can cause the SSDs to fill up.
+1. Append the `kubectl apply` command for the provided `pod-tmp-gc` [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/) to `kubectl-apply-all.sh to periodically clean up files in the SSD on each node. This is necessary because files on the SSDs are not automatically cleaned up if pods crash or are rescheduled which can cause the SSDs to fill up.
+
+   ```bash
+   echo kubectl apply --prune -l deploy=pod-tmp-gc -f configure/ssd --recursive >> kubectl-apply-all.sh
+   ```
+
+1. Apply your changes to `pod-tmp-gc` and the base deployments to the cluster.
+
+   ```bash
+   ./kubectl-apply-all.sh
+   ```
 
 Here is a convenience script:
 
@@ -35,6 +45,6 @@ DS=configure/ssd/pod-tmp-gc.DaemonSet.yaml
 cat $DS | yj | jq ".spec.template.spec.volumes = [{name: \"pod-tmp\", hostPath: {path: \"$SSD_NODE_PATH/pod-tmp\"}}]" | jy -o $DS
 
 # Deploy everything
-kubectl apply --prune -l deploy=sourcegraph -f base --recursive
-kubectl apply --prune -l deploy=pod-tmp-gc -f configure/ssd --recursive
+echo kubectl apply --prune -l deploy=pod-tmp-gc -f configure/ssd --recursive >> kubectl-apply-all.sh
+./kubectl-apply-all.sh
 ```

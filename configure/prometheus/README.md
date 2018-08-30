@@ -22,11 +22,18 @@
    myCustomMetric2 = sum by (route, ns, le)(task:src_http_request_duration_seconds_bucket:rate5m)
    ```
 
-2. Optional: [Enable Alertmanager](alertmanager/README.md).
-3. Apply the Prometheus resources to your cluster.
+1. Optional: [Enable Alertmanager](alertmanager/README.md).
+
+1. Append the `kubectl apply` command for the Prometheus resources to your cluster.
 
    ```bash
-   kubectl apply --prune -l deploy=prometheus -f configure/prometheus --recursive
+   echo kubectl apply --prune -l deploy=prometheus -f configure/prometheus --recursive >> kubectl-apply-all.sh
+   ```
+
+1. Apply your changes to Prometheus to the cluster.
+
+   ```bash
+   ./kubectl-apply-all.sh
    ```
 
 ## Making Prometheus accessible
