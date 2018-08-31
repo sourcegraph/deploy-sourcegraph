@@ -7,16 +7,20 @@ needed). Check the [Sourcegraph blog](https://about.sourcegraph.com/blog) for re
 
 ## Steps
 
-1. Deploy the desired version of Sourcegraph to your Kubernetes cluster:
+1. Following the [forking instructions in docs/configure.md](configure.md#fork-this-repository), rebase your fork on the new version tag from https://github.com/sourcegraph/deploy-sourcegraph/releases
 
    ```bash
-   wget https://github.com/sourcegraph/deploy-sourcegraph/archive/${VERSION}.zip # Choose which version you want to deploy from https://github.com/sourcegraph/deploy-sourcegraph/releases
-   unzip ${VERSION}.zip
-   cd deploy-sourcegraph-${VERSION}
-   kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+   cd $DEPLOY_SOURCEGRAPH_FORK
+   git rebase $VERSION # Choose which version you want to deploy from https://github.com/sourcegraph/deploy-sourcegraph/releases
    ```
 
-2. Monitor the status of the deployment.
+1. Deploy the updated version of Sourcegraph to your Kubernetes cluster:
+
+   ```bash
+   ./kubectl-apply-all.sh
+   ```
+
+1. Monitor the status of the deployment.
 
    ```bash
    watch kubectl get pods -o wide
