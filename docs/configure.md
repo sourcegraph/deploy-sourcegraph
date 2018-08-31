@@ -25,12 +25,11 @@ This will make upgrades far easier and is a good practice not just for Sourcegra
 
    The `mycompany` branch is your development branch. Commit all your configuration changes to this branch. When you upgrade Sourcegraph Data Center, you will rebase this branch on top of the tag corresponding to the new version.
 
-1. Track the following changes in your fork:
+1. You should commit the following customizations to your fork:
 
-   - Modifications to Kubernetes YAML files.
-   - `kubect apply` commands that are used for adding a new deployment (beyond the base deployment) or another Kubernetes YAML file to the cluster should be added to `./kubectl-apply-all.sh`
-   - Standalone `kubectl` commands (e.g., `kubectl create secret`, `kubectl expose`) should be added
-     to `./create-immutable-and-secrets.sh`.
+   - Any modifications to Kubernetes YAML files.
+   - `kubectl apply` commands that are used for adding a new deployment (beyond the base deployment) or another Kubernetes YAML file to the cluster should be added to [`./kubectl-apply-all.sh`](../kubectl-apply-all.sh). This script should be ran whenever you want to apply any configuration changes to the clusters resources.
+   - One-off `kubectl` commands (e.g. commands like `kubectl create secret`, `kubectl expose` that are typically only run once upon cluster creation) should be added to [`./create-new-cluster.sh`](../create-new-cluster.sh).
 
 ## Dependencies
 
@@ -83,7 +82,7 @@ Run one of the following commands depending on your desired transport protocol:
   kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=443 --target-port=3443
   ```
 
-Add the command you ran to `configure/create-immutable-and-secrets.sh` and commit the change.
+Add the command you ran to `create-new-cluster.sh` and commit the change.
 
 Once the load balancer has acquired an external IP address, you should be able to access Sourcegraph using that. You can check the external IP address by running the following command:
 
@@ -207,7 +206,11 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 **WARNING:** Do NOT commit the actual TLS cert and key files to your fork (unless your fork is
 private **and** you are okay with storing secrets in it).
 
-Add the `kubectl create secret ...` command to `configure/create-immutable-and-secrets.sh` and commit the outstanding changes.
+6. Add the `kubectl create secret ...` command to `create-new-cluster.sh` and commit the outstanding changes.
+
+   ```bash
+   echo kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY >> create-new-cluster.sh
+   ```
 
 ## Configure repository cloning via SSH
 
@@ -257,7 +260,13 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
 **WARNING:** Do NOT commit the actual `id_rsa` and `known_hosts` files to your fork (unless
 your fork is private **and** you are okay with storing secrets in it).
 
-Add the `kubectl create secret ...` command to `configure/create-immutable-and-secrets.sh` and commit the outstanding changes.
+4. Add the `kubectl create secret ...` command to `create-new-cluster.sh` and commit the outstanding changes.
+
+```bash
+echo kubectl create secret generic gitserver-ssh \
+    --from-file id_rsa=$HOME/id_rsa \
+    --from-file known_hosts=$HOME/known_hosts >> create-new-cluster.sh
+```
 
 ## Configure language servers
 
