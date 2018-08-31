@@ -46,7 +46,6 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 - [Configure repository cloning via SSH](#configure-repository-cloning-via-ssh)
 - [Configure language servers](#configure-language-servers)
 - [Configure SSDs to boost performance](../configure/ssd/README.md).
-- TODO: [Increase memory or CPU limits](TODO)
 
 ### Less common configuration
 
