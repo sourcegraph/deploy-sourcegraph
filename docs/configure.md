@@ -351,8 +351,6 @@ See [the official documentation](https://kubernetes.io/docs/concepts/configurati
 
 ## Configure a storage class
 
-TODO: the default storage class is typically spinny disks, not SSDs. Up until now, install instructions have instructed to use SSDs. This could have perf implications. This might be important enough to include in the main install instructions.
-
 Sourcegraph relies on the default storage class of your cluster. If your cluster does not have a default storage class or if you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class.
 
 ```bash
