@@ -3,29 +3,25 @@
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 VERSION="$1"
-LATEST="${LATEST:-true}"
 
 if [ -z "$VERSION" ] || [ "$VERSION" = "-h" ] || [ "$VERSION" = "--help" ]; then
     cat <<'EOF'
-Usage: LATEST={true(default)|false} ./release.sh X.Y.Z
+Usage: ./release.sh X.Y.Z
 
   This script cuts a new release of Sourcegraph Data Center (optionally tagging it as the latest version).
   It performs the following actions:
 
   * Check out a temporary branch `release-tmp-branch`
   * Writes= the version to the Chart.yaml and commit this change.
-  * `git tag` the revision as "vX.Y.Z" and push it upstream.
+  * `git tag` the revision as "vX.Y.Z-helm" and push it upstream.
   * Check out the previously checked-out revision and delete `release-tmp-branch`.
-  * Unless LATEST=false, `git tag` and push upstream the new version as the `latest` tag.
 EOF
     exit 1
 fi
 
-if [ "$LATEST" = "true" ]; then
-    echo -n "Is the commit you wish to release as version $VERSION (and LATEST) currently checked out? [y/N] "
-else
-    echo -n "Is the commit you wish to release as version $VERSION (NOT latest) currently checked out? [y/N] "
-fi
+
+echo -n "Is the commit you wish to release as version v$VERSION-helm currently checked out? [y/N] "
+
 read shouldProceed
 if [ "$shouldProceed" != "y" ] && [ "$shouldProceed" != "Y" ]; then
     echo "Aborting."
@@ -50,21 +46,12 @@ version: ${VERSION}
 home: https://sourcegraph.com
 EOF
 git commit -a -m "Release ${VERSION}"
-git tag "v${VERSION}"
+git tag "v${VERSION}-helm"
 git checkout "$CURRENT_REV"
 git branch -D release-tmp-branch &> /dev/null || true
 
 # Push up the tag $VERSION
-git push origin "v${VERSION}"
+git push origin "v${VERSION}-helm"
 
 set +ex
-echo "Sourcegraph Data Center ${VERSION} published."
-
-set -ex
-if [ "$LATEST" = "true" ]; then
-    git tag -d latest > /dev/null || true
-    git tag latest "v${VERSION}"
-    git push -f origin latest
-    set +ex
-    echo "Sourcegraph Data Center ${VERSION} tagged as latest."
-fi
+echo "Sourcegraph Data Center v${VERSION}-helm published."
