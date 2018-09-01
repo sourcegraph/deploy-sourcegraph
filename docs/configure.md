@@ -28,7 +28,7 @@ This will make upgrades far easier and is a good practice not just for Sourcegra
 
    - Commit manual modifications to Kubernetes YAML files.
    - Commit commands that should be run on every update (e.g. `kubectl apply`) to [./kubectl-apply-all.sh](../kubectl-apply-all.sh).
-   - Commit commands that generally only need to be run once per cluster to (e.g. `kubectl create secret`, `kubectl expose`) to [`./create-new-cluster.sh`](../create-new-cluster.sh).
+   - Commit commands that generally only need to be run once per cluster to (e.g. `kubectl create secret`, `kubectl expose`) to [./create-new-cluster.sh](../create-new-cluster.sh).
 
 ## Dependencies
 
@@ -80,7 +80,7 @@ Run one of the following commands depending on your desired transport protocol:
   kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=443 --target-port=3443
   ```
 
-Add the command you ran to `create-new-cluster.sh` and commit the change.
+Add the command you ran to [create-new-cluster.sh](../create-new-cluster.sh) and commit the change.
 
 Once the load balancer has acquired an external IP address, you should be able to access Sourcegraph using that. You can check the external IP address by running the following command:
 
@@ -164,6 +164,12 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
    kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY
    ```
 
+   Update [create-new-cluster.sh](../create-new-cluster.sh) with the previous command.
+
+   ```
+   echo kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY >> create-new-cluster.sh
+   ```
+
 2. Add the `TLS_CERT` and `TLS_KEY` environment variables to [base/frontend/sourcegraph-frontend.Deployment.yaml](../base/frontend/sourcegraph-frontend.Deployment.yaml).
 
    ```yaml
@@ -204,12 +210,6 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
 **WARNING:** Do NOT commit the actual TLS cert and key files to your fork (unless your fork is
 private **and** you are okay with storing secrets in it).
 
-6. Add the `kubectl create secret ...` command to `create-new-cluster.sh` and commit the outstanding changes.
-
-   ```bash
-   echo kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY >> create-new-cluster.sh
-   ```
-
 ## Configure repository cloning via SSH
 
 Sourcegraph will clone repositories using SSH credentials if they are mounted at `/root/.ssh` in the `gitserver` deployment.
@@ -218,8 +218,16 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
 
    ```bash
    kubectl create secret generic gitserver-ssh \
-    --from-file id_rsa=~/.ssh/id_rsa \
-    --from-file known_hosts=~/.ssh/known_hosts
+    --from-file id_rsa=${HOME}/.ssh/id_rsa \
+    --from-file known_hosts=${HOME}/.ssh/known_hosts
+   ```
+
+   Update [create-new-cluster.sh](../create-new-cluster.sh) with the previous command.
+
+   ```bash
+   echo kubectl create secret generic gitserver-ssh \
+    --from-file id_rsa=${HOME}/.ssh/id_rsa \
+    --from-file known_hosts=${HOME}/.ssh/known_hosts >> create-new-cluster.sh
    ```
 
 2. Mount the [secret as a volume](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-files-from-a-pod) in [gitserver.StatefulSet.yaml](../base/gitserver/gitserver.StatefulSet.yaml).
@@ -257,14 +265,6 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
 
 **WARNING:** Do NOT commit the actual `id_rsa` and `known_hosts` files to your fork (unless
 your fork is private **and** you are okay with storing secrets in it).
-
-4. Add the `kubectl create secret ...` command to `create-new-cluster.sh` and commit the outstanding changes.
-
-```bash
-echo kubectl create secret generic gitserver-ssh \
-    --from-file id_rsa=$HOME/id_rsa \
-    --from-file known_hosts=$HOME/known_hosts >> create-new-cluster.sh
-```
 
 ## Configure language servers
 
