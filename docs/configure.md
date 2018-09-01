@@ -8,28 +8,27 @@ We provide simple instructions for common things like setting up TLS, enabling c
 ## Fork this repository
 
 We recommend you fork this repository to track your configuration changes in Git.
-This will make upgrades far easier and is a good practice not just for Sourcegraph, but for any Kubernetes-based application.
+This will make upgrades far easier and is a good practice not just for Sourcegraph, but for any Kubernetes application.
 
 1. Create a fork of this repository.
 
    - The fork can be public **unless** you plan to store secrets in the repository itself.
    - We recommend not storing secrets in the repository itself and these instructions document how.
 
-1. Create a branch that tracks the currently deployed version of Sourcegraph at your company.
+1. Create a release branch to track all of your customizations to Sourcegraph.
+   When you upgrade Sourcegraph Data Center, you will merge upstream into this branch.
 
    ```bash
-   git checkout HEAD -b mycompany
+   git checkout HEAD -b release
    ```
 
    If you followed the installation instructions, `HEAD` should point at the Git tag you've deployed to your running Kubernetes cluster.
 
-   The `mycompany` branch is your development branch. Commit all your configuration changes to this branch. When you upgrade Sourcegraph Data Center, you will rebase this branch on top of the tag corresponding to the new version.
+1. Commit customizations to your release branch:
 
-1. You should commit the following customizations to your fork:
-
-   - Any modifications to Kubernetes YAML files.
-   - `kubectl apply` commands that are used for adding a new deployment (beyond the base deployment) or another Kubernetes YAML file to the cluster should be added to [`./kubectl-apply-all.sh`](../kubectl-apply-all.sh). This script should be ran whenever you want to apply any configuration changes to the clusters resources.
-   - One-off `kubectl` commands (e.g. commands like `kubectl create secret`, `kubectl expose` that are typically only run once upon cluster creation) should be added to [`./create-new-cluster.sh`](../create-new-cluster.sh).
+   - Commit manual modifications to Kubernetes YAML files.
+   - Commit commands that should be run on every update (e.g. `kubectl apply`) to [./kubectl-apply-all.sh](../kubectl-apply-all.sh).
+   - Commit commands that generally only need to be run once per cluster to (e.g. `kubectl create secret`, `kubectl expose`) to [`./create-new-cluster.sh`](../create-new-cluster.sh).
 
 ## Dependencies
 

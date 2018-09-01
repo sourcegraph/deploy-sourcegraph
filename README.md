@@ -1,5 +1,3 @@
-> 🚨 For existing customers, please refer to [deploy-sourcegraph@helm-legacy](https://github.com/sourcegraph/deploy-sourcegraph/tree/helm-legacy) if you want to avoid the migration for 2.11.x. It will be required for 2.12.x and beyond.
-
 > 🚨 If you are updating from a 2.10.x or previous deployment, follow the migration steps in [docs/migrate.md](docs/migrate.md).
 
 # Sourcegraph Data Center
