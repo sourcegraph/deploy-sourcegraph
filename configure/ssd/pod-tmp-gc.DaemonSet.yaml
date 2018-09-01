@@ -1,10 +1,13 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   labels:
     deploy: pod-tmp-gc
   name: pod-tmp-gc
 spec:
+  selector:
+    matchLabels:
+      app: pod-tmp-gc
   template:
     metadata:
       labels:
