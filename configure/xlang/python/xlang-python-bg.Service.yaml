@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: xlang-python-bg
+    deploy: xlang-python
+  name: xlang-python-bg
+spec:
+  ports:
+  - name: lsp
+    port: 2087
+    targetPort: lsp
+  selector:
+    app: xlang-python-bg
+  type: ClusterIP

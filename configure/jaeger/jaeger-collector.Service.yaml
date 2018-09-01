@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: jaeger-collector
+    deploy: jaeger
+  name: jaeger-collector
+spec:
+  ports:
+  - name: jaeger-thrift
+    port: 14267
+    targetPort: jaeger-thrift
+  selector:
+    app: jaeger-collector
+  type: ClusterIP

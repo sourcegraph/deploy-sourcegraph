@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  labels:
+    deploy: pod-tmp-gc
+  name: pod-tmp-gc
+spec:
+  template:
+    metadata:
+      labels:
+        app: pod-tmp-gc
+      name: pod-tmp-gc
+    spec:
+      containers:
+      - args:
+        - $(NODE_NAME)
+        - /pod-tmp
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        image: sourcegraph/pod-tmp-gc:latest
+        name: pod-tmp-gc
+        resources:
+          limits:
+            cpu: 10m
+            memory: 20M
+        # Replace ${SSD_MOUNT_PATH} with the with the absolute directory path 
+        # on the node where the local SSD is mounted.
+        # See ../README.md for more information.
+        # 
+        # volumeMounts:
+        # - mountPath: ${SSD_MOUNT_PATH}/pod-tmp
+        #   name: pod-tmp
+      serviceAccountName: pod-tmp-gc
+  updateStrategy: {}

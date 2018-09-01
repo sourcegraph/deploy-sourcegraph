@@ -1,45 +1,37 @@
-# Updating
+# Updating Sourcegraph
 
-A new version of Sourcegraph is released every month (with patch releases in between, released as
-needed). Check the [Sourcegraph blog](https://about.sourcegraph.com/blog) for release announcements.
+> 🚨 If you are updating from a 2.10.x or previous deployment, follow the migration steps in [docs/migrate.md](docs/migrate.md) before updating.
 
-## Update Sourcegraph Data Center
+A new version of Sourcegraph is released every month (with patch releases in between, released as needed). Check the [Sourcegraph blog](https://about.sourcegraph.com/blog) for release announcements.
 
-To update configuration or update to a new version, do the following:
+## Steps
 
-1. Make whatever changes you want to your `values.yaml` file.
+1. Following the [forking instructions in docs/configure.md](configure.md#fork-this-repository), rebase your fork on the new version tag from https://github.com/sourcegraph/deploy-sourcegraph/releases
 
-1. (Recommended) Check the diff the update will apply to your Kubernetes cluster:
    ```bash
-   # NOTE: use `./helm.sh` instead of `helm` if you migrated from `sourcegraph-server-gen`
-   helm diff upgrade -f values.yaml sourcegraph https://github.com/sourcegraph/datacenter/archive/$VERSION.tar.gz | less -R
+   cd $DEPLOY_SOURCEGRAPH_FORK
+   git rebase $VERSION # Choose which version you want to deploy from https://github.com/sourcegraph/deploy-sourcegraph/releases
    ```
-   You can find a list of all version releases here: https://github.com/sourcegraph/deploy-sourcegraph/releases.
-   You may first need to install the Helm diff plugin:
+
+1. Deploy the updated version of Sourcegraph to your Kubernetes cluster:
+
    ```bash
-   helm plugin install https://github.com/databus23/helm-diff
+   ./kubectl-apply-all.sh
    ```
-1. Apply the update:
-   ```bash
-   # NOTE: use `./helm.sh` instead of `helm` if you migrated from `sourcegraph-server-gen`
-   helm upgrade -f values.yaml sourcegraph https://github.com/sourcegraph/datacenter/archive/$VERSION.tar.gz
-   ```
-1. Check the health of the cluster after upgrade:
+
+1. Monitor the status of the deployment.
+
    ```bash
    watch kubectl get pods -o wide
    ```
 
-### Rollback
+## Rollback
 
-```
-helm history sourcegraph
-helm rollback sourcegraph [REVISION]
-```
+You can rollback by performing the [update steps](#steps) with the previous version.
 
-Note: if an update includes a database migration, rollback will require some manual DB
+_If an update includes a database migration, rollback will require some manual DB
 modifications. We plan to eliminate these in the near future, but for now,
-email <mailto:support@sourcegraph.com> if you have concerns before updating to a new release.
-
+email <mailto:support@sourcegraph.com> if you have concerns before updating to a new release._
 
 ## Improving update reliability and latency with node selectors
 
@@ -51,11 +43,11 @@ accommodate them. This may be especially true if the cluster is heterogeneous (i
 have the same amount of CPU/memory).
 
 If this happens, do the following:
-* Use `kubectl drain $NODE` to drain a node of existing pods, so it has enough allocation for the larger
+
+- Use `kubectl drain $NODE` to drain a node of existing pods, so it has enough allocation for the larger
   service.
-* Run `watch kubectl get pods -o wide` and wait until the node has been drained. Run `kubectl get
-  pods` to check that all pods except for the resource-hungry one(s) have been assigned to a node.
-* Run `kubectl uncordon $NODE` to enable the larger pod(s) to be scheduled on the drained node.
+- Run `watch kubectl get pods -o wide` and wait until the node has been drained. Run `kubectl get pods` to check that all pods except for the resource-hungry one(s) have been assigned to a node.
+- Run `kubectl uncordon $NODE` to enable the larger pod(s) to be scheduled on the drained node.
 
 Note that the need to run the above steps can be prevented altogether
 with
@@ -63,23 +55,21 @@ with
 which tell Kubernetes to assign certain pods to specific nodes. See
 the [docs on enabling node selectors](scale.md#node-selector) for Sourcegraph Data Center.
 
-
 ## High-availability updates
 
 Sourcegraph Data Center is designed to be a high-availability (HA) service. Updates require zero downtime and employ
 health checks to test the health of newly updated components before switching live traffic over to them. HA-enabling
 features include the following:
 
-* Replication: nearly all of the critical services within Sourcegraph are replicated. If a single instance of a
+- Replication: nearly all of the critical services within Sourcegraph are replicated. If a single instance of a
   service fails, that instance is restarted and removed from operation until it comes online again.
-* Updates are applied in a rolling fashion to each service such that a subset of instances are updated first while
+- Updates are applied in a rolling fashion to each service such that a subset of instances are updated first while
   traffic continues to flow to the old instances. Once the health check determines the set of new instances is
   healthy, traffic is directed to the new set and the old set is terminated.
-* Each service includes a health check that detects whether the service is in a healthy state. This check is specific to
+- Each service includes a health check that detects whether the service is in a healthy state. This check is specific to
   the service. These are used to check the health of new instances after an update and during regular operation to
   determine if an instance goes down.
-* Database migrations are handled automatically on update when they are necessary.
-
+- Database migrations are handled automatically on update when they are necessary.
 
 ### Updating blue-green deployments
 
@@ -88,17 +78,15 @@ Some users may wish to opt for running two separate Sourcegraph clusters running
 the update step more complex, but it can still be done with the `sourcegraph-server-gen snapshot`
 command:
 
-* Suppose cluster A is currently live, and cluster B is in standby. As a precondition, both should
+- Suppose cluster A is currently live, and cluster B is in standby. As a precondition, both should
   be running the same version of Sourcegraph Data Center.
-* Upgrade `sourcegraph-server-gen` to the version of Sourcegraph Data Center currently running (`sourcegraph-server-gen update ${VERSION}`).
-* Snapshot A: Configure `kubectl` to access A and then run `sourcegraph-server-gen
-  snapshot create`.
-* Restore A's snapshot to B: Configure `kubectl` to access B and then run `sourcegraph-server-gen
-  snapshot restore` from the same directory as you ran it before.
-* Upgrade B to the new version.
-* Switch traffic over to B. (B is now live.)
-* Upgrade A to the new version.
-* Switch traffic back to A. (A is now live again.)
+- Upgrade `sourcegraph-server-gen` to the version of Sourcegraph Data Center currently running (`sourcegraph-server-gen update ${VERSION}`).
+- Snapshot A: Configure `kubectl` to access A and then run `sourcegraph-server-gen snapshot create`.
+- Restore A's snapshot to B: Configure `kubectl` to access B and then run `sourcegraph-server-gen snapshot restore` from the same directory as you ran it before.
+- Upgrade B to the new version.
+- Switch traffic over to B. (B is now live.)
+- Upgrade A to the new version.
+- Switch traffic back to A. (A is now live again.)
 
 After the update, cluster A will be live, cluster B will be in standby, and both will be running the
 same new version of Sourcegraph Data Center. You may lose a few minutes of database updates while A
@@ -107,7 +95,6 @@ is not live, but that is generally acceptable.
 To keep the database on B current, you may periodically wish to sync A's database over to B
 (`sourcegraph-server-gen snapshot create` on A, `sourcegraph-server-gen snapshot restore` on B). It
 is important that the versions of A and B are equivalent when this is done.
-
 
 ### Troubleshooting
 

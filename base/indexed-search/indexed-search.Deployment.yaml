@@ -1,0 +1,86 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    description: Backend for indexed text search operations.
+  labels:
+    deploy: sourcegraph
+  name: indexed-search
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: indexed-search
+    spec:
+      containers:
+      - args:
+        - zoekt-webserver
+        - -index
+        - /data/index
+        - -pprof
+        - -rpc
+        image: sourcegraph/zoekt:18-05-30_3d2275e
+        name: zoekt-webserver
+        ports:
+        - containerPort: 6070
+          name: http
+        readinessProbe:
+          failureThreshold: 1
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 1
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4G
+          requests:
+            cpu: 500m
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+      - args:
+        - zoekt-sourcegraph-indexserver
+        - -index
+        - /data/index
+        - -sourcegraph_url
+        - http://sourcegraph-frontend-internal
+        - -listen
+        - :6072
+        - -interval
+        - 1m
+        - -cpu_fraction
+        - "1.0"
+        image: sourcegraph/zoekt:18-05-30_3d2275e
+        name: zoekt-indexserver
+        ports:
+        - containerPort: 6072
+          name: index-http
+        resources:
+          # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
+          # lower lag between a new commit and it being indexed for search.
+          limits:
+            cpu: "4"
+            memory: 4G
+          requests:
+            cpu: 500m
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: disk
+        persistentVolumeClaim:
+          claimName: indexed-search

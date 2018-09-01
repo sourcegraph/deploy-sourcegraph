@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Stores clones of repositories to perform Git operations.
+  labels:
+    deploy: sourcegraph
+  name: gitserver
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: gitserver
+  serviceName: gitserver
+  template:
+    metadata:
+      labels:
+        app: gitserver
+        group: backend
+        type: gitserver
+    spec:
+      containers:
+      - args:
+        - run
+        env:
+        - name: SOURCEGRAPH_CONFIG_FILE
+          value: /etc/sourcegraph/config.json
+        - name: SRC_REPOS_DIR
+          value: /data/repos
+        image: sourcegraph/gitserver:2.11.0
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: rpc
+          timeoutSeconds: 5
+        name: gitserver
+        ports:
+        - containerPort: 3178
+          name: rpc
+        resources:
+          limits:
+            cpu: "4"
+            memory: 8G
+          requests:
+            cpu: 500m
+            memory: 1G
+        volumeMounts:
+        - mountPath: /etc/sourcegraph
+          name: sg-config
+        - mountPath: /data/repos
+          name: repos
+        # See the customization guide (../../../docs/configure.md) for information 
+        # about configuring gitserver to use an SSH key
+        # - mountPath: /root/.ssh
+        #   name: ssh
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - configMap:
+          defaultMode: 464
+          name: config-file
+        name: sg-config
+      - name: repos
+      # See the customization guide (../../../docs/configure.md) for information 
+      # about configuring gitserver to use an SSH key
+      # - name: ssh
+      #   secret:
+      #     defaultMode: 384
+      #     secretName: gitserver-ssh
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: repos
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          # The size of disk used to mirror your git repositories.
+          # If you change this, also change indexed-search's disk size.
+          storage: 200Gi
