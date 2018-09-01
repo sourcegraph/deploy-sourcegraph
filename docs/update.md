@@ -6,11 +6,17 @@ A new version of Sourcegraph is released every month (with patch releases in bet
 
 ## Steps
 
-1. Following the [forking instructions in docs/configure.md](configure.md#fork-this-repository), rebase your fork on the new version tag from https://github.com/sourcegraph/deploy-sourcegraph/releases
+These steps assume that you followed the [forking instructions in docs/configure.md](configure.md#fork-this-repository)
+
+1. Merge the new version of Sourcegraph into your release branch.
 
    ```bash
    cd $DEPLOY_SOURCEGRAPH_FORK
-   git rebase $VERSION # Choose which version you want to deploy from https://github.com/sourcegraph/deploy-sourcegraph/releases
+   git fetch
+   git checkout release
+
+   # Choose which version you want to deploy from https://github.com/sourcegraph/deploy-sourcegraph/releases
+   git merge $VERSION
    ```
 
 1. Deploy the updated version of Sourcegraph to your Kubernetes cluster:
@@ -27,7 +33,7 @@ A new version of Sourcegraph is released every month (with patch releases in bet
 
 ## Rollback
 
-You can rollback by performing the [update steps](#steps) with the previous version.
+You can rollback by resetting your `release` branch to the old state and proceeding with step 2 above.
 
 _If an update includes a database migration, rollback will require some manual DB
 modifications. We plan to eliminate these in the near future, but for now,
