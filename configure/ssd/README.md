@@ -48,3 +48,5 @@ cat $DS | yj | jq ".spec.template.spec.volumes = [{name: \"pod-tmp\", hostPath: 
 echo kubectl apply --prune -l deploy=pod-tmp-gc -f configure/ssd --recursive >> kubectl-apply-all.sh
 ./kubectl-apply-all.sh
 ```
+
+_Note: If you are deploying Sourcegraph to a non-default namespace, you'll have to change the namespace specified in [configure/ssd/pod-tmp-gc.ClusterRoleBinding.yaml](pod-tmp-gc.ClusterRoleBinding.yaml) to the one that you created._

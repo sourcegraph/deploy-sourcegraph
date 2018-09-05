@@ -36,6 +36,8 @@
    ./kubectl-apply-all.sh
    ```
 
+_Note: If you are deploying Sourcegraph to a non-default namespace, you'll have to change the namespace specified in [configure/prometheus/prometheus.ClusterRoleBinding.yaml](prometheus.ClusterRoleBinding.yaml) to the one that you created._
+
 ## Making Prometheus accessible
 
 ### Port-forwarding
