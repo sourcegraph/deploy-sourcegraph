@@ -45,7 +45,7 @@ name: sourcegraph
 version: ${VERSION}
 home: https://sourcegraph.com
 EOF
-git commit -a -m "Release ${VERSION}"
+git commit -a -m "Release ${VERSION}-helm"
 git tag "v${VERSION}-helm"
 git checkout "$CURRENT_REV"
 git branch -D release-tmp-branch &> /dev/null || true
