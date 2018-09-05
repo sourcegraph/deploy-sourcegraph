@@ -2,22 +2,21 @@
 
 ## Requirements
 
-*   <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/" target="_blank">kubectl</a>, v1.8.6 or later
-*   <a href="https://docs.helm.sh/using_helm/#installing-helm" target="_blank">Helm</a>, v2.9.1 or later
-*   Access to server infrastructure on which you can create a Kubernetes cluster (see
-    [resource allocation guidelines](scale.md))
+- <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/" target="_blank">kubectl</a>, v1.8.6 or later
+- <a href="https://docs.helm.sh/using_helm/#installing-helm" target="_blank">Helm</a>, v2.9.1 or later
+- Access to server infrastructure on which you can create a Kubernetes cluster (see
+  [resource allocation guidelines](scale.md))
 
 ## Install
 
 > **Note:** Sourcegraph sends performance and usage data to Sourcegraph to help us make our product
 > better for you. The data sent does NOT include any source code or file data (including URLs that
-> might implicitly contain this information).  You can view traces and disable telemetry in the site
+> might implicitly contain this information). You can view traces and disable telemetry in the site
 > admin area on the server.
 
 Sourcegraph Data Center is deployed using Kubernetes. Before proceeding with these
 instructions, [provision a Kubernetes](k8s.md) cluster on the infrastructure of your choice. Make
 sure you have [configured `kubectl` to access your cluster](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/).
-
 
 1. Install Tiller with RBAC privileges (the server-side counterpart to Helm) on your cluster:
 
@@ -30,9 +29,9 @@ sure you have [configured `kubectl` to access your cluster](https://kubernetes.i
    helm init --service-account tiller
    ```
 
-   * If installing Tiller is not an option, consult the instructions below
+   - If installing Tiller is not an option, consult the instructions below
      for [installing without Tiller](#install-without-tiller).
-   * If your Kubernetes environment does not permit RBAC, consult the instructions below
+   - If your Kubernetes environment does not permit RBAC, consult the instructions below
      for [installing without RBAC](#install-without-rbac).
 
 1. Create a `values.yaml` file with the following contents:
@@ -66,7 +65,7 @@ sure you have [configured `kubectl` to access your cluster](https://kubernetes.i
 1. Install the Helm chart to your cluster:
 
    ```bash
-   helm install --name sourcegraph -f values.yaml https://github.com/sourcegraph/datacenter/archive/latest.tar.gz
+   helm install --name sourcegraph -f values.yaml https://github.com/sourcegraph/deploy-sourcegraph/archive/v2.11.0-helm.tar.gz
    ```
 
    If you see the error `could not find a ready tiller pod`, wait a minute and try again.
@@ -82,7 +81,7 @@ sure you have [configured `kubectl` to access your cluster](https://kubernetes.i
    [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html),
    [Google Cloud Platform Firewall rules](https://cloud.google.com/compute/docs/vpc/using-firewalls)).
    Sourcegraph should then be accessible at `$EXTERNAL_ADDR:30080`, where `$EXTERNAL_ADDR` is the
-   address of *any* node in the cluster. For production environments, we recommend using
+   address of _any_ node in the cluster. For production environments, we recommend using
    an [Internet Gateway](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Internet_Gateway.html) (or
    equivalent) and configuring a load balancer in Kubernetes.
 
@@ -123,11 +122,12 @@ helm upgrade -f values.yaml sourcegraph https://github.com/sourcegraph/datacente
 ```
 
 For more information,
-* Refer to the [examples](../examples) directory for an example of a cluster config with code
+
+- Refer to the [examples](../examples) directory for an example of a cluster config with code
   intelligence enabled.
-* See the [language-specific docs](https://about.sourcegraph.com/docs/code-intelligence) for
+- See the [language-specific docs](https://about.sourcegraph.com/docs/code-intelligence) for
   configuring specific languages.
-* [Contact us](mailto:support@sourcegraph.com) with questions or problems relating to code
+- [Contact us](mailto:support@sourcegraph.com) with questions or problems relating to code
   intelligence.
 
 ### Additional configuration
@@ -155,7 +155,6 @@ your Sourcegraph Data Center instance.
 
 See the [Troubleshooting page](troubleshoot.md).
 
-
 ### Install without RBAC
 
 Sourcegraph Data Center communicates with the Kubernetes API for service discovery. It also has some janitor DaemonSets
@@ -164,9 +163,9 @@ Helm's
 [Role-based Access Control documentation](https://github.com/kubernetes/helm/blob/v2.8.2/docs/rbac.md).
 
 If using RBAC is not an option, then
-* Set `"site.rbac": "disabled"` in your `values.yaml`
-* Run `helm init` instead of `helm init --service-account tiller` to install Tiller.
 
+- Set `"site.rbac": "disabled"` in your `values.yaml`
+- Run `helm init` instead of `helm init --service-account tiller` to install Tiller.
 
 ### Install without Tiller
 
