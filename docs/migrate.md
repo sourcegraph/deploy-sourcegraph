@@ -7,7 +7,7 @@ Two things have changed in 2.11.x that require migration:
 
 ## Deferring migration
 
-If you want to update to 2.11.x without performing any migrations, you can use 2.11.x-no-migration tags.
+If you want to update to 2.11.x without performing any migrations, you can use 2.11.x-helm tags.
 
 2.12.x will require this migration.
 
