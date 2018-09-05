@@ -7,7 +7,7 @@ Two things have changed in 2.11.x that require migration:
 
 ## Deferring migration
 
-If you want to update to 2.11.x without performing any migrations, you can use 2.11.x-helm tags.
+If you want to update to 2.11.x without performing any migrations, you can use the 2.11.x-helm tags and follow the [helm-legacy update instructions](https://github.com/sourcegraph/deploy-sourcegraph/blob/helm-legacy/docs/update.md).
 
 2.12.x will require this migration.
 
