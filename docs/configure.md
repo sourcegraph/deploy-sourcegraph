@@ -298,12 +298,14 @@ We also have the following experimental language servers (please [read about the
 
 ## Configure gitserver replica count
 
+**Note: If you are changing `gitserver`'s default replica count, you should do so _before_ you `./kubectl-apply-all` the base resources to a fresh cluster (so that you avoid needing to resize existing volumes).**
+
 Repository clones are consistently striped across all `gitserver` replicas. Other services need to be aware of how many `gitserver` replicas exist so they can resolve an individual repo.
 
 To change the number of `gitserver` replicas:
 
 1. Update the `replicas` field in [gitserver.StatefulSet.yaml](../base/gitserver/gitserver.StatefulSet.yaml).
-2. Update the `SRC_GIT_SERVERS` environment variable in all services to reflect the number of replicas.
+1. Update the `SRC_GIT_SERVERS` environment variable in all services to reflect the number of replicas.
 
    For example, if there are 2 gitservers then `SRC_GIT_SERVERS` should have the value `gitserver-0.gitserver:3178 gitserver-1.gitserver:3178`.
 
@@ -313,7 +315,19 @@ To change the number of `gitserver` replicas:
          value: gitserver-0.gitserver:3178 gitserver-1.gitserver:3178
    ```
 
-Here is a convenience script that performs both steps:
+1. Update the requested `storage` capacity in [base/indexed-search/indexed-search.PersistentVolumeClaim.yaml](../base/indexed-search/indexed-search.PersistentVolumeClaim.yaml) to be `200Gi` multiplied by the number of `gitserver` replicas.
+
+   For example, if there are 2 `gitserver` replicas then the `storage` requested in [base/indexed-search/indexed-search.PersistentVolumeClaim.yaml](../base/indexed-search/indexed-search.PersistentVolumeClaim.yaml) should have the value `400Gi`.
+
+   ```yaml
+   # base/indexed-search/indexed-search.PersistentVolumeClaim.yaml
+   spec:
+     resources:
+       requests:
+         storage: 400Gi
+   ```
+
+Here is a convenience script that performs all three steps:
 
 ```bash
 # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
@@ -330,6 +344,11 @@ GITSERVERS=$(for i in `seq 0 $(($REPLICA_COUNT-1))`; do echo -n "gitserver-$i.gi
 
 # Update SRC_GIT_SERVERS environment variable in other services
 find . -name "*yaml" -exec sed -i.sedibak -e "s/value: gitserver-0.gitserver:3178.*/value: $GITSERVERS/g" {} +
+
+IDX_SEARCH=base/indexed-search/indexed-search.PersistentVolumeClaim.yaml
+
+# Update the storage requested in indexed-search's persistent volume claim
+cat $IDX_SEARCH | yj | jq --arg REPLICA_COUNT "$REPLICA_COUNT" '.spec.resources.requests.storage = ((($REPLICA_COUNT |tonumber)  * 200) | tostring)+"Gi"' | jy -o $IDX_SEARCH
 
 # Delete sed's backup files
 find . -name "*.sedibak" -delete
