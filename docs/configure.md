@@ -318,10 +318,12 @@ Here is a convenience script that performs both steps:
 ```bash
 # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
 
+GS=base/gitserver/gitserver.StatefulSet.yaml
+
 REPLICA_COUNT=2 # number of gitserver replicas
 
 # Update gitserver replica count
-cat $GS | yj | jq ".spec.replicas = \"$REPLICA_COUNT\"" | jy -o $GS
+cat $GS | yj | jq ".spec.replicas = $REPLICA_COUNT" | jy -o $GS
 
 # Compute all gitserver names
 GITSERVERS=$(for i in `seq 0 $(($REPLICA_COUNT-1))`; do echo -n "gitserver-$i.gitserver:3178 "; done)
