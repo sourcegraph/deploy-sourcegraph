@@ -300,9 +300,9 @@ We also have the following experimental language servers (please [read about the
 
 **Note:** If you're creating a new cluster and would like to change `gitserver`'s replica count, do
 so _before_ running `./kubectl-apply-all.sh` for the first time. Changing this after the cluster
-configuration has been applied will require manually resizing the `gitserver` volume.
+configuration has been applied will require manually resizing the `indexed-search` volume.
 
-Repository clones are consistently striped across all `gitserver` replicas. Other services need to be aware of how many `gitserver` replicas exist so they can resolve an individual repo.
+Increasing the number of `gitserver` replicas can improve performance when your instance contains a large number of repositories. Repository clones are consistently striped across all `gitserver` replicas. Other services need to be aware of how many `gitserver` replicas exist so they can resolve an individual repo.
 
 To change the number of `gitserver` replicas:
 
