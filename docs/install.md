@@ -30,7 +30,7 @@
    git clone https://github.com/sourcegraph/deploy-sourcegraph && cd deploy-sourcegraph && git checkout ${VERSION}
    ```
 
-1. **If you want to change the number of `gitserver` replicas, you should follow [the instructions in configure.md](configure.md#configure-gitserver-replica-count) _before_ doing the next step**.
+1. If you want to change the number of `gitserver` replicas, follow [the instructions in configure.md](configure.md#configure-gitserver-replica-count) _before_ the next step.
 
 1. Deploy the desired version of Sourcegraph to your cluster:
 

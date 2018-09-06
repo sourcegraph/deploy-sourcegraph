@@ -298,7 +298,9 @@ We also have the following experimental language servers (please [read about the
 
 ## Configure gitserver replica count
 
-**Note: If you are changing `gitserver`'s default replica count, you should do so _before_ you `./kubectl-apply-all` the base resources to a fresh cluster (so that you avoid needing to resize existing volumes).**
+**Note:** If you're creating a new cluster and would like to change `gitserver`'s replica count, do
+so _before_ running `./kubectl-apply-all.sh` for the first time. Changing this after the cluster
+configuration has been applied will require manually resizing the `gitserver` volume.
 
 Repository clones are consistently striped across all `gitserver` replicas. Other services need to be aware of how many `gitserver` replicas exist so they can resolve an individual repo.
 
@@ -307,7 +309,7 @@ To change the number of `gitserver` replicas:
 1. Update the `replicas` field in [gitserver.StatefulSet.yaml](../base/gitserver/gitserver.StatefulSet.yaml).
 1. Update the `SRC_GIT_SERVERS` environment variable in all services to reflect the number of replicas.
 
-   For example, if there are 2 gitservers then `SRC_GIT_SERVERS` should have the value `gitserver-0.gitserver:3178 gitserver-1.gitserver:3178`.
+   For example, if there are 2 gitservers then `SRC_GIT_SERVERS` should have the value `gitserver-0.gitserver:3178 gitserver-1.gitserver:3178`:
 
    ```yaml
    - env:
