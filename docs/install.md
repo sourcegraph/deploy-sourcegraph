@@ -30,7 +30,7 @@
    git clone https://github.com/sourcegraph/deploy-sourcegraph && cd deploy-sourcegraph && git checkout ${VERSION}
    ```
 
-1. If you want to add a large number of repositories to your instance, you might want to increase the number of `gitserver` replicas ([the instructions to do so are in configure.md](configure.md#configure-gitserver-replica-count)). You should do this _before_ you continue with the next step.
+1. If you want to add a large number of repositories to your instance, you should [configure the number of gitserver replicas](configure.md#configure-gitserver-replica-count) _before_ you continue with the next step.
 
 1. Deploy the desired version of Sourcegraph to your cluster:
 
