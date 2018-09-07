@@ -1,6 +1,7 @@
 > 🚨 If you are updating from a 2.10.x or previous deployment, follow the migration steps in [docs/migrate.md](docs/migrate.md).
 
 # Sourcegraph Data Center
+[![sourcegraph: search](https://img.shields.io/badge/sourcegraph-search-brightgreen.svg)](https://sourcegraph.com/github.com/sourcegraph/sourcegraph-extension-api)
 
 Sourcegraph Data Center is for organizations that need highly scalable and available code search and
 code intelligence. This repository contains documentation for creating, updating, and maintaining a
