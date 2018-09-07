@@ -45,6 +45,7 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 - [Configure repository cloning via SSH](#configure-repository-cloning-via-ssh)
 - [Configure language servers](#configure-language-servers)
 - [Configure SSDs to boost performance](../configure/ssd/README.md).
+- [Increase memory or CPU limits](#increase-memory-or-cpu-limits)
 
 ### Less common configuration
 
@@ -295,6 +296,10 @@ We also have the following experimental language servers (please [read about the
 - [R](../configure/xlang/experimental/r/README.md)
 - [Ruby](../configure/xlang/experimental/ruby/README.md)
 - [Rust](../configure/xlang/experimental/rust/README.md)
+
+## Increase memory or CPU limits
+
+If your instance contains a large number of repositories or monorepos, changing the compute resources allocated to containers can improve performance. See [Kubernetes' official documentation](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for information about compute resources and how to specify then, and see [docs/scale.md](scale.md) for specific advice about what resources to tune.
 
 ## Configure gitserver replica count
 
