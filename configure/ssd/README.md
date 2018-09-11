@@ -1,6 +1,6 @@
 # SSDs
 
-Using local SSDs dramatically speeds up many of Sourcegraph's services. Read your cloud provider's documentation for mouting local SSDs.
+Using local SSDs dramatically speeds up many of Sourcegraph's services. Even if the cluster's default storage class uses SSDs, it's likely network-mounted rather than local. that Read your cloud provider's documentation for mouting local SSDs.
 
 - [GCP](https://cloud.google.com/compute/docs/disks/local-ssd)
 - [AWS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ssd-instance-store.html)
