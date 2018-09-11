@@ -377,7 +377,13 @@ See [the official documentation](https://kubernetes.io/docs/concepts/configurati
 
 ## Configure a storage class
 
-Sourcegraph relies on the default storage class of your cluster. If your cluster does not have a default storage class or if you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class.
+**Note:** The storage class configuration steps should be done _before_ running `./kubectl-apply-all.sh` for the first time.
+
+Sourcegraph specifies a default storage class in [base/default.StorageClass.yaml](../base/default.StorageClass.yaml).
+
+It can be configured by reading through the [Kubernetes storage class documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/) and specifying the `provisioner` and `parameters` fields in [base/default.StorageClass.yaml](../base/default.StorageClass.yaml) with the correct values for your hosting provider (e.x.: [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce), [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws), [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk)). **We highly recommend that the storage class use SSDs as the underlying disk type.**
+
+If you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class.
 
 ```bash
 # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
