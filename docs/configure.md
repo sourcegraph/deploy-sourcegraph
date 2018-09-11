@@ -406,6 +406,24 @@ By default, Sourcegraph uses the default storage class of your cluster. However,
 
 1. Read through the [Kubernetes storage class documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/), and fill in the `provisioner` and `parameters` fields in `base/default.StorageClass.yaml` with the correct values for your hosting provider (e.x.: [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce), [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws), [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk)). **Again, we highly recommend that the storage class use SSDs as the underlying disk type.**
 
+1. [Mark the existing storage classes in your cluster as non-default](https://kubernetes.io/docs/tasks/administer-cluster/change-default-storage-class/#changing-the-default-storageclass):
+
+   ```bash
+    kubectl get sc -o json | jq --raw-output ".items | map(select(.metadata.name)) | .[] | \"kubectl patch sc -p '{\\\"metadata\\\":{\\\"annotations\\\":{\\\"storageclass.kubernetes.io/is-default-class\\\":\\\"false\\\"}}}' \\(.metadata.name)\"" | bash
+   ```
+
+1. In [create-new-cluster.sh](../create-new-cluster.sh), add the above command _before_ `./kubectl-apply-all`.
+
+   ```bash
+   #!/bin/bash
+
+   # Mark the existing storage classes in the cluster as non-default
+   kubectl get sc -o json | jq --raw-output ".items | map(select(.metadata.name)) | .[] | \"kubectl patch sc -p '{\\\"metadata\\\":{\\\"annotations\\\":{\\\"storageclass.kubernetes.io/is-default-class\\\":\\\"false\\\"}}}' \\(.metadata.name)\"" | bash
+
+   ./kubectl-apply-all.sh
+   ...
+   ```
+
 1. In [kubectl-apply-all.sh](../kubectl-apply-all.sh), add the `kubectl apply` command for `base/default.StorageClass.yaml` _before_ the `kubectl apply` command for applying the base deployment.
 
    ```bash
