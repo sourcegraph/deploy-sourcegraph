@@ -377,7 +377,7 @@ See [the official documentation](https://kubernetes.io/docs/concepts/configurati
 
 ## Configure a storage class
 
-**Note:** The storage class configuration steps should be done _before_ running `./kubectl-apply-all.sh` for the first time.
+**Note:** The storage class configuration steps should be done _before_ running `./kubectl-apply-all.sh` for the first time. Otherwise, you'll have to manually migrate the PVCs that are already bound to the default storage class to the custom one that you specified.
 
 By default, Sourcegraph uses the default storage class of your cluster. However, **we highly recommend that you use a storage class that uses SSDs as the underlying disk type**. The configuration details for the storage class differs depending on your hosting provider, so you should:
 
