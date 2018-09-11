@@ -21,7 +21,7 @@
     command:
     - /go/bin/agent-linux
     - --collector.host-port=jaeger-collector:14267
-    image: docker.sourcegraph.com/jaeger-agent
+    image: sourcegraph/jaeger-agent
     name: jaeger-agent
     resources:
       limits:
