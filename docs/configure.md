@@ -379,9 +379,30 @@ See [the official documentation](https://kubernetes.io/docs/concepts/configurati
 
 **Note:** The storage class configuration steps should be done _before_ running `./kubectl-apply-all.sh` for the first time.
 
-Sourcegraph specifies a default storage class in [base/default.StorageClass.yaml](../base/default.StorageClass.yaml).
+By default, Sourcegraph uses the default storage class of your cluster. However, **we highly recommend that you use a storage class that uses SSDs as the underlying disk type**. The configuration details for the storage class differs depending on your hosting provider, so you should:
 
-It can be configured by reading through the [Kubernetes storage class documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/) and specifying the `provisioner` and `parameters` fields in [base/default.StorageClass.yaml](../base/default.StorageClass.yaml) with the correct values for your hosting provider (e.x.: [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce), [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws), [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk)). **We highly recommend that the storage class use SSDs as the underlying disk type.**
+1. Create a stub base/default.StorageClass.yaml.
+
+   ```yaml
+   # base/default.StorageClass.yaml
+   kind: StorageClass
+   apiVersion: storage.k8s.io/v1
+   metadata:
+     name: default
+     labels:
+       deploy: sourcegraph
+     annotations:
+       storageclass.kubernetes.io/is-default-class: "true"
+   # The values of following fields will differ depending on the cloud provider that you are using.
+   # Please read through https://kubernetes.io/docs/concepts/storage/storage-classes/
+   # in order to know what values to add. We recommend specifying SSDs as the disk type if possible.
+   # provisioner:
+   # parameters:
+   ```
+
+1. Read through the [Kubernetes storage class documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/), and fill in the `provisioner` and `parameters` fields in base/default.StorageClass.yaml with the correct values for your hosting provider (e.x.: [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce), [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws), [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk)). **Again, we highly recommend that the storage class use SSDs as the underlying disk type.**
+
+1. Commit base/default.StorageClass.yaml to your fork.
 
 If you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class.
 

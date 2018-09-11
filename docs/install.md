@@ -30,7 +30,7 @@
    git clone https://github.com/sourcegraph/deploy-sourcegraph && cd deploy-sourcegraph && git checkout ${VERSION}
    ```
 
-1. Configure the default storage class by reading through "Configure a storage class" in [docs/configure.md](../configure.md#configure-a-storage-class).
+1. Configure the cluster's default storage class by reading through "Configure a storage class" in [docs/configure.md](../configure.md#configure-a-storage-class).
 
 1. If you want to add a large number of repositories to your instance, you should [configure the number of gitserver replicas](configure.md#configure-gitserver-replica-count) _before_ you continue with the next step.
 
