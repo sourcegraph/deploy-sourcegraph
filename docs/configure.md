@@ -393,11 +393,15 @@ By default, Sourcegraph uses the default storage class of your cluster. However,
        deploy: sourcegraph
      annotations:
        storageclass.kubernetes.io/is-default-class: "true"
-   # The values of following fields will differ depending on the cloud provider that you are using.
-   # Please read through https://kubernetes.io/docs/concepts/storage/storage-classes/
-   # in order to know what values to add. We recommend specifying SSDs as the disk type if possible.
-   # provisioner:
+   #
+   # The values of the "provisioner" and "parameters" fields will differ depending on the cloud provider that you are using. Please read through https://kubernetes.io/docs/concepts/storage/storage-classes/ in order to know what values to add. We recommend specifying SSDs as the disk type if possible.
+   #
+   # For example, if you are using GKE with a cluster whose nodes are all in the "us-central1-a" zone, you could use the following values:
+   #
+   # provisioner: kubernetes.io/gce-pd
    # parameters:
+   #  type: pd-ssd
+   #  zones: us-central1-a
    ```
 
 1. Read through the [Kubernetes storage class documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/), and fill in the `provisioner` and `parameters` fields in `base/default.StorageClass.yaml` with the correct values for your hosting provider (e.x.: [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce), [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws), [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk)). **Again, we highly recommend that the storage class use SSDs as the underlying disk type.**
