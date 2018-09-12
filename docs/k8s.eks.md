@@ -45,7 +45,7 @@ Follow the [EKS Getting Started guide](https://docs.aws.amazon.com/eks/latest/us
 3. Select the very last **Specify an Amazon S3 template URL** option and enter `https://amazon-eks.s3-us-west-2.amazonaws.com/cloudformation/2018-08-30/amazon-eks-nodegroup.yaml`
 4. Under **Stack name**, enter `sourcegraph-worker-nodes`.
 5. Under **ClusterName**, enter the exact cluster name you used (`sourcegraph`).
-6. Under **ClusterControlPlaneSecurityGroup**, select the option prefixed `eks-vpc-sourcegraph-ControlPlaneSecurityGroup-` (Do NOT select the `NodeSecurityGroup`.)
+6. Under **ClusterControlPlaneSecurityGroup**, scroll down or begin typing and select the option prefixed `eks-vpc-sourcegraph-ControlPlaneSecurityGroup-` (Do NOT select the `NodeSecurityGroup`.)
 7. Under **NodeGroupName**, enter `sourcegraph-node-group`.
 8. Choose **NodeAutoScalingGroupMinSize** and **NodeAutoScalingGroupMaxSize** and **NodeInstanceType** based on the following chart:
 
@@ -63,8 +63,6 @@ Follow the [EKS Getting Started guide](https://docs.aws.amazon.com/eks/latest/us
 </div>
 
 > **Note:** You can always come back here later and modify these values to scale up/down the number of worker nodes. To do so, just visit the console page again, select **Actions**, **Create Change Set For Current Stack**, enter the same template URL mentioned above, modify the values and hit "next" until reviewing final changes, and finally **Execute**.
-
-
 
 9. Under **NodeImageId**, choose based on your region:
 
