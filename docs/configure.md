@@ -404,9 +404,13 @@ Sourcegraph expects there to be storage class named `sourcegraph` that it uses f
 
 1. Commit `base/sourcegraph.StorageClass.yaml` to your fork.
 
-If you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class.
+### Using a storage class with an alternate name
+
+If you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class. Convenience script:
 
 ```bash
+#!/bin/bash
+
 # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
 STORAGE_CLASS_NAME=
 

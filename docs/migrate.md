@@ -53,7 +53,11 @@ These steps will uninstall Sourcegraph from your cluster while preserving your d
    kubectl get pv -o json | jq --raw-output ".items | map(select(.spec.claimRef.name | contains(\"gitserver-\"))) | .[] | \"kubectl patch pv -p '{\\\"spec\\\":{\\\"claimRef\\\":{\\\"name\\\":\\\"repos-gitserver-\\(.spec.claimRef.name | ltrimstr(\"gitserver-\") | tonumber - 1)\\\"}}}' \\(.metadata.name)\""  | bash
    ```
 
-6. Proceed with the normal [installation steps](install.md).
+6. Proceed with the normal [installation steps](install.md). 🚨 When following the instructions for [configuring a storage class](configure.md#configure-a-storage-class), you need to make sure that the newly configured storage class has the same configuration as the one that you were using in the legacy helm deployment. Steps:
+
+   1. When creating the new storage class, use the same `cluster.storageClass.name` and `cluster.storageClass.zone` fields that were in your old [values.yaml](https://github.com/sourcegraph/deploy-sourcegraph/blob/helm-legacy/values.yaml).
+
+   1. Use the convenience script in ["Using a storage class with an alternate name"](configure.md#using-a-storage-class-with-an-alternate-name) to update all the `storageClassName` references in the PVCs to refer to the old `cluster.storageClass.name` field.
 
 7. The previous step produces a fresh base state, so you will need to reconfigure your cluster by following the relevant steps in [configure.md](configure.md) (e.g. exposing ports, applying your site config, enabling other services like language servers, Prometheus, Alertmanager, Jaeger, etc.).
 
