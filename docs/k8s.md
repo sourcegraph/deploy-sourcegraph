@@ -24,7 +24,7 @@ table.
     <th colspan="3">Compute nodes</th>
   </tr>
   <tr><th>Provider</th><th>Node type</th><th>Boot/ephemeral disk size</th></tr>
-  <tr><td><a href="/docs/k8s.eks.md">AWS EKS (better than plain EC2)</a> </td><td>t2.xlarge</td><td>N/A</td></tr>
+  <tr><td><a href="/docs/k8s.eks.md">Amazon EKS (better than plain EC2)</a> </td><td>t2.xlarge</td><td>N/A</td></tr>
   <tr><td><a href="https://kubernetes.io/docs/getting-started-guides/aws/">AWS EC2</a></td><td>m4.4xlarge</td><td>N/A</td></tr>
   <tr><td><a href="https://cloud.google.com/container-engine/docs/quickstart">Google Compute Engine</a></td><td>n1-standard-16</td><td>100 GB (default)</td></tr>
   <tr><td><a href="/docs/k8s.azure.md">Azure</a> </td><td>D16 v3</td><td>100 GB (SSD preferred)</td></tr>
