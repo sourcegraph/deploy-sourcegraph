@@ -400,7 +400,36 @@ Sourcegraph expects there to be storage class named `sourcegraph` that it uses f
    #  zones: us-central1-a
    ```
 
-1. Read through the [Kubernetes storage class documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/), and fill in the `provisioner` and `parameters` fields in `base/sourcegraph.StorageClass.yaml` with the correct values for your hosting provider (e.x.: [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce), [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws), [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk)). **We highly recommend that the storage class use SSDs as the underlying disk type.**
+1. Read through the [Kubernetes storage class documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/), and fill in the `provisioner` and `parameters` fields in `base/sourcegraph.StorageClass.yaml` with the correct values for your hosting provider (e.x.: [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce), [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws), [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk)).
+
+   **We highly recommend that the storage class use SSDs as the underlying disk type.**
+
+   Using the snippets below will create a storage class backed by SSDs:
+
+   - [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce):
+
+     ```yaml
+     # base/sourcegraph.StorageClass.yaml
+     parameters:
+       type: pd-ssd
+     ```
+
+   - [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws):
+
+     ```yaml
+     # base/sourcegraph.StorageClass.yaml
+     parameters:
+       type: gp2
+     ```
+
+   - [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk):
+
+     ```yaml
+     # base/sourcegraph.StorageClass.yaml
+     parameters:
+       storageaccounttype: Premium_LRS
+     ```
+
 
 1. Commit `base/sourcegraph.StorageClass.yaml` to your fork.
 
@@ -419,7 +448,7 @@ find . -name "*PersistentVolumeClaim.yaml" -exec sh -c "cat {} | yj | jq '.spec.
 GS=base/gitserver/gitserver.StatefulSet.yaml
 
 cat $GS | yj | jq  --arg STORAGE_CLASS_NAME $STORAGE_CLASS_NAME '.spec.volumeClaimTemplates = (.spec.volumeClaimTemplates | map( . * {spec:{storageClassName: $STORAGE_CLASS_NAME }}))' | jy -o $GS
-```
+````
 
 ## Configure Lightstep tracing
 
