@@ -89,6 +89,8 @@ Once the load balancer has acquired an external IP address, you should be able t
 kubectl get service sourcegraph-frontend-loadbalancer -o=custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip
 ```
 
+**EKS**: Look at the output of `kubectl get services` for the ELB address instead.
+
 ### Network rule
 
 Add a network rule that allows ingress traffic to port 30080 (HTTP) and/or 30081 (HTTPS) on at least one node.
