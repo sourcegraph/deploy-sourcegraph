@@ -408,7 +408,13 @@ If you wish to use a different storage class for Sourcegraph, then you need to u
 
 ```bash
 # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
+STORAGE_CLASS_NAME=
+
 find . -name "*PersistentVolumeClaim.yaml" -exec sh -c "cat {} | yj | jq '.spec.storageClassName = \"$STORAGE_CLASS_NAME\"' | jy -o {}" \;
+
+GS=base/gitserver/gitserver.StatefulSet.yaml
+
+cat $GS | yj | jq  --arg STORAGE_CLASS_NAME $STORAGE_CLASS_NAME '.spec.volumeClaimTemplates = (.spec.volumeClaimTemplates | map( . * {spec:{storageClassName: $STORAGE_CLASS_NAME }}))' | jy -o $GS
 ```
 
 ## Configure Lightstep tracing
