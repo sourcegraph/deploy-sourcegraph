@@ -83,13 +83,11 @@ Run one of the following commands depending on your desired transport protocol:
 
 Add the command you ran to [create-new-cluster.sh](../create-new-cluster.sh) and commit the change.
 
-Once the load balancer has acquired an external IP address, you should be able to access Sourcegraph using that. You can check the external IP address by running the following command:
+Once the load balancer has acquired an external address, you should be able to access Sourcegraph using that. You can check the external address by running the following command and looking for the `LoadBalancer` entry:
 
 ```bash
-kubectl get service sourcegraph-frontend-loadbalancer -o=custom-columns=EXTERNAL-IP:.status.loadBalancer.ingress[*].ip
+kubectl get svc
 ```
-
-**EKS**: Look at the output of `kubectl get services` for the ELB address instead.
 
 ### Network rule
 
