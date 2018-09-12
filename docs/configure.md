@@ -406,7 +406,7 @@ Sourcegraph expects there to be storage class named `sourcegraph` that it uses f
 
 ### Using a storage class with an alternate name
 
-If you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class. Convenience script:
+If you wish to use a different storage class for Sourcegraph, then you need to update all persistent volume claims with the name of the desired storage class. Convenience script:
 
 ```bash
 #!/bin/bash
