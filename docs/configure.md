@@ -39,6 +39,7 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 
 ### Common configuration
 
+- [Configure a storage class](#configure-a-storage-class)
 - [Configure network access](#configure-network-access)
 - [Update site configuration](#update-site-configuration)
 - [Configure TLS/SSL](#configure-tlsssl)
@@ -51,7 +52,6 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 
 - [Configure gitserver replica count](#configure-gitserver-replica-count)
 - [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
-- [Configure a storage class](#configure-a-storage-class)
 - [Configure Prometheus](../configure/prometheus/README.md)
   - [Configure Alertmanager](../configure/prometheus/alertmanager/README.md)
 - [Configure Jaeger tracing](../configure/jaeger/README.md)
@@ -377,24 +377,20 @@ See [the official documentation](https://kubernetes.io/docs/concepts/configurati
 
 ## Configure a storage class
 
-**Note:** The storage class configuration steps should be done _before_ running `./kubectl-apply-all.sh` for the first time. Otherwise, you'll have to manually migrate the PVCs that are already bound to the default storage class to the custom one that you specified.
+Sourcegraph expects there to be storage class named `sourcegraph` that it uses for all its persistent volume claims. This storage class must be configured before applying the base configuration to your cluster. The configuration details differs depending on your hosting provider, so you should:
 
-By default, Sourcegraph uses the default storage class of your cluster. However, **we highly recommend that you use a storage class that uses SSDs as the underlying disk type**. The configuration details for the storage class differs depending on your hosting provider, so you should:
-
-1. Create a stub `base/default.StorageClass.yaml`.
+1. Create a stub `base/sourcegraph.StorageClass.yaml`.
 
    ```yaml
-   # base/default.StorageClass.yaml
+   # base/sourcegraph.StorageClass.yaml
    kind: StorageClass
    apiVersion: storage.k8s.io/v1
    metadata:
-     name: default
+     name: sourcegraph
      labels:
        deploy: sourcegraph
-     annotations:
-       storageclass.kubernetes.io/is-default-class: "true"
    #
-   # The values of the "provisioner" and "parameters" fields will differ depending on the cloud provider that you are using. Please read through https://kubernetes.io/docs/concepts/storage/storage-classes/ in order to know what values to add. We recommend specifying SSDs as the disk type if possible.
+   # The values of the "provisioner" and "parameters" fields will differ depending on the cloud provider that you are using. Please read through https://kubernetes.io/docs/concepts/storage/storage-classes/ in order to know what values to add. 🚨 We recommend specifying SSDs as the disk type if possible. 🚨
    #
    # For example, if you are using GKE with a cluster whose nodes are all in the "us-central1-a" zone, you could use the following values:
    #
@@ -404,41 +400,9 @@ By default, Sourcegraph uses the default storage class of your cluster. However,
    #  zones: us-central1-a
    ```
 
-1. Read through the [Kubernetes storage class documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/), and fill in the `provisioner` and `parameters` fields in `base/default.StorageClass.yaml` with the correct values for your hosting provider (e.x.: [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce), [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws), [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk)). **Again, we highly recommend that the storage class use SSDs as the underlying disk type.**
+1. Read through the [Kubernetes storage class documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/), and fill in the `provisioner` and `parameters` fields in `base/sourcegraph.StorageClass.yaml` with the correct values for your hosting provider (e.x.: [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce), [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws), [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk)). **We highly recommend that the storage class use SSDs as the underlying disk type.**
 
-1. [Mark the existing storage classes in your cluster as non-default](https://kubernetes.io/docs/tasks/administer-cluster/change-default-storage-class/#changing-the-default-storageclass):
-
-   ```bash
-    kubectl get sc -o json | jq --raw-output ".items | map(select(.metadata.name)) | .[] | \"kubectl patch sc -p '{\\\"metadata\\\":{\\\"annotations\\\":{\\\"storageclass.kubernetes.io/is-default-class\\\":\\\"false\\\"}}}' \\(.metadata.name)\"" | bash
-   ```
-
-1. In [create-new-cluster.sh](../create-new-cluster.sh), add the above command _before_ `./kubectl-apply-all`.
-
-   ```bash
-   #!/bin/bash
-
-   # Mark the existing storage classes in the cluster as non-default
-   kubectl get sc -o json | jq --raw-output ".items | map(select(.metadata.name)) | .[] | \"kubectl patch sc -p '{\\\"metadata\\\":{\\\"annotations\\\":{\\\"storageclass.kubernetes.io/is-default-class\\\":\\\"false\\\"}}}' \\(.metadata.name)\"" | bash
-
-   ./kubectl-apply-all.sh
-   ...
-   ```
-
-1. In [kubectl-apply-all.sh](../kubectl-apply-all.sh), add the `kubectl apply` command for `base/default.StorageClass.yaml` _before_ the `kubectl apply` command for applying the base deployment.
-
-   ```bash
-   #!/bin/bash
-
-   #🚨 This command should come BEFORE applying the base deployment to ensure that the PVC's use this custom storage class configuration. 🚨
-   # Configure the default storage class for the cluster
-   kubectl apply -f base/default.StorageClass.yaml
-
-   # Apply the base Soucegraph deployment
-   kubectl apply --prune -l deploy=sourcegraph -f base --recursive
-   ...
-   ```
-
-1. Commit `base/default.StorageClass.yaml` and the changes to [kubectl-apply-all.sh](../kubectl-apply-all.sh) to your fork.
+1. Commit `base/sourcegraph.StorageClass.yaml` to your fork.
 
 If you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class.
 
