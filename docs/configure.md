@@ -377,7 +377,7 @@ See [the official documentation](https://kubernetes.io/docs/concepts/configurati
 
 ## Configure a storage class
 
-Sourcegraph expects there to be storage class named `sourcegraph` that it uses for all its persistent volume claims. This storage class must be configured before applying the base configuration to your cluster. The configuration details differs depending on your hosting provider, so you should:
+Sourcegraph expects there to be storage class named `sourcegraph` that it uses for all its persistent volume claims. This storage class must be configured before applying the base configuration to your cluster. The configuration details differ depending on your hosting provider, so you should:
 
 1. Create a stub `base/sourcegraph.StorageClass.yaml`.
 
