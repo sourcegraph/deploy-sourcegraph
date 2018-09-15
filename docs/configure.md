@@ -39,6 +39,7 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 
 ### Common configuration
 
+- [Configure a storage class](#configure-a-storage-class)
 - [Configure network access](#configure-network-access)
 - [Update site configuration](#update-site-configuration)
 - [Configure TLS/SSL](#configure-tlsssl)
@@ -51,7 +52,6 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 
 - [Configure gitserver replica count](#configure-gitserver-replica-count)
 - [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
-- [Configure a storage class](#configure-a-storage-class)
 - [Configure Prometheus](../configure/prometheus/README.md)
   - [Configure Alertmanager](../configure/prometheus/alertmanager/README.md)
 - [Configure Jaeger tracing](../configure/jaeger/README.md)
@@ -377,12 +377,78 @@ See [the official documentation](https://kubernetes.io/docs/concepts/configurati
 
 ## Configure a storage class
 
-Sourcegraph relies on the default storage class of your cluster. If your cluster does not have a default storage class or if you wish to use a different storage class for Sourcegraph, then you need to update all PersistentVolumeClaims with the name of the desired storage class.
+Sourcegraph expects there to be storage class named `sourcegraph` that it uses for all its persistent volume claims. This storage class must be configured before applying the base configuration to your cluster. The configuration details differ depending on your hosting provider, so you should:
+
+1. Create a stub `base/sourcegraph.StorageClass.yaml`.
+
+   ```yaml
+   # base/sourcegraph.StorageClass.yaml
+   kind: StorageClass
+   apiVersion: storage.k8s.io/v1
+   metadata:
+     name: sourcegraph
+     labels:
+       deploy: sourcegraph
+   #
+   # The values of the "provisioner" and "parameters" fields will differ depending on the cloud provider that you are using. Please read through https://kubernetes.io/docs/concepts/storage/storage-classes/ in order to know what values to add. 🚨 We recommend specifying SSDs as the disk type if possible. 🚨
+   #
+   # For example, if you are using GKE with a cluster whose nodes are all in the "us-central1-a" zone, you could use the following values:
+   #
+   # provisioner: kubernetes.io/gce-pd
+   # parameters:
+   #  type: pd-ssd
+   #  zones: us-central1-a
+   ```
+
+1. Read through the [Kubernetes storage class documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/), and fill in the `provisioner` and `parameters` fields in `base/sourcegraph.StorageClass.yaml` with the correct values for your hosting provider (e.x.: [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce), [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws), [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk)).
+
+   **We highly recommend that the storage class use SSDs as the underlying disk type.**
+
+   Using the snippets below will create a storage class backed by SSDs:
+
+   - [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce):
+
+     ```yaml
+     # base/sourcegraph.StorageClass.yaml
+     parameters:
+       type: pd-ssd
+     ```
+
+   - [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws):
+
+     ```yaml
+     # base/sourcegraph.StorageClass.yaml
+     parameters:
+       type: gp2
+     ```
+
+   - [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk):
+
+     ```yaml
+     # base/sourcegraph.StorageClass.yaml
+     parameters:
+       storageaccounttype: Premium_LRS
+     ```
+
+
+1. Commit `base/sourcegraph.StorageClass.yaml` to your fork.
+
+### Using a storage class with an alternate name
+
+If you wish to use a different storage class for Sourcegraph, then you need to update all persistent volume claims with the name of the desired storage class. Convenience script:
 
 ```bash
+#!/bin/bash
+
 # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
+STORAGE_CLASS_NAME=
+
 find . -name "*PersistentVolumeClaim.yaml" -exec sh -c "cat {} | yj | jq '.spec.storageClassName = \"$STORAGE_CLASS_NAME\"' | jy -o {}" \;
-```
+
+GS=base/gitserver/gitserver.StatefulSet.yaml
+
+cat $GS | yj | jq  --arg STORAGE_CLASS_NAME $STORAGE_CLASS_NAME '.spec.volumeClaimTemplates = (.spec.volumeClaimTemplates | map( . * {spec:{storageClassName: $STORAGE_CLASS_NAME }}))' | jy -o $GS
+````
 
 ## Configure Lightstep tracing
 
