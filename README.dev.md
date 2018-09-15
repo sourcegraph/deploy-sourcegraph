@@ -2,8 +2,17 @@
 
 ## Cutting a release
 
-- Make the desired changes to this repository. Most commonly, this involves updating the Docker image versions in `*.Deployment.yaml` to match the tagged version you are releasing. You should look at our
-  [DockerHub repositories](https://hub.docker.com/r/sourcegraph/) to see what the latest versions are.
+- Make the desired changes to this repository.
+
+  - Updating image tags:
+
+    - The vast majority of the time, [Renovate](https://renovatebot.com/docs/docker/) will open PRs in a timely manner.
+
+    - If you want to update them manually, you can update the Docker image versions in `*.Deployment.yaml` to match the tagged version you are releasing.
+
+      - You should look at our [DockerHub repositories](https://hub.docker.com/r/sourcegraph/) to see what the latest versions are.
+
+      - Make sure to include the sha256 digest for each image, which [ensures that each image pull is immutable](https://renovatebot.com/docs/docker/#digest-pinning). Use `docker inspect --format='{{index .RepoDigests 0}}' $IMAGE` to get the digest.
 
 - Open a PR and wait for buildkite to pass and for your changes to be approved, then merge and check out master.
 - Test what is currently checked in to master by [installing](docs/install.md) Sourcegraph on fresh cluster.
@@ -21,6 +30,7 @@
   ```
 
 - Cut the legacy Helm version of the release (this step will be deprecated after the next iteration):
+
   - checkout [deploy-sourcegraph@helm-legacy](https://github.com/sourcegraph/deploy-sourcegraph/tree/helm-legacy)
   - update the image tags in [yalues.yaml](https://github.com/sourcegraph/deploy-sourcegraph/blob/helm-legacy/values.yaml)
   - run [generate.sh](https://github.com/sourcegraph/deploy-sourcegraph/blob/helm-legacy/generate.sh)
