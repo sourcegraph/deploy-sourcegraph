@@ -410,6 +410,7 @@ Sourcegraph expects there to be storage class named `sourcegraph` that it uses f
 
      ```yaml
      # base/sourcegraph.StorageClass.yaml
+     provisioner: kubernetes.io/gce-pd
      parameters:
        type: pd-ssd
      ```
@@ -418,6 +419,7 @@ Sourcegraph expects there to be storage class named `sourcegraph` that it uses f
 
      ```yaml
      # base/sourcegraph.StorageClass.yaml
+     provisioner: kubernetes.io/aws-ebs
      parameters:
        type: gp2
      ```
@@ -426,6 +428,7 @@ Sourcegraph expects there to be storage class named `sourcegraph` that it uses f
 
      ```yaml
      # base/sourcegraph.StorageClass.yaml
+     provisioner: kubernetes.io/azure-disk
      parameters:
        storageaccounttype: Premium_LRS
      ```
