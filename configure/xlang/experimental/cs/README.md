@@ -12,7 +12,7 @@ You can enable it by:
    echo kubectl apply --prune -l deploy=xlang-cs -f configure/experimental/cs --recursive >> kubectl-apply-all.sh
    ```
 
-2. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the C# language server's existence.
+1. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the C# language server's existence.
 
    ```yaml
    # base/lsp-proxy/lsp-proxy.Deployment.yaml
@@ -21,7 +21,22 @@ You can enable it by:
        value: tcp://xlang-cs:8080
    ```
 
-3. Apply your changes to `lsp-proxy` and the C# language server to the cluster.
+1. Add the following entry for the C# language server to the `langservers` array in your site configuration.
+
+   ```yaml
+   # base/config-file.ConfigMap.yaml
+
+   config.json: |-
+     {
+       "langservers": [
+         {
+           "language": "cs"
+         }
+       ]
+     }
+   ```
+
+1) Apply your changes to `lsp-proxy`, `base/config-file.ConfigMap.yaml`, and the C# language server to the cluster.
 
    ```bash
    ./kubectl-apply-all.sh
