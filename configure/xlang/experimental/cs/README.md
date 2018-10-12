@@ -36,7 +36,7 @@ You can enable it by:
      }
    ```
 
-1) Apply your changes to `lsp-proxy`, `base/config-file.ConfigMap.yaml`, and the C# language server to the cluster.
+1. Apply your changes to `lsp-proxy`, `base/config-file.ConfigMap.yaml`, and the C# language server to the cluster.
 
    ```bash
    ./kubectl-apply-all.sh
