@@ -12,15 +12,6 @@ You can enable it by:
    echo kubectl apply --prune -l deploy=xlang-ocaml -f configure/experimental/ocaml --recursive >> kubectl-apply-all.sh
    ```
 
-1. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the OCaml language server's existence.
-
-   ```yaml
-   # base/lsp-proxy/lsp-proxy.Deployment.yaml
-   env:
-     - name: LANGSERVER_OCAML
-       value: tcp://xlang-ocaml:8080
-   ```
-
 1. Add the following entry for the OCaml language server to the `langservers` array in your site configuration.
 
    ```yaml
@@ -30,13 +21,14 @@ You can enable it by:
      {
        "langservers": [
          {
-           "language": "ocaml"
+           "language": "ocaml",
+           "address": "tcp://xlang-ocaml:8080"
          }
        ]
      }
    ```
 
-1. Apply your changes to `lsp-proxy`, `base/config-file.ConfigMap.yaml`, and the OCaml language server to the cluster.
+1. Apply your changes to `base/config-file.ConfigMap.yaml`, and the OCaml language server to the cluster.
 
    ```bash
    ./kubectl-apply-all.sh

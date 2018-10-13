@@ -12,15 +12,6 @@ You can enable it by:
    echo kubectl apply --prune -l deploy=xlang-html -f configure/experimental/html --recursive >> kubectl-apply-all.sh
    ```
 
-1. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the HTML language server's existence.
-
-   ```yaml
-   # base/lsp-proxy/lsp-proxy.Deployment.yaml
-   env:
-     - name: LANGSERVER_HTML
-       value: tcp://xlang-html:8080
-   ```
-
 1. Add the following entry for the HTML language server to the `langservers` array in your site configuration.
 
    ```yaml
@@ -30,13 +21,14 @@ You can enable it by:
      {
        "langservers": [
          {
-           "language": "html"
+           "language": "html",
+           "address": "tcp://xlang-html:8080"
          }
        ]
      }
    ```
 
-1. Apply your changes to `lsp-proxy`, `base/config-file.ConfigMap.yaml`, and the HTML language server to the cluster.
+1. Apply your changes to `base/config-file.ConfigMap.yaml`, and the HTML language server to the cluster.
 
    ```bash
    ./kubectl-apply-all.sh

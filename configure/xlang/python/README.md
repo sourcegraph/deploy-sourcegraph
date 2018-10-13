@@ -15,8 +15,6 @@ You can enable it by:
    ```yaml
    # base/lsp-proxy/lsp-proxy.Deployment.yaml
    env:
-     - name: LANGSERVER_PYTHON
-       value: tcp://xlang-python:2087
      - name: LANGSERVER_PYTHON_BG
        value: tcp://xlang-python-bg:2087
    ```
@@ -30,7 +28,8 @@ You can enable it by:
      {
        "langservers": [
          {
-           "language": "python"
+           "language": "python",
+           "address": "tcp://xlang-python:2087"
          }
        ]
      }

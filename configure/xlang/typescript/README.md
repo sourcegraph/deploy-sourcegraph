@@ -15,12 +15,8 @@ You can enable it by:
    ```yaml
    # base/lsp-proxy/lsp-proxy.Deployment.yaml
    env:
-     - name: LANGSERVER_JAVASCRIPT
-       value: tcp://xlang-typescript:2088
      - name: LANGSERVER_JAVASCRIPT_BG
        value: tcp://xlang-typescript-bg:2088
-     - name: LANGSERVER_TYPESCRIPT
-       value: tcp://xlang-typescript:2088
      - name: LANGSERVER_TYPESCRIPT_BG
        value: tcp://xlang-typescript-bg:2088
    ```
@@ -34,10 +30,12 @@ You can enable it by:
      {
        "langservers": [
          {
-           "language": "javascript"
+           "language": "javascript",
+           "address": "tcp://xlang-typescript:2088"
          },
          {
-           "language": "typescript"
+           "language": "typescript",
+           "address": "tcp://xlang-typescript:2088"
          }
        ]
      }

@@ -15,8 +15,6 @@ You can enable it by:
    ```yaml
    # base/lsp-proxy/lsp-proxy.Deployment.yaml
    env:
-     - name: LANGSERVER_GO
-       value: tcp://xlang-go:4389
      - name: LANGSERVER_GO_BG
        value: tcp://xlang-go-bg:4389
    ```
@@ -30,7 +28,8 @@ You can enable it by:
      {
        "langservers": [
          {
-           "language": "go"
+           "language": "go",
+           "address": "tcp://xlang-go:4389"
          }
        ]
      }

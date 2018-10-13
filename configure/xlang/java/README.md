@@ -17,8 +17,6 @@ You can enable it by:
    ```yaml
    # base/lsp-proxy/lsp-proxy.Deployment.yaml
    env:
-     - name: LANGSERVER_JAVA
-       value: tcp://xlang-java:2088
      - name: LANGSERVER_JAVA_BG
        value: tcp://xlang-java-bg:2088
    ```
@@ -32,7 +30,8 @@ You can enable it by:
      {
        "langservers": [
          {
-           "language": "java"
+           "language": "java",
+           "address": "tcp://xlang-java:2088"
          }
        ]
      }
