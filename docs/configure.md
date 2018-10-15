@@ -402,38 +402,42 @@ Sourcegraph expects there to be storage class named `sourcegraph` that it uses f
 
 1. Read through the [Kubernetes storage class documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/), and fill in the `provisioner` and `parameters` fields in `base/sourcegraph.StorageClass.yaml` with the correct values for your hosting provider (e.x.: [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce-pd), [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws), [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk)).
 
-   **We highly recommend that the storage class use SSDs as the underlying disk type.**
+   - Note that if you're using GCP with Kubernetes `v1.9.*`, you should omit the `replication-type` parameter mentioned in [the documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce-pd) from your `base/sourcegraph.StorageClass.yaml` file. That field wasn't added until Kubernetes `v.1.10.*+`, and you'll see errors like the following if you try to use it with an older version:
 
-   Using the snippets below will create a storage class backed by SSDs:
-
-   - [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce-pd):
-
-     ```yaml
-     # base/sourcegraph.StorageClass.yaml
-     provisioner: kubernetes.io/gce-pd
-     parameters:
-       type: pd-ssd
+     ```
+     Failed to provision volume with StorageClass "sourcegraph": invalid option "replication-type" for volume plugin kubernetes.io/gce-pd
      ```
 
-   - [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws):
+   - **We highly recommend that the storage class use SSDs as the underlying disk type.** Using the snippets below will create a storage class backed by SSDs:
 
-     ```yaml
-     # base/sourcegraph.StorageClass.yaml
-     provisioner: kubernetes.io/aws-ebs
-     parameters:
-       type: gp2
-     ```
+     - [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce-pd):
 
-   - [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk):
+       ```yaml
+       # base/sourcegraph.StorageClass.yaml
+       provisioner: kubernetes.io/gce-pd
+       parameters:
+         type: pd-ssd
+       ```
 
-     ```yaml
-     # base/sourcegraph.StorageClass.yaml
-     provisioner: kubernetes.io/azure-disk
-     parameters:
-       storageaccounttype: Premium_LRS
-     ```
+     - [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws):
 
-1) Commit `base/sourcegraph.StorageClass.yaml` to your fork.
+       ```yaml
+       # base/sourcegraph.StorageClass.yaml
+       provisioner: kubernetes.io/aws-ebs
+       parameters:
+         type: gp2
+       ```
+
+     - [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk):
+
+       ```yaml
+       # base/sourcegraph.StorageClass.yaml
+       provisioner: kubernetes.io/azure-disk
+       parameters:
+         storageaccounttype: Premium_LRS
+       ```
+
+1. Commit `base/sourcegraph.StorageClass.yaml` to your fork.
 
 ### Using a storage class with an alternate name
 
