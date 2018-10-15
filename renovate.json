@@ -1,6 +1,15 @@
 {
-  "extends": ["config:base", "group:all"],
+  "extends": ["config:base"],
   "kubernetes": {
     "fileMatch": ["(^|/)[^/]*\\.yaml$"]
-  }
+  },
+  "prHourlyLimit": 0,
+  "packageRules": [
+    {
+      "packagePatterns": [
+        "^sourcegraph/"
+      ],
+      "groupName": "sourcegraph docker images"
+    }
+  ]
 }
