@@ -1,4 +1,5 @@
 > 🚨 If you are updating from a 2.10.x or previous deployment, follow the migration steps in [docs/migrate.md](docs/migrate.md).
+> 🚨 If you are updating from a 2.11.x or previous deployment, you will need to add an Enterprise license key. Follow the steps in [docs/configure.md](docs/configure.md#add-a-license-key).
 
 # Sourcegraph Data Center
 [![sourcegraph: search](https://img.shields.io/badge/sourcegraph-search-brightgreen.svg)](https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph)

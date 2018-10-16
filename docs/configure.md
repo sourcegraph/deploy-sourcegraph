@@ -502,3 +502,21 @@ Simply edit the relevant PostgreSQL environment variables (e.g. PGHOST, PGPORT, 
 Sourcegraph Data Center communicates with the Kubernetes API for service discovery. It also has some janitor DaemonSets that clean up temporary cache data. To do that we need to create RBAC resources.
 
 If using RBAC is not an option, then you will not want to apply `*.Role.yaml` and `*.RoleBinding.yaml` files.
+
+## Add license key
+
+Beginning in version 2.12.x, Sourcegraph's Kubernetes deployment requires an Enterprise license key.
+
+1. Create an account or login on sourcegraph.com and go to https://sourcegraph.com/users/$YOUR_SOURCEGRAPH_USERNAME/subscriptions/new to buy a license key.
+
+1. Once you have a license key, add it to your configuration by `editing base/config-file.ConfigMap.yaml`.
+
+```yaml
+# base/config-file.ConfigMap.yaml
+config.json: |-
+  {
+    "licenseKey": "YOUR_LICENSE_KEY"
+  }
+```
+
+1. Run `./kubectl-apply-all.sh` to apply the changes to your cluster.
