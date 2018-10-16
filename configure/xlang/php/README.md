@@ -10,16 +10,23 @@ You can enable it by:
    echo kubectl apply --prune -l deploy=xlang-php -f configure/xlang/php/ --recursive >> kubectl-apply-all.sh
    ```
 
-2. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the PHP language server's existence:
+1. Add the following entry for the PHP language server to the `langservers` array in your site configuration.
 
    ```yaml
-   # base/lsp-proxy/lsp-proxy.Deployment.yaml
-   env:
-     - name: LANGSERVER_PHP
-       value: tcp://xlang-php:2088
+   # base/config-file.ConfigMap.yaml
+
+   config.json: |-
+     {
+       "langservers": [
+         {
+           "language": "php",
+           "address": "tcp://xlang-php:2088"
+         }
+       ]
+     }
    ```
 
-3. Apply your changes to `lsp-proxy` and the PHP language server to the cluster.
+1. Apply your changes to `base/config-file.ConfigMap.yaml`, and the PHP language server to the cluster.
 
    ```bash
    ./kubectl-apply-all.sh

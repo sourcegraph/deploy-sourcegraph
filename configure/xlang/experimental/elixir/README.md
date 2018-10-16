@@ -12,16 +12,23 @@ You can enable it by:
    echo kubectl apply --prune -l deploy=xlang-elixir -f configure/experimental/elixir --recursive >> kubectl-apply-all.sh
    ```
 
-2. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the Elixir language server's existence.
+1. Add the following entry for the Elixir language server to the `langservers` array in your site configuration.
 
    ```yaml
-   # base/lsp-proxy/lsp-proxy.Deployment.yaml
-   env:
-     - name: LANGSERVER_ELIXIR
-       value: tcp://xlang-elixir:8080
+   # base/config-file.ConfigMap.yaml
+
+   config.json: |-
+     {
+       "langservers": [
+         {
+           "language": "elixir",
+           "address": "tcp://xlang-elixir:8080"
+         }
+       ]
+     }
    ```
 
-3. Apply your changes to `lsp-proxy` and the Elixir language server to the cluster.
+1. Apply your changes to `base/config-file.ConfigMap.yaml`, and the Elixir language server to the cluster.
 
    ```bash
    ./kubectl-apply-all.sh

@@ -12,16 +12,23 @@ You can enable it by:
    echo kubectl apply --prune -l deploy=xlang-ruby -f configure/experimental/ruby --recursive >> kubectl-apply-all.sh
    ```
 
-2. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the Ruby language server's existence.
+1. Add the following entry for the Ruby language server to the `langservers` array in your site configuration.
 
    ```yaml
-   # base/lsp-proxy/lsp-proxy.Deployment.yaml
-   env:
-     - name: LANGSERVER_RUBY
-       value: tcp://xlang-ruby:8080
+   # base/config-file.ConfigMap.yaml
+
+   config.json: |-
+     {
+       "langservers": [
+         {
+           "language": "ruby",
+           "address": "tcp://xlang-ruby:8080"
+         }
+       ]
+     }
    ```
 
-3. Apply your changes to `lsp-proxy` and the Ruby language server to the cluster.
+1. Apply your changes to `base/config-file.ConfigMap.yaml`, and the Ruby language server to the cluster.
 
    ```bash
    ./kubectl-apply-all.sh

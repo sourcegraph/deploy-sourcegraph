@@ -12,16 +12,23 @@ You can enable it by:
    echo kubectl apply --prune -l deploy=xlang-dockerfile -f configure/experimental/dockerfile --recursive >> kubectl-apply-all.sh
    ```
 
-2. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the Dockerfile language server's existence.
+1. Add the following entry for the Dockerfile language server to the `langservers` array in your site configuration.
 
    ```yaml
-   # base/lsp-proxy/lsp-proxy.Deployment.yaml
-   env:
-     - name: LANGSERVER_DOCKERFILE
-       value: tcp://xlang-dockerfile:8080
+   # base/config-file.ConfigMap.yaml
+
+   config.json: |-
+     {
+       "langservers": [
+         {
+           "language": "dockerfile",
+           "address": "tcp://xlang-dockerfile:8080"
+         }
+       ]
+     }
    ```
 
-3. Apply your changes to `lsp-proxy` and the Dockerfile language server to the cluster.
+1. Apply your changes to `base/config-file.ConfigMap.yaml`, and the Dockerfile language server to the cluster.
 
    ```bash
    ./kubectl-apply-all.sh

@@ -12,16 +12,23 @@ You can enable it by:
    echo kubectl apply --prune -l deploy=xlang-cpp -f configure/experimental/cpp --recursive >> kubectl-apply-all.sh
    ```
 
-2. Add the following environment variables to the `lsp-proxy` deployment to make it aware of the C++ language server's existence.
+1. Add the following entry for the C++ language server to the `langservers` array in your site configuration.
 
    ```yaml
-   # base/lsp-proxy/lsp-proxy.Deployment.yaml
-   env:
-     - name: LANGSERVER_CPP
-       value: tcp://xlang-cpp:8080
+   # base/config-file.ConfigMap.yaml
+
+   config.json: |-
+     {
+       "langservers": [
+         {
+           "language": "cpp",
+           "address": "tcp://xlang-cpp:8080"
+         }
+       ]
+     }
    ```
 
-3. Apply your changes to `lsp-proxy` and the C++ language server to the cluster.
+1. Apply your changes to `base/config-file.ConfigMap.yaml`, and the C++ language server to the cluster.
 
    ```bash
    ./kubectl-apply-all.sh

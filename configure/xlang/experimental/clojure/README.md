@@ -12,16 +12,23 @@ You can enable it by:
    echo kubectl apply --prune -l deploy=xlang-clojure -f configure/experimental/clojure --recursive >> kubectl-apply-all.sh
    ```
 
-2. Add the following environment variables to the `lsp-proxy` deployment to make it aware of the Clojure language server's existence.
+1. Add the following entry for the Clojure language server to the `langservers` array in your site configuration.
 
    ```yaml
-   # base/lsp-proxy/lsp-proxy.Deployment.yaml
-   env:
-     - name: LANGSERVER_CLOJURE
-       value: tcp://xlang-clojure:8080
+   # base/config-file.ConfigMap.yaml
+
+   config.json: |-
+     {
+       "langservers": [
+         {
+           "language": "clojure",
+           "address": "tcp://xlang-clojure:8080"
+         }
+       ]
+     }
    ```
 
-3. Apply your changes to `lsp-proxy` and the Clojure language server to the cluster.
+1. Apply your changes to `base/config-file.ConfigMap.yaml`, and the Clojure language server to the cluster.
 
    ```bash
    ./kubectl-apply-all.sh

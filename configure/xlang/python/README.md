@@ -10,18 +10,32 @@ You can enable it by:
    echo kubectl apply --prune -l deploy=xlang-python -f configure/xlang/python/ --recursive >> kubectl-apply-all.sh
    ```
 
-2. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the Python language server's existence:
+1. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the Python language server's existence:
 
    ```yaml
    # base/lsp-proxy/lsp-proxy.Deployment.yaml
    env:
-     - name: LANGSERVER_PYTHON
-       value: tcp://xlang-python:2087
      - name: LANGSERVER_PYTHON_BG
        value: tcp://xlang-python-bg:2087
    ```
 
-3. Apply your changes to `lsp-proxy` and the Python language server to the cluster.
+1. Add the following entry for the Python language server to the `langservers` array in your site configuration.
+
+   ```yaml
+   # base/config-file.ConfigMap.yaml
+
+   config.json: |-
+     {
+       "langservers": [
+         {
+           "language": "python",
+           "address": "tcp://xlang-python:2087"
+         }
+       ]
+     }
+   ```
+
+1. Apply your changes to `lsp-proxy`, `base/config-file.ConfigMap.yaml`, and the Python language server to the cluster.
 
    ```bash
    ./kubectl-apply-all.sh

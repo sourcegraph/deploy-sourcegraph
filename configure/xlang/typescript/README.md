@@ -10,22 +10,38 @@ You can enable it by:
    echo kubectl apply --prune -l deploy=xlang-typescript -f configure/xlang/typescript/ --recursive >> kubectl-apply-all.sh
    ```
 
-2. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the Javascript / Typescript language server's existence.
+1. Adding the following environment variables to the `lsp-proxy` deployment to make it aware of the Javascript / Typescript language server's existence.
 
    ```yaml
    # base/lsp-proxy/lsp-proxy.Deployment.yaml
    env:
-     - name: LANGSERVER_JAVASCRIPT
-       value: tcp://xlang-typescript:2088
      - name: LANGSERVER_JAVASCRIPT_BG
        value: tcp://xlang-typescript-bg:2088
-     - name: LANGSERVER_TYPESCRIPT
-       value: tcp://xlang-typescript:2088
      - name: LANGSERVER_TYPESCRIPT_BG
        value: tcp://xlang-typescript-bg:2088
    ```
 
-3. Apply your changes to `lsp-proxy` and the Javascript / Typescript language server to the cluster.
+1. Add the following entries for the Javascript / Typescript language server to the `langservers` array in your site configuration.
+
+   ```yaml
+   # base/config-file.ConfigMap.yaml
+
+   config.json: |-
+     {
+       "langservers": [
+         {
+           "language": "javascript",
+           "address": "tcp://xlang-typescript:2088"
+         },
+         {
+           "language": "typescript",
+           "address": "tcp://xlang-typescript:2088"
+         }
+       ]
+     }
+   ```
+
+1. Apply your changes to `lsp-proxy`, `base/config-file.ConfigMap.yaml`, and the Javascript / Typescript language server to the cluster.
 
    ```bash
    ./kubectl-apply-all.sh
