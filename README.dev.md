@@ -15,8 +15,25 @@
       - Make sure to include the sha256 digest for each image, which [ensures that each image pull is immutable](https://renovatebot.com/docs/docker/#digest-pinning). Use `docker inspect --format='{{index .RepoDigests 0}}' $IMAGE` to get the digest.
 
 - Open a PR and wait for buildkite to pass and for your changes to be approved, then merge and check out master.
-- Test what is currently checked in to master by [installing](docs/install.md) Sourcegraph on fresh cluster.
-- Create a git tag and push it to the repository:
+- Test what is currently checked in to master by [installing](docs/install.md) Sourcegraph on a fresh cluster:
+  - Provision a new cluster:
+    1.  Create a cluster unique name that is identifiable to you (e.g `ggilmore-test`) in the [Sourcegraph Auxiliary GCP Project](https://console.cloud.google.com/kubernetes/list?project=sourcegraph-server&organizationId=1006954638239). You can create pool that has `3` nodes, each with `8` vCPUs and `30` GB memory (for a total of `24` vCPUs and `90` GB memory).
+        - See this screenshot, but note that the UI could have changed: ![](https://imgur.com/RuCyGX2.png)
+    1.  It’ll take a few minutes for it to be provisioned, you’ll see a green checkmark when it is done.
+    1.  Click on the `connect` button next to your cluster, it’ll give you a command to copy+paste in your terminal.
+    1.  Run the command in your terminal. Once it finishes, run `kubectl config current-context`. It should tell you that it’s set up to talk to the cluster that you just created.
+    1.  In order to give yourself permissions to create roles on the cluster, run: `kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user $YOUR_NAME@sourcegraph.com`
+  - Do the same smoke tests that we do for `sourcegraph/sourcegraph` (check to see that the new release works, check to see that the upgrade path works)
+    - Check to see that the latest `master` is working on a fresh cluster
+      1. Deploy the latest `master` to your new cluster
+         - You'll need to create a GCP Storage Class named `sourcegraph` with the same `zone` that you created your cluster in (see ["Configure a storage class"](./docs/configure.md#Configure-a-storage-class))
+      1. Use the instructions in [configure.md](./docs/configure.md) to add a repository, test that code intelligence is working on it, and do a couple searches
+    - Check the upgrade path from the previous release to the laster `master`
+      1. Tear down the cluster that you created above
+      1. Checkout the commit that contains the configuration for the previous release (e.g. the commit has `2.11.x` images if you're currently trying to release `2.12.x`, etc.), and use the instructions above to create a new cluster, deploy the older commit to it, and do the same smoke tests with the older version
+      1. Checkout the latest `master`, deploy the newer images to the same cluster (without tearing it down in between), and check to see the smoke test passes after the upgrade process
+
+* Create a git tag and push it to the repository:
 
   ```bash
   VERSION = vX.Y.Z
@@ -29,11 +46,11 @@
   git push origin $VERSION
   ```
 
-- Cut the legacy Helm version of the release (this step will be deprecated after the next iteration):
+* Cut the legacy Helm version of the release (this step will be deprecated after the next iteration):
 
   - checkout [deploy-sourcegraph@helm-legacy](https://github.com/sourcegraph/deploy-sourcegraph/tree/helm-legacy)
   - update the image tags in [yalues.yaml](https://github.com/sourcegraph/deploy-sourcegraph/blob/helm-legacy/values.yaml)
   - run [generate.sh](https://github.com/sourcegraph/deploy-sourcegraph/blob/helm-legacy/generate.sh)
   - run [release.sh](https://github.com/sourcegraph/deploy-sourcegraph/blob/helm-legacy/release.sh)
 
-- [Update the `latestReleaseDataCenterBuild` value in `sourcegraph/sourcegraph`](https://sourcegraph.sgdev.org/github.com/sourcegraph/sourcegraph/-/blob/cmd/server/README.md#5-notify-existing-instances-that-an-update-is-available)
+* [Update the `latestReleaseDataCenterBuild` value in `sourcegraph/sourcegraph`](https://sourcegraph.sgdev.org/github.com/sourcegraph/sourcegraph/-/blob/cmd/server/README.md#5-notify-existing-instances-that-an-update-is-available)
