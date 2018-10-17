@@ -33,7 +33,7 @@
       1. Checkout the commit that contains the configuration for the previous release (e.g. the commit has `2.11.x` images if you're currently trying to release `2.12.x`, etc.), and use the instructions above to create a new cluster, deploy the older commit to it, and do the same smoke tests with the older version
       1. Checkout the latest `master`, deploy the newer images to the same cluster (without tearing it down in between) by running `./kubectl-apply-all.sh`, and check to see the smoke test passes after the upgrade process
 
-* The version numbers for [sourcegraph/deploy-sourcegraph](https://github.com/sourcegraph/deploy-sourcegraph) follows [sourcegraph/sourcegraph](https://github.com/sourcegraph/sourcegraph)'s version numbers (i.e. `deploy-sourcegraph@v2.11.2` uses [sourcegraph/sourcegraph](https://github.com/sourcegraph/sourcegraph)'s `v2.11.2` image tags). Here is [sourcegraph/deploy-sourcegraph](https://github.com/sourcegraph/deploy-sourcegraph)'s branching strategy:
+* The version numbers for [sourcegraph/deploy-sourcegraph](https://github.com/sourcegraph/deploy-sourcegraph) largely follow [sourcegraph/sourcegraph](https://github.com/sourcegraph/sourcegraph)'s version numbers (i.e. `deploy-sourcegraph@v2.11.2` uses [sourcegraph/sourcegraph](https://github.com/sourcegraph/sourcegraph)'s `v2.11.2` image tags). Here is [sourcegraph/deploy-sourcegraph](https://github.com/sourcegraph/deploy-sourcegraph)'s branching strategy:
 
   - **If you are cutting a new minor version (e.g. `v2.12.0`)**:
 
