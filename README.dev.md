@@ -31,7 +31,7 @@
     - Check the upgrade path from the previous release to the laster `master`
       1. Tear down the cluster that you created above
       1. Checkout the commit that contains the configuration for the previous release (e.g. the commit has `2.11.x` images if you're currently trying to release `2.12.x`, etc.), and use the instructions above to create a new cluster, deploy the older commit to it, and do the same smoke tests with the older version
-      1. Checkout the latest `master`, deploy the newer images to the same cluster (without tearing it down in between), and check to see the smoke test passes after the upgrade process
+      1. Checkout the latest `master`, deploy the newer images to the same cluster (without tearing it down in between) by running `./kubectl-apply-all.sh`, and check to see the smoke test passes after the upgrade process
 
 * Create a git tag and push it to the repository:
 
