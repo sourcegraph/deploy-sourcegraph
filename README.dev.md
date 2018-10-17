@@ -22,12 +22,11 @@
     1.  It’ll take a few minutes for it to be provisioned, you’ll see a green checkmark when it is done.
     1.  Click on the `connect` button next to your cluster, it’ll give you a command to copy+paste in your terminal.
     1.  Run the command in your terminal. Once it finishes, run `kubectl config current-context`. It should tell you that it’s set up to talk to the cluster that you just created.
-    1.  In order to give yourself permissions to create roles on the cluster, run: `kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user $YOUR_NAME@sourcegraph.com`
-    1.  Make the frontend port accessible by running through the port-forwarding step in [docs/install.md](docs/install.md#port-forward).
   - Do the same smoke tests that we do for `sourcegraph/sourcegraph` (check to see that the new release works, check to see that the upgrade path works)
     - Check to see that the latest `master` is working on a fresh cluster
-      1. Deploy the latest `master` to your new cluster
+      1. Deploy the latest `master` to your new cluster by running through the quickstart steps in [docs/install.md](docs/install.md)
          - You'll need to create a GCP Storage Class named `sourcegraph` with the same `zone` that you created your cluster in (see ["Configure a storage class"](./docs/configure.md#Configure-a-storage-class))
+         - In order to give yourself permissions to create roles on the cluster, run: `kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user $YOUR_NAME@sourcegraph.com`
       1. Use the instructions in [configure.md](./docs/configure.md) to add a repository, test that code intelligence is working on it, and do a couple searches
     - Check the upgrade path from the previous release to the laster `master`
       1. Tear down the cluster that you created above
