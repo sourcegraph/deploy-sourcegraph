@@ -46,7 +46,7 @@
    watch kubectl get pods -o wide
    ```
 
-1. Once the deployment completes, verify Sourcegraph is running by temporarily making the frontend port accessible:
+1. <a name="port-forward"></a>Once the deployment completes, verify Sourcegraph is running by temporarily making the frontend port accessible:
 
    kubectl 1.9.x:
 
