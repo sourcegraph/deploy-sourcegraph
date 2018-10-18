@@ -35,7 +35,7 @@ Test what is currently checked in to master by [installing](docs/install.md) Sou
    - You'll need to create a GCP Storage Class named `sourcegraph` with the same `zone` that you created your cluster in (see ["Configure a storage class"](docs/configure.md#Configure-a-storage-class))
    - In order to give yourself permissions to create roles on the cluster, run: `kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user $YOUR_NAME@sourcegraph.com`
 1. Use the instructions in [configure.md](docs/configure.md) to:
-   1. Ad a repository (e.g. [sourcegraph/sourcegraph](https://github.com/sourcegraph/sourcegraph))
+   1. Add a repository (e.g. [sourcegraph/sourcegraph](https://github.com/sourcegraph/sourcegraph))
    1. [Add a language server](docs/configure.md#Configure-language-servers) (e.g. [Go](configure/xlang/go/README.md)), and test that code intelligence is working on the above repository
    1. Do a couple test searches
 
