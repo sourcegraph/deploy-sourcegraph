@@ -57,7 +57,6 @@
 {{/* --------------- START OF TEMPLATE ------------- */}}
 
 {{- define "collectCustomFrontendEnv" -}}
-{{- $_ := set .envVars "DEPLOY_TYPE" "datacenter" -}}
 {{- $_ := set .envVars "CORS_ORIGIN" .Values.site.corsOrigin -}}
 {{- $_ := set .envVars "NO_GO_GET_DOMAINS" .Values.site.noGoGetDomains -}}
 {{- $_ := set .envVars "SRC_APP_URL" .Values.site.appURL -}}
