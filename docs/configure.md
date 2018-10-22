@@ -488,7 +488,7 @@ Sourcegraph supports specifying a custom Redis server for:
 If you want to specify a custom Redis server, you'll need specify the corresponding environment variable for each of the following deployments:
 
 - `sourcegraph-frontend`
-- `indexer``
+- `indexer`
 - `xlang-go`
 - `xlang-go-bg`
 
