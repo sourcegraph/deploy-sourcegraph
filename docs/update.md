@@ -12,7 +12,7 @@ To update configuration or update to a new version, do the following:
 1. (Recommended) Check the diff the update will apply to your Kubernetes cluster:
    ```bash
    # NOTE: use `./helm.sh` instead of `helm` if you migrated from `sourcegraph-server-gen`
-   helm diff upgrade -f values.yaml sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/v2.11.0-helm.tar.gz | less -R
+   helm diff upgrade -f values.yaml sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/v2.11.3-helm.tar.gz | less -R
    ```
    You can find a list of all version releases here: https://github.com/sourcegraph/deploy-sourcegraph/releases.
    You may first need to install the Helm diff plugin:
@@ -22,7 +22,7 @@ To update configuration or update to a new version, do the following:
 1. Apply the update:
    ```bash
    # NOTE: use `./helm.sh` instead of `helm` if you migrated from `sourcegraph-server-gen`
-   helm upgrade -f values.yaml sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/v2.11.0-helm.tar.gz
+   helm upgrade -f values.yaml sourcegraph https://github.com/sourcegraph/deploy-sourcegraph/archive/v2.11.3-helm.tar.gz
    ```
 1. Check the health of the cluster after upgrade:
    ```bash
