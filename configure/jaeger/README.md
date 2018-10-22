@@ -36,7 +36,7 @@
     COLLECTOR_DEPLOYMENTS=(
         "github-proxy/github-proxy.Deployment.yaml"
         "indexer/indexer.Deployment.yaml"
-        "lsp-proxy/lsp-proxy.Deployment.yaml"
+
         "query-runner/query-runner.Deployment.yaml"
         "repo-updater/repo-updater.Deployment.yaml"
         "searcher/searcher.Deployment.yaml"

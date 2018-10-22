@@ -10,15 +10,6 @@ You can enable it by:
    echo kubectl apply --prune -l deploy=xlang-go -f configure/xlang/go/ --recursive >> kubectl-apply-all.sh
    ```
 
-1. Add the following environment variables to the `lsp-proxy` deployment to make it aware of the Go language server's existence.
-
-   ```yaml
-   # base/lsp-proxy/lsp-proxy.Deployment.yaml
-   env:
-     - name: LANGSERVER_GO_BG
-       value: tcp://xlang-go-bg:4389
-   ```
-
 1. Add the following entry for the Go language server to the `langservers` array in your site configuration.
 
    ```yaml
@@ -35,7 +26,7 @@ You can enable it by:
      }
    ```
 
-1. Apply your changes to `lsp-proxy`, `base/config-file.ConfigMap.yaml`, and the Go language server to the cluster.
+1. Apply your changes to `base/config-file.ConfigMap.yaml`, and the Go language server to the cluster.
 
    ```bash
    ./kubectl-apply-all.sh
