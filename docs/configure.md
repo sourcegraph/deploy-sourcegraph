@@ -312,7 +312,7 @@ Increasing the number of `gitserver` replicas can improve performance when your 
 To change the number of `gitserver` replicas:
 
 1. Update the `replicas` field in [gitserver.StatefulSet.yaml](../base/gitserver/gitserver.StatefulSet.yaml).
-1. Update the `SRC_GIT_SERVERS` environment variable in all services to reflect the number of replicas.
+1. Update the `SRC_GIT_SERVERS` environment variable in the frontend service to reflect the number of replicas.
 
    For example, if there are 2 gitservers then `SRC_GIT_SERVERS` should have the value `gitserver-0.gitserver:3178 gitserver-1.gitserver:3178`:
 
