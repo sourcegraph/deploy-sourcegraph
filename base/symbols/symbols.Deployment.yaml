@@ -25,8 +25,6 @@ spec:
     spec:
       containers:
       - env:
-        - name: SOURCEGRAPH_CONFIG_FILE
-          value: /etc/sourcegraph/config.json
         - name: SYMBOLS_CACHE_SIZE_MB
           value: "100000"
         - name: POD_NAME
@@ -50,16 +48,10 @@ spec:
             cpu: 500m
             memory: 500M
         volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
         - mountPath: /mnt/cache
           name: cache-ssd
       securityContext:
         runAsUser: 0
       volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file
-        name: sg-config
       - emptyDir: {}
         name: cache-ssd

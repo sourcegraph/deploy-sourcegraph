@@ -27,8 +27,6 @@ spec:
       - args:
         - -addr=:4388
         env:
-        - name: SOURCEGRAPH_CONFIG_FILE
-          value: /etc/sourcegraph/config.json
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -58,16 +56,10 @@ spec:
             cpu: 500m
             memory: 2Gi
         volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
         - mountPath: /mnt/cache
           name: cache-ssd
       securityContext:
         runAsUser: 0
       volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file
-        name: sg-config
       - emptyDir: {}
         name: cache-ssd

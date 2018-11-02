@@ -26,8 +26,6 @@ spec:
     spec:
       containers:
       - env:
-        - name: SOURCEGRAPH_CONFIG_FILE
-          value: /etc/sourcegraph/config.json
         image: sourcegraph/repo-updater:3.0.0-alpha.4@sha256:84fb8feac013f678c604dc688f8edd38ac3b5d10b24ed17acbfe7365cafc54b0
         name: repo-updater
         ports:
@@ -42,13 +40,5 @@ spec:
           requests:
             cpu: 100m
             memory: 500Mi
-        volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
       securityContext:
         runAsUser: 0
-      volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file
-        name: sg-config
