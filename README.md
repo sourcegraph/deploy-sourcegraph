@@ -24,6 +24,10 @@ node first. Migrating to Data Center is easy when you're ready.
   - [Prometheus metrics](docs/prom-metrics.md) - list of all Prometheus metrics that can be used for
     application performance monitoring
 
+## Kubernetes alternatives
+
+We recommend using Kubernetes for deploying Sourcegraph (see above for installation instructions). However, we understand not everyone can use Kubernetes or may prefer their own container infrastructure. If this is the case, check out our [pure-Docker deployment reference](https://github.com/sourcegraph/deploy-sourcegraph-docker).
+
 ## Contributing
 
 We've made our deployment configurations open source to better serve our customers' needs. If there is anything we can do to make deploying Sourcegraph easier just open an issue or a pull request and we will respond promptly!
