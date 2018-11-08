@@ -42,7 +42,6 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 - [Access Management Console](#wip-management-console)
 - [Configure a storage class](#configure-a-storage-class)
 - [Configure network access](#configure-network-access)
-- [Configure TLS/SSL](#configure-tlsssl)
 - [Configure repository cloning via SSH](#configure-repository-cloning-via-ssh)
 - [Configure language servers](#configure-language-servers)
 - [Configure SSDs to boost performance](../configure/ssd/README.md).
@@ -76,7 +75,7 @@ Run one of the following commands depending on your desired transport protocol:
   ```
   kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=80 --target-port=3080
   ```
-- HTTPS (requires you to [configure TLS/SSL](#configure-tlsssl))
+- HTTPS (requires you to [configure TLS/SSL in the management console](#wip-management-console))
   ```
   kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=443 --target-port=3443
   ```
@@ -120,62 +119,6 @@ Sourcegraph should now be accessible at `$EXTERNAL_ADDR:30080` and/or `$EXTERNAL
 ### Ingress controller
 
 You can also use an [Ingress controller](https://kubernetes.io/docs/concepts/services-networking/ingress/).
-
-## Configure TLS/SSL
-
-If you intend to make your Sourcegraph instance accessible on the Internet or another untrusted network, you should use TLS so that all traffic will be served over HTTPS.
-
-1. Create a [secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains your TLS certificate and private key.
-
-   ```bash
-   kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY
-   ```
-
-   Update [create-new-cluster.sh](../create-new-cluster.sh) with the previous command.
-
-   ```
-   echo kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY >> create-new-cluster.sh
-   ```
-
-2. Add the `TLS_CERT` and `TLS_KEY` environment variables to [base/frontend/sourcegraph-frontend.Deployment.yaml](../base/frontend/sourcegraph-frontend.Deployment.yaml).
-
-   ```yaml
-   # base/frontend/sourcegraph-frontend.Deployment.yaml
-   env:
-     - name: TLS_CERT
-       valueFrom:
-         secretKeyRef:
-           key: cert
-           name: tls
-     - name: TLS_KEY
-       valueFrom:
-         secretKeyRef:
-           key: key
-           name: tls
-   ```
-
-   Convenience script:
-
-   ```bash
-   # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
-   FE=base/frontend/sourcegraph-frontend.Deployment.yaml
-   cat $FE | yj | jq '(.spec.template.spec.containers[] | select(.name == "frontend") | .env) += [{name: "TLS_CERT", valueFrom: {secretKeyRef: {key: "cert", name: "tls"}}}, {name: "TLS_KEY", valueFrom: {secretKeyRef: {key: "key", name: "tls"}}}]' | jy -o $FE
-   ```
-
-3. Change your `appURL` in the site configuration stored in `base/config-file.ConfigMap.yaml`.
-
-   ```json
-   {
-     "appURL": "https://example.com:3443" // Must begin with "https"; replace with the public IP or hostname of your machine
-   }
-   ```
-
-4. Deploy the changes by following the [instructions to update to the site configuration](#update-site-configuration).
-
-5. Refer to the [Configure network access](#configure-network-access) section to make sure that `sourcegraph-frontend`'s port `3443` is properly exposed.
-
-**WARNING:** Do NOT commit the actual TLS cert and key files to your fork (unless your fork is
-private **and** you are okay with storing secrets in it).
 
 ## Configure repository cloning via SSH
 
@@ -492,7 +435,7 @@ config.json: |-
 
 ## WIP Management Console 
 
-Sourcegraph's management console is used to edit [these core configuration options](https://github.com/sourcegraph/sourcegraph/blob/management-console/schema/core.schema.json). _TODO: Call out `liscenseKey`, `appURL`, etc. This also needs to be part of the initial set up flow_. 
+Sourcegraph's management console is used to edit [these core configuration options](https://github.com/sourcegraph/sourcegraph/blob/management-console/schema/core.schema.json). _TODO: Call out `liscenseKey`, `appURL`, `TLS` settings, etc. This also needs to be part of the initial set up flow._
 
 You can access it by:
 
