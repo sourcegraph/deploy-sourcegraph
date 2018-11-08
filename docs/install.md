@@ -34,8 +34,6 @@
 
 1. If you want to add a large number of repositories to your instance, you should [configure the number of gitserver replicas](configure.md#configure-gitserver-replica-count) _before_ you continue with the next step.
 
-1. Beginning with version 2.12.0, Sourcegraph's Kubernetes deployment requires an Enterprise license key. See ["Add a license key"](./configure.md#add-a-license-key) for instructions.
-
 1. Deploy the desired version of Sourcegraph to your cluster:
 
    ```bash
@@ -48,7 +46,9 @@
    watch kubectl get pods -o wide
    ```
 
-1. Once the deployment completes, verify Sourcegraph is running by temporarily making the frontend port accessible:
+1. (🚨 TODO) Once the deployment completes, read through ["Management Console"](./configure.md#wip-management-console) to configure core settings like `licenseKey`, `appURL`, etc.
+
+1. Verify Sourcegraph is running by temporarily making the frontend port accessible:
 
    kubectl 1.9.x:
 
