@@ -28,10 +28,6 @@ spec:
         - -mode=tcp
         - -addr=:4389
         env:
-        - name: CONFIG_FILE_HASH
-          value: ad622f4e70f7edc1056a270559e8ca07bba00abd81c1bea1e8940c7156532081
-        - name: SOURCEGRAPH_CONFIG_FILE
-          value: /etc/sourcegraph/config.json
         # SRC_GIT_SERVERS must be kept in sync with the specified replica count in
         # gitserver.Statefulset.yaml
         # See ../../docs/configure.md for more information.
@@ -66,17 +62,11 @@ spec:
             cpu: 500m
             memory: 2Gi
         volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
         - mountPath: /mnt/cache
           name: cache-ssd
       securityContext:
         runAsUser: 0
       volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file
-        name: sg-config
       # See ../../docs/configure.md for more information about how to increase the
       # performance of this delpoyment by using an SSD.
       - emptyDir: {}

@@ -24,8 +24,6 @@ spec:
       - args:
         - run
         env:
-        - name: SOURCEGRAPH_CONFIG_FILE
-          value: /etc/sourcegraph/config.json
         - name: SRC_REPOS_DIR
           value: /data/repos
         image: sourcegraph/gitserver:2.13.2@sha256:b69f6810622042d433befd0f42d42e693704a96e786a979d6b8d27c2c7f08ebc
@@ -46,8 +44,6 @@ spec:
             cpu: 500m
             memory: 1G
         volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
         - mountPath: /data/repos
           name: repos
         # See the customization guide (../../../docs/configure.md) for information
@@ -57,10 +53,6 @@ spec:
       securityContext:
         runAsUser: 0
       volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file
-        name: sg-config
       - name: repos
       # See the customization guide (../../../docs/configure.md) for information
       # about configuring gitserver to use an SSH key
