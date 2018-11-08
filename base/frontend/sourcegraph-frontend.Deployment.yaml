@@ -78,14 +78,6 @@ spec:
           requests:
             cpu: "2"
             memory: 2G
-        volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
       securityContext:
         runAsUser: 0
       serviceAccountName: sourcegraph-frontend
-      volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file
-        name: sg-config
