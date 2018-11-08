@@ -39,6 +39,7 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 
 ### Common configuration
 
+- [Access Management Console](#wip-management-console)
 - [Configure a storage class](#configure-a-storage-class)
 - [Configure network access](#configure-network-access)
 - [Update site configuration](#update-site-configuration)
@@ -523,3 +524,17 @@ config.json: |-
 ```
 
 1. Run `./kubectl-apply-all.sh` to apply the changes to your cluster.
+
+## WIP Management Console 
+
+Sourcegraph's management console is used to edit [these core configuration options](https://github.com/sourcegraph/sourcegraph/blob/management-console/schema/core.schema.json). _TODO: Call out `liscenseKey`, `appURL`, etc. This also needs to be part of the initial set up flow_. 
+
+You can access it by:
+
+1. Port-forward the management-console service.
+
+    ```bash
+    kubectl port-forward svc/management-console 6075
+    ```
+
+2. Visit `localhost:6075` in your web-browser. 
