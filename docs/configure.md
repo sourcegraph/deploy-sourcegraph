@@ -42,7 +42,6 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 - [Access Management Console](#wip-management-console)
 - [Configure a storage class](#configure-a-storage-class)
 - [Configure network access](#configure-network-access)
-- [Update site configuration](#update-site-configuration)
 - [Configure TLS/SSL](#configure-tlsssl)
 - [Configure repository cloning via SSH](#configure-repository-cloning-via-ssh)
 - [Configure language servers](#configure-language-servers)
@@ -121,40 +120,6 @@ Sourcegraph should now be accessible at `$EXTERNAL_ADDR:30080` and/or `$EXTERNAL
 ### Ingress controller
 
 You can also use an [Ingress controller](https://kubernetes.io/docs/concepts/services-networking/ingress/).
-
-## Update site configuration
-
-The site configuration is stored inside a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume), which is mounted inside every deployment that needs it. You can change the site configuration by editing
-[base/config-file.ConfigMap.yaml](../base/config-file.ConfigMap.yaml).
-
-Updates to the site configuration are [propagated to the relevant services](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically) in about 1 minute. ([Future Kubernetes versions will decrease this latency.](https://github.com/kubernetes/kubernetes/pull/64752))
-
-For the impatient, site configuration changes can be applied immediately by changing the name of the ConfigMap. `kubectl apply`ing these changes will force the relevant pods to restart immediately with the new config:
-
-1. Change the name of the ConfigMap in all deployments.
-
-   The following convenience script changes the name of the site configuration's ConfigMap (and all references to it) by appending the current date and time. This script should be run
-   at the root of your `deploy-sourcegraph-$VERSION` folder.
-
-   ```bash
-   #!/bin/bash
-
-   # e.g. 2018-08-15t23-42-08z
-   CONFIG_DATE=$(date -u +"%Y-%m-%dt%H-%M-%Sz")
-
-   # update all references to the site config's ConfigMap
-   # from: 'config-file.*' , to:' config-file-$CONFIG_DATE'
-   find . -name "*yaml" -exec sed -i.sedibak -e "s/name: config-file.*/name: config-file-$CONFIG_DATE/g" {} +
-
-   # delete sed's backup files
-   find . -name "*.sedibak" -delete
-   ```
-
-2. Apply the new configuration to your Kubernetes cluster.
-
-   ```bash
-   ./kubectl-apply-all.sh
-   ```
 
 ## Configure TLS/SSL
 
