@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Failsafe editor for Sourcegraph's core configuration. 
+  labels:
+    deploy: sourcegraph
+  name: management-console
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: management-console
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: management-console
+    spec:
+      containers:
+      - env:
+        image: sourcegraph/management-console # this image doesn't exist yet
+        name: management-console
+        ports:
+        - containerPort: 6075
+          name: http
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1G
+          requests:
+            cpu: 100m
+            memory: 500Mi
+      securityContext:
+        runAsUser: 0
