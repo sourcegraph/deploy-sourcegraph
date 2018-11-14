@@ -58,6 +58,13 @@ spec:
         #       key: key
         #       name: tls
         image: sourcegraph/frontend:2.13.2@sha256:66ecfcdf900468aec7c63f3d4cbf5b86c24769eedfdf4096b1506d8bff65e460
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
         name: frontend
         ports:
         - containerPort: 3080
