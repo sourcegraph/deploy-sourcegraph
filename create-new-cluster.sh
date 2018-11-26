@@ -15,11 +15,17 @@
 # the relevant `kubectl apply` command to ./kubectl-apply-all.sh
 
 export GOOGLE_APPLICATION_CREDENTIALS="sourcegraph_cluster_creds.json"
+export USER_EMAIL_ADDRESS="seanrobertson@improbable.io"
 pushd cluster/terraform
 
 if [ ! -r ${GOOGLE_APPLICATION_CREDENTIALS} ]; then
   echo "You need the service account creds from LastPass."
   echo "Copy Shared-EngineeringEffectiveness > Sourcegraph-Cluster-SvcAcct to terraform/sourcegraph_cluster_creds.json"
+  exit 1
+fi
+
+if ! terraform init; then
+  echo "Unable to initialize Terraform.  Install it first."
   exit 1
 fi
 
@@ -34,6 +40,9 @@ if ! terraform apply; then
 fi
 
 popd
+
+# Set up cluster role binding so we can actually create things
+kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user ${USER_EMAIL_ADDRESS}
 
 # Create namespace and set the default storage class to SSD
 kubectl apply -f cluster/kube/

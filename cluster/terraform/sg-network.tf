@@ -21,7 +21,7 @@ resource "google_compute_forwarding_rule" "sg-frontend-lb" {
   name       = "sg-frontend-lb"
   target     = "${google_compute_target_pool.sg-frontend-proxy.self_link}"
   port_range = "443"
-  ip_address = "regions/europe-west1/addresses/sourcegraph-ext-ip"
+  ip_address = "${google_compute_address.sg-ext-ip.self_link}"
 
   load_balancing_scheme = "EXTERNAL"
   region                = "europe-west1"
@@ -52,12 +52,6 @@ resource "google_compute_subnetwork" "sg-eu1-subnet" {
 
   depends_on  = ["google_compute_network.sg-network"]
 }
-
-resource "google_compute_global_address" "default" {
-  name = "sg-ext-ip"
-  address_type = "EXTERNAL"
-}
-
 
 resource "google_compute_firewall" "fw-pod-comms" {
   name      = "sourcegraph-eu1-allow-pods-to-communicate"
