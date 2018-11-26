@@ -25,7 +25,8 @@ updateConfigVersion() {
 # Switch kubectl to use the sourcegraph cluster, if it isn't already
 gcloud container clusters get-credentials sourcegraph-eu1 --zone europe-west1-d --project solar-virtue-183310
 
-updateConfigVersion
+# TODO: Uncomment this.
+# updateConfigVersion
 
 # Start up base services
 kubectl apply --prune -l deploy=sourcegraph -f base --recursive
