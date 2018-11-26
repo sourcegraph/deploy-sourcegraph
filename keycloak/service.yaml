@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    component: sourcegraph-keycloak
+    k8s-app: sourcegraph-keycloak
+  name: sourcegraph-keycloak
+  namespace: default
+spec:
+  ports:
+  - name: https
+    port: 443
+    protocol: TCP
+    targetPort: 443
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    k8s-app: sourcegraph-keycloak
+  type: LoadBalancer
+  sessionAffinity: None
+  loadBalancerIP: 35.195.221.125

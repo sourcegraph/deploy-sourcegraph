@@ -14,4 +14,28 @@
 # a YAML file that can be `kubectl apply`d to the cluster, version that file in this repository, and add 
 # the relevant `kubectl apply` command to ./kubectl-apply-all.sh
 
+export GOOGLE_APPLICATION_CREDENTIALS="sourcegraph_cluster_creds.json"
+pushd cluster/terraform
+
+if [ ! -r ${GOOGLE_APPLICATION_CREDENTIALS} ]; then
+  echo "You need the service account creds from LastPass."
+  echo "Copy Shared-EngineeringEffectiveness > Sourcegraph-Cluster-SvcAcct to terraform/sourcegraph_cluster_creds.json"
+  exit 1
+fi
+
+if ! terraform validate; then
+  echo "Terraform validate failed.  Fix that before trying to apply it."
+  exit 1
+fi
+
+if ! terraform apply; then
+  echo "Terraform failed to apply.  Fix that before deploying workloads to the cluster."
+  exit 1
+fi
+
+popd
+
+kubectl apply -f cluster/kube/
+
+# And now apply the service configuration
 ./kubectl-apply-all.sh

@@ -1,0 +1,58 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: sourcegraph-keycloak
+  namespace: default
+  labels:
+    k8s-app: sourcegraph-keycloak
+spec:
+  revisionHistoryLimit: 2
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        k8s-app: sourcegraph-keycloak
+        component: sourcegraph-keycloak
+        poddns/port: "443"
+    spec:
+      containers:
+      - name: sourcegraph-keycloak
+        # image: eu.gcr.io/io-crafty-shelter/pub-oidc-proxy:production
+        image: quay.io/gambol99/keycloak-proxy:v2.2.2
+        imagePullPolicy: Always
+        command:
+        # - "/dinit"
+        # - "-timeout=40s"
+        # - "-r"
+        # - "/usr/local/bin/keycloak-proxy"
+        - "/opt/keycloak-proxy"
+        - "--config=/keycloak-proxy-config.yaml"
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256m
+          requests:
+            cpu: 200m
+            memory: 150m
+        ports:
+        - containerPort: 443
+          name: https
+          protocol: TCP
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        volumeMounts:
+        - name: code-i8e-tls
+          mountPath: /ssl/
+          readOnly: true
+        - mountPath: /keycloak-proxy-config.yaml
+          name: cfgmap
+          subPath: keycloak-proxy-config.yaml
+      volumes:
+      - name: code-i8e-tls
+        secret:
+          defaultMode: 420
+          secretName: code-i8e-tls
+      - name: cfgmap
+        configMap:
+          name: sourcegraph-keycloak-config
