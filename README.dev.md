@@ -20,7 +20,7 @@ Wait for buildkite to pass and for your changes to be approved, then merge and c
 
 Test what is currently checked in to master by [installing](docs/install.md) Sourcegraph on a fresh cluster.
 
-### Provision a new cluster
+### Option 1: Provision a new cluster on GCP
 
 1.  Create a cluster unique name that is identifiable to you (e.g `ggilmore-test`) in the [Sourcegraph Auxiliary GCP Project](https://console.cloud.google.com/kubernetes/list?project=sourcegraph-server&organizationId=1006954638239).
     - You can create pool that has `3` nodes, each with `8` vCPUs and `30` GB memory (for a total of `24` vCPUs and `90` GB memory).
@@ -28,6 +28,10 @@ Test what is currently checked in to master by [installing](docs/install.md) Sou
 1.  It’ll take a few minutes for it to be provisioned. You’ll see a green checkmark when it is done.
 1.  Click on the `connect` button next to your cluster, it’ll give you a command to copy+paste in your terminal.
 1.  Run the command in your terminal. Once it finishes, run `kubectl config current-context`. It should tell you that it’s set up to talk to the cluster that you just created.
+
+### Option 2: Provision a new cluster locally using Docker for Mac
+
+This option is not as good because it requires deleting all `resources` and `limits` references in our repository. This is easy to mess up / typo, so it may be easier to use GCP steps above. Still, this option can be easier/quicker if you are confident about making that change. For exact steps see: https://gist.github.com/slimsag/7fbf4a1015437863962b2c7e40406da7
 
 ### Do smoke tests for `master` branch
 
