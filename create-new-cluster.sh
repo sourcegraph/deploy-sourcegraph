@@ -35,6 +35,7 @@ fi
 
 popd
 
+# Create namespace and set the default storage class to SSD
 kubectl apply -f cluster/kube/
 
 # And now apply the service configuration
