@@ -53,6 +53,12 @@ resource "google_compute_subnetwork" "sg-eu1-subnet" {
   depends_on  = ["google_compute_network.sg-network"]
 }
 
+resource "google_compute_global_address" "default" {
+  name = "sg-ext-ip"
+  address_type = "EXTERNAL"
+}
+
+
 resource "google_compute_firewall" "fw-pod-comms" {
   name      = "sourcegraph-eu1-allow-pods-to-communicate"
   network   = "${google_compute_network.sg-network.name}"

@@ -9,8 +9,8 @@ resource "google_container_cluster" "sg-gke" {
   zone                     = "europe-west1-d"
   network                  = "sourcegraph-network"
   subnetwork               = "sourcegraph-eu1"
-  node_version             = "1.10.7-gke.1"
-  min_master_version       = "1.10.7-gke.1"
+  node_version             = "1.11.2-gke.18"
+  min_master_version       = "1.11.2-gke.18"
   initial_node_count       = 3
   remove_default_node_pool = true
 
@@ -39,7 +39,7 @@ resource "google_container_node_pool" "sg-gke-n1-8-pool" {
   cluster            = "${google_container_cluster.sg-gke.name}"
   initial_node_count = 3
 
-  version = "1.10.7-gke.1"
+  version = "1.11.2-gke.18"
 
   depends_on = ["google_container_cluster.sg-gke"]
 
@@ -61,7 +61,7 @@ resource "google_container_node_pool" "sg-gke-n1-8-pool" {
     ]
 
     labels = {
-      owner         = "infra"
+      owner         = "eng-foundations"
       owner_subteam = "engineering-velocity"
       role          = "sourcegraph"
     }
