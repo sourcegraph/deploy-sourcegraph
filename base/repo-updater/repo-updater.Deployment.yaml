@@ -26,11 +26,7 @@ spec:
     spec:
       containers:
       - env:
-        - name: SOURCEGRAPH_CONFIG_FILE
-          value: /etc/sourcegraph/config.json
-        - name: SRC_GIT_SERVERS
-          value: gitserver-0.gitserver:3178
-        image: sourcegraph/repo-updater:2.13.5@sha256:f349fbbf72098f2d650ef18512ef33ba794b7e4d81fb66d836d3dc8e6a274188
+        image: sourcegraph/repo-updater:3.0.0-alpha.4@sha256:84fb8feac013f678c604dc688f8edd38ac3b5d10b24ed17acbfe7365cafc54b0
         name: repo-updater
         ports:
         - containerPort: 3182
@@ -44,13 +40,5 @@ spec:
           requests:
             cpu: 100m
             memory: 500Mi
-        volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
       securityContext:
         runAsUser: 0
-      volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file
-        name: sg-config

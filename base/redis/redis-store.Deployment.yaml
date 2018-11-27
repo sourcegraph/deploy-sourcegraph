@@ -24,10 +24,8 @@ spec:
         app: redis-store
     spec:
       containers:
-      - command:
-        - redis-server
-        - /etc/redis/redis.conf
-        image: sourcegraph/redis:18-02-07_8205764_3.2-alpine@sha256:f2957e0973ef16968d4bfacfae5ab08da985257aa7ce358a85152275e3da78e8
+      - env:
+        image: sourcegraph/redis-store:18-10-28_e45f6d82@sha256:1fe101e1f04a8e267fda85c342cd3b974ab4a9e47718b864752f14f1da51579c
         livenessProbe:
           initialDelaySeconds: 30
           tcpSocket:
@@ -50,9 +48,6 @@ spec:
         volumeMounts:
         - mountPath: /redis-data
           name: redis-data
-        - mountPath: /etc/redis
-          name: config
-          readOnly: true
       - image: sourcegraph/redis_exporter:18-02-07_bb60087_v0.15.0@sha256:282d59b2692cca68da128a4e28d368ced3d17945cd1d273d3ee7ba719d77b753
         name: redis-exporter
         ports:
@@ -71,6 +66,3 @@ spec:
       - name: redis-data
         persistentVolumeClaim:
           claimName: redis-store
-      - configMap:
-          name: redis-store
-        name: config

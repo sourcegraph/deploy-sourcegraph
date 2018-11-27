@@ -25,23 +25,9 @@ spec:
     spec:
       containers:
       - env:
-        - name: SOURCEGRAPH_CONFIG_FILE
-          value: /etc/sourcegraph/config.json
         - name: LSP_PROXY
           value: lsp-proxy:4388
-        - name: PGDATABASE
-          value: sg
-        - name: PGHOST
-          value: pgsql
-        - name: PGPORT
-          value: "5432"
-        - name: PGSSLMODE
-          value: disable
-        - name: PGUSER
-          value: sg
-        - name: SRC_GIT_SERVERS
-          value: gitserver-0.gitserver:3178
-        image: sourcegraph/indexer:2.13.5@sha256:b298eadfc9d4c3795b1c6add36c9468d9290919c183b4b3ab6cf05aeb3792af1
+        image: sourcegraph/indexer:3.0.0-alpha.4@sha256:bcfd2518cc7df61d6344beac98d77fda88f33401d1106861cd855802931b023f
         name: indexer
         ports:
         - containerPort: 3179
@@ -53,13 +39,5 @@ spec:
           requests:
             cpu: 100m
             memory: 250M
-        volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
       securityContext:
         runAsUser: 0
-      volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file
-        name: sg-config

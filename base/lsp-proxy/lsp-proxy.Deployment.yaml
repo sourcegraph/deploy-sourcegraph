@@ -27,17 +27,13 @@ spec:
       - args:
         - -addr=:4388
         env:
-        - name: SOURCEGRAPH_CONFIG_FILE
-          value: /etc/sourcegraph/config.json
-        - name: SRC_GIT_SERVERS
-          value: gitserver-0.gitserver:3178
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: sourcegraph/lsp-proxy:2.13.5@sha256:5f8761aa340cded6d32e0d27ccad5219108b6aebd7bb97684d1a23ce8990cac7
+        image: sourcegraph/lsp-proxy:3.0.0-alpha.4@sha256:016b495506b1eddfe2f81368ac47708f7ce7b455fd47ee9fad34ee575b5beb72
         livenessProbe:
           initialDelaySeconds: 5
           tcpSocket:
@@ -60,16 +56,10 @@ spec:
             cpu: 500m
             memory: 2Gi
         volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
         - mountPath: /mnt/cache
           name: cache-ssd
       securityContext:
         runAsUser: 0
       volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file
-        name: sg-config
       - emptyDir: {}
         name: cache-ssd

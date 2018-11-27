@@ -25,11 +25,7 @@ spec:
     spec:
       containers:
       - env:
-        - name: SOURCEGRAPH_CONFIG_FILE
-          value: /etc/sourcegraph/config.json
-        - name: LOG_REQUESTS
-          value: "true"
-        image: sourcegraph/github-proxy:2.13.5@sha256:4bbc3d1934b7e0cfe1ec488e61246e1b77dc97b5841fd967542c64e88e1f8dad
+        image: sourcegraph/github-proxy:3.0.0-alpha.4@sha256:570886d2dcea2d8ebc625ba7e7a27eb48f325796700edbe17084af7bea9c91c1
         name: github-proxy
         ports:
         - containerPort: 3180
@@ -41,13 +37,5 @@ spec:
           requests:
             cpu: 100m
             memory: 250M
-        volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
       securityContext:
         runAsUser: 0
-      volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file
-        name: sg-config

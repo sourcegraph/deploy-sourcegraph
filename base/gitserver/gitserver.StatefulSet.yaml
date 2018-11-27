@@ -24,11 +24,7 @@ spec:
       - args:
         - run
         env:
-        - name: SOURCEGRAPH_CONFIG_FILE
-          value: /etc/sourcegraph/config.json
-        - name: SRC_REPOS_DIR
-          value: /data/repos
-        image: sourcegraph/gitserver:2.13.5@sha256:4e64f4782f016b035c488f19e87f147965dae50cd0efb6ce6796812366669991
+        image: sourcegraph/gitserver:3.0.0-alpha.4@sha256:4e853deeddc641a2bf5d8132c3e2a6f05d35840b0007b46053690ef9d92f4cb7
         livenessProbe:
           initialDelaySeconds: 5
           tcpSocket:
@@ -46,8 +42,6 @@ spec:
             cpu: 500m
             memory: 1G
         volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
         - mountPath: /data/repos
           name: repos
         # See the customization guide (../../../docs/configure.md) for information
@@ -57,10 +51,6 @@ spec:
       securityContext:
         runAsUser: 0
       volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file
-        name: sg-config
       - name: repos
       # See the customization guide (../../../docs/configure.md) for information
       # about configuring gitserver to use an SSH key
