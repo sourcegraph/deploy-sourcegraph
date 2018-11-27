@@ -14,15 +14,33 @@
 # a YAML file that can be `kubectl apply`d to the cluster, version that file in this repository, and add 
 # the relevant `kubectl apply` command to ./kubectl-apply-all.sh
 
-export GOOGLE_APPLICATION_CREDENTIALS="cluster_creds.json"
 export USER_EMAIL_ADDRESS="seanrobertson@improbable.io"
-pushd cluster/terraform
 
-if [ ! -r ${GOOGLE_APPLICATION_CREDENTIALS} ]; then
-  echo "You need the service account creds from LastPass."
-  echo "Copy Shared-EngineeringEffectiveness > Sourcegraph-Cluster-SvcAcct to terraform/sourcegraph_cluster_creds.json"
-  exit 1
-fi
+retrieveClusterSecret() {
+  # Make sure that we don't leave secrets around on disk in any case.
+  temp_dir=$(mktemp -d)
+  key_path="${temp_dir}/cluster_keys.json"
+  function cleanup_secrets() {
+    rm -rf "${temp_dir}"
+  }
+  trap cleanup_secrets EXIT
+
+  # Retrieve the secret from Vault
+  imp-vault read-key \
+    --key="secret/sync.v1/dev-workflow/production-sourcegraph/sourcegraph-eu1/gce-key-pair/cluster-keys" \
+    --write_to="${key_path}"
+
+  if [ $? -ne 0 ]; then
+    echo "Failed to retrieve secret from Vault.  Do you have permission?"
+    exit 1
+  fi
+  
+  export GOOGLE_APPLICATION_CREDENTIALS="${key_path}"
+}
+
+retrieveClusterSecret
+
+pushd cluster/terraform
 
 if ! terraform init; then
   echo "Unable to initialize Terraform.  Install it first."
@@ -49,3 +67,6 @@ kubectl apply -f cluster/kube/
 
 # And now apply the service configuration
 ./kubectl-apply-all.sh
+
+# Destroy any leftover secrets, just in case
+cleanup_secrets
