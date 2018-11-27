@@ -31,9 +31,6 @@ gcloud container clusters get-credentials sourcegraph-eu1 --zone europe-west1-d 
 # Start up base services
 kubectl apply --prune -l deploy=sourcegraph -f base --recursive
 
-# And switch on keycloak
-kubectl apply -f keycloak
-
 # Next, redeploy the xlang services
 kubectl apply --prune -l deploy=xlang-typescript -f configure/xlang/typescript/ --recursive
 kubectl apply --prune -l deploy=xlang-python -f configure/xlang/python/ --recursive

@@ -42,7 +42,7 @@ fi
 popd
 
 # Set up cluster role binding so we can actually create things
-kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user ${USER_EMAIL_ADDRESS}
+kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user "${USER_EMAIL_ADDRESS}"
 
 # Create namespace and set the default storage class to SSD
 kubectl apply -f cluster/kube/
