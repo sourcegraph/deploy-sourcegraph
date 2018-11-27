@@ -14,7 +14,7 @@
 # a YAML file that can be `kubectl apply`d to the cluster, version that file in this repository, and add 
 # the relevant `kubectl apply` command to ./kubectl-apply-all.sh
 
-export GOOGLE_APPLICATION_CREDENTIALS="sourcegraph_cluster_creds.json"
+export GOOGLE_APPLICATION_CREDENTIALS="cluster_creds.json"
 export USER_EMAIL_ADDRESS="seanrobertson@improbable.io"
 pushd cluster/terraform
 
