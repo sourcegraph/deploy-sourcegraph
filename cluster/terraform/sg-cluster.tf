@@ -9,8 +9,8 @@ resource "google_container_cluster" "sg-gke" {
   zone                     = "europe-west1-d"
   network                  = "sourcegraph-network"
   subnetwork               = "sourcegraph-eu1"
-  node_version             = "1.11.x"
-  min_master_version       = "1.11.x"
+  node_version             = "1.11"
+  min_master_version       = "1.11"
   initial_node_count       = 3
   remove_default_node_pool = true
 
@@ -33,8 +33,6 @@ resource "google_container_node_pool" "sg-gke-n1-8-pool" {
   zone               = "${google_container_cluster.sg-gke.zone}"
   cluster            = "${google_container_cluster.sg-gke.name}"
   initial_node_count = 3
-
-  version = "1.11.x"
 
   depends_on = ["google_container_cluster.sg-gke"]
 
