@@ -14,14 +14,15 @@
 # a YAML file that can be `kubectl apply`d to the cluster, version that file in this repository, and add 
 # the relevant `kubectl apply` command to ./kubectl-apply-all.sh
 
+BASE=$(dirname "${BASH_SOURCE[0]}")
+
 export USER_EMAIL_ADDRESS="seanrobertson@improbable.io"
 
-retrieveClusterSecret() {
+function retrieveClusterSecret() {
   # Make sure that we don't leave secrets around on disk in any case.
-  temp_dir=$(mktemp -d)
-  key_path="${temp_dir}/cluster_keys.json"
+  key_path=$(mktemp)
   function cleanup_secrets() {
-    rm -rf "${temp_dir}"
+    rm -rf "${key_path}"
   }
   trap cleanup_secrets EXIT
 
@@ -38,24 +39,19 @@ retrieveClusterSecret() {
   export GOOGLE_APPLICATION_CREDENTIALS="${key_path}"
 }
 
+function terraform-step {
+  if ! terraform "$@"; then
+    echo "Terraform $1 failed" >&2
+    exit 1
+  fi
+}
+
 retrieveClusterSecret
 
-pushd cluster/terraform
-
-if ! terraform init; then
-  echo "Unable to initialize Terraform.  Install it first."
-  exit 1
-fi
-
-if ! terraform validate; then
-  echo "Terraform validate failed.  Fix that before trying to apply it."
-  exit 1
-fi
-
-if ! terraform apply; then
-  echo "Terraform failed to apply.  Fix that before deploying workloads to the cluster."
-  exit 1
-fi
+pushd "${BASE}/cluster/terraform" || exit 1
+terraform-step init
+terraform-step validate
+terraform-step apply
 
 popd
 
@@ -67,6 +63,3 @@ kubectl apply -f cluster/kube/
 
 # And now apply the service configuration
 ./kubectl-apply-all.sh
-
-# Destroy any leftover secrets, just in case
-cleanup_secrets
