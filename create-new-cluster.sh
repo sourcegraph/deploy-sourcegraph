@@ -14,16 +14,18 @@
 # a YAML file that can be `kubectl apply`d to the cluster, version that file in this repository, and add 
 # the relevant `kubectl apply` command to ./kubectl-apply-all.sh
 
-BASE=$(dirname "${BASH_SOURCE[0]}")
+if ! [[ "${USER_EMAIL_ADDRESS}" ]]; then
+  echo "Please set \$USER_EMAIL_ADDRESS before running this script."
+  exit 1
+fi
 
-export USER_EMAIL_ADDRESS="seanrobertson@improbable.io"
+BASE=$(dirname "${BASH_SOURCE[0]}")
+SECRET_VAULT_PATH="secret/sync.v1/dev-workflow/production-sourcegraph/sourcegraph-eu1/gce-key-pair/cluster-keys"
 
 function retrieveClusterSecret() {
-  GOOGLE_CREDENTIALS=$(imp-vault read-key \
-    --key="secret/sync.v1/dev-workflow/production-sourcegraph/sourcegraph-eu1/gce-key-pair/cluster-keys")
-
-  if [ $? -ne 0 ] || [ -z "${GOOGLE_CREDENTIALS}" ]; then
-    echo "Failed to retrieve secret from Vault.  Do you have permission?"
+  if ! GOOGLE_CREDENTIALS=$(imp-vault read-key --key="${SECRET_VAULT_PATH}") \
+    || ! [[ "${GOOGLE_CREDENTIALS}" ]]; then
+    echo "Failed to retrieve secret from Vault."
     exit 1
   fi
 }
