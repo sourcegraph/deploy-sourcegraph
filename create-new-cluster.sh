@@ -19,24 +19,13 @@ BASE=$(dirname "${BASH_SOURCE[0]}")
 export USER_EMAIL_ADDRESS="seanrobertson@improbable.io"
 
 function retrieveClusterSecret() {
-  # Make sure that we don't leave secrets around on disk in any case.
-  key_path=$(mktemp)
-  function cleanup_secrets() {
-    rm -rf "${key_path}"
-  }
-  trap cleanup_secrets EXIT
+  GOOGLE_CREDENTIALS=$(imp-vault read-key \
+    --key="secret/sync.v1/dev-workflow/production-sourcegraph/sourcegraph-eu1/gce-key-pair/cluster-keys")
 
-  # Retrieve the secret from Vault
-  imp-vault read-key \
-    --key="secret/sync.v1/dev-workflow/production-sourcegraph/sourcegraph-eu1/gce-key-pair/cluster-keys" \
-    --write_to="${key_path}"
-
-  if [ $? -ne 0 ]; then
+  if [ $? -ne 0 ] || [ -z "${GOOGLE_CREDENTIALS}" ]; then
     echo "Failed to retrieve secret from Vault.  Do you have permission?"
     exit 1
   fi
-  
-  export GOOGLE_APPLICATION_CREDENTIALS="${key_path}"
 }
 
 function terraform-step {
@@ -52,7 +41,6 @@ pushd "${BASE}/cluster/terraform" || exit 1
 terraform-step init
 terraform-step validate
 terraform-step apply
-
 popd
 
 # Set up cluster role binding so we can actually create things
