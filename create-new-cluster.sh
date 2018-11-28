@@ -15,7 +15,7 @@
 # the relevant `kubectl apply` command to ./kubectl-apply-all.sh
 
 if ! [[ "${USER_EMAIL_ADDRESS}" ]]; then
-  echo "Please set \$USER_EMAIL_ADDRESS before running this script."
+  echo "Please set \$USER_EMAIL_ADDRESS before running this script." >&2
   exit 1
 fi
 
@@ -25,12 +25,12 @@ SECRET_VAULT_PATH="secret/sync.v1/dev-workflow/production-sourcegraph/sourcegrap
 function retrieveClusterSecret() {
   if ! GOOGLE_CREDENTIALS=$(imp-vault read-key --key="${SECRET_VAULT_PATH}") \
     || ! [[ "${GOOGLE_CREDENTIALS}" ]]; then
-    echo "Failed to retrieve secret from Vault."
+    echo "Failed to retrieve secret from Vault." >&2
     exit 1
   fi
 }
 
-function terraform-step {
+function terraform-step() {
   if ! terraform "$@"; then
     echo "Terraform $1 failed" >&2
     exit 1
