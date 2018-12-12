@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Management console for critical Sourcegraph configuration.
+  labels:
+    deploy: sourcegraph
+  name: management-console
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: management-console
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: management-console
+    spec:
+      containers:
+      - env:
+        - name: PGDATABASE
+          value: sg
+        - name: PGHOST
+          value: pgsql
+        - name: PGPORT
+          value: "5432"
+        - name: PGSSLMODE
+          value: disable
+        - name: PGUSER
+          value: sg
+        image: sourcegraph/management-console:25310_2018-12-12_a137c75@sha256:87c563e126570fb9e63ed3f4b62e54b92f63c312c99d4fa3a768b412d5e5516a
+        name: management-console
+        ports:
+        - containerPort: 2633
+          name: https
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          tcpSocket:
+            port: 2633
+        resources:
+          limits:
+            cpu: "1"
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        volumeMounts:
+        - mountPath: /etc/sourcegraph
+          name: disk
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: disk
+        persistentVolumeClaim:
+          claimName: management-console
