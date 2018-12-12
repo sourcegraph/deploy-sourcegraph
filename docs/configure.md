@@ -196,11 +196,11 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
    cat $FE | yj | jq '(.spec.template.spec.containers[] | select(.name == "frontend") | .env) += [{name: "TLS_CERT", valueFrom: {secretKeyRef: {key: "cert", name: "tls"}}}, {name: "TLS_KEY", valueFrom: {secretKeyRef: {key: "key", name: "tls"}}}]' | jy -o $FE
    ```
 
-3. Change your `appURL` in the site configuration stored in `base/config-file.ConfigMap.yaml`.
+3. Change your `externalURL` in the site configuration stored in `base/config-file.ConfigMap.yaml`.
 
    ```json
    {
-     "appURL": "https://example.com:3443" // Must begin with "https"; replace with the public IP or hostname of your machine
+     "externalURL": "https://example.com:3443" // Must begin with "https"; replace with the public IP or hostname of your machine
    }
    ```
 
