@@ -27,6 +27,12 @@ spec:
       - args:
         - serve
         env:
+        # TODO(slimsag): After 3.0 (NOT 3.0-preview), we can remove this. It is
+        # left here now so that users upgrading to 3.0 will leave it here so
+        # that the DB will be populated with their old site config file
+        # (i.e. for migration). This means that for now we have two sources of
+        # truth for the 'default' cluster configuration: The config-map in this
+        # repository and the confdefaults.Cluster variable in our main repo.
         - name: SOURCEGRAPH_CONFIG_FILE
           value: /etc/sourcegraph/config.json
         - name: LSP_PROXY
