@@ -274,9 +274,7 @@ Code intelligence is provided through [Sourcegraph extensions](https://docs.sour
 - [Go](https://sourcegraph.com/extensions/sourcegraph/lang-go)
 - [JavaScript/TypeScript](https://sourcegraph.com/extensions/sourcegraph/lang-typescript)
 - [Python](https://sourcegraph.com/extensions/sourcegraph/python)
-- Java (coming soon)
-- PHP (coming soon)
-- ... check the [extension registry](https://sourcegraph.com/extensions) for more or [create a new extension](https://docs.sourcegraph.com/extensions/authoring)
+- ... check the [extension registry](https://sourcegraph.com/extensions) for more (e.g. [Java](https://sourcegraph.com/extensions?query=java)) or [create a new extension](https://docs.sourcegraph.com/extensions/authoring)
 
 ## Increase memory or CPU limits
 
