@@ -100,20 +100,6 @@ you can [import these dashboards directly from JSON](/docs/grafana/).
     min(src_gitserver_disk_space_available) BY (job) / 1000 / 1000 / 1000"
     ```
 
-### Dashboard: lang
-
-1.  restarts, by service:
-
-    ```
-    sum by (container)(increase(kube_pod_container_status_restarts{container=~\"(lsp).*\"}[10m]))
-    ```
-
-1.  max CPU, by service:
-
-    ```
-    max by (container_name)(task:container_cpu_usage_seconds_total:sum{container_name=~\"(lsp).*\"})
-    ```
-
 ### Dashboard: resources
 
 1.  max CPU, by service
