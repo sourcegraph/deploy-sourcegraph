@@ -36,7 +36,7 @@ Test what is currently checked in to master by [installing](docs/install.md) Sou
    - In order to give yourself permissions to create roles on the cluster, run: `kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user $YOUR_NAME@sourcegraph.com`
 1. Use the instructions in [configure.md](docs/configure.md) to:
    1. Add a repository (e.g. [sourcegraph/sourcegraph](https://github.com/sourcegraph/sourcegraph))
-   1. [Add a language server](docs/configure.md#Configure-language-servers) (e.g. [Go](configure/xlang/go/README.md)), and test that code intelligence is working on the above repository
+   1. Enable a language extension (e.g. [Go](https://sourcegraph.com/extensions/chris/lang-go)), and test that code intelligence is working on the above repository
    1. Do a couple test searches
 
 ### Check the upgrade path from the previous release to `master`

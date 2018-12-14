@@ -269,33 +269,14 @@ your fork is private **and** you are okay with storing secrets in it).
 
 ## Configure language servers
 
-> Code intelligence is a paid upgrade on top of the Data Center deployment option. After following these instructions to confirm it works, [buy code intelligence](https://about.sourcegraph.com/pricing).
+Code intelligence is provided through [Sourcegraph extensions](https://docs.sourcegraph.com/extensions). Refer to the READMEs for each language for instructions about how to deploy and configure them:
 
-Code intelligence provides advanced code navigation and cross-references for your code on Sourcegraph.
-
-After setting up the base Sourcegraph deployment, refer to the following docs for each language for instructions about how to deploy / configure each language server:
-
-- [Go](../configure/xlang/go/README.md)
-- [Java](../configure/xlang/java/README.md)
-- [PHP](../configure/xlang/php/README.md)
-- [Python](../configure/xlang/python/README.md)
-- [Javascript / Typescript](../configure/xlang/typescript/README.md)
-
-We also have the following experimental language servers (please [read about the caveats](https://about.sourcegraph.com/docs/code-intelligence/experimental-language-servers/#caveats-of-experimental-language-servers) before enabling them):
-
-- [Bash](../configure/xlang/experimental/bash/README.md)
-- [Clojure](../configure/xlang/experimental/clojure/README.md)
-- [C++](../configure/xlang/experimental/cpp/README.md)
-- [C#](../configure/xlang/experimental/cs/README.md)
-- [CSS](../configure/xlang/experimental/css/README.md)
-- [Dockerfile](../configure/xlang/experimental/dockerfile/README.md)
-- [Elixir](../configure/xlang/experimental/elixir/README.md)
-- [HTML](../configure/xlang/experimental/html/README.md)
-- [Lua](../configure/xlang/experimental/lua/README.md)
-- [OCaml](../configure/xlang/experimental/ocaml/README.md)
-- [R](../configure/xlang/experimental/r/README.md)
-- [Ruby](../configure/xlang/experimental/ruby/README.md)
-- [Rust](../configure/xlang/experimental/rust/README.md)
+- [Go](https://sourcegraph.com/extensions/chris/lang-go)
+- [JavaScript/TypeScript](https://sourcegraph.com/extensions/sourcegraph/lang-typescript)
+- [Python](https://sourcegraph.com/extensions/sourcegraph/python)
+- Java (coming soon)
+- PHP (coming soon)
+- ... check the [extension registry](https://sourcegraph.com/extensions) for more or [create a new extension](https://docs.sourcegraph.com/extensions/authoring)
 
 ## Increase memory or CPU limits
 
@@ -488,11 +469,7 @@ Sourcegraph supports specifying a custom Redis server for:
 If you want to specify a custom Redis server, you'll need specify the corresponding environment variable for each of the following deployments:
 
 - `sourcegraph-frontend`
-- `indexer`
-- `lsp-proxy`
 - `repo-updater`
-- `xlang-go`
-- `xlang-go-bg`
 
 ## Configure custom PostgreSQL
 

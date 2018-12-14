@@ -23,19 +23,19 @@ you can [import these dashboards directly from JSON](/docs/grafana/).
 1.  frontend QPS, by route (5m avg):
 
     ```
-    sum(route:src_http_request_count:rate5m{route=~\"blob|graphql|home|page.def.landing|page.repo.landing|repo|repo-branches|search|settings|sign-in|site-admin|tree|xlang\"}) by (route)
+    sum(route:src_http_request_count:rate5m{route=~\"blob|graphql|home|page.def.landing|page.repo.landing|repo|repo-branches|search|settings|sign-in|site-admin|tree\"}) by (route)
     ```
 
 1.  frontend 90th-percentile request duration (5m avg):
 
     ```
-    histogram_quantile(0.90, route:src_http_request_duration_seconds_bucket:rate5m{route=~\"blob|graphql|home|page.def.landing|page.repo.landing|repo|repo-branches|search|settings|sign-in|site-admin|tree|xlang\"})
+    histogram_quantile(0.90, route:src_http_request_duration_seconds_bucket:rate5m{route=~\"blob|graphql|home|page.def.landing|page.repo.landing|repo|repo-branches|search|settings|sign-in|site-admin|tree\"})
     ```
 
 1.  frontend 75th-percentile request duration (5m avg):
 
     ```
-    histogram_quantile(0.75, route:src_http_request_duration_seconds_bucket:rate5m{route=~\"blob|graphql|home|page.def.landing|page.repo.landing|repo|repo-branches|search|settings|sign-in|site-admin|tree|xlang\"})
+    histogram_quantile(0.75, route:src_http_request_duration_seconds_bucket:rate5m{route=~\"blob|graphql|home|page.def.landing|page.repo.landing|repo|repo-branches|search|settings|sign-in|site-admin|tree\"})
     ```
 
 1.  frontend CPU usage, by pod (%)
@@ -102,40 +102,16 @@ you can [import these dashboards directly from JSON](/docs/grafana/).
 
 ### Dashboard: lang
 
-1.  open workspaces, by language:
-
-    ```
-    avg by (mode)(src_xlang_open_lsp_server_connections{mode!=\"\"})
-    ```
-
-1.  QPS, by language (5m avg):
-
-    ```
-    prod:xlang_requests:rate5m
-    ```
-
-1.  request error ratio, by language:
-
-    ```
-    prod:xlang_errors:ratio5m
-    ```
-
 1.  restarts, by service:
 
     ```
-    sum by (container)(increase(kube_pod_container_status_restarts{container=~\"(lsp|xlang).*\"}[10m]))
+    sum by (container)(increase(kube_pod_container_status_restarts{container=~\"(lsp).*\"}[10m]))
     ```
 
 1.  max CPU, by service:
 
     ```
-    max by (container_name)(task:container_cpu_usage_seconds_total:sum{container_name=~\"(lsp|xlang).*\"})
-    ```
-
-1.  max RAM, by service:
-
-    ```
-    max by (container_name)(container_memory_rss{container_name=~\"(xlang|lsp).*\"}) / 1024 / 1024 / 1024
+    max by (container_name)(task:container_cpu_usage_seconds_total:sum{container_name=~\"(lsp).*\"})
     ```
 
 ### Dashboard: resources
@@ -178,90 +154,58 @@ span.gray {
     of times a request fails only in the new validation.
 *   `frontend_graphql_validation_fails`<span class="gray"> : counter : sourcegraph-frontend</span><br>Total number of
     times a request fails validation.
-*   `go_gc_duration_seconds`<span class="gray"> : summary : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols, xlang-go</span><br>A
+*   `go_gc_duration_seconds`<span class="gray"> : summary : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>A
     summary of the GC invocation durations.
-*   `go_goroutines`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql, query-runner,
-    redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols, xlang-go</span><br>Number of
+*   `go_goroutines`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql, query-runner,
+    redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of
     goroutines that currently exist.
-*   `go_memstats_alloc_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of bytes allocated and still in use.
-*   `go_memstats_alloc_bytes_total`<span class="gray"> : counter : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Total number of bytes allocated, even if freed.
-*   `go_memstats_buck_hash_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of bytes used by the profiling bucket hash table.
-*   `go_memstats_frees_total`<span class="gray"> : counter : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Total number of frees.
-*   `go_memstats_gc_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of bytes used for garbage collection system metadata.
-*   `go_memstats_heap_alloc_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of heap bytes allocated and still in use.
-*   `go_memstats_heap_idle_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of heap bytes waiting to be used.
-*   `go_memstats_heap_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of heap bytes that are in use.
-*   `go_memstats_heap_objects`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of allocated objects.
-*   `go_memstats_heap_released_bytes_total`<span class="gray"> : counter : github-proxy, gitserver-1, indexer, lsp-proxy,
-    pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Total number of heap bytes released to OS.
-*   `go_memstats_heap_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of heap bytes obtained from system.
-*   `go_memstats_last_gc_time_seconds`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of seconds since 1970 of last garbage collection.
-*   `go_memstats_lookups_total`<span class="gray"> : counter : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Total number of pointer lookups.
-*   `go_memstats_mallocs_total`<span class="gray"> : counter : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Total number of mallocs.
-*   `go_memstats_mcache_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of bytes in use by mcache structures.
-*   `go_memstats_mcache_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of bytes used for mcache structures obtained from system.
-*   `go_memstats_mspan_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of bytes in use by mspan structures.
-*   `go_memstats_mspan_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of bytes used for mspan structures obtained from system.
-*   `go_memstats_next_gc_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of heap bytes when next garbage collection will take place.
-*   `go_memstats_other_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of bytes used for other system allocations.
-*   `go_memstats_stack_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of bytes in use by the stack allocator.
-*   `go_memstats_stack_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of bytes obtained from system for stack allocator.
-*   `go_memstats_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Number of bytes obtained by system. Sum of all system allocations.
-*   `golangserver_build_open_connections`<span class="gray"> : gauge : xlang-go</span><br>Number of open connections to
-    the Go language server.
-*   `golangserver_build_path_has_git_suffix`<span class="gray"> : counter : sourcegraph-frontend,
-    xlang-go</span><br>Temporary counter to determine if paths have a git suffix.
-*   `golangserver_symbol_cache_size`<span class="gray"> : gauge : sourcegraph-frontend, xlang-go</span><br>Number of items
-    in the symbol cache
-*   `golangserver_typecheck_cache_request_total`<span class="gray"> : counter : xlang-go</span><br>Count of requests to
-    cache.
-*   `golangserver_typecheck_cache_size`<span class="gray"> : gauge : sourcegraph-frontend, xlang-go</span><br>Number of
+*   `go_memstats_alloc_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes allocated and still in use.
+*   `go_memstats_alloc_bytes_total`<span class="gray"> : counter : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of bytes allocated, even if freed.
+*   `go_memstats_buck_hash_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used by the profiling bucket hash table.
+*   `go_memstats_frees_total`<span class="gray"> : counter : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of frees.
+*   `go_memstats_gc_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used for garbage collection system metadata.
+*   `go_memstats_heap_alloc_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes allocated and still in use.
+*   `go_memstats_heap_idle_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes waiting to be used.
+*   `go_memstats_heap_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes that are in use.
+*   `go_memstats_heap_objects`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of allocated objects.
+*   `go_memstats_heap_released_bytes_total`<span class="gray"> : counter : github-proxy, gitserver-1,
+    pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of heap bytes released to OS.
+*   `go_memstats_heap_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes obtained from system.
+*   `go_memstats_last_gc_time_seconds`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of seconds since 1970 of last garbage collection.
+*   `go_memstats_lookups_total`<span class="gray"> : counter : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of pointer lookups.
+*   `go_memstats_mallocs_total`<span class="gray"> : counter : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of mallocs.
+*   `go_memstats_mcache_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes in use by mcache structures.
+*   `go_memstats_mcache_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used for mcache structures obtained from system.
+*   `go_memstats_mspan_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes in use by mspan structures.
+*   `go_memstats_mspan_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used for mspan structures obtained from system.
+*   `go_memstats_next_gc_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes when next garbage collection will take place.
+*   `go_memstats_other_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used for other system allocations.
+*   `go_memstats_stack_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes in use by the stack allocator.
+*   `go_memstats_stack_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes obtained from system for stack allocator.
+*   `go_memstats_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes obtained by system. Sum of all system allocations.
     items in the typecheck cache
 *   `http_request_duration_microseconds`<span class="gray"> : summary : github-proxy, pgsql, redis-cache,
     redis-store</span><br>The HTTP request latencies in microseconds.
@@ -373,24 +317,20 @@ span.gray {
     that have been committed
 *   `pg_stat_database_xact_rollback`<span class="gray"> : counter : pgsql</span><br>Number of transactions in this
     database that have been rolled back
-*   `process_cpu_seconds_total`<span class="gray"> : counter : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Total user and system CPU time spent in seconds.
-*   `process_max_fds`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql, query-runner,
-    redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols, xlang-go</span><br>Maximum number of
+*   `process_cpu_seconds_total`<span class="gray"> : counter : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total user and system CPU time spent in seconds.
+*   `process_max_fds`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql, query-runner,
+    redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Maximum number of
     open file descriptors.
-*   `process_open_fds`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql, query-runner,
-    redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols, xlang-go</span><br>Number of open
+*   `process_open_fds`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql, query-runner,
+    redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of open
     file descriptors.
-*   `process_resident_memory_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Resident memory size in bytes.
-*   `process_start_time_seconds`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Start time of the process since unix epoch in seconds.
-*   `process_virtual_memory_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, indexer, lsp-proxy, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols,
-    xlang-go</span><br>Virtual memory size in bytes.
+*   `process_resident_memory_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Resident memory size in bytes.
+*   `process_start_time_seconds`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Start time of the process since unix epoch in seconds.
+*   `process_virtual_memory_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
+    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Virtual memory size in bytes.
 *   `redis_aof_current_rewrite_duration_sec`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
 *   `redis_aof_enabled`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
 *   `redis_aof_last_rewrite_duration_sec`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
@@ -468,8 +408,8 @@ span.gray {
     API remaining before hitting the rate limit.
 *   `src_github_requests_total`<span class="gray"> : counter : repo-updater</span><br>Total number of requests sent to the
     GitHub API.
-*   `src_gitserver_client_deadline_exceeded`<span class="gray"> : counter : indexer, lsp-proxy, repo-updater, searcher,
-    sourcegraph-frontend, symbols, xlang-go</span><br>Times that Client.sendExec() returned context.DeadlineExceeded
+*   `src_gitserver_client_deadline_exceeded`<span class="gray"> : counter : repo-updater, searcher,
+    sourcegraph-frontend, symbols</span><br>Times that Client.sendExec() returned context.DeadlineExceeded
 *   `src_gitserver_clone_queue`<span class="gray"> : gauge : gitserver-1</span><br>number of repos waiting to be cloned.
 *   `src_gitserver_disk_space_available`<span class="gray"> : gauge : gitserver-1</span><br>Amount of free space disk
     space on the repos mount.
@@ -495,8 +435,6 @@ span.gray {
     latencies in seconds.
 *   `src_http_requests_last_timestamp_unixtime`<span class="gray"> : gauge : sourcegraph-frontend</span><br>Last time a
     request finished for a http endpoint.
-*   `src_indexer_queue_length`<span class="gray"> : gauge : indexer</span><br>Lengh of the indexer&#39;s queue of repos to
-    check/index.
 *   `src_legacy_def_landing_webapp`<span class="gray"> : counter : sourcegraph-frontend</span><br>Number of times a legacy
     def landing page has been served.
 *   `src_legacy_repo_landing_webapp`<span class="gray"> : counter : sourcegraph-frontend</span><br>Number of times a
@@ -519,30 +457,7 @@ span.gray {
     update check handler.
 *   `src_updatecheck_requests_has_update`<span class="gray"> : counter : sourcegraph-frontend</span><br>Number of requests
     to the update check handler where an update is available.
-*   `src_vfs_gitserver_bytes_total`<span class="gray"> : counter : lsp-proxy, sourcegraph-frontend,
-    xlang-go</span><br>Total number of bytes read into memory by ArchiveFileSystem.
-*   `src_xlang_client_rate_limited`<span class="gray"> : counter : lsp-proxy, sourcegraph-frontend</span><br>The number of
-    times a client request was rate limited.
-*   `src_xlang_cumu_client_proxy_connections`<span class="gray"> : counter : lsp-proxy,
-    sourcegraph-frontend</span><br>Cumulative number of connections to the xlang client proxy (total of open &#43;
-    previously closed since process startup).
-*   `src_xlang_cumu_lsp_server_connections`<span class="gray"> : counter : lsp-proxy</span><br>Cumulative number of
-    connections (initialized &#43; uninitialized) to the language servers (total of open &#43; previously closed since process
-    startup).
-*   `src_xlang_cumu_lsp_server_method_calls`<span class="gray"> : counter : lsp-proxy</span><br>Total number of calls sent
-    for a (method, mode).
-*   `src_xlang_lsp_server_alive_seconds`<span class="gray"> : histogram : lsp-proxy</span><br>The number of seconds a
-    proxied connection is kept alive.
-*   `src_xlang_lsp_server_failed_method_calls`<span class="gray"> : histogram : lsp-proxy</span><br>Total number of failed
-    calls sent to a server proxy before it is shutdown.
-*   `src_xlang_lsp_server_method_calls`<span class="gray"> : histogram : lsp-proxy</span><br>Total number of calls sent to
-    a server proxy before it is shutdown.
-*   `src_xlang_open_client_proxy_connections`<span class="gray"> : gauge : lsp-proxy,
-    sourcegraph-frontend</span><br>Number of open connections to the xlang client proxy.
-*   `src_xlang_open_lsp_server_connections`<span class="gray"> : gauge : lsp-proxy</span><br>Open connections (initialized
-    &#43; uninitialized) to the language servers.
-*   `src_xlang_request_duration_seconds`<span class="gray"> : histogram : sourcegraph-frontend</span><br>The xlang request
-    latencies in seconds.
+*   `src_vfs_gitserver_bytes_total`<span class="gray"> : counter : sourcegraph-frontend</span><br>Total number of bytes read into memory by ArchiveFileSystem.
 *   `symbols_parse_parse_failed`<span class="gray"> : counter : symbols</span><br>The total number of parse jobs that
     failed.
 *   `symbols_parse_parse_queue_size`<span class="gray"> : gauge : symbols</span><br>The number of parse jobs enqueued.
@@ -555,25 +470,5 @@ span.gray {
     failed.
 *   `symbols_store_fetch_queue_size`<span class="gray"> : gauge : symbols</span><br>The number of fetch jobs enqueued.
 *   `symbols_store_fetching`<span class="gray"> : gauge : symbols</span><br>The number of fetches currently running.
-*   `xlang_cache_get_total`<span class="gray"> : counter : lsp-proxy</span><br>Total number of gets for a mode.
-*   `xlang_cache_get_total_bytes`<span class="gray"> : counter : lsp-proxy</span><br>Total number of bytes fetched from
-    the cache for a mode.
-*   `xlang_cache_set_total`<span class="gray"> : counter : lsp-proxy</span><br>Total number of sets for a mode.
-*   `xlang_cache_set_total_bytes`<span class="gray"> : counter : lsp-proxy</span><br>Total number of bytes set to the
-    cache for a mode.
-*   `xlang_vfs_cached_file_evict`<span class="gray"> : counter : lsp-proxy, sourcegraph-frontend, xlang-go</span><br>Total
-    number of evictions to cachedFetch archives.
-*   `xlang_vfs_github_fetch_failed_total`<span class="gray"> : counter : lsp-proxy, sourcegraph-frontend,
-    xlang-go</span><br>Total number of fetches by GitHubRepoVFS that failed.
-*   `xlang_vfs_github_fetch_total`<span class="gray"> : counter : lsp-proxy, sourcegraph-frontend,
-    xlang-go</span><br>Total number of fetches by GitHubRepoVFS.
-*   `xlang_vfs_gitserver_fetch_failed_total`<span class="gray"> : counter : lsp-proxy, sourcegraph-frontend,
-    xlang-go</span><br>Total number of fetches to GitServer that failed.
-*   `xlang_vfs_gitserver_fetch_total`<span class="gray"> : counter : lsp-proxy, sourcegraph-frontend,
-    xlang-go</span><br>Total number of fetches to GitServer.
-*   `xlang_vfs_remote_bytes_total`<span class="gray"> : counter : lsp-proxy, sourcegraph-frontend,
-    xlang-go</span><br>Total number of bytes cached into memory by RemoteProxyFS.
-*   `xlang_vfs_xremote_bytes_total`<span class="gray"> : counter : lsp-proxy, sourcegraph-frontend,
-    xlang-go</span><br>Total number of bytes cached into memory by XRemoteFS.
 
 <!-- END AUTOGENERATED CODE -->

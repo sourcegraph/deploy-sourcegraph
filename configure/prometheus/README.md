@@ -139,7 +139,7 @@ seconds):
 
 ```
 ALERT ProdPageLoadLatency
-  IF histogram_quantile(0.9, sum(rate(src_http_request_duration_seconds_bucket{job="sourcegraph-frontend",route!="xlang",route!="lsp"}[10m])) by (le)) > 20
+  IF histogram_quantile(0.9, sum(rate(src_http_request_duration_seconds_bucket{job="sourcegraph-frontend"}[10m])) by (le)) > 20
   LABELS { severity="page" }
   ANNOTATIONS {
     summary = "High page load latency",

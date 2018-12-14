@@ -22,7 +22,7 @@ data:
       }
 
     ALERT ProdPageLoadLatency
-      IF histogram_quantile(0.9, sum(rate(src_http_request_duration_seconds_bucket{job="sourcegraph-frontend",route!="xlang",route!="lsp"}[10m])) by (le)) > 20
+      IF histogram_quantile(0.9, sum(rate(src_http_request_duration_seconds_bucket{job="sourcegraph-frontend"}[10m])) by (le)) > 20
       LABELS { severity="page" }
       ANNOTATIONS {
         summary = "High page load latency",
@@ -81,18 +81,6 @@ data:
     #     help = "Alerts when the symbols service has more than 10% of requests failing.",
     #   }
 
-    # NOTE(beyang): this should no longer be part of the default metrics, because not all DC instances have Go code intelligence
-    #
-    # ALERT XLangAbsent
-    #   IF absent(prod:xlang_requests:rate5m{mode="go"})
-    #   FOR 1m
-    #   LABELS { severity="page" }
-    #   ANNOTATIONS {
-    #     summary = "{{`{{`}} $labels.mode {{`}}`}} is not running",
-    #     help = "Alerts when the Go language server is not running.",
-    #     readme = "enterprise",
-    #   }
-
     # http_response_size_bytes is measured at the Prometheus clients, not at the server.
     ALERT PrometheusMetricsBloat
       IF http_response_size_bytes{handler="prometheus", quantile="0.5", job!="kubernetes-nodes", job!="kubernetes-apiservers"} > 20000
@@ -100,78 +88,6 @@ data:
         summary = "{{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.ns{{`}}`}} is probably leaking metrics (unbounded attribute)",
         help = "Alerts when a service is probably leaking metrics (unbounded attribute).",
       }
-  apdex.rules: |+
-    # Generated with apdex.py
-    # Do not manually edit
-
-    # Rate 15m
-    prod:src_xlang_request_duration_seconds:apdex_02_08_rate15m =
-      (
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="0.2",success="true"}[15m])) by (mode, method)
-      +
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="0.8",success="true"}[15m])) by (mode, method)
-      ) / 2 / sum(rate(src_xlang_request_duration_seconds_count[15m])) by (mode, method)
-
-    prod:src_xlang_request_duration_seconds:apdex_1_5_rate15m =
-      (
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="1",success="true"}[15m])) by (mode, method)
-      +
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="5",success="true"}[15m])) by (mode, method)
-      ) / 2 / sum(rate(src_xlang_request_duration_seconds_count[15m])) by (mode, method)
-
-    prod:src_xlang_request_duration_seconds:apdex_2_10_rate15m =
-      (
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="2",success="true"}[15m])) by (mode, method)
-      +
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="10",success="true"}[15m])) by (mode, method)
-      ) / 2 / sum(rate(src_xlang_request_duration_seconds_count[15m])) by (mode, method)
-
-
-    # Rate 1h
-    prod:src_xlang_request_duration_seconds:apdex_02_08_rate1h =
-      (
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="0.2",success="true"}[1h])) by (mode, method)
-      +
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="0.8",success="true"}[1h])) by (mode, method)
-      ) / 2 / sum(rate(src_xlang_request_duration_seconds_count[1h])) by (mode, method)
-
-    prod:src_xlang_request_duration_seconds:apdex_1_5_rate1h =
-      (
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="1",success="true"}[1h])) by (mode, method)
-      +
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="5",success="true"}[1h])) by (mode, method)
-      ) / 2 / sum(rate(src_xlang_request_duration_seconds_count[1h])) by (mode, method)
-
-    prod:src_xlang_request_duration_seconds:apdex_2_10_rate1h =
-      (
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="2",success="true"}[1h])) by (mode, method)
-      +
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="10",success="true"}[1h])) by (mode, method)
-      ) / 2 / sum(rate(src_xlang_request_duration_seconds_count[1h])) by (mode, method)
-
-
-    # Rate 1d
-    prod:src_xlang_request_duration_seconds:apdex_02_08_rate1d =
-      (
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="0.2",success="true"}[1d])) by (mode, method)
-      +
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="0.8",success="true"}[1d])) by (mode, method)
-      ) / 2 / sum(rate(src_xlang_request_duration_seconds_count[1d])) by (mode, method)
-
-    prod:src_xlang_request_duration_seconds:apdex_1_5_rate1d =
-      (
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="1",success="true"}[1d])) by (mode, method)
-      +
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="5",success="true"}[1d])) by (mode, method)
-      ) / 2 / sum(rate(src_xlang_request_duration_seconds_count[1d])) by (mode, method)
-
-    prod:src_xlang_request_duration_seconds:apdex_2_10_rate1d =
-      (
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="2",success="true"}[1d])) by (mode, method)
-      +
-        sum(rate(src_xlang_request_duration_seconds_bucket{le="10",success="true"}[1d])) by (mode, method)
-      ) / 2 / sum(rate(src_xlang_request_duration_seconds_count[1d])) by (mode, method)
-
 
   extra.rules: ""
   node.rules: |
@@ -195,8 +111,6 @@ data:
     rule_files:
       - 'node.rules'
       - 'sourcegraph.rules'
-      - 'xlang.rules'
-      - 'apdex.rules'
       - 'searcher.rules'
       - 'symbols.rules'
       - 'alert.rules'
@@ -464,12 +378,6 @@ data:
     symbols_requests:rate10m = sum by (instance)(rate(symbols_service_request_total[10m]))
     symbols_errors:rate10m   = sum by (instance)(rate(symbols_service_request_total{code!="200",code!="canceled"}[10m]))
     symbols_errors:ratio10m = sum(symbols_errors:rate10m) / sum(symbols_requests:rate10m)
-  xlang.rules: |
-    prod:xlang_requests:rate5m = sum by (mode)(rate(src_xlang_request_duration_seconds_count[5m]))
-    prod:xlang_errors:rate5m   = sum by (mode)(rate(src_xlang_request_duration_seconds_count{success="false"}[5m]))
-    prod:xlang_errors:ratio5m  = prod:xlang_errors:rate5m / prod:xlang_requests:rate5m
-    prod:src_xlang_request_duration_seconds_bucket:rate1d =
-      sum by (le, mode, method)(rate(src_xlang_request_duration_seconds_bucket{success="true"}[1d]))
 kind: ConfigMap
 metadata:
   labels:
