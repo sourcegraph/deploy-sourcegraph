@@ -271,7 +271,7 @@ your fork is private **and** you are okay with storing secrets in it).
 
 Code intelligence is provided through [Sourcegraph extensions](https://docs.sourcegraph.com/extensions). Refer to the READMEs for each language for instructions about how to deploy and configure them:
 
-- [Go](https://sourcegraph.com/extensions/chris/lang-go)
+- [Go](https://sourcegraph.com/extensions/sourcegraph/lang-go)
 - [JavaScript/TypeScript](https://sourcegraph.com/extensions/sourcegraph/lang-typescript)
 - [Python](https://sourcegraph.com/extensions/sourcegraph/python)
 - Java (coming soon)
