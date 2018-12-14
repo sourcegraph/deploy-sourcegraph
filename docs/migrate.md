@@ -61,8 +61,6 @@ These steps will uninstall Sourcegraph from your cluster while preserving your d
 
 7. The previous step produces a fresh base state, so you will need to reconfigure your cluster by following the relevant steps in [configure.md](configure.md) (e.g. exposing ports, applying your site config, enabling other services like language servers, Prometheus, Alertmanager, Jaeger, etc.).
 
-   If you were previously configuring Gradle and Artifactory for the Java Language Server, you'll now need to set those options via environment variables instead of just the site configuration. [configure/xlang/java/README.md](../configure/xlang/java/README.md#Gradle-and-Aritfactory-configuration) contains information about the environment variables that you'll need to set.
-
    **Downtime ends once installation and configuration is complete**
 
 ## Why is there a new deployment strategy?
