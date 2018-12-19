@@ -53,7 +53,7 @@ _You can change the replica count of `searcher` by editing [base/searcher/search
 | 25k+         | 20+ ([contact us](https://about.sourcegraph.com/contact/) for scaling advice) |
 | Monorepo     | 1 ([contact us](https://about.sourcegraph.com/contact/) for scaling advice)   |
 
-_Read [docs/configure.md](docs/configure.md#Configure-gitserver-replica-count) to learn about how to change
+_Read [docs/configure.md](/docs/configure.md#Configure-gitserver-replica-count) to learn about how to change
 the replica count of `gitserver`._
 
 </div>
