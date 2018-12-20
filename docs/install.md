@@ -62,7 +62,7 @@
    kubectl port-forward svc/sourcegraph-frontend 3080:30080
    ```
 
-   Open http://localhost:30080 in your browser and you will see a setup page. Congrats, you have Sourcegraph up and running!
+   Open http://localhost:3080 in your browser and you will see a setup page. Congrats, you have Sourcegraph up and running!
 
 1. Now [configure your deployment](configure.md).
 
