@@ -63,6 +63,10 @@ These steps will uninstall Sourcegraph from your cluster while preserving your d
 
    **Downtime ends once installation and configuration is complete**
 
+## Language server deployment
+
+Sourcegraph 3.0 dropped lsp-proxy and automatic language server deployment in favor of [Sourcegraph extensions](https://docs.sourcegraph.com/extensions). As a consequence, Sourcegraph 3.0 does not automatically run or manage language servers. If you had code intelligence enabled in 2.x, you will need to follow the instructions for each language extension and deploy them individually. Check out the [code intelligence documentation](https://docs.sourcegraph.com/user/code_intelligence).
+
 ## Why is there a new deployment strategy?
 
 2.10.x and prior was deployed by configuring `values.yaml` and using `helm` to generate the final yaml to deploy to a cluster.
