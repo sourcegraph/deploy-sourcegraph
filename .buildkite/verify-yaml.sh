@@ -3,14 +3,9 @@
 set -ex
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-.buildkite/install-kubeval.sh
-
 gcloud container clusters get-credentials dogfood --zone us-central1-a --project sourcegraph-dev
 
-kubectl apply --dry-run --validate --recursive -f base/
-kubectl apply --dry-run --validate --recursive -f configure/
-
-find base -name '*.yaml' -exec kubeval {} +
-find configure -name '*.yaml' -exec kubeval {} +
+kubectl apply --dry-run --validate --recursive -f base/ --context=gke_sourcegraph-dev_us-central1-a_dogfood
+kubectl apply --dry-run --validate --recursive -f configure/ --context=gke_sourcegraph-dev_us-central1-a_dogfood
 
 .buildkite/verify-label.sh
