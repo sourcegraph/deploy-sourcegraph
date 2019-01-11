@@ -1,6 +1,6 @@
 # Migrating from Sourcegraph 2.13.x to Sourcegraph 3.x
 
-🚨 If you have not migrated off of helm yet, please refer to [docs/helm.migrate.md](docs/helm.migrate.md) before reading the following notes for migrating to Sourcegraph 3.0.
+🚨 If you have not migrated off of helm yet, please refer to [docs/helm.migrate.md](helm.migrate.md) before reading the following notes for migrating to Sourcegraph 3.0.
 
 🚨 Please upgrade your Sourcegraph instance to 2.13.x before reading the following notes for migrating to Sourcegraph 3.0. 
 
