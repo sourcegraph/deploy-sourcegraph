@@ -1,15 +1,9 @@
-# Migrating from Data Center 2.10.x or prior
+# Migrating from Data Center's old helm deployment (2.10.x and prior)
 
 Two things have changed in 2.11.x that require migration:
 
 - Gitserver is now configured using [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).
 - We have [a new deployment strategy](#why-is-there-a-new-deployment-strategy).
-
-## Deferring migration
-
-If you want to update to 2.11.x without performing any migrations, you can use the 2.11.x-helm tags and follow the [helm-legacy update instructions](https://github.com/sourcegraph/deploy-sourcegraph/blob/helm-legacy/docs/update.md).
-
-2.12.x will require this migration.
 
 ## Migrating
 
@@ -62,10 +56,6 @@ These steps will uninstall Sourcegraph from your cluster while preserving your d
 7. The previous step produces a fresh base state, so you will need to reconfigure your cluster by following the relevant steps in [configure.md](configure.md) (e.g. exposing ports, applying your site config, enabling other services like language servers, Prometheus, Alertmanager, Jaeger, etc.).
 
    **Downtime ends once installation and configuration is complete**
-
-## Language server deployment
-
-Sourcegraph 3.0 dropped lsp-proxy and automatic language server deployment in favor of [Sourcegraph extensions](https://docs.sourcegraph.com/extensions). As a consequence, Sourcegraph 3.0 does not automatically run or manage language servers. If you had code intelligence enabled in 2.x, you will need to follow the instructions for each language extension and deploy them individually. Check out the [code intelligence documentation](https://docs.sourcegraph.com/user/code_intelligence).
 
 ## Why is there a new deployment strategy?
 

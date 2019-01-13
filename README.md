@@ -1,6 +1,8 @@
-> 🚨 If you are updating from a 2.10.x or previous deployment, follow the migration steps in [docs/migrate.md](docs/migrate.md).
+> 🚨 If you are updating from a 2.10.x or previous deployment, follow the migration steps in [docs/helm.migrate.md](docs/helm.migrate.md).
 
 > 🚨 If you are updating from a 2.11.x or previous deployment, you will need to add an Enterprise license key. Follow the steps in [docs/configure.md](docs/configure.md#add-a-license-key).
+
+> 🚨 If you updating from 2.13.x or previous deployment, please follow the Sourcegraph 3.x migration steps in [docs/sourcegraph-3.0.migrate.md](docs/sourcegraph-3.0.migrate.md).
 
 # Sourcegraph Data Center
 [![sourcegraph: search](https://img.shields.io/badge/sourcegraph-search-brightgreen.svg)](https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph)
