@@ -64,34 +64,31 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 
 You need to make the main web server accessible over the network to external users.
 
-There are a few approaches, but using a load balancer is recommended.
+There are a few approaches, but using an ingress controller is recommended.
 
-### Load balancer (recommended)
+### Ingress controller (recommended)
 
-For production environments, we recommend using a [load balancer](https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/).
+For production environments, we recommend using the [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/).
 
-Run one of the following commands depending on your desired transport protocol:
+As part of our base configuration we install an ingress for [sourcegraph-frontend](../base/frontend/sourcegraph-frontend.Ingress.yaml). It installs rules for the default ingress, see comments to restrict it to a specific host.
 
-- HTTP
-  ```
-  kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=80 --target-port=3080
-  ```
-- HTTPS (requires you to [configure TLS/SSL](#configure-tlsssl))
-  ```
-  kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraph-frontend-loadbalancer --port=443 --target-port=3443
-  ```
+If you do not already use `ingress-nginx` in your kubernetes cluster, follow the instructions at https://kubernetes.github.io/ingress-nginx/deploy/ to create the `ingress-nginx`. Add the files to [../configure/ingress-nginx], including an `install.sh` file which applies the relevant manifests. We include the generic-cloud manifests as part of this repository, but please check the above guide to confirm it will work on your provider.
 
-Add the command you ran to [create-new-cluster.sh](../create-new-cluster.sh) and commit the change.
+Add `./configure/ingress-nginx/install.sh` command to [create-new-cluster.sh](../create-new-cluster.sh) and commit the change:
 
-Once the load balancer has acquired an external address, you should be able to access Sourcegraph using that. You can check the external address by running the following command and looking for the `LoadBalancer` entry:
+```shell
+echo ./configure/ingress-nginx/install.sh >> create-new-cluster.sh
+```
+
+Once the ingress has acquired an external address, you should be able to access Sourcegraph using that. You can check the external address by running the following command and looking for the `LoadBalancer` entry:
 
 ```bash
-kubectl get svc
+kubectl -n ingress-nginx get svc
 ```
 
 ### Network rule
 
-Add a network rule that allows ingress traffic to port 30080 (HTTP) and/or 30081 (HTTPS) on at least one node.
+Add a network rule that allows ingress traffic to port 30080 (HTTP) on at least one node.
 
 - [Google Cloud Platform Firewall rules](https://cloud.google.com/compute/docs/vpc/using-firewalls).
 
@@ -99,7 +96,6 @@ Add a network rule that allows ingress traffic to port 30080 (HTTP) and/or 30081
 
      ```bash
      gcloud compute --project=$PROJECT firewall-rules create sourcegraph-frontend-http --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:30080
-     gcloud compute --project=$PROJECT firewall-rules create sourcegraph-frontend-https --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:30081
      ```
 
   2. Find a node name.
@@ -115,11 +111,7 @@ Add a network rule that allows ingress traffic to port 30080 (HTTP) and/or 30081
 
 - [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html).
 
-Sourcegraph should now be accessible at `$EXTERNAL_ADDR:30080` and/or `$EXTERNAL_ADDR:30081`, where `$EXTERNAL_ADDR` is the address of _any_ node in the cluster.
-
-### Ingress controller
-
-You can also use an [Ingress controller](https://kubernetes.io/docs/concepts/services-networking/ingress/).
+Sourcegraph should now be accessible at `$EXTERNAL_ADDR:30080`, where `$EXTERNAL_ADDR` is the address of _any_ node in the cluster.
 
 ## Update site configuration
 
@@ -159,54 +151,46 @@ For the impatient, site configuration changes can be applied immediately by chan
 
 If you intend to make your Sourcegraph instance accessible on the Internet or another untrusted network, you should use TLS so that all traffic will be served over HTTPS.
 
-1. Create a [secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains your TLS certificate and private key.
+1. Create a [TLS secret](https://kubernetes.io/docs/concepts/configuration/secret/) that contains your TLS certificate and private key.
 
    ```bash
-   kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY
+   kubectl create secret tls sourcegraph-tls --key $PATH_TO_KEY --cert $PATH_TO_CERT
    ```
 
    Update [create-new-cluster.sh](../create-new-cluster.sh) with the previous command.
 
    ```
-   echo kubectl create secret generic tls --from-file=cert=$PATH_TO_CERT --from-file=key=$PATH_TO_KEY >> create-new-cluster.sh
+   echo kubectl create secret tls sourcegraph-tls --key $PATH_TO_KEY --cert $PATH_TO_CERT >> create-new-cluster.sh
    ```
 
-2. Add the `TLS_CERT` and `TLS_KEY` environment variables to [base/frontend/sourcegraph-frontend.Deployment.yaml](../base/frontend/sourcegraph-frontend.Deployment.yaml).
+2. Add the tls configuration to [base/frontend/sourcegraph-frontend.Ingress.yaml](../base/frontend/sourcegraph-frontend.Ingress.yaml).
 
    ```yaml
-   # base/frontend/sourcegraph-frontend.Deployment.yaml
-   env:
-     - name: TLS_CERT
-       valueFrom:
-         secretKeyRef:
-           key: cert
-           name: tls
-     - name: TLS_KEY
-       valueFrom:
-         secretKeyRef:
-           key: key
-           name: tls
+   # base/frontend/sourcegraph-frontend.Ingress.yaml
+   tls:
+     - hosts:
+       - example.sourcegraph.com
+       secretName: sourcegraph-tls
    ```
 
    Convenience script:
 
    ```bash
    # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
-   FE=base/frontend/sourcegraph-frontend.Deployment.yaml
-   cat $FE | yj | jq '(.spec.template.spec.containers[] | select(.name == "frontend") | .env) += [{name: "TLS_CERT", valueFrom: {secretKeyRef: {key: "cert", name: "tls"}}}, {name: "TLS_KEY", valueFrom: {secretKeyRef: {key: "key", name: "tls"}}}]' | jy -o $FE
+   EXTERNAL_URL=example.sourcegraph.com
+   FE=base/frontend/sourcegraph-frontend.Ingress.yaml
+   cat $FE | yj | jq --arg host ${EXTERNAL_URL} '.spec.tls += {hosts: [$host], secretName: "sourcegraph-tls"}' | jy -o $FE
    ```
 
 3. Change your `externalURL` in the site configuration stored in `base/config-file.ConfigMap.yaml`.
 
    ```json
    {
-     "externalURL": "https://example.com:3443" // Must begin with "https"; replace with the public IP or hostname of your machine
+     "externalURL": "https://example.sourcegraph.com" // Must begin with "https"; replace with the public IP or hostname of your machine
    }
    ```
 
 4. Deploy the changes by following the [instructions to update to the site configuration](#update-site-configuration).
-
-5. Refer to the [Configure network access](#configure-network-access) section to make sure that `sourcegraph-frontend`'s port `3443` is properly exposed.
 
 **WARNING:** Do NOT commit the actual TLS cert and key files to your fork (unless your fork is
 private **and** you are okay with storing secrets in it).

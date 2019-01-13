@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    # We can upload large files (extensions)
+    nginx.ingress.kubernetes.io/proxy-body-size: "150m"
+    # See
+    # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/
+    # for more nginx annotations.
+  labels:
+    app: sourcegraph-frontend
+    deploy: sourcegraph
+  name: sourcegraph-frontend
+  namespace: prod
+spec:
+  # See the customization guide (../../../docs/configure.md) for information
+  # about configuring TLS
+  # tls:
+  # - hosts:
+  #   - example.sourcegraph.com
+  #   secretName: sourcegraph-tls
+  rules:
+  - http:
+      paths:
+      - path: /
+        backend:
+          serviceName: sourcegraph-frontend
+          servicePort: 30080
+    # Set a host if you have multiple ingresses. This installs a default
+    # handler.
+    # host: sourcegraph.example.com

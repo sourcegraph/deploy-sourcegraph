@@ -47,18 +47,6 @@ spec:
           value: sg
         - name: SRC_GIT_SERVERS
           value: gitserver-0.gitserver:3178
-        # See the customization guide (../../../docs/configure.md) for information
-        # about how to configure Sourcegraph to use TLS
-        # - name: TLS_CERT
-        #   valueFrom:
-        #     secretKeyRef:
-        #       key: cert
-        #       name: tls
-        # - name: TLS_KEY
-        #   valueFrom:
-        #     secretKeyRef:
-        #       key: key
-        #       name: tls
         image: sourcegraph/frontend:3.0.0-alpha.10@sha256:f81b660478d517ddf82dc2b5b696f72de1dedf71d1ca2e1f5426b3d2921e3098
         livenessProbe:
           httpGet:
@@ -73,8 +61,6 @@ spec:
           name: http
         - containerPort: 3090
           name: http-internal
-        - containerPort: 3443
-          name: https
         resources:
           limits:
             cpu: "2"
