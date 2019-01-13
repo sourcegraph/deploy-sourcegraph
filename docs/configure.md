@@ -88,7 +88,7 @@ kubectl -n ingress-nginx get svc
 
 ### Network rule
 
-Add a network rule that allows ingress traffic to port 30080 (HTTP) and/or 30081 (HTTPS) on at least one node.
+Add a network rule that allows ingress traffic to port 30080 (HTTP) on at least one node.
 
 - [Google Cloud Platform Firewall rules](https://cloud.google.com/compute/docs/vpc/using-firewalls).
 
@@ -96,7 +96,6 @@ Add a network rule that allows ingress traffic to port 30080 (HTTP) and/or 30081
 
      ```bash
      gcloud compute --project=$PROJECT firewall-rules create sourcegraph-frontend-http --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:30080
-     gcloud compute --project=$PROJECT firewall-rules create sourcegraph-frontend-https --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:30081
      ```
 
   2. Find a node name.
@@ -112,7 +111,7 @@ Add a network rule that allows ingress traffic to port 30080 (HTTP) and/or 30081
 
 - [AWS Security Group rules](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_SecurityGroups.html).
 
-Sourcegraph should now be accessible at `$EXTERNAL_ADDR:30080` and/or `$EXTERNAL_ADDR:30081`, where `$EXTERNAL_ADDR` is the address of _any_ node in the cluster.
+Sourcegraph should now be accessible at `$EXTERNAL_ADDR:30080`, where `$EXTERNAL_ADDR` is the address of _any_ node in the cluster.
 
 ## Update site configuration
 
