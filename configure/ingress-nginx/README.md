@@ -15,7 +15,7 @@ _See the installation guide found at https://github.com/kubernetes/ingress-nginx
    curl https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.21.0/deploy/provider/cloud-generic.yaml
    ```
 
-   _Note: If you are using AWS, you require a different manifest to `cloud-generic.yaml`. See the ingress-nginx installation guide._
+   _Note: If you are using AWS, you require a different manifest to `cloud-generic.yaml`. See the [ingress-nginx installation guide](https://github.com/kubernetes/ingress-nginx/blob/nginx-0.21.0/docs/deploy/index.md#installation-guide)._
 
 1. Run the following commands:
 

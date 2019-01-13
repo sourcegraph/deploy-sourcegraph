@@ -77,7 +77,7 @@ If you do not already use `ingress-nginx` in your kubernetes cluster, follow the
 Add `./configure/ingress-nginx/install.sh` command to [create-new-cluster.sh](../create-new-cluster.sh) and commit the change:
 
 ```shell
-echo ./configure/ingress-nginx/install.sh >> create_new_cluster.sh
+echo ./configure/ingress-nginx/install.sh >> create-new-cluster.sh
 ```
 
 Once the ingress has acquired an external address, you should be able to access Sourcegraph using that. You can check the external address by running the following command and looking for the `LoadBalancer` entry:
