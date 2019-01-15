@@ -4,4 +4,4 @@
 
 ## Installing / Updating
 
-See [ingress controller documentation](../../docs/configure.md#ingress-controller-recommended). The resources in this directory are from the `0.21.0` release of [ingress-nginx](https://github.com/kubernetes/ingress-nginx/releases/tag/nginx-0.21.0).
+See [ingress controller documentation](../../docs/configure.md#ingress-controller-recommended). The resources in this directory are from the `0.22.0` release of [ingress-nginx](https://github.com/kubernetes/ingress-nginx/releases/tag/nginx-0.22.0).
