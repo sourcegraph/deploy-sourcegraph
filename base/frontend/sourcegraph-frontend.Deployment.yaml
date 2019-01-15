@@ -55,6 +55,13 @@ spec:
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
         name: frontend
         ports:
         - containerPort: 3080
