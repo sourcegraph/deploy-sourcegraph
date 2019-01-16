@@ -86,6 +86,8 @@ Once the ingress has acquired an external address, you should be able to access 
 kubectl -n ingress-nginx get svc
 ```
 
+If you are having trouble accessing Sourcegraph, ensure ingress-nginx IP is accessible above. Otherwise see [Troubleshooting ingress-nginx](https://kubernetes.github.io/ingress-nginx/troubleshooting/). The namespace of the ingress-controller is `ingress-nginx`.
+
 ### Network rule
 
 Add a network rule that allows ingress traffic to port 30080 (HTTP) on at least one node.
