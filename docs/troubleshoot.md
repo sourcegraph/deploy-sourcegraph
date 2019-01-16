@@ -43,6 +43,8 @@ Less frequently used commands:
   with only one CPU, and that some components request a 2-CPU node. When creating a cluster, use
   `--machine-type=n1-standard-16`.
 
+- You can't access Sourcegraph. See [Troubleshooting ingress-nginx](https://kubernetes.github.io/ingress-nginx/troubleshooting/). If you followed our instructions the namespace of the ingress-controller is `ingress-nginx`.
+
 Any other issues? Contact us at [@srcgraph](https://twitter.com/srcgraph)
 or <mailto:support@sourcegraph.com>, or file issues on
 our [public issue tracker](https://github.com/sourcegraph/issues/issues).
