@@ -2,12 +2,36 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-configuration
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
 
 ---
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: nginx-configuration
+  name: tcp-services
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: udp-services
   namespace: ingress-nginx
   labels:
     app.kubernetes.io/name: ingress-nginx
@@ -160,7 +184,8 @@ subjects:
     namespace: ingress-nginx
 
 ---
-apiVersion: extensions/v1beta1
+
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nginx-ingress-controller
@@ -186,7 +211,7 @@ spec:
       serviceAccountName: nginx-ingress-serviceaccount
       containers:
         - name: nginx-ingress-controller
-          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.21.0@sha256:617076c3e3d4d0638a4927702530d8456bda64c67194f6daed272a59e93b992f
+          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.22.0
           args:
             - /nginx-ingress-controller
             - --configmap=$(POD_NAMESPACE)/nginx-configuration
@@ -195,6 +220,7 @@ spec:
             - --publish-service=$(POD_NAMESPACE)/ingress-nginx
             - --annotations-prefix=nginx.ingress.kubernetes.io
           securityContext:
+            allowPrivilegeEscalation: true
             capabilities:
               drop:
                 - ALL
@@ -237,4 +263,3 @@ spec:
             timeoutSeconds: 1
 
 ---
-
