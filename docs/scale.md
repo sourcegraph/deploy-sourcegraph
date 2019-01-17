@@ -84,6 +84,8 @@ Notes:
   steps depend on your cloud provider; [contact us](https://about.sourcegraph.com/contact/) for
   advice.
 
+- For context on what each service does, see [Sourcegraph Architecture Overview](https://docs.sourcegraph.com/dev/architecture).
+
 ---
 
 ## Improving performance with large monorepos
