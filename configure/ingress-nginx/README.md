@@ -1,6 +1,6 @@
 # Ingress-NGINX
 
-[ingress-nginx](https://github.com/kubernetes/ingress-nginx) provide specialized routing for all of the publically available instances on this cluster.
+[ingress-nginx](https://github.com/kubernetes/ingress-nginx) provide specialized routing for all of the publicly available instances on this cluster.
 
 ## Installing / Updating
 
