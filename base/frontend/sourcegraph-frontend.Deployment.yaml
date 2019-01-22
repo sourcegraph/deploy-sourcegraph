@@ -47,6 +47,15 @@ spec:
           value: sg
         - name: SRC_GIT_SERVERS
           value: gitserver-0.gitserver:3178
+        # POD_NAME is used by CACHE_DIR
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        # CACHE_DIR stores larger items we cache. Majority of it is zip
+        # archives of repositories at a commit.
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
         image: sourcegraph/frontend:3.0.0-beta@sha256:c05e3be96fd92f62ac8e74f6117749cd4ba78f89652ed88b62380d38c545e7ec
         livenessProbe:
           httpGet:
@@ -78,6 +87,8 @@ spec:
         volumeMounts:
         - mountPath: /etc/sourcegraph
           name: sg-config
+        - mountPath: /mnt/cache
+          name: cache-ssd
       securityContext:
         runAsUser: 0
       serviceAccountName: sourcegraph-frontend
@@ -86,3 +97,5 @@ spec:
           defaultMode: 464
           name: config-file
         name: sg-config
+      - emptyDir: {}
+        name: cache-ssd
