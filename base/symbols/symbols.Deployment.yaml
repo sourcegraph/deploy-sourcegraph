@@ -35,6 +35,20 @@ spec:
           value: /mnt/cache/$(POD_NAME)
         image: sourcegraph/symbols:3.0.0-beta.3@sha256:a178410f6216a815b9447eaf659ac71dae760ecb52afae9c0ad21ff80bfbd0dd
         name: symbols
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
         ports:
         - containerPort: 3184
           name: http
