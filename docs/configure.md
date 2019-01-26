@@ -100,7 +100,7 @@ example of how to do this via a NodePort service (any other type of Kubernetes s
 work):
 
 1. Modify [configure/nginx-svc/nginx.ConfigMap.yaml](../configure/nginx-svc/nginx.ConfigMap.yaml) to
-   contain the TLS certificate and key for your domain
+   contain the TLS certificate and key for your domain.
 
 1. `kubectl apply -f configure/nginx-svc` to create the NGINX service.
 
