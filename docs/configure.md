@@ -72,7 +72,7 @@ For production environments, we recommend using the [ingress-nginx](https://kube
 
 As part of our base configuration we install an ingress for [sourcegraph-frontend](../base/frontend/sourcegraph-frontend.Ingress.yaml). It installs rules for the default ingress, see comments to restrict it to a specific host.
 
-If you do not already use ingress-nginx in your kubernetes cluster, follow the instructions at https://kubernetes.github.io/ingress-nginx/deploy/ to create the ingress-nginx. Add the files to [configure/ingress-nginx](../configure/ingress-nginx), including an [install.sh](configure/ingress-nginx/install.sh) file which applies the relevant manifests. We include the generic-cloud manifests as part of this repository, but please check the above guide to confirm it will work on your provider.
+In addition to the sourcegraph-frontend ingress, you'll need to install the NGINX ingress controller (ingress-nginx). Follow the instructions at https://kubernetes.github.io/ingress-nginx/deploy/ to create the ingress controller. Add the files to [configure/ingress-nginx](../configure/ingress-nginx), including an [install.sh](configure/ingress-nginx/install.sh) file which applies the relevant manifests. We include sample generic-cloud manifests as part of this repository, but please follow the official instructions for your cloud provider.
 
 Add the [configure/ingress-nginx/install.sh](configure/ingress-nginx/install.sh) command to [create-new-cluster.sh](../create-new-cluster.sh) and commit the change:
 
