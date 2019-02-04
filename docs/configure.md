@@ -104,6 +104,12 @@ work):
 
 1. `kubectl apply -f configure/nginx-svc` to create the NGINX service.
 
+1. Update [create-new-cluster.sh](../create-new-cluster.sh) with the previous command.
+
+   ```
+   echo kubectl apply -f configure/nginx-svc >> create-new-cluster.sh
+   ```
+
 ### Network rule
 
 > Note: this setup path does not support TLS.
