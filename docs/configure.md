@@ -92,7 +92,7 @@ If you are having trouble accessing Sourcegraph, ensure ingress-nginx IP is acce
 
 `ingress-nginx` has extensive configuration documented at [NGINX Configuration](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/). We expect most administrators to modify [ingress-nginx annotations](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/) in [sourcegraph-frontend.Ingress.yaml](../base/frontend/sourcegraph-frontend.Ingress.yaml). Some settings are modified globally (such as HSTS). In that case we expect administrators to modify the [ingress-nginx configmap](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/) in [configure/ingress-nginx/mandatory.yaml](../configure/ingress-nginx/mandatory.yaml).
 
-### Ingress service
+### NGINX service
 
 In cases where ingress controllers cannot be created, creating an explicit NGINX service is a viable
 alternative. See the files in the [configure/nginx-svc](../configure/nginx-svc) folder for an
@@ -124,13 +124,20 @@ Add a network rule that allows ingress traffic to port 30080 (HTTP) on at least 
      gcloud compute --project=$PROJECT firewall-rules create sourcegraph-frontend-http --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:30080
      ```
 
-  2. Find a node name.
+  1. Change the type of the `sourcegraph-frontend` service in [base/frontend/sourcegraph-frontend.Service.yaml](../base/frontend/sourcegraph-frontend.Service.yaml) from `ClusterIP` to `NodePort`:
+
+      ```yaml
+      spec:
+        type: NodePort
+      ```
+
+  1. Find a node name.
 
      ```bash
      kubectl get pods -l app=sourcegraph-frontend -o=custom-columns=NODE:.spec.nodeName
      ```
 
-  3. Get the EXTERNAL-IP address (will be ephemeral unless you [make it static](https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address#promote_ephemeral_ip)).
+  1. Get the EXTERNAL-IP address (will be ephemeral unless you [make it static](https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address#promote_ephemeral_ip)).
      ```bash
      kubectl get node $NODE -o wide
      ```
@@ -177,6 +184,10 @@ For the impatient, site configuration changes can be applied immediately by chan
 
 If you intend to make your Sourcegraph instance accessible on the Internet or another untrusted network, you should use TLS so that all traffic will be served over HTTPS.
 
+### Ingress controller 
+
+If you exposed your Sourcegraph instance via an ingress controller as described in ["Ingress controller (recommended)"](#ingress-controller-recommended): 
+
 1. Create a [TLS secret](https://kubernetes.io/docs/concepts/configuration/secret/) that contains your TLS certificate and private key.
 
    ```bash
@@ -189,7 +200,7 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
    echo kubectl create secret tls sourcegraph-tls --key $PATH_TO_KEY --cert $PATH_TO_CERT >> create-new-cluster.sh
    ```
 
-2. Add the tls configuration to [base/frontend/sourcegraph-frontend.Ingress.yaml](../base/frontend/sourcegraph-frontend.Ingress.yaml).
+1. Add the tls configuration to [base/frontend/sourcegraph-frontend.Ingress.yaml](../base/frontend/sourcegraph-frontend.Ingress.yaml).
 
    ```yaml
    # base/frontend/sourcegraph-frontend.Ingress.yaml
@@ -208,7 +219,7 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
    cat $FE | yj | jq --arg host ${EXTERNAL_URL} '.spec.tls += {hosts: [$host], secretName: "sourcegraph-tls"}' | jy -o $FE
    ```
 
-3. Change your `externalURL` in the site configuration stored in `base/config-file.ConfigMap.yaml`.
+1. Change your `externalURL` in the site configuration stored in `base/config-file.ConfigMap.yaml`.
 
    ```json
    {
@@ -216,10 +227,14 @@ If you intend to make your Sourcegraph instance accessible on the Internet or an
    }
    ```
 
-4. Deploy the changes by following the [instructions to update to the site configuration](#update-site-configuration).
+1. Deploy the changes by following the [instructions to update to the site configuration](#update-site-configuration).
 
 **WARNING:** Do NOT commit the actual TLS cert and key files to your fork (unless your fork is
 private **and** you are okay with storing secrets in it).
+
+### NGINX service
+
+If you exposed your Sourcegraph instance via the altenative nginx service as described in ["nginx service"](#nginx-service), those instructions already walked you through setting up TLS/SSL. 
 
 ## Configure repository cloning via SSH
 
