@@ -126,10 +126,22 @@ Add a network rule that allows ingress traffic to port 30080 (HTTP) on at least 
 
   1. Change the type of the `sourcegraph-frontend` service in [base/frontend/sourcegraph-frontend.Service.yaml](../base/frontend/sourcegraph-frontend.Service.yaml) from `ClusterIP` to `NodePort`:
 
-      ```yaml
+      ```diff
       spec:
-        type: NodePort
+         ports:
+         - name: http
+           port: 30080
+      +    nodePort: 30080
+      -  type: ClusterIP
+      +  type: NodePort
       ```
+  
+  1. Directly applying this change to the service [will fail](https://github.com/kubernetes/kubernetes/issues/42282). Instead, you must delete the old service and then create the new one (this will result in a few seconds of downtime):
+
+   ```shell
+   kubectl delete svc sourcegraph-frontend
+   kubectl apply -f base/frontend/sourcegraph-frontend.Service.yaml
+   ```
 
   1. Find a node name.
 
