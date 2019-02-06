@@ -16,6 +16,4 @@ If you previously configured `TLS_KEY` and `TLS_CERT` environment variables, you
 
 ## Postgres 11.1
 
-Sourcegraph 3.0 has been upgraded to work with Postgres 11.1 (from 9.4). Follow the below upgrade procedure before deploying Sourcegraph 3.0.
-
-**To be written.**
+Sourcegraph 3.0 ships with Postgres 11.1. The upgrade procedure is mostly automatic. Please read [this page](https://docs.sourcegraph.com/admin/postgres) for detailed information.
