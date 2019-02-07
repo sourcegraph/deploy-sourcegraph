@@ -26,6 +26,7 @@ spec:
       containers:
       - env:
         image: sourcegraph/zoekt-webserver:18-10-30_faca01d@sha256:afadb33c9c254256fc41a6cbd372d2eca93140eebc1fee05367fd81059ea7205
+        terminationMessagePolicy: FallbackToLogsOnError
         name: zoekt-webserver
         ports:
         - containerPort: 6070
@@ -49,6 +50,7 @@ spec:
           name: disk
       - env:
         image: sourcegraph/zoekt-indexserver:18-10-30_faca01d@sha256:36c1309d935b7faf5ec69277444a6c0eefa510a6eb20deb651cdb7ce3de3913f
+        terminationMessagePolicy: FallbackToLogsOnError
         name: zoekt-indexserver
         ports:
         - containerPort: 6072

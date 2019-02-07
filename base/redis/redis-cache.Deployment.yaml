@@ -26,6 +26,7 @@ spec:
       containers:
       - env:
         image: sourcegraph/redis-cache:18-10-28_ba610fdf@sha256:10a4430cb8bb9c0ad2b96eac40882509fb1b11cbd77cffd0900f74a58a4014d2
+        terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 30
           tcpSocket:
@@ -49,6 +50,7 @@ spec:
         - mountPath: /redis-data
           name: redis-data
       - image: sourcegraph/redis_exporter:18-02-07_bb60087_v0.15.0@sha256:282d59b2692cca68da128a4e28d368ced3d17945cd1d273d3ee7ba719d77b753
+        terminationMessagePolicy: FallbackToLogsOnError
         name: redis-exporter
         ports:
         - containerPort: 9121
