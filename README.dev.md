@@ -109,13 +109,6 @@ git tag $VERSION
 git push origin $VERSION
 ```
 
-## Cut the legacy Helm version of the release (this step will be deprecated after the next iteration):
-
-- checkout [deploy-sourcegraph@helm-legacy](https://github.com/sourcegraph/deploy-sourcegraph/tree/helm-legacy)
-- update the image tags in [yalues.yaml](https://github.com/sourcegraph/deploy-sourcegraph/blob/helm-legacy/values.yaml)
-- run [generate.sh](https://github.com/sourcegraph/deploy-sourcegraph/blob/helm-legacy/generate.sh)
-- run [release.sh](https://github.com/sourcegraph/deploy-sourcegraph/blob/helm-legacy/release.sh)
-
 ## Update the `latestReleaseDataCenterBuild` value in `sourcegraph/sourcegraph`
 
 See https://sourcegraph.sgdev.org/github.com/sourcegraph/sourcegraph/-/blob/cmd/server/README.md#5-notify-existing-instances-that-an-update-is-available.
