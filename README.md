@@ -21,7 +21,7 @@ node first. Migrating to Data Center is easy when you're ready.
 - [Scaling](docs/scale.md)
 - [Troubleshooting](docs/troubleshoot.md)
 - [Admin guide](docs/admin-guide.md) - useful guide for Sourcegraph admins
-  - [Prometheus metrics](docs/prom-metrics.md) - list of all Prometheus metrics that can be used for
+  - [Prometheus metrics](docs/admin-guide.md#prometheus) - list of all Prometheus metrics that can be used for
     application performance monitoring
 
 ## Kubernetes alternatives
