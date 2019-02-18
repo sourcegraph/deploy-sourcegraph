@@ -126,22 +126,22 @@ Add a network rule that allows ingress traffic to port 30080 (HTTP) on at least 
 
   1. Change the type of the `sourcegraph-frontend` service in [base/frontend/sourcegraph-frontend.Service.yaml](../base/frontend/sourcegraph-frontend.Service.yaml) from `ClusterIP` to `NodePort`:
 
-      ```diff
-      spec:
-         ports:
-         - name: http
-           port: 30080
-      +    nodePort: 30080
-      -  type: ClusterIP
-      +  type: NodePort
-      ```
-  
+     ```diff
+     spec:
+        ports:
+        - name: http
+          port: 30080
+     +    nodePort: 30080
+     -  type: ClusterIP
+     +  type: NodePort
+     ```
+
   1. Directly applying this change to the service [will fail](https://github.com/kubernetes/kubernetes/issues/42282). Instead, you must delete the old service and then create the new one (this will result in a few seconds of downtime):
 
-   ```shell
-   kubectl delete svc sourcegraph-frontend
-   kubectl apply -f base/frontend/sourcegraph-frontend.Service.yaml
-   ```
+  ```shell
+  kubectl delete svc sourcegraph-frontend
+  kubectl apply -f base/frontend/sourcegraph-frontend.Service.yaml
+  ```
 
   1. Find a node name.
 
@@ -196,9 +196,9 @@ For the impatient, site configuration changes can be applied immediately by chan
 
 If you intend to make your Sourcegraph instance accessible on the Internet or another untrusted network, you should use TLS so that all traffic will be served over HTTPS.
 
-### Ingress controller 
+### Ingress controller
 
-If you exposed your Sourcegraph instance via an ingress controller as described in ["Ingress controller (recommended)"](#ingress-controller-recommended): 
+If you exposed your Sourcegraph instance via an ingress controller as described in ["Ingress controller (recommended)"](#ingress-controller-recommended):
 
 1. Create a [TLS secret](https://kubernetes.io/docs/concepts/configuration/secret/) that contains your TLS certificate and private key.
 
@@ -218,7 +218,7 @@ If you exposed your Sourcegraph instance via an ingress controller as described 
    # base/frontend/sourcegraph-frontend.Ingress.yaml
    tls:
      - hosts:
-       - example.sourcegraph.com
+         - example.sourcegraph.com
        secretName: sourcegraph-tls
    ```
 
@@ -246,7 +246,7 @@ private **and** you are okay with storing secrets in it).
 
 ### NGINX service
 
-If you exposed your Sourcegraph instance via the altenative nginx service as described in ["nginx service"](#nginx-service), those instructions already walked you through setting up TLS/SSL. 
+If you exposed your Sourcegraph instance via the altenative nginx service as described in ["nginx service"](#nginx-service), those instructions already walked you through setting up TLS/SSL.
 
 ## Configure repository cloning via SSH
 
@@ -393,67 +393,66 @@ See [the official documentation](https://kubernetes.io/docs/concepts/configurati
 
 ## Configure a storage class
 
-Sourcegraph expects there to be storage class named `sourcegraph` that it uses for all its persistent volume claims. This storage class must be configured before applying the base configuration to your cluster. The configuration details differ depending on your hosting provider, so you should:
+Sourcegraph expects there to be storage class named `sourcegraph` that it uses for all its persistent volume claims. This storage class must be configured before applying the base configuration to your cluster.
 
-1. Create a stub `base/sourcegraph.StorageClass.yaml`.
+Create `base/sourcegraph.StorageClass.yaml` with the appropriate configuration for your cloud provider and commit the file to your fork.
 
-   ```yaml
-   # base/sourcegraph.StorageClass.yaml
-   kind: StorageClass
-   apiVersion: storage.k8s.io/v1
-   metadata:
-     name: sourcegraph
-     labels:
-       deploy: sourcegraph
-   #
-   # The values of the "provisioner" and "parameters" fields will differ depending on the cloud provider that you are using. Please read through https://kubernetes.io/docs/concepts/storage/storage-classes/ in order to know what values to add. 🚨 We recommend specifying SSDs as the disk type if possible. 🚨
-   #
-   # For example, if you are using GKE with a cluster whose nodes are all in the "us-central1-a" zone, you could use the following values:
-   #
-   # provisioner: kubernetes.io/gce-pd
-   # parameters:
-   #  type: pd-ssd
-   #  zones: us-central1-a
-   ```
+### Google Cloud Platform (GCP)
 
-1. Read through the [Kubernetes storage class documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/), and fill in the `provisioner` and `parameters` fields in `base/sourcegraph.StorageClass.yaml` with the correct values for your hosting provider (e.x.: [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce-pd), [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws), [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk)).
+```yaml
+# base/sourcegraph.StorageClass.yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: sourcegraph
+  labels:
+    deploy: sourcegraph
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-ssd
+```
 
-   - Note that if you're using GCP with Kubernetes `v1.9.*`, you should omit the `replication-type` parameter mentioned in [the documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce-pd) from your `base/sourcegraph.StorageClass.yaml` file. That field wasn't added until Kubernetes `v.1.10.*+`, and you'll see errors like the following if you try to use it with an older version:
+[Additional documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce-pd).
 
-     ```
-     Failed to provision volume with StorageClass "sourcegraph": invalid option "replication-type" for volume plugin kubernetes.io/gce-pd
-     ```
+### Amazon Web Services (AWS)
 
-   - **We highly recommend that the storage class use SSDs as the underlying disk type.** Using the snippets below will create a storage class backed by SSDs:
+```yaml
+# base/sourcegraph.StorageClass.yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: sourcegraph
+  labels:
+    deploy: sourcegraph
+provisioner: kubernetes.io/aws-ebs
+parameters:
+  type: gp2
+```
 
-     - [GCP](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce-pd):
+[Additional documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws-ebs).
 
-       ```yaml
-       # base/sourcegraph.StorageClass.yaml
-       provisioner: kubernetes.io/gce-pd
-       parameters:
-         type: pd-ssd
-       ```
+### Azure
 
-     - [AWS](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws):
+```yaml
+# base/sourcegraph.StorageClass.yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: sourcegraph
+  labels:
+    deploy: sourcegraph
+provisioner: kubernetes.io/azure-disk
+parameters:
+  storageaccounttype: Premium_LRS
+```
 
-       ```yaml
-       # base/sourcegraph.StorageClass.yaml
-       provisioner: kubernetes.io/aws-ebs
-       parameters:
-         type: gp2
-       ```
+[Additional documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk).
 
-     - [Azure](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk):
+### Other cloud providers
 
-       ```yaml
-       # base/sourcegraph.StorageClass.yaml
-       provisioner: kubernetes.io/azure-disk
-       parameters:
-         storageaccounttype: Premium_LRS
-       ```
+The [the documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#parameters) for your cloud provider.
 
-1. Commit `base/sourcegraph.StorageClass.yaml` to your fork.
+**SSDs are highly recommended.**
 
 ### Using a storage class with an alternate name
 
