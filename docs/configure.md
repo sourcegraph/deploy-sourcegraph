@@ -450,9 +450,19 @@ parameters:
 
 ### Other cloud providers
 
-Read [the documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#parameters) for your cloud provider.
-
-**SSDs are highly recommended.**
+```yaml
+# base/sourcegraph.StorageClass.yaml
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: sourcegraph
+  labels:
+    deploy: sourcegraph
+# Read https://kubernetes.io/docs/concepts/storage/storage-classes/ to configure the "provisioner" and "parameters" fields for your cloud provider.
+# SSDs are highly recommended!
+# provisioner:
+# parameters:
+```
 
 ### Using a storage class with an alternate name
 
