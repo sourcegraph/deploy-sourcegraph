@@ -450,7 +450,7 @@ parameters:
 
 ### Other cloud providers
 
-The [the documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#parameters) for your cloud provider.
+Read [the documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#parameters) for your cloud provider.
 
 **SSDs are highly recommended.**
 
