@@ -409,7 +409,7 @@ metadata:
     deploy: sourcegraph
 provisioner: kubernetes.io/gce-pd
 parameters:
-  type: pd-ssd
+  type: pd-ssd # This configures SSDs (recommended).
 ```
 
 [Additional documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#gce-pd).
@@ -426,7 +426,7 @@ metadata:
     deploy: sourcegraph
 provisioner: kubernetes.io/aws-ebs
 parameters:
-  type: gp2
+  type: gp2 # This configures SSDs (recommended).
 ```
 
 [Additional documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#aws-ebs).
@@ -443,7 +443,7 @@ metadata:
     deploy: sourcegraph
 provisioner: kubernetes.io/azure-disk
 parameters:
-  storageaccounttype: Premium_LRS
+  storageaccounttype: Premium_LRS # This configures SSDs (recommended). A Premium VM is required.
 ```
 
 [Additional documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#azure-disk).
