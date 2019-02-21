@@ -109,6 +109,6 @@ git tag $VERSION
 git push origin $VERSION
 ```
 
-## Update the `latestReleaseDataCenterBuild` value in `sourcegraph/sourcegraph`
+## Update the `latestReleaseKubernetesBuild` value in `sourcegraph/sourcegraph`
 
-See https://sourcegraph.sgdev.org/github.com/sourcegraph/sourcegraph/-/blob/cmd/server/README.md#5-notify-existing-instances-that-an-update-is-available.
+See https://sourcegraph.sgdev.org/github.com/sourcegraph/sourcegraph/-/blob/cmd/frontend/internal/app/pkg/updatecheck/handler.go#L29:5
