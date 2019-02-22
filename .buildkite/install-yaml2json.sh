@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -ex
+
 VERSION=1.2
 
 if [ ! $(which yaml2json) ]; then
