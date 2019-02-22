@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=1.3
+VERSION=1.2
 
 if [ ! $(which yaml2json) ]; then
     echo "Installing yaml2json to /usr/local/bin"
