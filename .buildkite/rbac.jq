@@ -10,9 +10,11 @@ def rbacKind:
 def isRBAC: 
     rbacAPI or rbacKind;
 
-if . | isRBAC then
-   .metadata.labels.category == "rbac"
-else
-    true
-end
+def hasLabel: 
+    if . | isRBAC then
+        .metadata.labels.category == "rbac" 
+    else
+        true
+    end;
 
+. | all(hasLabel)
