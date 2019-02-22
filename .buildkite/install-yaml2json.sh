@@ -2,6 +2,7 @@
 
 set -ex
 
+# Version 1.3 panics on null inputs, see https://github.com/bronze1man/yaml2json/issues/15
 VERSION=1.2
 
 if [ ! $(which yaml2json) ]; then
