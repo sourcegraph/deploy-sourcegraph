@@ -4,8 +4,6 @@ set -ex
 
 cd $(dirname "${BASH_SOURCE[0]}")/..
 
-.buildkite/install-yaml2json.sh
-
 # Ignore configure/ingress-nginx since it won't be deployed by CI regularly
 missing_labels=$(find base configure -not \( -path configure/ingress-nginx -prune \) -name "*.yaml" -print0 | xargs -0L1 -I {} sh -c "cat {} | yaml2json | jq -s --exit-status -f .buildkite/rbac.jq > /dev/null || echo {}")
 
