@@ -7,7 +7,7 @@
 
 ## Requirements
 
-- [Kubernetes](https://kubernetes.io/) v1.8.7 or later
+- [Kubernetes](https://kubernetes.io/) v1.9 or later
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) v1.9.7 or later
 - Access to server infrastructure on which you can create a Kubernetes cluster (see
   [resource allocation guidelines](scale.md)).
