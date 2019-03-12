@@ -8,7 +8,7 @@
 - HTTP error codes
 - Time since last search index update
 
-<img src="./images/prometheus.png" />
+<img src="../../docs/images/prometheus.png" />
 
 ## Steps
 
