@@ -134,327 +134,415 @@ span.gray {
 }
 </style>
 
-*   `frontend_graphql_parse_fails`<span class="gray"> : counter : sourcegraph-frontend</span><br>Total number of times a
-    request fails query parsing.
-*   `frontend_graphql_strict_validation_fails`<span class="gray"> : counter : sourcegraph-frontend</span><br>Total number
-    of times a request fails only in the new validation.
-*   `frontend_graphql_validation_fails`<span class="gray"> : counter : sourcegraph-frontend</span><br>Total number of
-    times a request fails validation.
-*   `go_gc_duration_seconds`<span class="gray"> : summary : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>A
-    summary of the GC invocation durations.
-*   `go_goroutines`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql, query-runner,
-    redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of
-    goroutines that currently exist.
-*   `go_memstats_alloc_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes allocated and still in use.
-*   `go_memstats_alloc_bytes_total`<span class="gray"> : counter : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of bytes allocated, even if freed.
-*   `go_memstats_buck_hash_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used by the profiling bucket hash table.
-*   `go_memstats_frees_total`<span class="gray"> : counter : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of frees.
-*   `go_memstats_gc_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used for garbage collection system metadata.
-*   `go_memstats_heap_alloc_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes allocated and still in use.
-*   `go_memstats_heap_idle_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes waiting to be used.
-*   `go_memstats_heap_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes that are in use.
-*   `go_memstats_heap_objects`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of allocated objects.
-*   `go_memstats_heap_released_bytes_total`<span class="gray"> : counter : github-proxy, gitserver-1,
-    pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of heap bytes released to OS.
-*   `go_memstats_heap_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes obtained from system.
-*   `go_memstats_last_gc_time_seconds`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of seconds since 1970 of last garbage collection.
-*   `go_memstats_lookups_total`<span class="gray"> : counter : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of pointer lookups.
-*   `go_memstats_mallocs_total`<span class="gray"> : counter : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of mallocs.
-*   `go_memstats_mcache_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes in use by mcache structures.
-*   `go_memstats_mcache_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used for mcache structures obtained from system.
-*   `go_memstats_mspan_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes in use by mspan structures.
-*   `go_memstats_mspan_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used for mspan structures obtained from system.
-*   `go_memstats_next_gc_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes when next garbage collection will take place.
-*   `go_memstats_other_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used for other system allocations.
-*   `go_memstats_stack_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes in use by the stack allocator.
-*   `go_memstats_stack_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes obtained from system for stack allocator.
-*   `go_memstats_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes obtained by system. Sum of all system allocations.
-    items in the typecheck cache
-*   `http_request_duration_microseconds`<span class="gray"> : summary : github-proxy, pgsql, redis-cache,
-    redis-store</span><br>The HTTP request latencies in microseconds.
-*   `http_request_size_bytes`<span class="gray"> : summary : github-proxy, pgsql, redis-cache, redis-store</span><br>The
-    HTTP request sizes in bytes.
-*   `http_requests_total`<span class="gray"> : counter : github-proxy, pgsql, redis-cache, redis-store</span><br>Total
-    number of HTTP requests made.
-*   `http_response_size_bytes`<span class="gray"> : summary : github-proxy, pgsql, redis-cache, redis-store</span><br>The
-    HTTP response sizes in bytes.
-*   `pg_exporter_last_scrape_duration_seconds`<span class="gray"> : gauge : pgsql</span><br>Duration of the last scrape of
-    metrics from PostgresSQL.
-*   `pg_exporter_last_scrape_error`<span class="gray"> : gauge : pgsql</span><br>Whether the last scrape of metrics from
-    PostgreSQL resulted in an error (1 for error, 0 for success).
-*   `pg_exporter_scrapes_total`<span class="gray"> : counter : pgsql</span><br>Total number of times PostgresSQL was
-    scraped for metrics.
-*   `pg_locks_count`<span class="gray"> : gauge : pgsql</span><br>Number of locks
-*   `pg_runtime_variable_max_connections`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of
-    concurrent connections.
-*   `pg_runtime_variable_max_files_per_process`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of
-    simultaneously open files for each server process.
-*   `pg_runtime_variable_max_function_args`<span class="gray"> : gauge : pgsql</span><br>Shows the maximum number of
-    function arguments.
-*   `pg_runtime_variable_max_identifier_length`<span class="gray"> : gauge : pgsql</span><br>Shows the maximum identifier
-    length.
-*   `pg_runtime_variable_max_index_keys`<span class="gray"> : gauge : pgsql</span><br>Shows the maximum number of index
-    keys.
-*   `pg_runtime_variable_max_locks_per_transaction`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number
-    of locks per transaction.
-*   `pg_runtime_variable_max_pred_locks_per_transaction`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum
-    number of predicate locks per transaction.
-*   `pg_runtime_variable_max_prepared_transactions`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number
-    of simultaneously prepared transactions.
-*   `pg_runtime_variable_max_standby_archive_delay_milliseconds`<span class="gray"> : gauge : pgsql</span><br>Sets the
-    maximum delay before canceling queries when a hot standby server is processing archived WAL data.
-*   `pg_runtime_variable_max_standby_streaming_delay_milliseconds`<span class="gray"> : gauge : pgsql</span><br>Sets the
-    maximum delay before canceling queries when a hot standby server is processing streamed WAL data.
-*   `pg_runtime_variable_max_wal_senders`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of
-    simultaneously running WAL sender processes.
-*   `pg_stat_activity_count`<span class="gray"> : gauge : pgsql</span><br>number of connections in this state
-*   `pg_stat_activity_max_tx_duration`<span class="gray"> : gauge : pgsql</span><br>max duration in seconds any active
-    transaction has been running
-*   `pg_stat_bgwriter_buffers_alloc`<span class="gray"> : counter : pgsql</span><br>Number of buffers allocated
-*   `pg_stat_bgwriter_buffers_backend`<span class="gray"> : counter : pgsql</span><br>Number of buffers written directly
-    by a backend
-*   `pg_stat_bgwriter_buffers_backend_fsync`<span class="gray"> : counter : pgsql</span><br>Number of times a backend had
-    to execute its own fsync call (normally the background writer handles those even when the backend does its own write)
-*   `pg_stat_bgwriter_buffers_checkpoint`<span class="gray"> : counter : pgsql</span><br>Number of buffers written during
-    checkpoints
-*   `pg_stat_bgwriter_buffers_clean`<span class="gray"> : counter : pgsql</span><br>Number of buffers written by the
-    background writer
-*   `pg_stat_bgwriter_checkpoint_sync_time`<span class="gray"> : counter : pgsql</span><br>Total amount of time that has
-    been spent in the portion of checkpoint processing where files are synchronized to disk, in milliseconds
-*   `pg_stat_bgwriter_checkpoint_write_time`<span class="gray"> : counter : pgsql</span><br>Total amount of time that has
-    been spent in the portion of checkpoint processing where files are written to disk, in milliseconds
-*   `pg_stat_bgwriter_checkpoints_req`<span class="gray"> : counter : pgsql</span><br>Number of requested checkpoints that
-    have been performed
-*   `pg_stat_bgwriter_checkpoints_timed`<span class="gray"> : counter : pgsql</span><br>Number of scheduled checkpoints
-    that have been performed
-*   `pg_stat_bgwriter_maxwritten_clean`<span class="gray"> : counter : pgsql</span><br>Number of times the background
-    writer stopped a cleaning scan because it had written too many buffers
-*   `pg_stat_bgwriter_stats_reset`<span class="gray"> : counter : pgsql</span><br>Time at which these statistics were last
-    reset
-*   `pg_stat_database_blk_read_time`<span class="gray"> : counter : pgsql</span><br>Time spent reading data file blocks by
-    backends in this database, in milliseconds
-*   `pg_stat_database_blk_write_time`<span class="gray"> : counter : pgsql</span><br>Time spent writing data file blocks
-    by backends in this database, in milliseconds
-*   `pg_stat_database_blks_hit`<span class="gray"> : counter : pgsql</span><br>Number of times disk blocks were found
-    already in the buffer cache, so that a read was not necessary (this only includes hits in the PostgreSQL buffer cache,
-    not the operating system&#39;s file system cache)
-*   `pg_stat_database_blks_read`<span class="gray"> : counter : pgsql</span><br>Number of disk blocks read in this
-    database
-*   `pg_stat_database_conflicts`<span class="gray"> : counter : pgsql</span><br>Number of queries canceled due to
-    conflicts with recovery in this database. (Conflicts occur only on standby servers; see pg_stat_database_conflicts for
-    details.)
-*   `pg_stat_database_conflicts_confl_bufferpin`<span class="gray"> : counter : pgsql</span><br>Number of queries in this
-    database that have been canceled due to pinned buffers
-*   `pg_stat_database_conflicts_confl_deadlock`<span class="gray"> : counter : pgsql</span><br>Number of queries in this
-    database that have been canceled due to deadlocks
-*   `pg_stat_database_conflicts_confl_lock`<span class="gray"> : counter : pgsql</span><br>Number of queries in this
-    database that have been canceled due to lock timeouts
-*   `pg_stat_database_conflicts_confl_snapshot`<span class="gray"> : counter : pgsql</span><br>Number of queries in this
-    database that have been canceled due to old snapshots
-*   `pg_stat_database_conflicts_confl_tablespace`<span class="gray"> : counter : pgsql</span><br>Number of queries in this
-    database that have been canceled due to dropped tablespaces
-*   `pg_stat_database_deadlocks`<span class="gray"> : counter : pgsql</span><br>Number of deadlocks detected in this
-    database
-*   `pg_stat_database_numbackends`<span class="gray"> : gauge : pgsql</span><br>Number of backends currently connected to
-    this database. This is the only column in this view that returns a value reflecting current state; all other columns
-    return the accumulated values since the last reset.
-*   `pg_stat_database_stats_reset`<span class="gray"> : counter : pgsql</span><br>Time at which these statistics were last
-    reset
-*   `pg_stat_database_temp_bytes`<span class="gray"> : counter : pgsql</span><br>Total amount of data written to temporary
-    files by queries in this database. All temporary files are counted, regardless of why the temporary file was created,
-    and regardless of the log_temp_files setting.
-*   `pg_stat_database_temp_files`<span class="gray"> : counter : pgsql</span><br>Number of temporary files created by
-    queries in this database. All temporary files are counted, regardless of why the temporary file was created (e.g.,
-    sorting or hashing), and regardless of the log_temp_files setting.
-*   `pg_stat_database_tup_deleted`<span class="gray"> : counter : pgsql</span><br>Number of rows deleted by queries in
-    this database
-*   `pg_stat_database_tup_fetched`<span class="gray"> : counter : pgsql</span><br>Number of rows fetched by queries in
-    this database
-*   `pg_stat_database_tup_inserted`<span class="gray"> : counter : pgsql</span><br>Number of rows inserted by queries in
-    this database
-*   `pg_stat_database_tup_returned`<span class="gray"> : counter : pgsql</span><br>Number of rows returned by queries in
-    this database
-*   `pg_stat_database_tup_updated`<span class="gray"> : counter : pgsql</span><br>Number of rows updated by queries in
-    this database
-*   `pg_stat_database_xact_commit`<span class="gray"> : counter : pgsql</span><br>Number of transactions in this database
-    that have been committed
-*   `pg_stat_database_xact_rollback`<span class="gray"> : counter : pgsql</span><br>Number of transactions in this
-    database that have been rolled back
-*   `process_cpu_seconds_total`<span class="gray"> : counter : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total user and system CPU time spent in seconds.
-*   `process_max_fds`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql, query-runner,
-    redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Maximum number of
-    open file descriptors.
-*   `process_open_fds`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql, query-runner,
-    redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of open
-    file descriptors.
-*   `process_resident_memory_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Resident memory size in bytes.
-*   `process_start_time_seconds`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Start time of the process since unix epoch in seconds.
-*   `process_virtual_memory_bytes`<span class="gray"> : gauge : github-proxy, gitserver-1, pgsql,
-    query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Virtual memory size in bytes.
-*   `redis_aof_current_rewrite_duration_sec`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_aof_enabled`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_aof_last_rewrite_duration_sec`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_aof_rewrite_in_progress`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_aof_rewrite_scheduled`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_blocked_clients`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_client_longest_output_list`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_cluster_enabled`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_command_call_duration_seconds_count`<span class="gray"> : gauge : redis-cache, redis-store</span><br>Total
-    number of calls per command
-*   `redis_command_call_duration_seconds_sum`<span class="gray"> : gauge : redis-cache, redis-store</span><br>Total amount
-    of time in seconds spent per command
-*   `redis_commands_processed_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_connected_clients`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_connected_slaves`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_connections_received_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_db_avg_ttl_seconds`<span class="gray"> : gauge : redis-cache, redis-store</span><br>Avg TTL in seconds
-*   `redis_db_keys`<span class="gray"> : gauge : redis-cache, redis-store</span><br>Total number of keys by DB
-*   `redis_db_keys_expiring`<span class="gray"> : gauge : redis-cache, redis-store</span><br>Total number of expiring keys
-    by DB
-*   `redis_evicted_keys_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_expired_keys_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_exporter_build_info`<span class="gray"> : gauge : redis-cache, redis-store</span><br>redis exporter build_info
-*   `redis_exporter_last_scrape_duration_seconds`<span class="gray"> : gauge : redis-cache, redis-store</span><br>The last
-    scrape duration.
-*   `redis_exporter_last_scrape_error`<span class="gray"> : gauge : redis-cache, redis-store</span><br>The last scrape
-    error status.
-*   `redis_exporter_scrapes_total`<span class="gray"> : counter : redis-cache, redis-store</span><br>Current total redis
-    scrapes.
-*   `redis_instance_info`<span class="gray"> : gauge : redis-cache, redis-store</span><br>Information about the Redis
-    instance
-*   `redis_instantaneous_ops_per_sec`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_keyspace_hits_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_keyspace_misses_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_latest_fork_usec`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_loading_dump_file`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_master_repl_offset`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_memory_fragmentation_ratio`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_memory_max_bytes`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_memory_used_bytes`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_memory_used_lua_bytes`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_memory_used_peak_bytes`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_memory_used_rss_bytes`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_net_input_bytes_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_net_output_bytes_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_process_id`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_pubsub_channels`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_pubsub_patterns`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_rdb_changes_since_last_save`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_rdb_current_bgsave_duration_sec`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_rdb_last_bgsave_duration_sec`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_rejected_connections_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_replication_backlog_bytes`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_up`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_uptime_in_seconds`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_used_cpu_sys`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_used_cpu_sys_children`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_used_cpu_user`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `redis_used_cpu_user_children`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
-*   `searcher_service_request_total`<span class="gray"> : counter : searcher</span><br>Number of returned search requests.
-*   `searcher_service_running`<span class="gray"> : gauge : searcher</span><br>Number of running search requests.
-*   `searcher_store_cache_size_bytes`<span class="gray"> : gauge : searcher</span><br>The total size of items in the on
-    disk cache.
-*   `searcher_store_evictions`<span class="gray"> : counter : searcher</span><br>The total number of items evicted from
-    the cache.
-*   `searcher_store_fetch_failed`<span class="gray"> : counter : searcher</span><br>The total number of archive fetches
-    that failed.
-*   `searcher_store_fetch_queue_size`<span class="gray"> : gauge : searcher</span><br>The number of fetch jobs enqueued.
-*   `searcher_store_fetching`<span class="gray"> : gauge : searcher</span><br>The number of fetches currently running.
-*   `src_backend_client_request_duration_seconds`<span class="gray"> : histogram : sourcegraph-frontend</span><br>Total
-    time spent on backend endpoints.
-*   `src_backend_client_requests`<span class="gray"> : gauge : sourcegraph-frontend</span><br>Current number of requests
-    running for a method.
-*   `src_github_rate_limit_remaining`<span class="gray"> : gauge : github-proxy</span><br>Number of calls to GitHub&#39;s
-    API remaining before hitting the rate limit.
-*   `src_github_requests_total`<span class="gray"> : counter : repo-updater</span><br>Total number of requests sent to the
-    GitHub API.
-*   `src_gitserver_client_deadline_exceeded`<span class="gray"> : counter : repo-updater, searcher,
-    sourcegraph-frontend, symbols</span><br>Times that Client.sendExec() returned context.DeadlineExceeded
-*   `src_gitserver_clone_queue`<span class="gray"> : gauge : gitserver-1</span><br>number of repos waiting to be cloned.
-*   `src_gitserver_disk_space_available`<span class="gray"> : gauge : gitserver-1</span><br>Amount of free space disk
-    space on the repos mount.
-*   `src_gitserver_echo_duration_seconds`<span class="gray"> : gauge : gitserver-1</span><br>Duration of executing the
-    echo command.
-*   `src_gitserver_exec_duration_seconds`<span class="gray"> : histogram : gitserver-1</span><br>gitserver.Command
-    latencies in seconds.
-*   `src_gitserver_exec_running`<span class="gray"> : gauge : gitserver-1</span><br>number of gitserver.Command running
-    concurrently.
-*   `src_gitserver_lsremote_queue`<span class="gray"> : gauge : gitserver-1</span><br>number of repos waiting to check
-    existence on remote code host (git ls-remote).
-*   `src_gitserver_repos_recloned`<span class="gray"> : counter : gitserver-1</span><br>number of repos removed and
-    recloned due to age
-*   `src_gitserver_repos_removed`<span class="gray"> : counter : gitserver-1</span><br>number of repos removed during
-    cleanup due to inactivity
-*   `src_gitserver_update_queue`<span class="gray"> : gauge : gitserver-1</span><br>number of repos waiting to be updated
-    (enqueue-repo-update)
-*   `src_graphql_field_seconds`<span class="gray"> : histogram : sourcegraph-frontend</span><br>GraphQL field resolver
-    latencies in seconds.
-*   `src_graphql_search_results_stats_cache_hit`<span class="gray"> : counter : sourcegraph-frontend</span><br>Counts
-    cache hits and misses for search results stats (e.g. sparklines).
-*   `src_http_request_duration_seconds`<span class="gray"> : histogram : sourcegraph-frontend</span><br>The HTTP request
-    latencies in seconds.
-*   `src_http_requests_last_timestamp_unixtime`<span class="gray"> : gauge : sourcegraph-frontend</span><br>Last time a
-    request finished for a http endpoint.
-*   `src_legacy_def_landing_webapp`<span class="gray"> : counter : sourcegraph-frontend</span><br>Number of times a legacy
-    def landing page has been served.
-*   `src_legacy_repo_landing_webapp`<span class="gray"> : counter : sourcegraph-frontend</span><br>Number of times a
-    legacy repo landing page has been served.
-*   `src_pgsql_app_open_connections`<span class="gray"> : gauge : sourcegraph-frontend</span><br>Number of open
-    connections to pgsql DB, as reported by pgsql.DB.Stats()
-*   `src_repos_github_cache_hit`<span class="gray"> : counter : repo-updater</span><br>Counts cache hits and misses for
-    GitHub repo metadata.
-*   `src_repoupdater_time_last_bitbucketserver_sync`<span class="gray"> : gauge : repo-updater</span><br>The last time a
-    comprehensive Bitbucket Server sync finished
-*   `src_repoupdater_time_last_github_sync`<span class="gray"> : gauge : repo-updater</span><br>The last time a
-    comprehensive GitHub sync finished
-*   `src_repoupdater_time_last_gitlab_sync`<span class="gray"> : gauge : repo-updater</span><br>The last time a
-    comprehensive GitLab sync finished
-*   `src_repoupdater_time_last_gitolite_sync`<span class="gray"> : gauge : repo-updater</span><br>The last time a
-    comprehensive Gitolite sync finished
-*   `src_repoupdater_time_last_repolist_sync`<span class="gray"> : gauge : repo-updater</span><br>The time the last
-    repository sync loop completed
-*   `src_updatecheck_requests`<span class="gray"> : counter : sourcegraph-frontend</span><br>Number of requests to the
-    update check handler.
-*   `src_updatecheck_requests_has_update`<span class="gray"> : counter : sourcegraph-frontend</span><br>Number of requests
-    to the update check handler where an update is available.
-*   `src_vfs_gitserver_bytes_total`<span class="gray"> : counter : sourcegraph-frontend</span><br>Total number of bytes read into memory by ArchiveFileSystem.
-*   `symbols_parse_parse_failed`<span class="gray"> : counter : symbols</span><br>The total number of parse jobs that
-    failed.
-*   `symbols_parse_parse_queue_size`<span class="gray"> : gauge : symbols</span><br>The number of parse jobs enqueued.
-*   `symbols_parse_parsing`<span class="gray"> : gauge : symbols</span><br>The number of parse jobs currently running.
-*   `symbols_store_cache_size_bytes`<span class="gray"> : gauge : symbols</span><br>The total size of items in the on disk
-    cache.
-*   `symbols_store_evictions`<span class="gray"> : counter : symbols</span><br>The total number of items evicted from the
-    cache.
-*   `symbols_store_fetch_failed`<span class="gray"> : counter : symbols</span><br>The total number of archive fetches that
-    failed.
-*   `symbols_store_fetch_queue_size`<span class="gray"> : gauge : symbols</span><br>The number of fetch jobs enqueued.
-*   `symbols_store_fetching`<span class="gray"> : gauge : symbols</span><br>The number of fetches currently running.
+- `go_gc_duration_seconds`<span class="gray"> : summary : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>A summary of the GC invocation durations.
+- `go_goroutines`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of goroutines that currently exist.
+- `go_info`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Information about the Go environment.
+- `go_memstats_alloc_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes allocated and still in use.
+- `go_memstats_alloc_bytes_total`<span class="gray"> : counter : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of bytes allocated, even if freed.
+- `go_memstats_buck_hash_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used by the profiling bucket hash table.
+- `go_memstats_frees_total`<span class="gray"> : counter : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of frees.
+- `go_memstats_gc_cpu_fraction`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>The fraction of this program&#39;s available CPU time used by the GC since the program started.
+- `go_memstats_gc_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used for garbage collection system metadata.
+- `go_memstats_heap_alloc_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes allocated and still in use.
+- `go_memstats_heap_idle_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes waiting to be used.
+- `go_memstats_heap_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes that are in use.
+- `go_memstats_heap_objects`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of allocated objects.
+- `go_memstats_heap_released_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes released to OS.
+- `go_memstats_heap_released_bytes_total`<span class="gray"> : counter : redis-cache, redis-store</span><br>Total number of heap bytes released to OS.
+- `go_memstats_heap_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes obtained from system.
+- `go_memstats_last_gc_time_seconds`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of seconds since 1970 of last garbage collection.
+- `go_memstats_lookups_total`<span class="gray"> : counter : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of pointer lookups.
+- `go_memstats_mallocs_total`<span class="gray"> : counter : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of mallocs.
+- `go_memstats_mcache_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes in use by mcache structures.
+- `go_memstats_mcache_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used for mcache structures obtained from system.
+- `go_memstats_mspan_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes in use by mspan structures.
+- `go_memstats_mspan_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used for mspan structures obtained from system.
+- `go_memstats_next_gc_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of heap bytes when next garbage collection will take place.
+- `go_memstats_other_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes used for other system allocations.
+- `go_memstats_stack_inuse_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes in use by the stack allocator.
+- `go_memstats_stack_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes obtained from system for stack allocator.
+- `go_memstats_sys_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of bytes obtained from system.
+- `go_threads`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of OS threads created.
+- `http_request_duration_microseconds`<span class="gray"> : summary : github-proxy, redis-cache, redis-store</span><br>The HTTP request latencies in microseconds.
+- `http_request_size_bytes`<span class="gray"> : summary : github-proxy, redis-cache, redis-store</span><br>The HTTP request sizes in bytes.
+- `http_requests_total`<span class="gray"> : counter : github-proxy, redis-cache, redis-store</span><br>Total number of HTTP requests made.
+- `http_response_size_bytes`<span class="gray"> : summary : github-proxy, redis-cache, redis-store</span><br>The HTTP response sizes in bytes.
+- `pg_exporter_last_scrape_duration_seconds`<span class="gray"> : gauge : pgsql</span><br>Duration of the last scrape of metrics from PostgresSQL.
+- `pg_exporter_last_scrape_error`<span class="gray"> : gauge : pgsql</span><br>Whether the last scrape of metrics from PostgreSQL resulted in an error (1 for error, 0 for success).
+- `pg_exporter_scrapes_total`<span class="gray"> : counter : pgsql</span><br>Total number of times PostgresSQL was scraped for metrics.
+- `pg_locks_count`<span class="gray"> : gauge : pgsql</span><br>Number of locks
+- `pg_settings_allow_system_table_mods`<span class="gray"> : gauge : pgsql</span><br>Allows modifications of the structure of system tables.
+- `pg_settings_archive_timeout_seconds`<span class="gray"> : gauge : pgsql</span><br>Forces a switch to the next WAL file if a new file has not been started within N seconds. [Units converted to seconds.]
+- `pg_settings_array_nulls`<span class="gray"> : gauge : pgsql</span><br>Enable input of NULL elements in arrays.
+- `pg_settings_authentication_timeout_seconds`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum allowed time to complete client authentication. [Units converted to seconds.]
+- `pg_settings_autovacuum`<span class="gray"> : gauge : pgsql</span><br>Starts the autovacuum subprocess.
+- `pg_settings_autovacuum_analyze_scale_factor`<span class="gray"> : gauge : pgsql</span><br>Number of tuple inserts, updates, or deletes prior to analyze as a fraction of reltuples.
+- `pg_settings_autovacuum_analyze_threshold`<span class="gray"> : gauge : pgsql</span><br>Minimum number of tuple inserts, updates, or deletes prior to analyze.
+- `pg_settings_autovacuum_freeze_max_age`<span class="gray"> : gauge : pgsql</span><br>Age at which to autovacuum a table to prevent transaction ID wraparound.
+- `pg_settings_autovacuum_max_workers`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of simultaneously running autovacuum worker processes.
+- `pg_settings_autovacuum_multixact_freeze_max_age`<span class="gray"> : gauge : pgsql</span><br>Multixact age at which to autovacuum a table to prevent multixact wraparound.
+- `pg_settings_autovacuum_naptime_seconds`<span class="gray"> : gauge : pgsql</span><br>Time to sleep between autovacuum runs. [Units converted to seconds.]
+- `pg_settings_autovacuum_vacuum_cost_delay_seconds`<span class="gray"> : gauge : pgsql</span><br>Vacuum cost delay in milliseconds, for autovacuum. [Units converted to seconds.]
+- `pg_settings_autovacuum_vacuum_cost_limit`<span class="gray"> : gauge : pgsql</span><br>Vacuum cost amount available before napping, for autovacuum.
+- `pg_settings_autovacuum_vacuum_scale_factor`<span class="gray"> : gauge : pgsql</span><br>Number of tuple updates or deletes prior to vacuum as a fraction of reltuples.
+- `pg_settings_autovacuum_vacuum_threshold`<span class="gray"> : gauge : pgsql</span><br>Minimum number of tuple updates or deletes prior to vacuum.
+- `pg_settings_autovacuum_work_mem_bytes`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum memory to be used by each autovacuum worker process. [Units converted to bytes.]
+- `pg_settings_backend_flush_after_bytes`<span class="gray"> : gauge : pgsql</span><br>Number of pages after which previously performed writes are flushed to disk. [Units converted to bytes.]
+- `pg_settings_bgwriter_delay_seconds`<span class="gray"> : gauge : pgsql</span><br>Background writer sleep time between rounds. [Units converted to seconds.]
+- `pg_settings_bgwriter_flush_after_bytes`<span class="gray"> : gauge : pgsql</span><br>Number of pages after which previously performed writes are flushed to disk. [Units converted to bytes.]
+- `pg_settings_bgwriter_lru_maxpages`<span class="gray"> : gauge : pgsql</span><br>Background writer maximum number of LRU pages to flush per round.
+- `pg_settings_bgwriter_lru_multiplier`<span class="gray"> : gauge : pgsql</span><br>Multiple of the average buffer usage to free per round.
+- `pg_settings_block_size`<span class="gray"> : gauge : pgsql</span><br>Shows the size of a disk block.
+- `pg_settings_bonjour`<span class="gray"> : gauge : pgsql</span><br>Enables advertising the server via Bonjour.
+- `pg_settings_check_function_bodies`<span class="gray"> : gauge : pgsql</span><br>Check function bodies during CREATE FUNCTION.
+- `pg_settings_checkpoint_completion_target`<span class="gray"> : gauge : pgsql</span><br>Time spent flushing dirty buffers during checkpoint, as fraction of checkpoint interval.
+- `pg_settings_checkpoint_flush_after_bytes`<span class="gray"> : gauge : pgsql</span><br>Number of pages after which previously performed writes are flushed to disk. [Units converted to bytes.]
+- `pg_settings_checkpoint_timeout_seconds`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum time between automatic WAL checkpoints. [Units converted to seconds.]
+- `pg_settings_checkpoint_warning_seconds`<span class="gray"> : gauge : pgsql</span><br>Enables warnings if checkpoint segments are filled more frequently than this. [Units converted to seconds.]
+- `pg_settings_commit_delay`<span class="gray"> : gauge : pgsql</span><br>Sets the delay in microseconds between transaction commit and flushing WAL to disk.
+- `pg_settings_commit_siblings`<span class="gray"> : gauge : pgsql</span><br>Sets the minimum concurrent open transactions before performing commit_delay.
+- `pg_settings_cpu_index_tuple_cost`<span class="gray"> : gauge : pgsql</span><br>Sets the planner&#39;s estimate of the cost of processing each index entry during an index scan.
+- `pg_settings_cpu_operator_cost`<span class="gray"> : gauge : pgsql</span><br>Sets the planner&#39;s estimate of the cost of processing each operator or function call.
+- `pg_settings_cpu_tuple_cost`<span class="gray"> : gauge : pgsql</span><br>Sets the planner&#39;s estimate of the cost of processing each tuple (row).
+- `pg_settings_cursor_tuple_fraction`<span class="gray"> : gauge : pgsql</span><br>Sets the planner&#39;s estimate of the fraction of a cursor&#39;s rows that will be retrieved.
+- `pg_settings_data_checksums`<span class="gray"> : gauge : pgsql</span><br>Shows whether data checksums are turned on for this cluster.
+- `pg_settings_data_directory_mode`<span class="gray"> : gauge : pgsql</span><br>Mode of the data directory.
+- `pg_settings_db_user_namespace`<span class="gray"> : gauge : pgsql</span><br>Enables per-database user names.
+- `pg_settings_deadlock_timeout_seconds`<span class="gray"> : gauge : pgsql</span><br>Sets the time to wait on a lock before checking for deadlock. [Units converted to seconds.]
+- `pg_settings_debug_assertions`<span class="gray"> : gauge : pgsql</span><br>Shows whether the running server has assertion checks enabled.
+- `pg_settings_debug_pretty_print`<span class="gray"> : gauge : pgsql</span><br>Indents parse and plan tree displays.
+- `pg_settings_debug_print_parse`<span class="gray"> : gauge : pgsql</span><br>Logs each query&#39;s parse tree.
+- `pg_settings_debug_print_plan`<span class="gray"> : gauge : pgsql</span><br>Logs each query&#39;s execution plan.
+- `pg_settings_debug_print_rewritten`<span class="gray"> : gauge : pgsql</span><br>Logs each query&#39;s rewritten parse tree.
+- `pg_settings_default_statistics_target`<span class="gray"> : gauge : pgsql</span><br>Sets the default statistics target.
+- `pg_settings_default_transaction_deferrable`<span class="gray"> : gauge : pgsql</span><br>Sets the default deferrable status of new transactions.
+- `pg_settings_default_transaction_read_only`<span class="gray"> : gauge : pgsql</span><br>Sets the default read-only status of new transactions.
+- `pg_settings_default_with_oids`<span class="gray"> : gauge : pgsql</span><br>Create new tables with OIDs by default.
+- `pg_settings_effective_cache_size_bytes`<span class="gray"> : gauge : pgsql</span><br>Sets the planner&#39;s assumption about the total size of the data caches. [Units converted to bytes.]
+- `pg_settings_effective_io_concurrency`<span class="gray"> : gauge : pgsql</span><br>Number of simultaneous requests that can be handled efficiently by the disk subsystem.
+- `pg_settings_enable_bitmapscan`<span class="gray"> : gauge : pgsql</span><br>Enables the planner&#39;s use of bitmap-scan plans.
+- `pg_settings_enable_gathermerge`<span class="gray"> : gauge : pgsql</span><br>Enables the planner&#39;s use of gather merge plans.
+- `pg_settings_enable_hashagg`<span class="gray"> : gauge : pgsql</span><br>Enables the planner&#39;s use of hashed aggregation plans.
+- `pg_settings_enable_hashjoin`<span class="gray"> : gauge : pgsql</span><br>Enables the planner&#39;s use of hash join plans.
+- `pg_settings_enable_indexonlyscan`<span class="gray"> : gauge : pgsql</span><br>Enables the planner&#39;s use of index-only-scan plans.
+- `pg_settings_enable_indexscan`<span class="gray"> : gauge : pgsql</span><br>Enables the planner&#39;s use of index-scan plans.
+- `pg_settings_enable_material`<span class="gray"> : gauge : pgsql</span><br>Enables the planner&#39;s use of materialization.
+- `pg_settings_enable_mergejoin`<span class="gray"> : gauge : pgsql</span><br>Enables the planner&#39;s use of merge join plans.
+- `pg_settings_enable_nestloop`<span class="gray"> : gauge : pgsql</span><br>Enables the planner&#39;s use of nested-loop join plans.
+- `pg_settings_enable_parallel_append`<span class="gray"> : gauge : pgsql</span><br>Enables the planner&#39;s use of parallel append plans.
+- `pg_settings_enable_parallel_hash`<span class="gray"> : gauge : pgsql</span><br>Enables the planner&#39;s use of parallel hash plans.
+- `pg_settings_enable_partition_pruning`<span class="gray"> : gauge : pgsql</span><br>Enable plan-time and run-time partition pruning.
+- `pg_settings_enable_partitionwise_aggregate`<span class="gray"> : gauge : pgsql</span><br>Enables partitionwise aggregation and grouping.
+- `pg_settings_enable_partitionwise_join`<span class="gray"> : gauge : pgsql</span><br>Enables partitionwise join.
+- `pg_settings_enable_seqscan`<span class="gray"> : gauge : pgsql</span><br>Enables the planner&#39;s use of sequential-scan plans.
+- `pg_settings_enable_sort`<span class="gray"> : gauge : pgsql</span><br>Enables the planner&#39;s use of explicit sort steps.
+- `pg_settings_enable_tidscan`<span class="gray"> : gauge : pgsql</span><br>Enables the planner&#39;s use of TID scan plans.
+- `pg_settings_escape_string_warning`<span class="gray"> : gauge : pgsql</span><br>Warn about backslash escapes in ordinary string literals.
+- `pg_settings_exit_on_error`<span class="gray"> : gauge : pgsql</span><br>Terminate session on any error.
+- `pg_settings_extra_float_digits`<span class="gray"> : gauge : pgsql</span><br>Sets the number of digits displayed for floating-point values.
+- `pg_settings_from_collapse_limit`<span class="gray"> : gauge : pgsql</span><br>Sets the FROM-list size beyond which subqueries are not collapsed.
+- `pg_settings_fsync`<span class="gray"> : gauge : pgsql</span><br>Forces synchronization of updates to disk.
+- `pg_settings_full_page_writes`<span class="gray"> : gauge : pgsql</span><br>Writes full pages to WAL when first modified after a checkpoint.
+- `pg_settings_geqo`<span class="gray"> : gauge : pgsql</span><br>Enables genetic query optimization.
+- `pg_settings_geqo_effort`<span class="gray"> : gauge : pgsql</span><br>GEQO: effort is used to set the default for other GEQO parameters.
+- `pg_settings_geqo_generations`<span class="gray"> : gauge : pgsql</span><br>GEQO: number of iterations of the algorithm.
+- `pg_settings_geqo_pool_size`<span class="gray"> : gauge : pgsql</span><br>GEQO: number of individuals in the population.
+- `pg_settings_geqo_seed`<span class="gray"> : gauge : pgsql</span><br>GEQO: seed for random path selection.
+- `pg_settings_geqo_selection_bias`<span class="gray"> : gauge : pgsql</span><br>GEQO: selective pressure within the population.
+- `pg_settings_geqo_threshold`<span class="gray"> : gauge : pgsql</span><br>Sets the threshold of FROM items beyond which GEQO is used.
+- `pg_settings_gin_fuzzy_search_limit`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum allowed result for exact search by GIN.
+- `pg_settings_gin_pending_list_limit_bytes`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum size of the pending list for GIN index. [Units converted to bytes.]
+- `pg_settings_hot_standby`<span class="gray"> : gauge : pgsql</span><br>Allows connections and queries during recovery.
+- `pg_settings_hot_standby_feedback`<span class="gray"> : gauge : pgsql</span><br>Allows feedback from a hot standby to the primary that will avoid query conflicts.
+- `pg_settings_idle_in_transaction_session_timeout_seconds`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum allowed duration of any idling transaction. [Units converted to seconds.]
+- `pg_settings_ignore_checksum_failure`<span class="gray"> : gauge : pgsql</span><br>Continues processing after a checksum failure.
+- `pg_settings_ignore_system_indexes`<span class="gray"> : gauge : pgsql</span><br>Disables reading from system indexes.
+- `pg_settings_integer_datetimes`<span class="gray"> : gauge : pgsql</span><br>Datetimes are integer based.
+- `pg_settings_jit`<span class="gray"> : gauge : pgsql</span><br>Allow JIT compilation.
+- `pg_settings_jit_above_cost`<span class="gray"> : gauge : pgsql</span><br>Perform JIT compilation if query is more expensive.
+- `pg_settings_jit_debugging_support`<span class="gray"> : gauge : pgsql</span><br>Register JIT compiled function with debugger.
+- `pg_settings_jit_dump_bitcode`<span class="gray"> : gauge : pgsql</span><br>Write out LLVM bitcode to facilitate JIT debugging.
+- `pg_settings_jit_expressions`<span class="gray"> : gauge : pgsql</span><br>Allow JIT compilation of expressions.
+- `pg_settings_jit_inline_above_cost`<span class="gray"> : gauge : pgsql</span><br>Perform JIT inlining if query is more expensive.
+- `pg_settings_jit_optimize_above_cost`<span class="gray"> : gauge : pgsql</span><br>Optimize JITed functions if query is more expensive.
+- `pg_settings_jit_profiling_support`<span class="gray"> : gauge : pgsql</span><br>Register JIT compiled function with perf profiler.
+- `pg_settings_jit_tuple_deforming`<span class="gray"> : gauge : pgsql</span><br>Allow JIT compilation of tuple deforming.
+- `pg_settings_join_collapse_limit`<span class="gray"> : gauge : pgsql</span><br>Sets the FROM-list size beyond which JOIN constructs are not flattened.
+- `pg_settings_krb_caseins_users`<span class="gray"> : gauge : pgsql</span><br>Sets whether Kerberos and GSSAPI user names should be treated as case-insensitive.
+- `pg_settings_lo_compat_privileges`<span class="gray"> : gauge : pgsql</span><br>Enables backward compatibility mode for privilege checks on large objects.
+- `pg_settings_lock_timeout_seconds`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum allowed duration of any wait for a lock. [Units converted to seconds.]
+- `pg_settings_log_autovacuum_min_duration_seconds`<span class="gray"> : gauge : pgsql</span><br>Sets the minimum execution time above which autovacuum actions will be logged. [Units converted to seconds.]
+- `pg_settings_log_checkpoints`<span class="gray"> : gauge : pgsql</span><br>Logs each checkpoint.
+- `pg_settings_log_connections`<span class="gray"> : gauge : pgsql</span><br>Logs each successful connection.
+- `pg_settings_log_disconnections`<span class="gray"> : gauge : pgsql</span><br>Logs end of a session, including duration.
+- `pg_settings_log_duration`<span class="gray"> : gauge : pgsql</span><br>Logs the duration of each completed SQL statement.
+- `pg_settings_log_executor_stats`<span class="gray"> : gauge : pgsql</span><br>Writes executor performance statistics to the server log.
+- `pg_settings_log_file_mode`<span class="gray"> : gauge : pgsql</span><br>Sets the file permissions for log files.
+- `pg_settings_log_hostname`<span class="gray"> : gauge : pgsql</span><br>Logs the host name in the connection logs.
+- `pg_settings_log_lock_waits`<span class="gray"> : gauge : pgsql</span><br>Logs long lock waits.
+- `pg_settings_log_min_duration_statement_seconds`<span class="gray"> : gauge : pgsql</span><br>Sets the minimum execution time above which statements will be logged. [Units converted to seconds.]
+- `pg_settings_log_parser_stats`<span class="gray"> : gauge : pgsql</span><br>Writes parser performance statistics to the server log.
+- `pg_settings_log_planner_stats`<span class="gray"> : gauge : pgsql</span><br>Writes planner performance statistics to the server log.
+- `pg_settings_log_replication_commands`<span class="gray"> : gauge : pgsql</span><br>Logs each replication command.
+- `pg_settings_log_rotation_age_seconds`<span class="gray"> : gauge : pgsql</span><br>Automatic log file rotation will occur after N minutes. [Units converted to seconds.]
+- `pg_settings_log_rotation_size_bytes`<span class="gray"> : gauge : pgsql</span><br>Automatic log file rotation will occur after N kilobytes. [Units converted to bytes.]
+- `pg_settings_log_statement_stats`<span class="gray"> : gauge : pgsql</span><br>Writes cumulative performance statistics to the server log.
+- `pg_settings_log_temp_files_bytes`<span class="gray"> : gauge : pgsql</span><br>Log the use of temporary files larger than this number of kilobytes. [Units converted to bytes.]
+- `pg_settings_log_truncate_on_rotation`<span class="gray"> : gauge : pgsql</span><br>Truncate existing log files of same name during log rotation.
+- `pg_settings_logging_collector`<span class="gray"> : gauge : pgsql</span><br>Start a subprocess to capture stderr output and/or csvlogs into log files.
+- `pg_settings_maintenance_work_mem_bytes`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum memory to be used for maintenance operations. [Units converted to bytes.]
+- `pg_settings_max_connections`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of concurrent connections.
+- `pg_settings_max_files_per_process`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of simultaneously open files for each server process.
+- `pg_settings_max_function_args`<span class="gray"> : gauge : pgsql</span><br>Shows the maximum number of function arguments.
+- `pg_settings_max_identifier_length`<span class="gray"> : gauge : pgsql</span><br>Shows the maximum identifier length.
+- `pg_settings_max_index_keys`<span class="gray"> : gauge : pgsql</span><br>Shows the maximum number of index keys.
+- `pg_settings_max_locks_per_transaction`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of locks per transaction.
+- `pg_settings_max_logical_replication_workers`<span class="gray"> : gauge : pgsql</span><br>Maximum number of logical replication worker processes.
+- `pg_settings_max_parallel_maintenance_workers`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of parallel processes per maintenance operation.
+- `pg_settings_max_parallel_workers`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of parallel workers that can be active at one time.
+- `pg_settings_max_parallel_workers_per_gather`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of parallel processes per executor node.
+- `pg_settings_max_pred_locks_per_page`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of predicate-locked tuples per page.
+- `pg_settings_max_pred_locks_per_relation`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of predicate-locked pages and tuples per relation.
+- `pg_settings_max_pred_locks_per_transaction`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of predicate locks per transaction.
+- `pg_settings_max_prepared_transactions`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of simultaneously prepared transactions.
+- `pg_settings_max_replication_slots`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of simultaneously defined replication slots.
+- `pg_settings_max_stack_depth_bytes`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum stack depth, in kilobytes. [Units converted to bytes.]
+- `pg_settings_max_standby_archive_delay_seconds`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum delay before canceling queries when a hot standby server is processing archived WAL data. [Units converted to seconds.]
+- `pg_settings_max_standby_streaming_delay_seconds`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum delay before canceling queries when a hot standby server is processing streamed WAL data. [Units converted to seconds.]
+- `pg_settings_max_sync_workers_per_subscription`<span class="gray"> : gauge : pgsql</span><br>Maximum number of table synchronization workers per subscription.
+- `pg_settings_max_wal_senders`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of simultaneously running WAL sender processes.
+- `pg_settings_max_wal_size_bytes`<span class="gray"> : gauge : pgsql</span><br>Sets the WAL size that triggers a checkpoint. [Units converted to bytes.]
+- `pg_settings_max_worker_processes`<span class="gray"> : gauge : pgsql</span><br>Maximum number of concurrent worker processes.
+- `pg_settings_min_parallel_index_scan_size_bytes`<span class="gray"> : gauge : pgsql</span><br>Sets the minimum amount of index data for a parallel scan. [Units converted to bytes.]
+- `pg_settings_min_parallel_table_scan_size_bytes`<span class="gray"> : gauge : pgsql</span><br>Sets the minimum amount of table data for a parallel scan. [Units converted to bytes.]
+- `pg_settings_min_wal_size_bytes`<span class="gray"> : gauge : pgsql</span><br>Sets the minimum size to shrink the WAL to. [Units converted to bytes.]
+- `pg_settings_old_snapshot_threshold_seconds`<span class="gray"> : gauge : pgsql</span><br>Time before a snapshot is too old to read pages changed after the snapshot was taken. [Units converted to seconds.]
+- `pg_settings_operator_precedence_warning`<span class="gray"> : gauge : pgsql</span><br>Emit a warning for constructs that changed meaning since PostgreSQL 9.4.
+- `pg_settings_parallel_leader_participation`<span class="gray"> : gauge : pgsql</span><br>Controls whether Gather and Gather Merge also run subplans.
+- `pg_settings_parallel_setup_cost`<span class="gray"> : gauge : pgsql</span><br>Sets the planner&#39;s estimate of the cost of starting up worker processes for parallel query.
+- `pg_settings_parallel_tuple_cost`<span class="gray"> : gauge : pgsql</span><br>Sets the planner&#39;s estimate of the cost of passing each tuple (row) from worker to master backend.
+- `pg_settings_port`<span class="gray"> : gauge : pgsql</span><br>Sets the TCP port the server listens on.
+- `pg_settings_post_auth_delay_seconds`<span class="gray"> : gauge : pgsql</span><br>Waits N seconds on connection startup after authentication. [Units converted to seconds.]
+- `pg_settings_pre_auth_delay_seconds`<span class="gray"> : gauge : pgsql</span><br>Waits N seconds on connection startup before authentication. [Units converted to seconds.]
+- `pg_settings_quote_all_identifiers`<span class="gray"> : gauge : pgsql</span><br>When generating SQL fragments, quote all identifiers.
+- `pg_settings_random_page_cost`<span class="gray"> : gauge : pgsql</span><br>Sets the planner&#39;s estimate of the cost of a nonsequentially fetched disk page.
+- `pg_settings_restart_after_crash`<span class="gray"> : gauge : pgsql</span><br>Reinitialize server after backend crash.
+- `pg_settings_row_security`<span class="gray"> : gauge : pgsql</span><br>Enable row security.
+- `pg_settings_segment_size_bytes`<span class="gray"> : gauge : pgsql</span><br>Shows the number of pages per disk file. [Units converted to bytes.]
+- `pg_settings_seq_page_cost`<span class="gray"> : gauge : pgsql</span><br>Sets the planner&#39;s estimate of the cost of a sequentially fetched disk page.
+- `pg_settings_server_version_num`<span class="gray"> : gauge : pgsql</span><br>Shows the server version as an integer.
+- `pg_settings_shared_buffers_bytes`<span class="gray"> : gauge : pgsql</span><br>Sets the number of shared memory buffers used by the server. [Units converted to bytes.]
+- `pg_settings_ssl`<span class="gray"> : gauge : pgsql</span><br>Enables SSL connections.
+- `pg_settings_ssl_passphrase_command_supports_reload`<span class="gray"> : gauge : pgsql</span><br>Also use ssl_passphrase_command during server reload.
+- `pg_settings_ssl_prefer_server_ciphers`<span class="gray"> : gauge : pgsql</span><br>Give priority to server ciphersuite order.
+- `pg_settings_standard_conforming_strings`<span class="gray"> : gauge : pgsql</span><br>Causes &#39;...&#39; strings to treat backslashes literally.
+- `pg_settings_statement_timeout_seconds`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum allowed duration of any statement. [Units converted to seconds.]
+- `pg_settings_superuser_reserved_connections`<span class="gray"> : gauge : pgsql</span><br>Sets the number of connection slots reserved for superusers.
+- `pg_settings_synchronize_seqscans`<span class="gray"> : gauge : pgsql</span><br>Enable synchronized sequential scans.
+- `pg_settings_syslog_sequence_numbers`<span class="gray"> : gauge : pgsql</span><br>Add sequence number to syslog messages to avoid duplicate suppression.
+- `pg_settings_syslog_split_messages`<span class="gray"> : gauge : pgsql</span><br>Split messages sent to syslog by lines and to fit into 1024 bytes.
+- `pg_settings_tcp_keepalives_count`<span class="gray"> : gauge : pgsql</span><br>Maximum number of TCP keepalive retransmits.
+- `pg_settings_tcp_keepalives_idle_seconds`<span class="gray"> : gauge : pgsql</span><br>Time between issuing TCP keepalives. [Units converted to seconds.]
+- `pg_settings_tcp_keepalives_interval_seconds`<span class="gray"> : gauge : pgsql</span><br>Time between TCP keepalive retransmits. [Units converted to seconds.]
+- `pg_settings_temp_buffers_bytes`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum number of temporary buffers used by each session. [Units converted to bytes.]
+- `pg_settings_temp_file_limit_bytes`<span class="gray"> : gauge : pgsql</span><br>Limits the total size of all temporary files used by each process. [Units converted to bytes.]
+- `pg_settings_trace_notify`<span class="gray"> : gauge : pgsql</span><br>Generates debugging output for LISTEN and NOTIFY.
+- `pg_settings_trace_sort`<span class="gray"> : gauge : pgsql</span><br>Emit information about resource usage in sorting.
+- `pg_settings_track_activities`<span class="gray"> : gauge : pgsql</span><br>Collects information about executing commands.
+- `pg_settings_track_activity_query_size_bytes`<span class="gray"> : gauge : pgsql</span><br>Sets the size reserved for pg_stat_activity.query, in bytes. [Units converted to bytes.]
+- `pg_settings_track_commit_timestamp`<span class="gray"> : gauge : pgsql</span><br>Collects transaction commit time.
+- `pg_settings_track_counts`<span class="gray"> : gauge : pgsql</span><br>Collects statistics on database activity.
+- `pg_settings_track_io_timing`<span class="gray"> : gauge : pgsql</span><br>Collects timing statistics for database I/O activity.
+- `pg_settings_transaction_deferrable`<span class="gray"> : gauge : pgsql</span><br>Whether to defer a read-only serializable transaction until it can be executed with no possible serialization failures.
+- `pg_settings_transaction_read_only`<span class="gray"> : gauge : pgsql</span><br>Sets the current transaction&#39;s read-only status.
+- `pg_settings_transform_null_equals`<span class="gray"> : gauge : pgsql</span><br>Treats &#34;expr=NULL&#34; as &#34;expr IS NULL&#34;.
+- `pg_settings_unix_socket_permissions`<span class="gray"> : gauge : pgsql</span><br>Sets the access permissions of the Unix-domain socket.
+- `pg_settings_update_process_title`<span class="gray"> : gauge : pgsql</span><br>Updates the process title to show the active SQL command.
+- `pg_settings_vacuum_cleanup_index_scale_factor`<span class="gray"> : gauge : pgsql</span><br>Number of tuple inserts prior to index cleanup as a fraction of reltuples.
+- `pg_settings_vacuum_cost_delay_seconds`<span class="gray"> : gauge : pgsql</span><br>Vacuum cost delay in milliseconds. [Units converted to seconds.]
+- `pg_settings_vacuum_cost_limit`<span class="gray"> : gauge : pgsql</span><br>Vacuum cost amount available before napping.
+- `pg_settings_vacuum_cost_page_dirty`<span class="gray"> : gauge : pgsql</span><br>Vacuum cost for a page dirtied by vacuum.
+- `pg_settings_vacuum_cost_page_hit`<span class="gray"> : gauge : pgsql</span><br>Vacuum cost for a page found in the buffer cache.
+- `pg_settings_vacuum_cost_page_miss`<span class="gray"> : gauge : pgsql</span><br>Vacuum cost for a page not found in the buffer cache.
+- `pg_settings_vacuum_defer_cleanup_age`<span class="gray"> : gauge : pgsql</span><br>Number of transactions by which VACUUM and HOT cleanup should be deferred, if any.
+- `pg_settings_vacuum_freeze_min_age`<span class="gray"> : gauge : pgsql</span><br>Minimum age at which VACUUM should freeze a table row.
+- `pg_settings_vacuum_freeze_table_age`<span class="gray"> : gauge : pgsql</span><br>Age at which VACUUM should scan whole table to freeze tuples.
+- `pg_settings_vacuum_multixact_freeze_min_age`<span class="gray"> : gauge : pgsql</span><br>Minimum age at which VACUUM should freeze a MultiXactId in a table row.
+- `pg_settings_vacuum_multixact_freeze_table_age`<span class="gray"> : gauge : pgsql</span><br>Multixact age at which VACUUM should scan whole table to freeze tuples.
+- `pg_settings_wal_block_size`<span class="gray"> : gauge : pgsql</span><br>Shows the block size in the write ahead log.
+- `pg_settings_wal_buffers_bytes`<span class="gray"> : gauge : pgsql</span><br>Sets the number of disk-page buffers in shared memory for WAL. [Units converted to bytes.]
+- `pg_settings_wal_compression`<span class="gray"> : gauge : pgsql</span><br>Compresses full-page writes written in WAL file.
+- `pg_settings_wal_keep_segments`<span class="gray"> : gauge : pgsql</span><br>Sets the number of WAL files held for standby servers.
+- `pg_settings_wal_log_hints`<span class="gray"> : gauge : pgsql</span><br>Writes full pages to WAL when first modified after a checkpoint, even for a non-critical modifications.
+- `pg_settings_wal_receiver_status_interval_seconds`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum interval between WAL receiver status reports to the primary. [Units converted to seconds.]
+- `pg_settings_wal_receiver_timeout_seconds`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum wait time to receive data from the primary. [Units converted to seconds.]
+- `pg_settings_wal_retrieve_retry_interval_seconds`<span class="gray"> : gauge : pgsql</span><br>Sets the time to wait before retrying to retrieve WAL after a failed attempt. [Units converted to seconds.]
+- `pg_settings_wal_segment_size_bytes`<span class="gray"> : gauge : pgsql</span><br>Shows the size of write ahead log segments. [Units converted to bytes.]
+- `pg_settings_wal_sender_timeout_seconds`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum time to wait for WAL replication. [Units converted to seconds.]
+- `pg_settings_wal_writer_delay_seconds`<span class="gray"> : gauge : pgsql</span><br>Time between WAL flushes performed in the WAL writer. [Units converted to seconds.]
+- `pg_settings_wal_writer_flush_after_bytes`<span class="gray"> : gauge : pgsql</span><br>Amount of WAL written out by WAL writer that triggers a flush. [Units converted to bytes.]
+- `pg_settings_work_mem_bytes`<span class="gray"> : gauge : pgsql</span><br>Sets the maximum memory to be used for query workspaces. [Units converted to bytes.]
+- `pg_settings_zero_damaged_pages`<span class="gray"> : gauge : pgsql</span><br>Continues processing past damaged page headers.
+- `pg_stat_activity_count`<span class="gray"> : gauge : pgsql</span><br>number of connections in this state
+- `pg_stat_activity_max_tx_duration`<span class="gray"> : gauge : pgsql</span><br>max duration in seconds any active transaction has been running
+- `pg_stat_bgwriter_buffers_alloc`<span class="gray"> : counter : pgsql</span><br>Number of buffers allocated
+- `pg_stat_bgwriter_buffers_backend`<span class="gray"> : counter : pgsql</span><br>Number of buffers written directly by a backend
+- `pg_stat_bgwriter_buffers_backend_fsync`<span class="gray"> : counter : pgsql</span><br>Number of times a backend had to execute its own fsync call (normally the background writer handles those even when the backend does its own write)
+- `pg_stat_bgwriter_buffers_checkpoint`<span class="gray"> : counter : pgsql</span><br>Number of buffers written during checkpoints
+- `pg_stat_bgwriter_buffers_clean`<span class="gray"> : counter : pgsql</span><br>Number of buffers written by the background writer
+- `pg_stat_bgwriter_checkpoint_sync_time`<span class="gray"> : counter : pgsql</span><br>Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk, in milliseconds
+- `pg_stat_bgwriter_checkpoint_write_time`<span class="gray"> : counter : pgsql</span><br>Total amount of time that has been spent in the portion of checkpoint processing where files are written to disk, in milliseconds
+- `pg_stat_bgwriter_checkpoints_req`<span class="gray"> : counter : pgsql</span><br>Number of requested checkpoints that have been performed
+- `pg_stat_bgwriter_checkpoints_timed`<span class="gray"> : counter : pgsql</span><br>Number of scheduled checkpoints that have been performed
+- `pg_stat_bgwriter_maxwritten_clean`<span class="gray"> : counter : pgsql</span><br>Number of times the background writer stopped a cleaning scan because it had written too many buffers
+- `pg_stat_bgwriter_stats_reset`<span class="gray"> : counter : pgsql</span><br>Time at which these statistics were last reset
+- `pg_stat_database_blk_read_time`<span class="gray"> : counter : pgsql</span><br>Time spent reading data file blocks by backends in this database, in milliseconds
+- `pg_stat_database_blk_write_time`<span class="gray"> : counter : pgsql</span><br>Time spent writing data file blocks by backends in this database, in milliseconds
+- `pg_stat_database_blks_hit`<span class="gray"> : counter : pgsql</span><br>Number of times disk blocks were found already in the buffer cache, so that a read was not necessary (this only includes hits in the PostgreSQL buffer cache, not the operating system&#39;s file system cache)
+- `pg_stat_database_blks_read`<span class="gray"> : counter : pgsql</span><br>Number of disk blocks read in this database
+- `pg_stat_database_conflicts`<span class="gray"> : counter : pgsql</span><br>Number of queries canceled due to conflicts with recovery in this database. (Conflicts occur only on standby servers; see pg_stat_database_conflicts for details.)
+- `pg_stat_database_conflicts_confl_bufferpin`<span class="gray"> : counter : pgsql</span><br>Number of queries in this database that have been canceled due to pinned buffers
+- `pg_stat_database_conflicts_confl_deadlock`<span class="gray"> : counter : pgsql</span><br>Number of queries in this database that have been canceled due to deadlocks
+- `pg_stat_database_conflicts_confl_lock`<span class="gray"> : counter : pgsql</span><br>Number of queries in this database that have been canceled due to lock timeouts
+- `pg_stat_database_conflicts_confl_snapshot`<span class="gray"> : counter : pgsql</span><br>Number of queries in this database that have been canceled due to old snapshots
+- `pg_stat_database_conflicts_confl_tablespace`<span class="gray"> : counter : pgsql</span><br>Number of queries in this database that have been canceled due to dropped tablespaces
+- `pg_stat_database_deadlocks`<span class="gray"> : counter : pgsql</span><br>Number of deadlocks detected in this database
+- `pg_stat_database_numbackends`<span class="gray"> : gauge : pgsql</span><br>Number of backends currently connected to this database. This is the only column in this view that returns a value reflecting current state; all other columns return the accumulated values since the last reset.
+- `pg_stat_database_stats_reset`<span class="gray"> : counter : pgsql</span><br>Time at which these statistics were last reset
+- `pg_stat_database_temp_bytes`<span class="gray"> : counter : pgsql</span><br>Total amount of data written to temporary files by queries in this database. All temporary files are counted, regardless of why the temporary file was created, and regardless of the log_temp_files setting.
+- `pg_stat_database_temp_files`<span class="gray"> : counter : pgsql</span><br>Number of temporary files created by queries in this database. All temporary files are counted, regardless of why the temporary file was created (e.g., sorting or hashing), and regardless of the log_temp_files setting.
+- `pg_stat_database_tup_deleted`<span class="gray"> : counter : pgsql</span><br>Number of rows deleted by queries in this database
+- `pg_stat_database_tup_fetched`<span class="gray"> : counter : pgsql</span><br>Number of rows fetched by queries in this database
+- `pg_stat_database_tup_inserted`<span class="gray"> : counter : pgsql</span><br>Number of rows inserted by queries in this database
+- `pg_stat_database_tup_returned`<span class="gray"> : counter : pgsql</span><br>Number of rows returned by queries in this database
+- `pg_stat_database_tup_updated`<span class="gray"> : counter : pgsql</span><br>Number of rows updated by queries in this database
+- `pg_stat_database_xact_commit`<span class="gray"> : counter : pgsql</span><br>Number of transactions in this database that have been committed
+- `pg_stat_database_xact_rollback`<span class="gray"> : counter : pgsql</span><br>Number of transactions in this database that have been rolled back
+- `pg_static`<span class="gray"> : untyped : pgsql</span><br>Version string as reported by postgres
+- `pg_up`<span class="gray"> : gauge : pgsql</span><br>Whether the last scrape of metrics from PostgreSQL was able to connect to the server (1 for yes, 0 for no).
+- `process_cpu_seconds_total`<span class="gray"> : counter : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total user and system CPU time spent in seconds.
+- `process_max_fds`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Maximum number of open file descriptors.
+- `process_open_fds`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Number of open file descriptors.
+- `process_resident_memory_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Resident memory size in bytes.
+- `process_start_time_seconds`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Start time of the process since unix epoch in seconds.
+- `process_virtual_memory_bytes`<span class="gray"> : gauge : github-proxy, gitserver, pgsql, query-runner, redis-cache, redis-store, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Virtual memory size in bytes.
+- `process_virtual_memory_max_bytes`<span class="gray"> : gauge : github-proxy, gitserver, query-runner, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Maximum amount of virtual memory available in bytes.
+- `promhttp_metric_handler_requests_in_flight`<span class="gray"> : gauge : github-proxy, gitserver, query-runner, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Current number of scrapes being served.
+- `promhttp_metric_handler_requests_total`<span class="gray"> : counter : github-proxy, gitserver, query-runner, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Total number of scrapes by HTTP status code.
+- `redis_aof_current_rewrite_duration_sec`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_aof_enabled`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_aof_last_rewrite_duration_sec`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_aof_rewrite_in_progress`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_aof_rewrite_scheduled`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_blocked_clients`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_client_biggest_input_buf`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_client_longest_output_list`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_cluster_enabled`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_command_call_duration_seconds_count`<span class="gray"> : gauge : redis-cache, redis-store</span><br>Total number of calls per command
+- `redis_command_call_duration_seconds_sum`<span class="gray"> : gauge : redis-cache, redis-store</span><br>Total amount of time in seconds spent per command
+- `redis_commands_processed_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_config_maxmemory`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_connected_clients`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_connected_slaves`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_connections_received_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_db_avg_ttl_seconds`<span class="gray"> : gauge : redis-cache, redis-store</span><br>Avg TTL in seconds
+- `redis_db_keys`<span class="gray"> : gauge : redis-cache, redis-store</span><br>Total number of keys by DB
+- `redis_db_keys_expiring`<span class="gray"> : gauge : redis-cache, redis-store</span><br>Total number of expiring keys by DB
+- `redis_evicted_keys_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_expired_keys_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_exporter_build_info`<span class="gray"> : gauge : redis-cache, redis-store</span><br>redis exporter build_info
+- `redis_exporter_last_scrape_duration_seconds`<span class="gray"> : gauge : redis-cache, redis-store</span><br>The last scrape duration.
+- `redis_exporter_last_scrape_error`<span class="gray"> : gauge : redis-cache, redis-store</span><br>The last scrape error status.
+- `redis_exporter_scrapes_total`<span class="gray"> : counter : redis-cache, redis-store</span><br>Current total redis scrapes.
+- `redis_instance_info`<span class="gray"> : gauge : redis-cache, redis-store</span><br>Information about the Redis instance
+- `redis_instantaneous_input_kbps`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_instantaneous_ops_per_sec`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_instantaneous_output_kbps`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_keyspace_hits_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_keyspace_misses_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_latest_fork_usec`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_loading_dump_file`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_master_repl_offset`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_memory_fragmentation_ratio`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_memory_max_bytes`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_memory_used_bytes`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_memory_used_lua_bytes`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_memory_used_peak_bytes`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_memory_used_rss_bytes`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_net_input_bytes_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_net_output_bytes_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_process_id`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_pubsub_channels`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_pubsub_patterns`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_rdb_changes_since_last_save`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_rdb_current_bgsave_duration_sec`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_rdb_last_bgsave_duration_sec`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_rejected_connections_total`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_replication_backlog_bytes`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_up`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_uptime_in_seconds`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_used_cpu_sys`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_used_cpu_sys_children`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_used_cpu_user`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `redis_used_cpu_user_children`<span class="gray"> : gauge : redis-cache, redis-store</span><br>
+- `searcher_service_request_total`<span class="gray"> : counter : searcher</span><br>Number of returned search requests.
+- `searcher_service_running`<span class="gray"> : gauge : searcher</span><br>Number of running search requests.
+- `searcher_store_cache_size_bytes`<span class="gray"> : gauge : searcher</span><br>The total size of items in the on disk cache.
+- `searcher_store_evictions`<span class="gray"> : counter : searcher</span><br>The total number of items evicted from the cache.
+- `searcher_store_fetch_failed`<span class="gray"> : counter : searcher</span><br>The total number of archive fetches that failed.
+- `searcher_store_fetch_queue_size`<span class="gray"> : gauge : searcher</span><br>The number of fetch jobs enqueued.
+- `searcher_store_fetching`<span class="gray"> : gauge : searcher</span><br>The number of fetches currently running.
+- `src_backend_client_request_duration_seconds`<span class="gray"> : histogram : sourcegraph-frontend</span><br>Total time spent on backend endpoints.
+- `src_backend_client_requests`<span class="gray"> : gauge : sourcegraph-frontend</span><br>Current number of requests running for a method.
+- `src_github_rate_limit_remaining`<span class="gray"> : gauge : github-proxy</span><br>Number of calls to GitHub&#39;s API remaining before hitting the rate limit.
+- `src_github_requests_total`<span class="gray"> : counter : repo-updater, sourcegraph-frontend</span><br>Total number of requests sent to the GitHub API.
+- `src_gitlab_requests_total`<span class="gray"> : counter : repo-updater</span><br>Total number of requests sent to the GitLab API.
+- `src_gitserver_client_deadline_exceeded`<span class="gray"> : counter : gitserver, repo-updater, searcher, sourcegraph-frontend, symbols</span><br>Times that Client.sendExec() returned context.DeadlineExceeded
+- `src_gitserver_clone_queue`<span class="gray"> : gauge : gitserver</span><br>number of repos waiting to be cloned.
+- `src_gitserver_disk_space_available`<span class="gray"> : gauge : gitserver</span><br>Amount of free space disk space on the repos mount.
+- `src_gitserver_echo_duration_seconds`<span class="gray"> : gauge : gitserver</span><br>Duration of executing the echo command.
+- `src_gitserver_exec_duration_seconds`<span class="gray"> : histogram : gitserver</span><br>gitserver.Command latencies in seconds.
+- `src_gitserver_exec_running`<span class="gray"> : gauge : gitserver</span><br>number of gitserver.Command running concurrently.
+- `src_gitserver_lsremote_queue`<span class="gray"> : gauge : gitserver</span><br>number of repos waiting to check existence on remote code host (git ls-remote).
+- `src_gitserver_repo_cloned`<span class="gray"> : counter : gitserver</span><br>number of successful git clones run
+- `src_gitserver_repos_recloned`<span class="gray"> : counter : gitserver</span><br>number of repos removed and recloned due to age
+- `src_gitserver_repos_removed`<span class="gray"> : counter : gitserver</span><br>number of repos removed during cleanup
+- `src_graphql_field_seconds`<span class="gray"> : histogram : sourcegraph-frontend</span><br>GraphQL field resolver latencies in seconds.
+- `src_graphql_links_for_repository_failed_total`<span class="gray"> : counter : sourcegraph-frontend</span><br>The total number of times the GraphQL field LinksForRepository failed.
+- `src_http_request_duration_seconds`<span class="gray"> : histogram : sourcegraph-frontend</span><br>The HTTP request latencies in seconds.
+- `src_http_requests_last_timestamp_unixtime`<span class="gray"> : gauge : sourcegraph-frontend</span><br>Last time a request finished for a http endpoint.
+- `src_legacy_def_landing_webapp`<span class="gray"> : counter : sourcegraph-frontend</span><br>Number of times a legacy def landing page has been served.
+- `src_legacy_repo_landing_webapp`<span class="gray"> : counter : sourcegraph-frontend</span><br>Number of times a legacy repo landing page has been served.
+- `src_pgsql_app_open_connections`<span class="gray"> : gauge : sourcegraph-frontend</span><br>Number of open connections to pgsql DB, as reported by pgsql.DB.Stats()
+- `src_projs_gitlab_cache_hit`<span class="gray"> : counter : repo-updater</span><br>Counts cache hits and misses for GitLab project metadata.
+- `src_registry_requests_error`<span class="gray"> : counter : sourcegraph-frontend</span><br>Number of failed (non-HTTP 200) requests to the HTTP registry API
+- `src_registry_requests_success`<span class="gray"> : counter : sourcegraph-frontend</span><br>Number of successful requests (HTTP 200) to the HTTP registry API
+- `src_repos_github_cache_hit`<span class="gray"> : counter : repo-updater</span><br>Counts cache hits and misses for GitHub repo metadata.
+- `src_repoupdater_purge_failed`<span class="gray"> : counter : repo-updater</span><br>Incremented each time we try and fail to remove a repository clone.
+- `src_repoupdater_purge_skipped`<span class="gray"> : counter : repo-updater</span><br>Incremented each time we skip a repository clone to remove.
+- `src_repoupdater_purge_success`<span class="gray"> : counter : repo-updater</span><br>Incremented each time we remove a repository clone.
+- `src_repoupdater_sched_auto_fetch`<span class="gray"> : counter : repo-updater</span><br>Incremented each time the scheduler updates a managed repository due to hitting a deadline.
+- `src_repoupdater_sched_error`<span class="gray"> : counter : repo-updater</span><br>Incremented each time we encounter an error updating a repository.
+- `src_repoupdater_sched_known_repos`<span class="gray"> : gauge : repo-updater</span><br>The number of repositories that are managed by the scheduler.
+- `src_repoupdater_sched_loops`<span class="gray"> : counter : repo-updater</span><br>Incremented each time the scheduler loops.
+- `src_repoupdater_sched_manual_fetch`<span class="gray"> : counter : repo-updater</span><br>Incremented each time the scheduler updates a repository due to user traffic.
+- `src_repoupdater_time_last_github_sync`<span class="gray"> : gauge : repo-updater</span><br>The last time a comprehensive GitHub sync finished
+- `src_repoupdater_time_last_gitlab_sync`<span class="gray"> : gauge : repo-updater</span><br>The last time a comprehensive GitLab sync finished
+- `src_repoupdater_time_last_gitolite_sync`<span class="gray"> : gauge : repo-updater</span><br>The last time a comprehensive Gitolite sync finished
+- `src_updatecheck_requests`<span class="gray"> : counter : sourcegraph-frontend</span><br>Number of requests to the update check handler.
+- `src_updatecheck_requests_has_update`<span class="gray"> : counter : sourcegraph-frontend</span><br>Number of requests to the update check handler where an update is available.
+- `symbols_parse_parse_failed`<span class="gray"> : counter : symbols</span><br>The total number of parse jobs that failed.
+- `symbols_parse_parse_queue_size`<span class="gray"> : gauge : symbols</span><br>The number of parse jobs enqueued.
+- `symbols_parse_parsing`<span class="gray"> : gauge : symbols</span><br>The number of parse jobs currently running.
+- `symbols_store_cache_size_bytes`<span class="gray"> : gauge : symbols</span><br>The total size of items in the on disk cache.
+- `symbols_store_evictions`<span class="gray"> : counter : symbols</span><br>The total number of items evicted from the cache.
+- `symbols_store_fetch_failed`<span class="gray"> : counter : symbols</span><br>The total number of archive fetches that failed.
+- `symbols_store_fetch_queue_size`<span class="gray"> : gauge : symbols</span><br>The number of fetch jobs enqueued.
+- `symbols_store_fetching`<span class="gray"> : gauge : symbols</span><br>The number of fetches currently running.
+- `vfsutil_vfs_cached_file_evict`<span class="gray"> : counter : sourcegraph-frontend</span><br>Total number of evictions to cachedFetch archives.
+- `vfsutil_vfs_github_fetch_failed_total`<span class="gray"> : counter : sourcegraph-frontend</span><br>Total number of fetches by GitHubRepoVFS that failed.
+- `vfsutil_vfs_github_fetch_total`<span class="gray"> : counter : sourcegraph-frontend</span><br>Total number of fetches by GitHubRepoVFS.
+- `vfsutil_vfs_gitserver_fetch_failed_total`<span class="gray"> : counter : sourcegraph-frontend</span><br>Total number of fetches to GitServer that failed.
+- `vfsutil_vfs_gitserver_fetch_total`<span class="gray"> : counter : sourcegraph-frontend</span><br>Total number of fetches to GitServer.
 
 <!-- END AUTOGENERATED CODE -->
