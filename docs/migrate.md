@@ -10,6 +10,12 @@ version you are upgrading to should be applied (unless otherwise noted).
 
 🚨 Please upgrade your Sourcegraph instance to 2.13.x before reading the following notes for migrating to Sourcegraph 3.0.
 
+### Configuration
+
+In Sourcegraph 3.0 all site configuration has been moved out of the `config-file.ConfigMap.yaml` and into the PostgreSQL database. An automatic migration will occur when running Sourcegraph 3.0 which will take the contents of your existing `config-file` and migrate them to the database.
+
+After running 3.0, you should visit the configuration page (`/site-admin/configuration`) and [the management console](https://docs.sourcegraph.com/admin/management_console) and ensure that your configuration is as expected. In some rare cases, automatic migration may not be able to properly carry over some settings and you may need to reconfigure them.
+
 ### `sourcegraph-frontend` service type 
 
 The type of the `sourcegraph-frontend` service ([base/frontend/sourcegraph-frontend.Service.yaml](../base/frontend/sourcegraph-frontend.Service.yaml)) has changed
