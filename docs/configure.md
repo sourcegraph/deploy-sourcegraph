@@ -204,15 +204,7 @@ If you exposed your Sourcegraph instance via an ingress controller as described 
    cat $FE | yj | jq --arg host ${EXTERNAL_URL} '.spec.tls += {hosts: [$host], secretName: "sourcegraph-tls"}' | jy -o $FE
    ```
 
-1. Change your `externalURL` in the site configuration stored in `base/config-file.ConfigMap.yaml`.
-
-   ```json
-   {
-     "externalURL": "https://example.sourcegraph.com" // Must begin with "https"; replace with the public IP or hostname of your machine
-   }
-   ```
-
-1. Deploy the changes by following the [instructions to update to the site configuration](#update-site-configuration).
+1. Change your `externalURL` in [the management console](https://docs.sourcegraph.com/admin/management_console) to e.g. `https://example.sourcegraph.com`:
 
 **WARNING:** Do NOT commit the actual TLS cert and key files to your fork (unless your fork is
 private **and** you are okay with storing secrets in it).
