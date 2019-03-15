@@ -160,37 +160,10 @@ Sourcegraph should now be accessible at `$EXTERNAL_ADDR:30080`, where `$EXTERNAL
 
 ## Update site configuration
 
-The site configuration is stored inside a [ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#add-configmap-data-to-a-volume), which is mounted inside every deployment that needs it. You can change the site configuration by editing
-[base/config-file.ConfigMap.yaml](../base/config-file.ConfigMap.yaml).
+Sourcegraph's application configuration is stored in the PostgreSQL database. For editing this configuration you may use the web UI and management console, respectively. Please refer to the following documentation:
 
-Updates to the site configuration are [propagated to the relevant services](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#mounted-configmaps-are-updated-automatically) in about 1 minute. ([Future Kubernetes versions will decrease this latency.](https://github.com/kubernetes/kubernetes/pull/64752))
-
-For the impatient, site configuration changes can be applied immediately by changing the name of the ConfigMap. `kubectl apply`ing these changes will force the relevant pods to restart immediately with the new config:
-
-1. Change the name of the ConfigMap in all deployments.
-
-   The following convenience script changes the name of the site configuration's ConfigMap (and all references to it) by appending the current date and time. This script should be run
-   at the root of your `deploy-sourcegraph-$VERSION` folder.
-
-   ```bash
-   #!/bin/bash
-
-   # e.g. 2018-08-15t23-42-08z
-   CONFIG_DATE=$(date -u +"%Y-%m-%dt%H-%M-%Sz")
-
-   # update all references to the site config's ConfigMap
-   # from: 'config-file.*' , to:' config-file-$CONFIG_DATE'
-   find . -name "*yaml" -exec sed -i.sedibak -e "s/name: config-file.*/name: config-file-$CONFIG_DATE/g" {} +
-
-   # delete sed's backup files
-   find . -name "*.sedibak" -delete
-   ```
-
-2. Apply the new configuration to your Kubernetes cluster.
-
-   ```bash
-   ./kubectl-apply-all.sh
-   ```
+- [Site configuration](https://docs.sourcegraph.com/admin/config/site_config)
+- [Critical configuration](https://docs.sourcegraph.com/admin/config/critical_config) (external URL, auth, etc.)
 
 ## Configure TLS/SSL
 
