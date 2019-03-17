@@ -25,8 +25,16 @@ spec:
         app: repo-updater
     spec:
       containers:
-      - env:
-        image: sourcegraph/repo-updater:3.1.2@sha256:22728d048ef2eef0ee5b244fdf2c0dc7314267d426ebc63629e0f0ebbe88136e
+      - image: sourcegraph/repo-updater:3.1.2@sha256:22728d048ef2eef0ee5b244fdf2c0dc7314267d426ebc63629e0f0ebbe88136e
+        env:
+        - name: PGHOST
+          value: pgsql
+        - name: PGPORT
+          value: "5432"
+        - name: PGSSLMODE
+          value: disable
+        - name: PGUSER
+          value: sg
         terminationMessagePolicy: FallbackToLogsOnError
         name: repo-updater
         ports:
