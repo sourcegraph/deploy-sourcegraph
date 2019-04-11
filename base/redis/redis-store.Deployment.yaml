@@ -25,11 +25,12 @@ spec:
     spec:
       containers:
       - env:
-        image: sourcegraph/redis-store:18-10-28_e45f6d82@sha256:1fe101e1f04a8e267fda85c342cd3b974ab4a9e47718b864752f14f1da51579c
+        image: sourcegraph/redis-store:19-04-11_ef9225c3@sha256:4fbb50eb15e6f4d8db3303cd0eaced8e06d6abc28fce270e29bb778c431ea090
+        terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 30
           tcpSocket:
-            port: redis
+            port: redis                       
         name: redis
         ports:
         - containerPort: 6379
