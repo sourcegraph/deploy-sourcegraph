@@ -211,7 +211,8 @@ spec:
       serviceAccountName: nginx-ingress-serviceaccount
       containers:
         - name: nginx-ingress-controller
-          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.22.0@sha256:47ef793dc8dfcbf73c9dee4abfb87afa3aa8554c35461635f6539c6cc5073b2c
+          image: quay.io/kubernetes-ingress-controller/nginx-ingress-controller:0.24.1@sha256:76861d167e4e3db18f2672fd3435396aaa898ddf4d1128375d7c93b91c59f87f
+          terminationMessagePolicy: FallbackToLogsOnError
           args:
             - /nginx-ingress-controller
             - --configmap=$(POD_NAMESPACE)/nginx-configuration
@@ -251,7 +252,7 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 10
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 10
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -260,6 +261,6 @@ spec:
               scheme: HTTP
             periodSeconds: 10
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 10
 
 ---

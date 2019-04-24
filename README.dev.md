@@ -20,16 +20,44 @@ Wait for buildkite to pass and for your changes to be approved, then merge and c
 
 Test what is currently checked in to master by [installing](docs/install.md) Sourcegraph on a fresh cluster.
 
-### Provision a new cluster
+### Provision a cluster and install Sourcegraph
+
+#### Using the sourcegraph/deploy-k8s-helper tool
+
+Clone https://github.com/sourcegraph/deploy-k8s-helper to your machine and follow the [README](https://github.com/sourcegraph/deploy-k8s-helper/blob/master/README.md) to set up all the prerequisistes. 
+
+##### Do smoke tests for `master` branch
+
+1. Ensure that the `deploySourcegraphRoot` value in your stack configuration (see https://github.com/sourcegraph/deploy-k8s-helper/blob/master/README.md) is pointing to your deploy-sourcegraph checkout (ex: `pulumi config set deploySourcegraphRoot /Users/ggilmore/dev/go/src/github.com/sourcegraph/deploy-sourcegraph`)
+1. In your deploy-sourcegraph checkout, make sure that you're on  the latest `master`
+1. Run `yarn up` in your https://github.com/sourcegraph/deploy-k8s-helper checkout 
+1. It'll take a few minutes for the cluster to be provisioned and for sourcegraph to be installed. Pulumi will show you the progresss that it's making, and will tell you when it's done. 
+1. Use the instructions in [configure.md](docs/configure.md) to:
+   1. Add a repository (e.g. [sourcegraph/sourcegraph](https://github.com/sourcegraph/sourcegraph))
+   1. Enable a language extension (e.g. [Go](https://sourcegraph.com/extensions/sourcegraph/lang-go)), and test that code intelligence is working on the above repository
+   1. Do a few test searches
+1. When you're done, run `yarn destroy` to tear the cluster down. This can take ~10 minutes.
+
+##### Check the upgrade path from the previous release to `master`
+
+1. In your deploy-sourcegraph checkout, checkout the commit that contains the configuration for the previous release (e.g. the commit that has `2.11.x` images if you're currently trying to release `2.12.x`, etc.)
+1. Run `yarn up` in your https://github.com/sourcegraph/deploy-k8s-helper checkout 
+1. Do [the same smoke tests that you did above](#Do-smoke-tests-for-master-branch)
+1. In your deploy-sourcegraph checkout, checkout the latest `master` commit again and run `yarn up` to deploy the new images. Check to see that [the same smoke tests](#Do-smoke-tests-for-master-branch) pass after the upgrade process. 
+1. When you're done, run `yarn destroy` to tear the cluster down.
+
+#### Manual instructions
+
+##### Provision a new cluster
 
 1.  Create a cluster unique name that is identifiable to you (e.g `ggilmore-test`) in the [Sourcegraph Auxiliary GCP Project](https://console.cloud.google.com/kubernetes/list?project=sourcegraph-server&organizationId=1006954638239).
-    - You can create pool that has `3` nodes, each with `8` vCPUs and `30` GB memory (for a total of `24` vCPUs and `90` GB memory).
+    - You can create a pool that has `4` nodes, each with `8` vCPUs and `30` GB memory (for a total of `32` vCPUs and `120` GB memory).
     - See this screenshot, but note that the UI could have changed: ![](https://imgur.com/RuCyGX2.png)
 1.  It’ll take a few minutes for it to be provisioned. You’ll see a green checkmark when it is done.
 1.  Click on the `connect` button next to your cluster, it’ll give you a command to copy+paste in your terminal.
 1.  Run the command in your terminal. Once it finishes, run `kubectl config current-context`. It should tell you that it’s set up to talk to the cluster that you just created.
 
-### Do smoke tests for `master` branch
+##### Do smoke tests for `master` branch
 
 1. Deploy the latest `master` to your new cluster by running through the quickstart steps in [docs/install.md](docs/install.md)
    - You'll need to create a GCP Storage Class named `sourcegraph` with the same `zone` that you created your cluster in (see ["Configure a storage class"](docs/configure.md#Configure-a-storage-class))
@@ -39,7 +67,7 @@ Test what is currently checked in to master by [installing](docs/install.md) Sou
    1. Enable a language extension (e.g. [Go](https://sourcegraph.com/extensions/sourcegraph/lang-go)), and test that code intelligence is working on the above repository
    1. Do a couple test searches
 
-### Check the upgrade path from the previous release to `master`
+##### Check the upgrade path from the previous release to `master`
 
 1. Tear down the cluster that you created above by deleting it through from the [Sourcegraph Auxiliary GCP Project](https://console.cloud.google.com/kubernetes/list?project=sourcegraph-server&organizationId=1006954638239).
 1. Checkout the commit that contains the configuration for the previous release (e.g. the commit has `2.11.x` images if you're currently trying to release `2.12.x`, etc.)
