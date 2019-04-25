@@ -8,7 +8,7 @@ metadata:
   name: sourcegraph-frontend
 spec:
   minReadySeconds: 10
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -46,7 +46,7 @@ spec:
         - name: PGUSER
           value: sg
         - name: SRC_GIT_SERVERS
-          value: gitserver-0.gitserver:3178
+          value: gitserver-0.gitserver:3178 gitserver-1.gitserver:3178 gitserver-2.gitserver:3178 gitserver-3.gitserver:3178 gitserver-4.gitserver:3178
         # POD_NAME is used by CACHE_DIR
         - name: POD_NAME
           valueFrom:
@@ -80,8 +80,8 @@ spec:
           name: http-internal
         resources:
           limits:
-            cpu: "2"
-            memory: 4G
+            cpu: "4"
+            memory: 8G
           requests:
             cpu: "2"
             memory: 2G
