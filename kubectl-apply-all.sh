@@ -7,4 +7,5 @@
 #   * Whenever the configuration for any resource has been updated
 
 # Apply the base Soucegraph deployment 
+kubectl config set-context $(kubectl config current-context) --namespace=tooling
 kubectl apply --prune -l deploy=sourcegraph -f base --recursive

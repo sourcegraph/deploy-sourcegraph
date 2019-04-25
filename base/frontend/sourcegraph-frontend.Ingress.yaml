@@ -2,30 +2,23 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   annotations:
-    kubernetes.io/ingress.class: "nginx"
-    # We can upload large files (extensions)
-    nginx.ingress.kubernetes.io/proxy-body-size: "150m"
-    # See
-    # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/
-    # for more nginx annotations.
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-west-2:355207333203:certificate/bb034c55-673a-480c-bfe2-736b3c9d24f1
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/tags: Environment=stage,Team=tooling
+    kubernetes.io/ingress.class: alb
+  name: sourcegraph-frontend
+  namespace: tooling
   labels:
     app: sourcegraph-frontend
     deploy: sourcegraph
   name: sourcegraph-frontend
 spec:
-  # See the customization guide (../../../docs/configure.md) for information
-  # about configuring TLS
-  # tls:
-  # - hosts:
-  #   - example.sourcegraph.com
-  #   secretName: sourcegraph-tls
   rules:
-  - http:
+  - host: sourcegraph.segment.build
+    http:
       paths:
       - path: /
         backend:
           serviceName: sourcegraph-frontend
           servicePort: 30080
-    # Set a host if you have multiple ingresses. This installs a default
-    # handler.
-    # host: sourcegraph.example.com
