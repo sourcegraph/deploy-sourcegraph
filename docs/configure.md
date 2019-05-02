@@ -285,17 +285,7 @@ your fork is private **and** you are okay with storing secrets in it).
 Code intelligence is provided through [Sourcegraph extensions](https://docs.sourcegraph.com/extensions). These language extensions communicate with language servers that are deployed inside your Sourcegraph cluster. See the README.md for each language for configuration information: 
 
 - Go: [configure/lang/go/README.md](../configure/lang/go/README.md)
-- JavaScript/TypeScript: (../configure/lang/go)
-
-### Prequisites
-
-1. TLS/SSL is required for secure communication with the language server. Once you have completed ["Configure TLS/SSL"](#configure-tlsssl) 
-Refer to the READMEs for each language for instructions about how to deploy and configure them:
-
-- [Go](https://sourcegraph.com/extensions/sourcegraph/lang-go)
-- [JavaScript/TypeScript](https://sourcegraph.com/extensions/sourcegraph/lang-typescript)
-- [Python](https://sourcegraph.com/extensions/sourcegraph/python)
-- ... check the [extension registry](https://sourcegraph.com/extensions) for more (e.g. [Java](https://sourcegraph.com/extensions?query=java)) or [create a new extension](https://docs.sourcegraph.com/extensions/authoring)
+- JavaScript/TypeScript: [configure/lang/typescipt/README.md](../configure/lang/typescript/README.md)
 
 ## Increase memory or CPU limits
 
