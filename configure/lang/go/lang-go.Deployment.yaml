@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Go code intelligence provided by xlang-go, but supporting TLS and
+      WebSockets.
+  labels:
+    deploy: lang-go
+  name: lang-go
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: lang-go
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: lang-go
+    spec:
+      containers:
+      - args:
+        - go-langserver
+        - -mode=websocket
+        - -addr=:7777
+        - -usebuildserver
+        - -usebinarypkgcache=false
+        - -cachedir=$(CACHE_DIR)
+        - -freeosmemory=false
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        image: sourcegraph/lang-go:insiders@sha256:8178238cb956676c990ad910a6c677293dca7e2660d9c72eeb6eed1836e62023
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: lsp
+          timeoutSeconds: 5
+        name: lang-go
+        ports:
+        - containerPort: 7777
+          name: lsp
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          tcpSocket:
+            port: 7777
+        terminationMessagePolicy: FallbackToLogsOnError
+        resources:
+          limits:
+            cpu: "4"
+            memory: 8G
+          requests:
+            cpu: "1"
+            memory: 2G
+        volumeMounts:
+        - mountPath: /mnt/cache
+          name: cache-ssd
+      volumes:
+      - hostPath:
+          path: /mnt/disks/ssd0/pod-tmp
+        name: cache-ssd
