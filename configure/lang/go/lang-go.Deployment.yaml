@@ -58,15 +58,15 @@ spec:
         terminationMessagePolicy: FallbackToLogsOnError
         resources:
           limits:
+            # TODO@ggilmore: Are these figures reasonable?
             cpu: "4"
-            memory: 8G
+            memory: 8Gi
           requests:
             cpu: "1"
-            memory: 2G
+            memory: 2Gi
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
       volumes:
-      - hostPath:
-          path: /mnt/disks/ssd0/pod-tmp
+      - emptyDir: {}
         name: cache-ssd

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: npm-proxy
+    deploy: lang-typescript
+  name: npm-proxy
+spec:
+  selector:
+    matchLabels:
+      disk: npm-proxy
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: sourcegraph
