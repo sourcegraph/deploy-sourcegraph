@@ -1,6 +1,6 @@
 # lang-go
 
-This folder contains the deployment manifests for the [Go language extension](https://sourcegraph.com/extensions/sourcegraph/lang-go)]. 
+This folder contains the deployment manifests for the [Go language extension](https://sourcegraph.com/extensions/sourcegraph/lang-go). 
 
 ## Installation instructions
 
@@ -8,20 +8,20 @@ This folder contains the deployment manifests for the [Go language extension](ht
 
 TLS/SSL is required for secure communication with the language server. Once you have completed ["Configure TLS/SSL"](../../../docs/configure.md#configure-tlsssl) in [docs/configure.md](../../../docs/configure.md#configure-tlsssl), change the `sourcegraph.example.com` domain in [configure/lang/go/lang-go.Deployment.yaml](lang-go.Deployment.yaml) to the real domain name that you are using for your Sourcegraph instance.
 
-    ```diff
-    spec:
-        tls:
-        - hosts:
-        # 🚨 TLS is required for secure communication with the language server. 
-        # See the customization guide (../../../docs/configure.md) for information
-        # about configuring TLS
-    -     - sourcegraph.example.com
-    +     - your.real.domain.com
-        secretName: sourcegraph-tls
-        rules:
-    -    - host: sourcegraph.example.com
-    +    + your.real.domain.com
-    ```
+```diff
+spec:
+    tls:
+    - hosts:
+    # 🚨 TLS is required for secure communication with the language server. 
+    # See the customization guide (../../../docs/configure.md) for information
+    # about configuring TLS
+-     - sourcegraph.example.com
++     - your.real.domain.com
+    secretName: sourcegraph-tls
+    rules:
+-    - host: sourcegraph.example.com
++    + your.real.domain.com
+```
 
 ### HTTP basic authentication
 
