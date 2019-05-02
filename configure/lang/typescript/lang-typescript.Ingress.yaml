@@ -23,17 +23,16 @@ metadata:
 spec:
     tls:
     - hosts:
-      # 🚨 Replace 'typescript.example.com' with the hostname that you want the go language server to use
-      - typescript.example.com
-      # This assumes lang-typescript-tls exists and the SSL 
-      # certificate contains a CN for 'typescript.example.com'
-      secretName: lang-typescript-tls
+      # 🚨 TLS is required for secure communication with the language server. 
+      # See the customization guide (../../../docs/configure.md) for information
+      # about configuring TLS
+      - sourcegraph.example.com
+      secretName: sourcegraph-tls
     rules:
-     # 🚨 Replace 'typescript.example.com' with the hostname that you want the go language server to use
-    - host: typescript.example.com
+    - host: sourcegraph.example.com
       http:
         paths:
-        - path: /
+        - path: /typescript
           backend:
             serviceName: lang-typescript
             servicePort: 8080 

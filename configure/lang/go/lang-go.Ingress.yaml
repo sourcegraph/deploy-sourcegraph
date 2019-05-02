@@ -23,17 +23,16 @@ metadata:
 spec:
     tls:
     - hosts:
-      # 🚨 Replace 'go.example.com' with the hostname that you want the go language server to use
-      - go.example.com
-      # This assumes lang-go-tls exists and the SSL 
-      # certificate contains a CN for 'go.example.com'
-      secretName: lang-go-tls
+      # 🚨 TLS is required for secure communication with the language server. 
+      # See the customization guide (../../../docs/configure.md) for information
+      # about configuring TLS
+      - sourcegraph.example.com
+      secretName: sourcegraph-tls
     rules:
-     # 🚨 Replace 'go.example.com' with the hostname that you want the go language server to use
-    - host: go.example.com
+    - host: sourcegraph.example.com
       http:
         paths:
-        - path: /
+        - path: /go
           backend:
             serviceName: lang-go
             servicePort: 7777 
