@@ -285,7 +285,7 @@ your fork is private **and** you are okay with storing secrets in it).
 Code intelligence is provided through [Sourcegraph extensions](https://docs.sourcegraph.com/extensions). These language extensions communicate with language servers that are deployed inside your Sourcegraph cluster. See the README.md for each language for configuration information: 
 
 - Go: [configure/lang/go/README.md](../configure/lang/go/README.md)
-- JavaScript/TypeScript: [configure/lang/typescipt/README.md](../configure/lang/typescript/README.md)
+- JavaScript/TypeScript: [configure/lang/typescript/README.md](../configure/lang/typescript/README.md)
 
 ## Increase memory or CPU limits
 
