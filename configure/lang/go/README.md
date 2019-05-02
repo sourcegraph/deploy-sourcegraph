@@ -38,7 +38,7 @@ _These instructions are derived from https://kubernetes.github.io/ingress-nginx/
     Adding password for user langserveruser
     ```
 
-    **WARNING:** Do NOT commit the actual TLS cert and key files to your fork (unless your fork is
+    **WARNING:** Do NOT commit the actual `auth` password file to your fork (unless your fork is
     private **and** you are okay with storing secrets in it).
 
 1. Create a secret named `langserver-auth` from the `auth` file that you just created
