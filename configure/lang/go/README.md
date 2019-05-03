@@ -57,7 +57,7 @@ _These instructions are derived from https://kubernetes.github.io/ingress-nginx/
 1. Add the following fields to your Sourcegraph global settings (`$PASSWORD` is that password that you created above, and `$DOMAIN_NAME` is the domain name that you are using for your Sourcegraph instance):
 
     ```js
-    "go.serverUrl": "ws://langserveruser:$PASSWORD@$DOMAIN_NAME/go",
+    "go.serverUrl": "wss://langserveruser:$PASSWORD@$DOMAIN_NAME/go",
     "go.sourcegraphUrl": "http://sourcegraph-frontend:30080",
     ```
 
