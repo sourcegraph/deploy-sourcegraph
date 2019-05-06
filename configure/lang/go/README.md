@@ -67,7 +67,7 @@ _These instructions are derived from https://kubernetes.github.io/ingress-nginx/
 1. Add the `kubectl` command that applies the Go language server configuration to [kubectl-apply-all.sh](../../../kubectl-apply-all.sh)
 
     ```console
-    echo kubectl apply --prune -l deploy=lang-go -f configure/lang-go --recursive >> kubectl-apply-all.sh
+    echo kubectl apply --prune -l deploy=lang-go -f configure/lang/go --recursive >> kubectl-apply-all.sh
     ```
 
 1. Apply your changes to the cluster
