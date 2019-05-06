@@ -8,19 +8,20 @@ This folder contains the deployment manifests for the [Javascript/Typescript lan
 
 TLS/SSL is required for secure communication with the language server. Once you have completed ["Configure TLS/SSL"](../../../docs/configure.md#configure-tlsssl) in [docs/configure.md](../../../docs/configure.md#configure-tlsssl), change the `sourcegraph.example.com` domain in [configure/lang/typescript/lang-typescript.Ingress.yaml](lang-typescript.Ingress.yaml) to the real domain name that you are using for your Sourcegraph instance.
 
-```diff
+```yaml
 spec:
     tls:
     - hosts:
     # 🚨 TLS is required for secure communication with the language server. 
     # See the customization guide (../../../docs/configure.md) for information
     # about configuring TLS
--     - sourcegraph.example.com
-+     - your.real.domain.com
+    #
+    # Make sure to replace 'sourcegraph.example.com' with the real domain that you are
+    # using for your Sourcegraph instance.
+      - sourcegraph.example.com
     secretName: sourcegraph-tls
     rules:
--    - host: sourcegraph.example.com
-+    + your.real.domain.com
+     - host: sourcegraph.example.com
 ```
 
 ### HTTP basic authentication
