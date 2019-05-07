@@ -27,15 +27,15 @@ spec:
       # See the customization guide (../../../docs/configure.md) for information
       # about configuring TLS
       # 
-      # Make sure to replace 'sourcegraph.example.com' with the real domain that you are
-      # using for your Sourcegraph instance.
-      - sourcegraph.example.com
-      secretName: sourcegraph-tls
+      # Make sure to replace 'typescript.sourcegraph.example.com' with the real domain that you are
+      # using for the Javascript/Typescript language server.
+      - typescript.sourcegraph.example.com
+      secretName: typescript-tls
     rules:
-    - host: sourcegraph.example.com
+    - host: typescript.sourcegraph.example.com
       http:
         paths:
-        - path: /typescript
+        - path: /
           backend:
             serviceName: lang-typescript
             servicePort: 8080 

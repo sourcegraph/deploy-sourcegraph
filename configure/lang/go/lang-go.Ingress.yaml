@@ -27,15 +27,15 @@ spec:
       # See the customization guide (../../../docs/configure.md) for information
       # about configuring TLS
       #
-      # Make sure to replace 'sourcegraph.example.com' with the real domain that you are
-      # using for your Sourcegraph instance.
-      - sourcegraph.example.com
+      # Make sure to replace 'go.sourcegraph.example.com' with the real domain that you are
+      # using for the Go language server.
+      - go.sourcegraph.example.com
       secretName: sourcegraph-tls
     rules:
-    - host: sourcegraph.example.com
+    - host: go.sourcegraph.example.com
       http:
         paths:
-        - path: /go
+        - path: /
           backend:
             serviceName: lang-go
             servicePort: 7777 
