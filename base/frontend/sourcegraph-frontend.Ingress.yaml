@@ -17,15 +17,13 @@ spec:
   # about configuring TLS
   # tls:
   # - hosts:
-  #   - example.sourcegraph.com
+  #   - sourcegraph.example.com
   #   secretName: sourcegraph-tls
   rules:
-  - http:
+  - host: sourcegraph.example.com
+    http:
       paths:
       - path: /
         backend:
           serviceName: sourcegraph-frontend
           servicePort: 30080
-    # Set a host if you have multiple ingresses. This installs a default
-    # handler.
-    # host: sourcegraph.example.com

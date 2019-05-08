@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: WebSocket language server for JavaScript and TypeScript (used for
+      live requests).
+    prometheus.io/port: '6060'
+    prometheus.io/scrape: 'true'
+  labels:
+    app: lang-typescript
+    deploy: lang-typescript
+  name: lang-typescript
+spec:
+  minReadySeconds: 5
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lang-typescript
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: lang-typescript
+    spec:
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /home/node/cache/$(POD_NAME)
+        image: sourcegraph/lang-typescript:insiders@sha256:577c88751addc71563bc24d1b1be6c821247bcf7b5616f8ae6296260edfc4cb4
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          initialDelaySeconds: 10
+          tcpSocket:
+            port: wss
+          timeoutSeconds: 5
+        name: lang-typescript
+        ports:
+        - containerPort: 8080
+          name: wss
+          protocol: TCP
+        - containerPort: 6060
+          name: debug
+          protocol: TCP
+        readinessProbe:
+          tcpSocket:
+            port: wss
+        terminationMessagePolicy: FallbackToLogsOnError
+        resources:
+          limits:
+            cpu: "4"
+            memory: 5Gi
+          requests:
+            cpu: "1"
+            memory: 2Gi
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /yarn-config
+          name: yarn-config
+        - mountPath: /home/node/cache
+          name: cache-ssd
+      securityContext: {}
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: yarn-config
+        name: yarn-config
+      - emptyDir: {}
+        name: cache-ssd
