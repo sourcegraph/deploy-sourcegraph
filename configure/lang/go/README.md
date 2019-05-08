@@ -47,7 +47,7 @@ private **and** you are okay with storing secrets in it).
 
 HTTP basic authentication is used to prevent unauthorized access to the language server. At a high level, you'll create a secret then put it in both [configure/lang/go/lang-go.Ingress.yaml](lang-go.Ingress.yaml) and in your Sourcegraph global settings so that logged-in users are authenticated when their browser makes requests to the Go language server.
 
-**WARNING:** 🚨 If your basic auth credentials are exposed, anyone with that credential now has unauthorized access to the language server and the code it operates on. Using an auth proxy, VPN, or firewall would provide more security. More information about this alternative methods will come at a later date. 🚨 
+**WARNING:** 🚨 If your basic auth credentials are exposed, anyone with that credential now has unauthorized access to the language server and the code it operates on. Using an auth proxy, VPN, or firewall would provide more security. More information about these alternative methods will come at a later date. 🚨 
 
 _These instructions are derived from https://kubernetes.github.io/ingress-nginx/examples/auth/basic/_
 
