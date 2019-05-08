@@ -60,8 +60,7 @@ _These instructions are derived from https://kubernetes.github.io/ingress-nginx/
     Adding password for user langserveruser
     ```
 
-    **WARNING:** Do NOT commit the actual `auth` password file to your fork (unless your fork is
-    private **and** you are okay with storing secrets in it).
+    **WARNING:** Do NOT commit the actual `auth` password file to your fork (unless your fork is private **and** you are okay with storing secrets in it).
 
 1. Create a secret named `langserver-auth` from the `auth` file that you just created
 
@@ -96,3 +95,19 @@ _These instructions are derived from https://kubernetes.github.io/ingress-nginx/
     ```console
     ./kubectl-apply-all.sh
     ```
+
+## Resource requests/limits
+
+By default, the Go language server uses a large amount of resources so that it's capable of handling large repositories like https://github.com/kubernetes/kubernetes/.
+
+```yaml
+resources:
+    limits:
+        cpu: "8"
+        memory: 12Gi
+    requests:
+        cpu: "1"
+        memory: 11Gi
+```
+
+Feel free to lower these resource requests if you aren't adding large Go repositories to your Sourcegraph instance.
