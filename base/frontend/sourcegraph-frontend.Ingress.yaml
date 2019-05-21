@@ -20,10 +20,12 @@ spec:
   #   - sourcegraph.example.com
   #   secretName: sourcegraph-tls
   rules:
-  - host: sourcegraph.example.com
-    http:
+  - http:
       paths:
       - path: /
         backend:
           serviceName: sourcegraph-frontend
           servicePort: 30080
+    # If you're using TLS/SSL, uncommenent the following line and replace 'sourcegraph.example.com' with the real
+    # domain that you want to use for your Sourcegraph instance.
+    # host: sourcegraph.example.com
