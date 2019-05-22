@@ -70,17 +70,8 @@ There are a few approaches, but using an ingress controller is recommended.
 
 For production environments, we recommend using the [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/).
 
-As part of our base configuration we install an ingress for [sourcegraph-frontend](../base/frontend/sourcegraph-frontend.Ingress.yaml). 
-
-In [base/frontend/sourcegraph-frontend.Ingress.yaml](../base/frontend/sourcegraph-frontend.Ingress.yaml), you'll want swap the default `sourcegraph.example.com` host to the real domain name that you wish to use to connect to your Sourcegraph instance:
-
-```diff
-spec:
-  rules:
--  - host: sourcegraph.example.com
-+  - host: your.real.domain.com
-```
-
+As part of our base configuration we install an ingress for [sourcegraph-frontend](../base/frontend/sourcegraph-frontend.Ingress.yaml). It installs rules for the default ingress, see comments to restrict it to a specific host.
+ 
 In addition to the sourcegraph-frontend ingress, you'll need to install the NGINX ingress controller (ingress-nginx). Follow the instructions at https://kubernetes.github.io/ingress-nginx/deploy/ to create the ingress controller. Add the files to [configure/ingress-nginx](../configure/ingress-nginx), including an [install.sh](configure/ingress-nginx/install.sh) file which applies the relevant manifests. We include sample generic-cloud manifests as part of this repository, but please follow the official instructions for your cloud provider.
 
 Add the [configure/ingress-nginx/install.sh](configure/ingress-nginx/install.sh) command to [create-new-cluster.sh](../create-new-cluster.sh) and commit the change:
@@ -200,19 +191,18 @@ If you exposed your Sourcegraph instance via an ingress controller as described 
    # base/frontend/sourcegraph-frontend.Ingress.yaml
    tls:
      - hosts:
-         # Replace 'sourcegraph.example.com' with the real domain name that you set up in 
-         # the "Configure network access" section.
+         #  Replace 'sourcegraph.example.com' with the real domain that you want to use for your Sourcegraph instance.
          - sourcegraph.example.com
        secretName: sourcegraph-tls
-   ```
-
-   Convenience script:
-
-   ```bash
-   # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
-   EXTERNAL_URL=sourcegraph.example.com
-   FE=base/frontend/sourcegraph-frontend.Ingress.yaml
-   cat $FE | yj | jq --arg host ${EXTERNAL_URL} '.spec.tls += {hosts: [$host], secretName: "sourcegraph-tls"}' | jy -o $FE
+   rules:
+     - http:
+         paths:
+         - path: /
+           backend:
+             serviceName: sourcegraph-frontend
+             servicePort: 30080
+       # Replace 'sourcegraph.example.com' with the real domain that you want to use for your Sourcegraph instance.
+       host: sourcegraph.example.com
    ```
 
 1. Change your `externalURL` in [the management console](https://docs.sourcegraph.com/admin/management_console) to e.g. `https://sourcegraph.example.com`:
