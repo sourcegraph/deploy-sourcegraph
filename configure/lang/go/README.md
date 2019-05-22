@@ -4,11 +4,11 @@ This folder contains the deployment manifests for the [Go language extension](ht
 
 ## Installation instructions
 
-### Setup TLS/SSL 
+### Setup TLS/SSL (Highly recommended, optional)
 
 TLS/SSL is required for secure communication with the language server. Once you have completed ["Configure TLS/SSL"](../../../docs/configure.md#configure-tlsssl) in [docs/configure.md](../../../docs/configure.md#configure-tlsssl), for your overall Sourcegraph instance, you'll need to configure TLS/SSL for the Go language server as well.  
 
-The Go language server needs it's own domain (e.g. `go.sourcegraph.example.com`), and an SSL certificate/key for that domain.
+The Go language server needs its own domain (e.g. `go.sourcegraph.example.com`), and an SSL certificate/key for that domain.
 
 1. Create a [TLS secret](https://kubernetes.io/docs/concepts/configuration/secret/) that contains your TLS certificate and private key for the Go language server.
 
@@ -43,7 +43,7 @@ The Go language server needs it's own domain (e.g. `go.sourcegraph.example.com`)
 **WARNING:** Do NOT commit the actual TLS cert and key files to your fork (unless your fork is
 private **and** you are okay with storing secrets in it).
 
-### HTTP basic authentication
+### HTTP basic authentication (Highly recommended, optional)
 
 HTTP basic authentication is used to prevent unauthorized access to the language server. At a high level, you'll create a secret then put it in both [configure/lang/go/lang-go.Ingress.yaml](lang-go.Ingress.yaml) and in your Sourcegraph global settings so that logged-in users are authenticated when their browser makes requests to the Go language server.
 
@@ -75,13 +75,6 @@ _These instructions are derived from https://kubernetes.github.io/ingress-nginx/
    echo kubectl create secret generic langserver-auth --from-file=auth >> create-new-cluster.sh
    ```
 
-1. Add the following fields to your Sourcegraph global settings (`$PASSWORD` is that password that you created above, and `$GO_DOMAIN_NAME` is the domain name that you are using for your Go language server instance):
-
-    ```js
-    "go.serverUrl": "wss://langserveruser:$PASSWORD@$GO_DOMAIN_NAME/",
-    "go.sourcegraphUrl": "http://sourcegraph-frontend:30080",
-    ```
-
 ### Apply the Go language server configuration to the cluster
 
 1. Add the `kubectl` command that applies the Go language server configuration to [kubectl-apply-all.sh](../../../kubectl-apply-all.sh)
@@ -95,6 +88,35 @@ _These instructions are derived from https://kubernetes.github.io/ingress-nginx/
     ```console
     ./kubectl-apply-all.sh
     ```
+
+### Configure Sourcegraph to use the Go language server
+
+Add the following fields to your Sourcegraph global settings (`$PASSWORD` is the HTTP basic auth password that you created above, and `$GO_DOMAIN_NAME` is the domain name that you are using for your Go language server instance):
+
+```js
+"go.serverUrl": "wss://langserveruser:$PASSWORD@$GO_DOMAIN_NAME/",
+"go.sourcegraphUrl": "http://sourcegraph-frontend:30080",
+```
+
+If you haven't setup SSL/TLS and HTTP basic authentication yet `go.serverUrl` should look like this:
+
+```js
+"go.serverUrl": "ws://$GO_DOMAIN_NAME"
+```
+
+Note that `wss` has been changed to `ws`.
+
+If you choose not to expose the language server to the internet yet, you need to forward a local port to the language server so that your browser can connect to it:
+
+```console
+kubectl port-forward svc/lang-go 9876:7777
+```
+
+Then your `go.serverUrl` would look like this:
+
+```js
+"go.serverUrl": "ws://localhost:9876"
+```
 
 ## Resource requests/limits
 
