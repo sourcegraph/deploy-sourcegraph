@@ -38,7 +38,7 @@ Less frequently used commands:
    "Message": "0/3 nodes are available: 1 Insufficient memory, 3 Insufficient cpu.",
   ```
 
-  This indicates that no available nodes meet the requirements specified for the corresponding nodes.
+  This means that your cluster is under provisioned (i.e. has too few nodes, or not enough CPU and memory).
   If you're using Google Cloud Platform, note that the default node type is `n1-standard-1`, a machine
   with only one CPU, and that some components request a 2-CPU node. When creating a cluster, use
   `--machine-type=n1-standard-16`.
