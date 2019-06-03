@@ -495,6 +495,6 @@ If using RBAC is not an option, then you will not want to apply `*.Role.yaml` an
 
 Sourcegraph's Kubernetes deployment [requires an Enterprise license key](https://about.sourcegraph.com/pricing).
 
-1. Create an account on or sign in to sourcegraph.com, and go to https://sourcegraph.com/users/subscriptions/new to obtain a license key.
+1. Create an account on or sign in to sourcegraph.com, and go to https://sourcegraph.com/subscriptions/new to obtain a license key.
 
 1. Once you have a license key, add it to your configuration by setting it [in the management console](https://docs.sourcegraph.com/admin/management_console).
