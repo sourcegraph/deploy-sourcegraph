@@ -4,11 +4,23 @@ This folder contains the deployment manifests for the [Go language extension](ht
 
 ## Installation instructions
 
-### Setup TLS/SSL (Highly recommended, optional)
+There are two methods for securely deploying the Go language server: 
+
+1. HTTP Basic Authentication (default)
+
+1. HTTP Authentication Proxy
+
+### HTTP basic authentication (default)
+
+HTTP basic authenication can be used to prevent unauthorized access to the language server. At a high level, you'll create an authentication secret that will be put in both [configure/lang/go/lang-go.Ingress.yaml](lang-go.Ingress.yaml) and on your Sourcegraph global settings. This allows users that are logged in to the Sourcegraph instance to be authenticated when their browser makes requests to the Go lanugage server.  
+
+**WARNING:** 🚨 If your basic auth credentials are exposed, anyone with that credential now has unauthorized access to the language server and the code it operates on. Using an auth proxy, VPN, or firewall would provide more security. 🚨 
+
+#### Setup TLS/SSL (Highly recommended, optional) 
 
 TLS/SSL is required for secure communication with the language server. Once you have completed ["Configure TLS/SSL"](../../../docs/configure.md#configure-tlsssl) in [docs/configure.md](../../../docs/configure.md#configure-tlsssl), for your overall Sourcegraph instance, you'll need to configure TLS/SSL for the Go language server as well.  
 
-The Go language server needs its own domain (e.g. `go.sourcegraph.example.com`), and an SSL certificate/key for that domain.
+With the HTTP basic auth deployment method, the Go language server **needs its own domain** (e.g. `go.sourcegraph.example.com`), and an **SSL certificate/key for that domain**.
 
 1. Create a [TLS secret](https://kubernetes.io/docs/concepts/configuration/secret/) that contains your TLS certificate and private key for the Go language server.
 
@@ -22,7 +34,7 @@ The Go language server needs its own domain (e.g. `go.sourcegraph.example.com`),
    echo kubectl create secret tls go-tls --key $PATH_TO_KEY --cert $PATH_TO_CERT >> create-new-cluster.sh
    ```
 
-1. Add the above TLS configuration to [configure/lang/go/lang-go.Ingress.yaml](lang-go.Ingress.yaml), making sure to use the real domain name that you are using for the Go language server.
+1. Add the above TLS configuration to [configure/lang/go/lang-go.Ingress.yaml](lang-go.Ingress.yaml), **making sure to use the real domain name that you are using for the Go language server**.
 
     ```yaml
     spec:
@@ -42,6 +54,81 @@ The Go language server needs its own domain (e.g. `go.sourcegraph.example.com`),
 
 **WARNING:** Do NOT commit the actual TLS cert and key files to your fork (unless your fork is
 private **and** you are okay with storing secrets in it).
+
+
+#### Create the HTTP basic auth secret 
+
+_These instructions are derived from https://kubernetes.github.io/ingress-nginx/examples/auth/basic/_
+
+1. Create an `.htpasswd` file in the current directory with one entry:
+
+    ```console
+    > htpasswd -c auth langserveruser 
+    New password:
+    Re-type new password:
+    Adding password for user langserveruser
+    ```
+
+    **WARNING:** Do NOT commit the actual `auth` password file to your fork (unless your fork is private **and** you are okay with storing secrets in it).
+
+1. Create a secret named `langserver-auth` from the `auth` file that you just created
+
+    ```console
+    > kubectl create secret generic langserver-auth --from-file=auth
+    secret "basic-auth" created
+    ```
+
+   Update [create-new-cluster.sh](../../../create-new-cluster.sh) with the previous command.
+
+   ```console
+   echo kubectl create secret generic langserver-auth --from-file=auth >> create-new-cluster.sh
+   ```
+
+1. Add the following basic auth annotations to [configure/lang/go/lang-go.Ingress.yaml](lang-go.Ingress.yaml)
+
+    ```yaml
+    metadata:
+        annotations:
+            # HTTP basic auth prevents unauthorized access to the language server.
+            # See https://kubernetes.github.io/ingress-nginx/examples/auth/basic/ for more information.
+            nginx.ingress.kubernetes.io/auth-type: basic
+            nginx.ingress.kubernetes.io/auth-realm: 'Basic authentication is required to access the language server'
+
+            # Name of the Kubernetes secret that contains the user/password definitions.
+            # 🚨 You must create the 'langserver-auth' secret with 'kubectl create secret generic langserver-auth ...'
+            nginx.ingress.kubernetes.io/auth-secret: langserver-auth
+    ```
+
+### HTTP Authentication Proxy
+
+If your Sourcegraph instance is wrapped in an authentication proxy (see https://docs.sourcegraph.com/admin/auth#http-authentication-proxies), then this same proxy can be used to secure the Go language server. At a high level, you'll configure the Go language server to use the same TLS/SSL configuration as the main Sourcegraph application and rely on your auth proxy to prevent unauthorized access to the language server. 
+
+#### Remove all HTTP basic auth annotations
+
+The default [configure/lang/go/lang-go.Ingress.yaml](lang-go.Ingress.yaml) contains HTTP basic auth annotations that we should remove / comment out since we aren't using that deployment method: 
+
+```diff 
+metadata:
+    annotations:
+        kubernetes.io/ingress.class: "nginx"
+
+-        # HTTP basic auth prevents unauthorized access to the language server.
+-        # See https://kubernetes.github.io/ingress-nginx/examples/auth/basic/ for more information.
+-        nginx.ingress.kubernetes.io/auth-type: basic
+-        nginx.ingress.kubernetes.io/auth-realm: 'Basic authentication is required to access the language server'
+-
+-        # Name of the Kubernetes secret that contains the user/password definitions.
+-        # 🚨 You must create the 'langserver-auth' secret with 'kubectl create secret generic langserver-auth ...'
+-        nginx.ingress.kubernetes.io/auth-secret: langserver-auth
+
+        # See
+        # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/
+        # for more nginx annotations.
+spec:
+```
+
+#### Configure [configure/lang/go/lang-go.Ingress.yaml](lang-go.Ingress.yaml) to use the same TLS/SSL configuration as [base/frontend/sourcegraph-frontend.Ingress.yaml](../../../base/frontend/sourcegraph-frontend.Ingress.yaml)
+1. 
 
 ### HTTP basic authentication (Highly recommended, optional)
 
