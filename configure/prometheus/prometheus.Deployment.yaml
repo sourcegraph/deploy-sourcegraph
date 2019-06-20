@@ -30,7 +30,7 @@ spec:
         - -storage.local.path=/prometheus/data
         - -web.console.libraries=/etc/prometheus/console_libraries
         - -web.console.templates=/etc/prometheus/consoles
-        image: sourcegraph/prometheus:v1.4.1@sha256:1a02878ac9a0f532a68673bda93d406b21786706446c42a40cb3ed3e867278c0
+        image: docker.io/sourcegraph/prometheus:v1.4.1@sha256:1a02878ac9a0f532a68673bda93d406b21786706446c42a40cb3ed3e867278c0
         terminationMessagePolicy: FallbackToLogsOnError
         name: prometheus
         ports:
@@ -51,7 +51,7 @@ spec:
       - args:
         - --volume-dir=/etc/prometheus
         - --webhook-url=http://localhost:9090/-/reload
-        image: sourcegraph/configmap-reload:v0.1@sha256:dc40dccdaa22cd28a77fc2a53a765c59d315c6828b2bbe51a40416954b6d3705
+        image: docker.io/sourcegraph/configmap-reload:v0.1@sha256:dc40dccdaa22cd28a77fc2a53a765c59d315c6828b2bbe51a40416954b6d3705
         name: configmap-reload
         resources:
           limits:
