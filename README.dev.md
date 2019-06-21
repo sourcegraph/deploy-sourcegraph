@@ -1,8 +1,10 @@
-# Cutting a release
+# Sourcegraph Developer README
 
-## Make the desired changes to this repository
+## Cutting a release
 
-### Updating docker image tags
+### Make the desired changes to this repository
+
+#### Updating docker image tags
 
 - The vast majority of the time, [Renovate](https://renovatebot.com/docs/docker/) will open PRs in a timely manner.
 
@@ -12,21 +14,21 @@
 
   - Make sure to include the sha256 digest for each image, which [ensures that each image pull is immutable](https://renovatebot.com/docs/docker/#digest-pinning). Use `docker inspect --format='{{index .RepoDigests 0}}' $IMAGE` to get the digest.
 
-## Open a PR
+### Open a PR
 
 Wait for buildkite to pass and for your changes to be approved, then merge and check out `master`.
 
-## Smoke test
+### Smoke test
 
 Test what is currently checked in to master by [installing](docs/install.md) Sourcegraph on a fresh cluster.
 
-### Provision a cluster and install Sourcegraph
+#### Provision a cluster and install Sourcegraph
 
-#### Using the sourcegraph/deploy-k8s-helper tool
+##### Using the sourcegraph/deploy-k8s-helper tool
 
 Clone https://github.com/sourcegraph/deploy-k8s-helper to your machine and follow the [README](https://github.com/sourcegraph/deploy-k8s-helper/blob/master/README.md) to set up all the prerequisistes. 
 
-##### Do smoke tests for `master` branch
+###### Do smoke tests for `master` branch
 
 1. Ensure that the `deploySourcegraphRoot` value in your stack configuration (see https://github.com/sourcegraph/deploy-k8s-helper/blob/master/README.md) is pointing to your deploy-sourcegraph checkout (ex: `pulumi config set deploySourcegraphRoot /Users/ggilmore/dev/go/src/github.com/sourcegraph/deploy-sourcegraph`)
 1. In your deploy-sourcegraph checkout, make sure that you're on  the latest `master`
@@ -38,7 +40,7 @@ Clone https://github.com/sourcegraph/deploy-k8s-helper to your machine and follo
    1. Do a few test searches
 1. When you're done, run `yarn destroy` to tear the cluster down. This can take ~10 minutes.
 
-##### Check the upgrade path from the previous release to `master`
+###### Check the upgrade path from the previous release to `master`
 
 1. In your deploy-sourcegraph checkout, checkout the commit that contains the configuration for the previous release (e.g. the commit that has `2.11.x` images if you're currently trying to release `2.12.x`, etc.)
 1. Run `yarn up` in your https://github.com/sourcegraph/deploy-k8s-helper checkout 
@@ -46,9 +48,9 @@ Clone https://github.com/sourcegraph/deploy-k8s-helper to your machine and follo
 1. In your deploy-sourcegraph checkout, checkout the latest `master` commit again and run `yarn up` to deploy the new images. Check to see that [the same smoke tests](#Do-smoke-tests-for-master-branch) pass after the upgrade process. 
 1. When you're done, run `yarn destroy` to tear the cluster down.
 
-#### Manual instructions
+##### Manual instructions
 
-##### Provision a new cluster
+###### Provision a new cluster
 
 1.  Create a cluster unique name that is identifiable to you (e.g `ggilmore-test`) in the [Sourcegraph Auxiliary GCP Project](https://console.cloud.google.com/kubernetes/list?project=sourcegraph-server&organizationId=1006954638239).
     - You can create a pool that has `4` nodes, each with `8` vCPUs and `30` GB memory (for a total of `32` vCPUs and `120` GB memory).
@@ -57,7 +59,7 @@ Clone https://github.com/sourcegraph/deploy-k8s-helper to your machine and follo
 1.  Click on the `connect` button next to your cluster, it’ll give you a command to copy+paste in your terminal.
 1.  Run the command in your terminal. Once it finishes, run `kubectl config current-context`. It should tell you that it’s set up to talk to the cluster that you just created.
 
-##### Do smoke tests for `master` branch
+###### Do smoke tests for `master` branch
 
 1. Deploy the latest `master` to your new cluster by running through the quickstart steps in [docs/install.md](docs/install.md)
    - You'll need to create a GCP Storage Class named `sourcegraph` with the same `zone` that you created your cluster in (see ["Configure a storage class"](docs/configure.md#Configure-a-storage-class))
@@ -67,7 +69,7 @@ Clone https://github.com/sourcegraph/deploy-k8s-helper to your machine and follo
    1. Enable a language extension (e.g. [Go](https://sourcegraph.com/extensions/sourcegraph/lang-go)), and test that code intelligence is working on the above repository
    1. Do a couple test searches
 
-##### Check the upgrade path from the previous release to `master`
+###### Check the upgrade path from the previous release to `master`
 
 1. Tear down the cluster that you created above by deleting it through from the [Sourcegraph Auxiliary GCP Project](https://console.cloud.google.com/kubernetes/list?project=sourcegraph-server&organizationId=1006954638239).
 1. Checkout the commit that contains the configuration for the previous release (e.g. the commit has `2.11.x` images if you're currently trying to release `2.12.x`, etc.)
@@ -75,13 +77,13 @@ Clone https://github.com/sourcegraph/deploy-k8s-helper to your machine and follo
 1. Deploy the older commit to the new cluster, and do [the same smoke tests](#Do-smoke-tests-for-master-branch) with the older version.
 1. Checkout the latest `master`, deploy the newer images to the same cluster (without tearing it down in between) by running `./kubectl-apply-all.sh`, and check to see [that the smoke test](#Do-smoke-tests-for-master-branch) passes after the upgrade process.
 
-## Tag the release
+### Tag the release
 
 The version numbers for [sourcegraph/deploy-sourcegraph](https://github.com/sourcegraph/deploy-sourcegraph) largely follow [sourcegraph/sourcegraph](https://github.com/sourcegraph/sourcegraph)'s version numbers (i.e. `deploy-sourcegraph@v2.11.2` uses [sourcegraph/sourcegraph](https://github.com/sourcegraph/sourcegraph)'s `v2.11.2` image tags).
 
-### [sourcegraph/deploy-sourcegraph](https://github.com/sourcegraph/deploy-sourcegraph)'s branching strategy
+#### [sourcegraph/deploy-sourcegraph](https://github.com/sourcegraph/deploy-sourcegraph)'s branching strategy
 
-#### Cutting a new minor version (e.g. `v2.12.0`)
+##### Cutting a new minor version (e.g. `v2.12.0`)
 
 - Make a branch named `2.12` that stems from the current `master` branch and push it. `2.12` will be used as the base for all `v2.12.x` images, and future changes to the `v2.12.x` series will be cherry-picked onto it and tagged from there.
 
@@ -94,7 +96,7 @@ The version numbers for [sourcegraph/deploy-sourcegraph](https://github.com/sour
 
 - Follow [the tagging instructions below](#Create-a-git-tag-and-push-it-to-the-repository) to tag the `v2.12.0` release from the `2.12` branch.
 
-#### Cutting a new patch version (e.g. `v2.12.1`)
+##### Cutting a new patch version (e.g. `v2.12.1`)
 
 - Cherry-pick the relevant commits from `master` that update the image tags to `v2.12.1` onto the `2.12` branch (which should have been created as mentioned above).
 
@@ -107,7 +109,7 @@ The version numbers for [sourcegraph/deploy-sourcegraph](https://github.com/sour
 
 - Follow [the tagging instructions below](#Create-a-git-tag-and-push-it-to-the-repository) to tag the `v2.12.1` release from the `2.12` branch.
 
-#### Only updating Kubernetes manifests/docs
+##### Only updating Kubernetes manifests/docs
 
 _See [this commit](https://github.com/sourcegraph/deploy-sourcegraph/commit/1d1846f67c01ad2a81741cf95ee867405d3de3ab) as an example of a change that would fall into this category._
 
@@ -124,7 +126,7 @@ _See [this commit](https://github.com/sourcegraph/deploy-sourcegraph/commit/1d18
 
 - Follow [the tagging instructions below](#Create-a-git-tag-and-push-it-to-the-repository) to tag the `v2.12.0-2` release from the `2.12` branch.
 
-### Create a git tag and push it to the repository
+#### Create a git tag and push it to the repository
 
 ```bash
 VERSION = vX.Y.Z
@@ -137,6 +139,6 @@ git tag $VERSION
 git push origin $VERSION
 ```
 
-## Update the `latestReleaseKubernetesBuild` value in `sourcegraph/sourcegraph`
+### Update the `latestReleaseKubernetesBuild` value in `sourcegraph/sourcegraph`
 
 See https://sourcegraph.sgdev.org/github.com/sourcegraph/sourcegraph/-/blob/cmd/frontend/internal/app/pkg/updatecheck/handler.go#L29:5
