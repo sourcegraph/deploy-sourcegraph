@@ -142,3 +142,29 @@ git push origin $VERSION
 ### Update the `latestReleaseKubernetesBuild` value in `sourcegraph/sourcegraph`
 
 See https://sourcegraph.sgdev.org/github.com/sourcegraph/sourcegraph/-/blob/cmd/frontend/internal/app/pkg/updatecheck/handler.go#L29:5
+
+## Minikube
+
+You can use minikube to run Sourcegraph Cluster on your development machine. However, due to minikube requirements and reduced available resources we need to modify the resources to remove `resources` requests/limits and `storageClassNames`. Here is the shell commands you can use to spin up minikube:
+
+```shell
+find base -name '*Deployment.yaml' | while read i; do yj < $i | jq 'walk(if type == "object" then del(.resources) else . end)' | jy -o $i; done
+find base -name '*PersistentVolumeClaim.yaml' | while read i; do yj < $i | jq 'del(.spec.storageClassName)' | jy -o $i; done
+find base -name '*StatefulSet.yaml' | while read i; do yj < $i | jq 'del(.spec.volumeClaimTemplates[] | .spec.storageClassName) | del(.spec.template.spec.containers[] | .resources)' | jy -o $i; done
+minikube start
+kubectl create ns src
+kubens src
+./kubectl-apply-all.sh
+kubectl expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph
+kubectl expose deployment management-console --type=NodePort --name admin
+minikube service list
+```
+
+Additionally you may want to deploy a modified version of a service locally. Minikube allows us to directly connect to its docker instance, making it easy to use unpublished images from the sourcegraph repository:
+
+```shell
+eval $(minikube docker-env)
+IMAGE=repo-updater:dev ./cmd/repo-updater/build.sh
+kubectl edit deployment/repo-updater # set imagePullPolicy to Never
+kubectl set image deployment repo-updater '*=repo-updater:dev'
+```
