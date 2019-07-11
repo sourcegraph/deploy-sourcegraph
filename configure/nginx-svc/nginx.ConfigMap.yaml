@@ -19,6 +19,11 @@ data:
     http {
         server_tokens off;
 
+        # SAML redirect response headers are sometimes large
+        proxy_buffer_size     128k;
+        proxy_buffers         8 256k;
+        proxy_busy_buffers_size    256k;
+
         ssl_certificate     /etc/nginx/tls.crt;
         ssl_certificate_key /etc/nginx/tls.key;
         ssl_ciphers         EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH;
@@ -42,6 +47,11 @@ data:
                 proxy_set_header Host $http_host;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header X-Forwarded-Proto $scheme;
+
+                # SAML redirect response headers are sometimes large
+                proxy_buffer_size     128k;
+                proxy_buffers         8 256k;
+                proxy_busy_buffers_size    256k;
             }
         }
     }
