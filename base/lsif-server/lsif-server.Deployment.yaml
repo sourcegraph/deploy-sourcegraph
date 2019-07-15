@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: LSIF HTTP server for code intelligence.
+  labels:
+    deploy: sourcegraph
+  name: lsif-server
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: lsif-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: lsif-server
+    spec:
+      containers:
+      - env:
+        - name: LSIF_STORAGE_ROOT
+          value: /lsif-storage
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        image: index.docker.io/sourcegraph/lsif-server@sha256:a19bc9e24cc86fa2c9656f1fcff532a5dce07739b6dcfe2b2503ba170e0593ff
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: lsif-server
+        livenessProbe:
+          httpGet:
+            path: /ping
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ping
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 3186
+          name: http
+        resources:
+          limits:
+            cpu: "2"
+            memory: 2G
+          requests:
+            cpu: 500m
+            memory: 500M
+        volumeMounts:
+        - mountPath: /lsif-storage
+          name: lsif-storage
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: lsif-storage
+        emptyDir: {}
