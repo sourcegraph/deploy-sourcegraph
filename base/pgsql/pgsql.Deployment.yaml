@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - env:
-        image: sourcegraph/postgres-11.1:19-02-13_22d74790@sha256:10c2ff7a4da422cd75e022b51bef3a0c935f4b3ded335d9679a4f1202db605d2
+        image: index.docker.io/sourcegraph/postgres-11.4:19-07-15_63c77a05@sha256:21881633991e9548319fcf5b9e2777ddba6404b7d551dedde9e39e5b9287a982
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
           exec:
@@ -54,7 +54,7 @@ spec:
       - env:
         - name: DATA_SOURCE_NAME
           value: postgres://sg:@localhost:5432/?sslmode=disable
-        image: wrouesnel/postgres_exporter:v0.4.7@sha256:dd8051322ceb8995d3d7f116041a2116815e01e88232a90f635ebde8dcc4d3f4
+        image: wrouesnel/postgres_exporter:v0.5.0@sha256:63b99863928c2cd739f59e156a1994327987729af57b31c0f753c84db3e356ba
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
         resources:
