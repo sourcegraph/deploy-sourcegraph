@@ -27,14 +27,6 @@ spec:
       - args:
         - serve
         env:
-        # TODO(slimsag): After 3.0 (NOT 3.0-preview), we can remove this. It is
-        # left here now so that users upgrading to 3.0 will leave it here so
-        # that the DB will be populated with their old site config file
-        # (i.e. for migration). This means that for now we have two sources of
-        # truth for the 'default' cluster configuration: The config-map in this
-        # repository and the confdefaults.Cluster variable in our main repo.
-        - name: SOURCEGRAPH_CONFIG_FILE
-          value: /etc/sourcegraph/config.json
         - name: PGDATABASE
           value: sg
         - name: PGHOST
@@ -56,7 +48,7 @@ spec:
         # archives of repositories at a commit.
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: sourcegraph/frontend:3.3.1@sha256:6b8ead7b399b505722592a5bba7c9607d50df5c4c5a2bf37ee4aed9e1cfecc06
+        image: sourcegraph/frontend:3.5.0-rc.1@sha256:391c3bfb64faf6eb452b18a58ad63dd5464ae858497bf696d3d0eb99a3a26daf
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -86,17 +78,11 @@ spec:
             cpu: "2"
             memory: 2G
         volumeMounts:
-        - mountPath: /etc/sourcegraph
-          name: sg-config
         - mountPath: /mnt/cache
           name: cache-ssd
       securityContext:
         runAsUser: 0
       serviceAccountName: sourcegraph-frontend
       volumes:
-      - configMap:
-          defaultMode: 464
-          name: config-file
-        name: sg-config
       - emptyDir: {}
         name: cache-ssd

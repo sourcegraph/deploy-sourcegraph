@@ -71,7 +71,7 @@ There are a few approaches, but using an ingress controller is recommended.
 For production environments, we recommend using the [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/).
 
 As part of our base configuration we install an ingress for [sourcegraph-frontend](../base/frontend/sourcegraph-frontend.Ingress.yaml). It installs rules for the default ingress, see comments to restrict it to a specific host.
-
+ 
 In addition to the sourcegraph-frontend ingress, you'll need to install the NGINX ingress controller (ingress-nginx). Follow the instructions at https://kubernetes.github.io/ingress-nginx/deploy/ to create the ingress controller. Add the files to [configure/ingress-nginx](../configure/ingress-nginx), including an [install.sh](configure/ingress-nginx/install.sh) file which applies the relevant manifests. We include sample generic-cloud manifests as part of this repository, but please follow the official instructions for your cloud provider.
 
 Add the [configure/ingress-nginx/install.sh](configure/ingress-nginx/install.sh) command to [create-new-cluster.sh](../create-new-cluster.sh) and commit the change:
@@ -191,20 +191,21 @@ If you exposed your Sourcegraph instance via an ingress controller as described 
    # base/frontend/sourcegraph-frontend.Ingress.yaml
    tls:
      - hosts:
-         - example.sourcegraph.com
+         #  Replace 'sourcegraph.example.com' with the real domain that you want to use for your Sourcegraph instance.
+         - sourcegraph.example.com
        secretName: sourcegraph-tls
+   rules:
+     - http:
+         paths:
+         - path: /
+           backend:
+             serviceName: sourcegraph-frontend
+             servicePort: 30080
+       # Replace 'sourcegraph.example.com' with the real domain that you want to use for your Sourcegraph instance.
+       host: sourcegraph.example.com
    ```
 
-   Convenience script:
-
-   ```bash
-   # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
-   EXTERNAL_URL=example.sourcegraph.com
-   FE=base/frontend/sourcegraph-frontend.Ingress.yaml
-   cat $FE | yj | jq --arg host ${EXTERNAL_URL} '.spec.tls += {hosts: [$host], secretName: "sourcegraph-tls"}' | jy -o $FE
-   ```
-
-1. Change your `externalURL` in [the management console](https://docs.sourcegraph.com/admin/management_console) to e.g. `https://example.sourcegraph.com`:
+1. Change your `externalURL` in [the management console](https://docs.sourcegraph.com/admin/management_console) to e.g. `https://sourcegraph.example.com`:
 
 **WARNING:** Do NOT commit the actual TLS cert and key files to your fork (unless your fork is
 private **and** you are okay with storing secrets in it).
@@ -271,12 +272,10 @@ your fork is private **and** you are okay with storing secrets in it).
 
 ## Configure language servers
 
-Code intelligence is provided through [Sourcegraph extensions](https://docs.sourcegraph.com/extensions). Refer to the READMEs for each language for instructions about how to deploy and configure them:
+Code intelligence is provided through [Sourcegraph extensions](https://docs.sourcegraph.com/extensions). These language extensions communicate with language servers that are deployed inside your Sourcegraph cluster. See the README.md for each language for configuration information: 
 
-- [Go](https://sourcegraph.com/extensions/sourcegraph/lang-go)
-- [JavaScript/TypeScript](https://sourcegraph.com/extensions/sourcegraph/lang-typescript)
-- [Python](https://sourcegraph.com/extensions/sourcegraph/python)
-- ... check the [extension registry](https://sourcegraph.com/extensions) for more (e.g. [Java](https://sourcegraph.com/extensions?query=java)) or [create a new extension](https://docs.sourcegraph.com/extensions/authoring)
+- Go: [configure/lang/go/README.md](../configure/lang/go/README.md)
+- JavaScript/TypeScript: [configure/lang/typescript/README.md](../configure/lang/typescript/README.md)
 
 ## Increase memory or CPU limits
 
@@ -496,6 +495,6 @@ If using RBAC is not an option, then you will not want to apply `*.Role.yaml` an
 
 Sourcegraph's Kubernetes deployment [requires an Enterprise license key](https://about.sourcegraph.com/pricing).
 
-1. Create an account on or sign in to sourcegraph.com, and go to https://sourcegraph.com/users/subscriptions/new to obtain a license key.
+1. Create an account on or sign in to sourcegraph.com, and go to https://sourcegraph.com/subscriptions/new to obtain a license key.
 
 1. Once you have a license key, add it to your configuration by setting it [in the management console](https://docs.sourcegraph.com/admin/management_console).
