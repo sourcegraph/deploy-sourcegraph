@@ -44,12 +44,12 @@ email <mailto:support@sourcegraph.com> if you have concerns before updating to a
 
 ## Improving update reliability and latency with node selectors
 
-Some of the services that comprise Sourcegraph Data Center require more resources than others,
-especially if the default CPU or memory allocations have been overridden. During an update when many
-services restart, you may observe that the more resource-hungry pods (e.g., `gitserver`,
-`indexed-search`) fail to restart, because no single node has enough available CPU or memory to
-accommodate them. This may be especially true if the cluster is heterogeneous (i.e., not all nodes
-have the same amount of CPU/memory).
+Some of the services that comprise Sourcegraph require more resources than others, especially if the
+default CPU or memory allocations have been overridden. During an update when many services restart,
+you may observe that the more resource-hungry pods (e.g., `gitserver`, `indexed-search`) fail to
+restart, because no single node has enough available CPU or memory to accommodate them. This may be
+especially true if the cluster is heterogeneous (i.e., not all nodes have the same amount of
+CPU/memory).
 
 If this happens, do the following:
 
@@ -58,17 +58,16 @@ If this happens, do the following:
 - Run `watch kubectl get pods -o wide` and wait until the node has been drained. Run `kubectl get pods` to check that all pods except for the resource-hungry one(s) have been assigned to a node.
 - Run `kubectl uncordon $NODE` to enable the larger pod(s) to be scheduled on the drained node.
 
-Note that the need to run the above steps can be prevented altogether
-with
-[node selectors](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector),
-which tell Kubernetes to assign certain pods to specific nodes. See
-the [docs on enabling node selectors](scale.md#node-selector) for Sourcegraph Data Center.
+Note that the need to run the above steps can be prevented altogether with [node
+selectors](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector), which
+tell Kubernetes to assign certain pods to specific nodes. See the [docs on enabling node
+selectors](scale.md#node-selector) for Sourcegraph on Kubernetes.
 
 ## High-availability updates
 
-Sourcegraph Data Center is designed to be a high-availability (HA) service. Updates require zero downtime and employ
-health checks to test the health of newly updated components before switching live traffic over to them. HA-enabling
-features include the following:
+Sourcegraph is designed to be a high-availability (HA) service. Updates require zero downtime and
+employ health checks to test the health of newly updated components before switching live traffic
+over to them. HA-enabling features include the following:
 
 - Replication: nearly all of the critical services within Sourcegraph are replicated. If a single instance of a
   service fails, that instance is restarted and removed from operation until it comes online again.
@@ -88,8 +87,9 @@ the update step more complex, but it can still be done with the `sourcegraph-ser
 command:
 
 - Suppose cluster A is currently live, and cluster B is in standby. As a precondition, both should
-  be running the same version of Sourcegraph Data Center.
-- Upgrade `sourcegraph-server-gen` to the version of Sourcegraph Data Center currently running (`sourcegraph-server-gen update ${VERSION}`).
+  be running the same version of Sourcegraph.
+- Upgrade `sourcegraph-server-gen` to the version of Sourcegraph currently running
+  (`sourcegraph-server-gen update ${VERSION}`).
 - Snapshot A: Configure `kubectl` to access A and then run `sourcegraph-server-gen snapshot create`.
 - Restore A's snapshot to B: Configure `kubectl` to access B and then run `sourcegraph-server-gen snapshot restore` from the same directory as you ran it before.
 - Upgrade B to the new version.
@@ -98,8 +98,8 @@ command:
 - Switch traffic back to A. (A is now live again.)
 
 After the update, cluster A will be live, cluster B will be in standby, and both will be running the
-same new version of Sourcegraph Data Center. You may lose a few minutes of database updates while A
-is not live, but that is generally acceptable.
+same new version of Sourcegraph. You may lose a few minutes of database updates while A is not live,
+but that is generally acceptable.
 
 To keep the database on B current, you may periodically wish to sync A's database over to B
 (`sourcegraph-server-gen snapshot create` on A, `sourcegraph-server-gen snapshot restore` on B). It
