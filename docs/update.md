@@ -86,16 +86,30 @@ Some users may wish to opt for running two separate Sourcegraph clusters running
 the update step more complex, but it can still be done with the `sourcegraph-server-gen snapshot`
 command:
 
-- Suppose cluster A is currently live, and cluster B is in standby. As a precondition, both should
-  be running the same version of Sourcegraph.
-- Upgrade `sourcegraph-server-gen` to the version of Sourcegraph currently running
-  (`sourcegraph-server-gen update ${VERSION}`).
-- Snapshot A: Configure `kubectl` to access A and then run `sourcegraph-server-gen snapshot create`.
-- Restore A's snapshot to B: Configure `kubectl` to access B and then run `sourcegraph-server-gen snapshot restore` from the same directory as you ran it before.
-- Upgrade B to the new version.
-- Switch traffic over to B. (B is now live.)
-- Upgrade A to the new version.
-- Switch traffic back to A. (A is now live again.)
+- **Precondition:** Suppose cluster A is currently live, and cluster B is in standby. As a
+  precondition, both should be running the same version of Sourcegraph.
+- Upgrade `sourcegraph-server-gen` to version 3.0.1 (`sourcegraph-server-gen update`)
+- **Snapshot of A:** Configure `kubectl` to access cluster A and then run `sourcegraph-server-gen snapshot create`.
+- **Restore A's snapshot to B:**
+  - Configure `kubectl` to access B.
+  - Spin down `sourcegraph-frontend` replicas to 0. (This is important, because otherwise
+    `sourcegraph-frontend` may apply changes to the database that corrupt the snapshot restoration.)
+
+    ```
+    kubectl scale --replicas=0 deployment/sourcegraph-frontend
+    ```
+
+  - `sourcegraph-server-gen snapshot restore` from the same directory where you ran the snapshot creation earlier.
+  - Spin up `sourcegraph-frontend` replicas to what it was before:
+
+    ```
+    kubectl scale --replicas=$N deployment/sourcegraph-frontend
+    ```
+- **Upgrade cluster B** to the new Sourcegraph version. Perform some quick checks to verify it is
+  functioning.
+- **Switch traffic over to B.** (B is now live.)
+- **Upgrade cluster A** to the new Sourcegraph version.
+- **Switch traffic back to A.** (A is now live again.)
 
 After the update, cluster A will be live, cluster B will be in standby, and both will be running the
 same new version of Sourcegraph. You may lose a few minutes of database updates while A is not live,
