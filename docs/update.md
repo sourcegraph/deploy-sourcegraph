@@ -86,9 +86,10 @@ Some users may wish to opt for running two separate Sourcegraph clusters running
 the update step more complex, but it can still be done with the `sourcegraph-server-gen snapshot`
 command:
 
-- **Precondition:** Suppose cluster A is currently live, and cluster B is in standby. As a
-  precondition, both should be running the same version of Sourcegraph.
-- Upgrade `sourcegraph-server-gen` to version 3.0.1 (`sourcegraph-server-gen update`)
+- **Preconditions:**
+  - Suppose cluster A is currently live, and cluster B is in standby.
+  - Clusters A and B should be running the same version of Sourcegraph.
+  - Ensure `sourcegraph-server-gen` is ugpraded to version 3.0.1 (`sourcegraph-server-gen update`)
 - **Snapshot of A:** Configure `kubectl` to access cluster A and then run `sourcegraph-server-gen snapshot create`.
 - **Restore A's snapshot to B:**
   - Configure `kubectl` to access B.
