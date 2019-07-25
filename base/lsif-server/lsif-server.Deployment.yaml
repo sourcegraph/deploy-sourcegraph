@@ -2,17 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: Backend for symbols operations.
+    description: LSIF HTTP server for code intelligence.
   labels:
     deploy: sourcegraph
-  name: symbols
+  name: lsif-server
 spec:
   minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: symbols
+      app: lsif-server
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -21,52 +21,49 @@ spec:
   template:
     metadata:
       labels:
-        app: symbols
+        app: lsif-server
     spec:
       containers:
       - env:
-        - name: SYMBOLS_CACHE_SIZE_MB
-          value: "100000"
+        - name: LSIF_STORAGE_ROOT
+          value: /lsif-storage
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: CACHE_DIR
-          value: /mnt/cache/$(POD_NAME)
-        image: index.docker.io/sourcegraph/symbols:3.6.0@sha256:83d98a12e7aee505d91fd6b6b2f6cb26f774d433accd1ac997a757e98af03a42
+        image: index.docker.io/sourcegraph/lsif-server:3.6.0@sha256:5e6f119888595ad19cf6c000d71d20e58148b4dddb9837ad423185a21c1f147c
         terminationMessagePolicy: FallbackToLogsOnError
-        name: symbols
+        name: lsif-server
         livenessProbe:
           httpGet:
-            path: /healthz
+            path: /ping
             port: http
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
-            path: /healthz
+            path: /ping
             port: http
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
-        - containerPort: 3184
+        - containerPort: 3186
           name: http
-        - containerPort: 6060
-          name: debug
         resources:
           limits:
-            cpu: "1"
-            memory: 1G
+            cpu: "2"
+            memory: 2G
           requests:
             cpu: 500m
             memory: 500M
         volumeMounts:
-        - mountPath: /mnt/cache
-          name: cache-ssd
+        - mountPath: /lsif-storage
+          name: lsif-storage
       securityContext:
         runAsUser: 0
       volumes:
-      - emptyDir: {}
-        name: cache-ssd
+      - name: lsif-storage
+        persistentVolumeClaim:
+          claimName: lsif-server
