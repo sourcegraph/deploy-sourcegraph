@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    prometheus.io/scrape: "true"
+  labels:
+    app: replacer
+    deploy: sourcegraph
+  name: replacer
+spec:
+  ports:
+  - name: http
+    port: 3185
+    targetPort: http
+  - name: debug
+    port: 6060
+    targetPort: debug
+  selector:
+    app: replacer
+  type: ClusterIP

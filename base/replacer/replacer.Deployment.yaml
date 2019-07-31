@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Backend for replace operations.
+  labels:
+    deploy: sourcegraph
+  name: replacer
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: replacer
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: replacer
+  template:
+    metadata:
+      labels:
+        app: replacer
+    spec:
+      containers:
+      - env:
+        - name: REPLACER_CACHE_SIZE_MB
+          value: "100000"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        image: index.docker.io/sourcegraph/replacer:insiders@sha256:7c376f1983652dbb899ccb72709c01bb68bcefdad488cf3bae153b2d3f3bb9f7
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: replacer
+        ports:
+        - containerPort: 3185
+          name: http
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          failureThreshold: 1
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 1
+        resources:
+          limits:
+            cpu: "4"
+            memory: 500M
+          requests:
+            cpu: 500m
+            memory: 500M
+        volumeMounts:
+        - mountPath: /mnt/cache
+          name: cache-ssd
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - emptyDir: {}
+        name: cache-ssd

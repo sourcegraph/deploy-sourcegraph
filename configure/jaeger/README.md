@@ -38,6 +38,7 @@
         "query-runner/query-runner.Deployment.yaml"
         "repo-updater/repo-updater.Deployment.yaml"
         "searcher/searcher.Deployment.yaml"
+        "replacer/replacer.Deployment.yaml"
         "frontend/sourcegraph-frontend.Deployment.yaml"
         "symbols/symbols.Deployment.yaml"
         "gitserver/gitserver.StatefulSet.yaml"
