@@ -141,7 +141,8 @@ spec:
 -    - host: go.sourcegraph.example.com
       http:
         paths:
-        - path: /go
+-        - path: /
++        - path: /go
           backend:
             serviceName: lang-go
             servicePort: 7777 
