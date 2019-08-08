@@ -128,7 +128,24 @@ spec:
 ```
 
 #### Configure [configure/lang/go/lang-go.Ingress.yaml](lang-go.Ingress.yaml) to use the same TLS/SSL configuration as [base/frontend/sourcegraph-frontend.Ingress.yaml](../../../base/frontend/sourcegraph-frontend.Ingress.yaml)
-1. 
+
+By default, [configure/lang/go/lang-go.Ingress.yaml](lang-go.Ingress.yaml)'s `tls` configuration assumes that you'll be using a separate hostname and SSL certificate for the Go language server. When using an HTTP auth proxy,  [configure/lang/go/lang-go.Ingress.yaml](lang-go.Ingress.yaml)'s `tls` configuration **should be identical** to [base/frontend/sourcegraph-frontend.Ingress.yaml](../../../base/frontend/sourcegraph-frontend.Ingress.yaml)'s `tls` configuration (e.g. both should be using the same hostname and certificate).
+
+#### Configure [configure/lang/go/lang-go.Ingress.yaml](lang-go.Ingress.yaml) to use the same hostname as [base/frontend/sourcegraph-frontend.Ingress.yaml](../../../base/frontend/sourcegraph-frontend.Ingress.yaml)
+
+When using an HTTP authentication proxy, the Go language server will use the same domain as the main Sourcegraph application - just under a special route. (e.g. sourcegraph.example.com/go)
+
+```diff
+spec:
+    rules:
+-    - host: go.sourcegraph.example.com
+      http:
+        paths:
+        - path: /go
+          backend:
+            serviceName: lang-go
+            servicePort: 7777 
+```
 
 ### HTTP basic authentication (Highly recommended, optional)
 
