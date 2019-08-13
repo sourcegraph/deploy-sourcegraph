@@ -53,8 +53,8 @@ Follow the [EKS Getting Started guide](https://docs.aws.amazon.com/eks/latest/us
 
 | Users        | Instance type | Min nodes | Max nodes | Cost est.  | Attached Storage | Root Storage |
 | ------------ | ------------- | --------- | --------- | ---------- | ---------------- | ------------ |
-| 10-25        | m5.4xlarge    | 4         | 7         | $80-137/day | 500 GB           | 100 GB        |
-| 25-500       | m5.4xlarge   | 6         | 10         | $118-195/day | 500 GB           | 100 GB        |
+| 10-500        | m5.4xlarge    | 3         | 6         | $59-118/day | 500 GB           | 100 GB        |
+| 500-2000       | m5.4xlarge   | 6         | 10         | $118-195/day | 500 GB           | 100 GB        |
 
 
 </div>
