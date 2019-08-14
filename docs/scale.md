@@ -120,13 +120,14 @@ Kubernetes cluster, based on the number of users in your organization:
 
 <div class="table">
 
-| Users        | vCPUs | Memory | Attached Storage | Root Storage |
-| ------------ | ----- | ------ | ---------------- | ------------ |
-| 10-500       | 10    | 24 GB  | 500 GB           | 50 GB        |
-| 500-2,000    | 16    | 48 GB  | 500 GB           | 50 GB        |
-| 2,000-4,000  | 32    | 72 GB  | 900 GB           | 50 GB        |
-| 4,000-10,000 | 48    | 96 GB  | 900 GB           | 50 GB        |
-| 10,000+      | 64    | 200 GB | 900 GB           | 50 GB        |
+| Users        | vCPUs | Memory     | Attached Storage | Root Storage |
+| ------------ | ----- | ---------- | ---------------- | ------------ |
+| 10-25        | 16-24 | 64-96 GB   | 500 GB           | 50 GB        |
+| 25-500       | 20-32 | 80-128 GB  | 500 GB           | 50 GB        |
+| 500-2,000    | 24-32 | 96-128 GB  | 500 GB           | 50 GB        |
+| 2,000-4,000  | 32-40 | 128-160 GB | 900 GB           | 50 GB        |
+| 4,000-10,000 | 48-56 | 192-224 GB | 900 GB           | 50 GB        |
+| 10,000+      | 32-40 | 128-160 GB | 900 GB           | 50 GB        |
 
 </div>
 
