@@ -53,12 +53,9 @@ Follow the [EKS Getting Started guide](https://docs.aws.amazon.com/eks/latest/us
 
 | Users        | Instance type | Min nodes | Max nodes | Cost est.  | Attached Storage | Root Storage |
 | ------------ | ------------- | --------- | --------- | ---------- | ---------------- | ------------ |
-| 10-25        | t2.xlarge     | 4         | 6         | $18-27/day | 500 GB           | 50 GB        |
-| 25-500       | t2.xlarge     | 5         | 8         | $22-36/day | 500 GB           | 50 GB        |
-| 500-2,000    | t2.xlarge     | 6         | 8         | $27-36/day | 500 GB           | 50 GB        |
-| 2,000-4,000  | t2.xlarge     | 8         | 10        | $36-45/day | 900 GB           | 50 GB        |
-| 4,000-10,000 | t2.xlarge     | 12        | 14        | $53-62/day | 900 GB           | 50 GB        |
-| 10,000+      | t2.2xlarge    | 8         | 10        | $71-89/day | 900 GB           | 50 GB        |
+| 10-500        | m5.4xlarge    | 3         | 6         | $59-118/day | 500 GB           | 100 GB        |
+| 500-2000       | m5.4xlarge   | 6         | 10         | $118-195/day | 500 GB           | 100 GB        |
+
 
 </div>
 
