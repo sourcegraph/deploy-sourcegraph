@@ -24,7 +24,7 @@ $ ls /data/*_v16*.zoekt | wc -l
 12793
 
 # Delete the new format index files:
-$ sudo rm -rf /data/*_v15*.zoekt
+$ sudo rm -rf /data/*_v16*.zoekt
 ```
 
 Proceed with the downgrade to v3.6, then wait for reindexing to finish.
