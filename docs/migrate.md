@@ -4,6 +4,31 @@ This document records manual migrations that are necessary to apply when upgradi
 Sourcegraph versions. All manual migrations between the version you are upgrading from and the
 version you are upgrading to should be applied (unless otherwise noted).
 
+## 3.7.1 (downgrading)
+
+**If you upgrade to v3.7.1 and intend to downgrade back to v3.6 for any reason, please note that reindexing must occur and in the meantime search will effectively be unindexed and performance will suffer substantially.**
+
+**Instead of downgrading**, we suggest turning off indexed symbol search if you suffer issues: set `search.index.symbols.enabled` to `false` in your site configuration, then wait for reindexing to finish (approximately 6,000 repositories will be indexed per hour, you can check the status at e.g. https://sourcegraph.example.com/site-admin/repositories?filter=needs-index).
+
+If you must downgrade, prepare a window when you can do this with acceptable downtime. Expect roughly 1 hour per 6,000 repositories. Upon downgrade from v3.7.x to v3.6.x:
+
+1. Reindexing will begin generating index files in the format used by v3.6.
+2. The v3.7 index files will remain on disk (in the indexed-search pod / zoekt data directory). You may run out of disk space if you do not have enough spare space, so we advise manually deleting the new format files immediately before / after downgrading:
+
+```sh
+# Grab a shell:
+$ kubectl exec -it indexed-search --container zoekt-webserver -- /bin/sh
+
+# Confirm how many index files in the new format will be deleted:
+$ ls /data/*_v16*.zoekt | wc -l
+12793
+
+# Delete the new format index files:
+$ sudo rm -rf /data/*_v15*.zoekt
+```
+
+Proceed with the downgrade to v3.6, then wait for reindexing to finish.
+
 ## 3.0
 
 🚨 If you have not migrated off of helm yet, please refer to [docs/helm.migrate.md](helm.migrate.md) before reading the following notes for migrating to Sourcegraph 3.0.
