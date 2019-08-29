@@ -8,11 +8,7 @@ import (
 	"github.com/pulumi/pulumi/pkg/testing/integration"
 )
 
-var step1Name interface{}
-var step2Name interface{}
-var step3Name interface{}
-
-func TestAutonaming(t *testing.T) {
+func TestFreshDeployment(t *testing.T) {
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
 		Config: map[string]string{
 			"gcp:config:project":    "sourcegraph-dev",
