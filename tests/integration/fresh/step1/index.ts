@@ -33,7 +33,7 @@ const clusterAdmin = new k8s.rbac.v1.ClusterRoleBinding(
 )
 
 const storageClass = new k8s.storage.v1.StorageClass(
-    'sourcegraph-storage-class',                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+    'sourcegraph-storage-class',
     {
         metadata: {
             name: 'sourcegraph',
@@ -70,8 +70,10 @@ const ingressNginx = new k8s.yaml.ConfigGroup(
     { providers: { kubernetes: k8sProvider }, dependsOn: clusterAdmin }
 )
 
-export const ingressIPs = ingressNginx
+export const ingressIP = ingressNginx
     .getResource('v1/Service', 'ingress-nginx', 'ingress-nginx')
-    .apply(svc => svc.status).apply(status => status.loadBalancer.ingress.map(i => i.ip))
+    .apply(svc => svc.status)
+    .apply(status => status.loadBalancer.ingress.map(i => i.ip))
+    .apply(ips => (ips.length === 1 ? ips[0] : undefined))
 
 export * from './cluster'
