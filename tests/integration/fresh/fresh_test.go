@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"os"
 	"sort"
 	"testing"
 
@@ -13,15 +14,19 @@ import (
 )
 
 func TestFreshDeployment(t *testing.T) {
+
+	config, err := baseConfig()
+	if err != nil {
+		pFatalf(t, "unable to generate base pulumi configuration, err: %s", err)
+	}
+
 	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Config: map[string]string{
-			"gcp:config:project":    "sourcegraph-dev",
-			"gcp:config:zone":       "us-central1-a",
-			"deploySourcegraphRoot": "/Users/ggilmore/dev/go/src/github.com/sourcegraph/deploy",
-		},
-		Dir:                  "step1",
+		Dir: "step1",
+
+		Config:               config,
 		ExpectRefreshChanges: true,
 		Quick:                false,
+
 		ExtraRuntimeValidation: func(t *testing.T, stackInfo integration.RuntimeValidationStackInfo) {
 			v, ok := stackInfo.Outputs["ingressIP"]
 			if !ok {
@@ -43,6 +48,28 @@ func TestFreshDeployment(t *testing.T) {
 			}
 		},
 	})
+}
+
+func baseConfig() (map[string]string, error) {
+	config := map[string]string{}
+
+	for env, key := range map[string]string{
+		"TEST_GCP_PROJECT":        "gcp:config:project",
+		"TEST_GCP_ZONE":           "gcp:config:zone",
+		"TEST_GCP_USERNAME":       "gcpUsername",
+		"DEPLOY_SOURCEGRAPH_ROOT": "deploySourcegraphRoot",
+	} {
+		value, present := os.LookupEnv(env)
+		if !present {
+			if !present {
+				return nil, fmt.Errorf("%q not set", env)
+			}
+
+			config[key] = value
+		}
+	}
+
+	return config, nil
 }
 
 func PingURL(url string) error {

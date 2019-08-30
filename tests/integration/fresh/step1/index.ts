@@ -9,6 +9,7 @@ import { k8sProvider } from './cluster'
 const config = new pulumi.Config()
 
 const deploySourcegraphRoot = config.require('deploySourcegraphRoot')
+const gcpUsername = config.require('gcpUsername')
 
 const clusterAdmin = new k8s.rbac.v1.ClusterRoleBinding(
     'cluster-admin-role-binding',
@@ -25,7 +26,7 @@ const clusterAdmin = new k8s.rbac.v1.ClusterRoleBinding(
             {
                 apiGroup: 'rbac.authorization.k8s.io',
                 kind: 'User',
-                name: 'geoffrey@sourcegraph.com',
+                name: gcpUsername,
             },
         ],
     },

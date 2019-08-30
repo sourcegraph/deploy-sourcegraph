@@ -5,3 +5,10 @@ steps:
     command: .buildkite/verify-label.sh
   - label: ":k8s:"
     command: .buildkite/verify-rbac-labels.sh
+
+  - wait
+
+  - label: ":pulumi: :k8s:"
+    concurrency: 3
+    concurrency_group: deploy-sourcegraph/integration
+    command: .buildkite/integration-test.sh
