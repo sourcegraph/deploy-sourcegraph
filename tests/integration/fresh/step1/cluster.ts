@@ -2,7 +2,7 @@ import * as gcp from '@pulumi/gcp'
 import * as k8s from '@pulumi/kubernetes'
 import * as pulumi from '@pulumi/pulumi'
 
-import { dotCase } from 'change-case'
+import { paramCase } from 'change-case'
 
 const name = 'fresh-integration-test'
 
@@ -34,7 +34,7 @@ const cluster = new gcp.container.Cluster(name, {
         'cost-category': 'build',
         repository: 'deploy-sourcegraph',
         'integration-test': 'fresh',
-        creator: dotCase(buildCreator),
+        creator: paramCase(buildCreator),
     },
 })
 
