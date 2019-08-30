@@ -9,4 +9,4 @@ export TEST_GCP_PROJECT=sourcegraph-dev
 export TEST_GCP_ZONE=us-central1-a
 export TEST_GCP_USERNAME=buildkite@sourcegraph-dev.iam.gserviceaccount.com
 
-go test ./... -v -parallel -timeout 25m
+go test ./... -v -timeout 25m
