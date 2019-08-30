@@ -14,7 +14,6 @@ import (
 )
 
 func TestFreshDeployment(t *testing.T) {
-
 	config, err := baseConfig()
 	if err != nil {
 		pFatalf(t, "unable to generate base pulumi configuration, err: %s", err)
@@ -61,12 +60,10 @@ func baseConfig() (map[string]string, error) {
 	} {
 		value, present := os.LookupEnv(env)
 		if !present {
-			if !present {
-				return nil, fmt.Errorf("%q not set", env)
-			}
-
-			config[key] = value
+			return nil, fmt.Errorf("%q environment variable not set", env)
 		}
+
+		config[key] = value
 	}
 
 	return config, nil
