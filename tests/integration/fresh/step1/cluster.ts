@@ -10,12 +10,12 @@ const cluster = new gcp.container.Cluster(name, {
     location: gcp.config.zone,
     project: gcp.config.project,
 
-    initialNodeCount: 4,
+    initialNodeCount: 3,
 
     nodeConfig: {
         diskType: 'pd-ssd',
         localSsdCount: 1,
-        machineType: 'n1-standard-8',
+        machineType: 'n1-standard-16',
 
         oauthScopes: [
             'https://www.googleapis.com/auth/compute',
@@ -23,6 +23,10 @@ const cluster = new gcp.container.Cluster(name, {
             'https://www.googleapis.com/auth/logging.write',
             'https://www.googleapis.com/auth/monitoring',
         ],
+    },
+
+    resourceLabels: {
+        'cost-category': 'build',
     },
 })
 
