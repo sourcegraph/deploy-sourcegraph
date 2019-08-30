@@ -27,6 +27,8 @@ const cluster = new gcp.container.Cluster(name, {
 
     resourceLabels: {
         'cost-category': 'build',
+        'repository': 'https://github.com/sourcegraph/deploy-sourcegraph',
+        'integration-test': 'fresh'
     },
 })
 
