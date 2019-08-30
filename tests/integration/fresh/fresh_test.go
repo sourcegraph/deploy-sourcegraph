@@ -56,6 +56,7 @@ func baseConfig() (map[string]string, error) {
 		"TEST_GCP_PROJECT":        "gcp:config:project",
 		"TEST_GCP_ZONE":           "gcp:config:zone",
 		"TEST_GCP_USERNAME":       "gcpUsername",
+		"BUILD_CREATOR":           "buildCreator",
 		"DEPLOY_SOURCEGRAPH_ROOT": "deploySourcegraphRoot",
 	} {
 		value, present := os.LookupEnv(env)

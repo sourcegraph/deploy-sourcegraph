@@ -2,7 +2,12 @@ import * as gcp from '@pulumi/gcp'
 import * as k8s from '@pulumi/kubernetes'
 import * as pulumi from '@pulumi/pulumi'
 
+import { dotCase } from 'change-case'
+
 const name = 'fresh-integration-test'
+
+const config = new pulumi.Config()
+const buildCreator = config.require('buildCreator')
 
 const cluster = new gcp.container.Cluster(name, {
     description: 'Scratch cluster used for testing sourcegraph/deploy-sourcegraph',
@@ -27,8 +32,9 @@ const cluster = new gcp.container.Cluster(name, {
 
     resourceLabels: {
         'cost-category': 'build',
-        'repository': 'deploy-sourcegraph',
-        'integration-test': 'fresh'
+        repository: 'deploy-sourcegraph',
+        'integration-test': 'fresh',
+        creator: dotCase(buildCreator),
     },
 })
 
