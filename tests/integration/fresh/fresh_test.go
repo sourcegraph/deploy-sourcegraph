@@ -27,6 +27,7 @@ func TestFreshDeployment(t *testing.T) {
 		Config:               config,
 		ExpectRefreshChanges: true,
 		Quick:                false,
+		Verbose:              true,
 
 		ExtraRuntimeValidation: ValidateFrontendIsReachable,
 	})
