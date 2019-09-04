@@ -16,6 +16,10 @@ import (
 func TestFreshDeployment(t *testing.T) {
 	c := qt.New(t)
 
+	if testing.Short() {
+		c.Skip("skipping fresh cluster integration test in short mode")
+	}
+
 	config, err := Config()
 	if err != nil {
 		c.Fatalf("unable to generate pulumi configuration, err: %s", err)

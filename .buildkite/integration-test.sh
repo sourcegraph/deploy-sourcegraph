@@ -10,4 +10,10 @@ export TEST_GCP_ZONE=us-central1-a
 export TEST_GCP_USERNAME=buildkite@sourcegraph-dev.iam.gserviceaccount.com
 export BUILD_CREATOR=$BUILDKITE_BUILD_CREATOR
 
-go test ./... -v -timeout 25m
+maybe_short_flag=""
+
+if [[ $BUILDKITE_PULL_REQUEST ]];
+    maybe_short_flag="-short"
+fi 
+
+go test ./... -v -timeout 25m ${maybe_short_flag}
