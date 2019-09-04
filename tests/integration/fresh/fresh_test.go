@@ -37,8 +37,8 @@ func Config() (map[string]string, error) {
 	config := map[string]string{}
 
 	for env, key := range map[string]string{
-		"TEST_GCP_PROJECT":        "gcp:config:project",
-		"TEST_GCP_ZONE":           "gcp:config:zone",
+		"TEST_GCP_PROJECT":        "gcp:project",
+		"TEST_GCP_ZONE":           "gcp:zone",
 		"TEST_GCP_USERNAME":       "gcpUsername",
 		"DEPLOY_SOURCEGRAPH_ROOT": "deploySourcegraphRoot",
 		"BUILD_CREATOR":           "buildCreator",
