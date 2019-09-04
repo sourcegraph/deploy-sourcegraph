@@ -6,7 +6,9 @@ import { paramCase } from 'change-case'
 
 import { buildCreator } from './config'
 
-const cluster = new gcp.container.Cluster('ds-integ-fresh-test', {
+const name = `ds-integ-fresh-test`
+
+const cluster = new gcp.container.Cluster(`${name}-cluster`, {
     description: 'Scratch cluster used for testing sourcegraph/deploy-sourcegraph',
 
     location: gcp.config.zone,
@@ -69,6 +71,6 @@ users:
 `
     })
 
-export const k8sProvider = new k8s.Provider(name, {
+export const k8sProvider = new k8s.Provider(`${name}-provider`, {
     kubeconfig,
 })
