@@ -14,23 +14,21 @@ import (
 )
 
 func TestFreshDeployment(t *testing.T) {
-	t.Run("", func(t *testing.T) {
-		c := qt.New(t)
+	c := qt.New(t)
 
-		config, err := Config()
-		if err != nil {
-			c.Fatalf("unable to generate pulumi configuration, err: %s", err)
-		}
+	config, err := Config()
+	if err != nil {
+		c.Fatalf("unable to generate pulumi configuration, err: %s", err)
+	}
 
-		integration.ProgramTest(t, &integration.ProgramTestOptions{
-			Dir: "step1",
+	integration.ProgramTest(t, &integration.ProgramTestOptions{
+		Dir: "step1",
 
-			Config:               config,
-			ExpectRefreshChanges: true,
-			Quick:                false,
+		Config:               config,
+		ExpectRefreshChanges: true,
+		Quick:                false,
 
-			ExtraRuntimeValidation: ValidateFrontendIsReachable,
-		})
+		ExtraRuntimeValidation: ValidateFrontendIsReachable,
 	})
 }
 
