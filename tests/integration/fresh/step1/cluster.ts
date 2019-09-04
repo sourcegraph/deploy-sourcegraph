@@ -4,12 +4,9 @@ import * as pulumi from '@pulumi/pulumi'
 
 import { paramCase } from 'change-case'
 
-const name = 'fresh-integration-test'
+import { buildCreator } from './config'
 
-const config = new pulumi.Config()
-const buildCreator = config.require('buildCreator')
-
-const cluster = new gcp.container.Cluster(name, {
+const cluster = new gcp.container.Cluster('ds-integ-fresh-test', {
     description: 'Scratch cluster used for testing sourcegraph/deploy-sourcegraph',
 
     location: gcp.config.zone,

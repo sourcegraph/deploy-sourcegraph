@@ -3,61 +3,46 @@ package fresh
 import (
 	"crypto/tls"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
-	"sort"
 	"testing"
 
-	"github.com/kr/pretty"
+	qt "github.com/frankban/quicktest"
 	"github.com/pulumi/pulumi/pkg/testing/integration"
 	"github.com/sethgrid/pester"
 )
 
 func TestFreshDeployment(t *testing.T) {
-	config, err := baseConfig()
-	if err != nil {
-		pFatalf(t, "unable to generate base pulumi configuration, err: %s", err)
-	}
+	t.Run("", func(t *testing.T) {
+		c := qt.New(t)
 
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: "step1",
+		config, err := Config()
+		if err != nil {
+			c.Fatalf("unable to generate pulumi configuration, err: %s", err)
+		}
 
-		Config:               config,
-		ExpectRefreshChanges: true,
-		Quick:                false,
+		integration.ProgramTest(t, &integration.ProgramTestOptions{
+			Dir: "step1",
 
-		ExtraRuntimeValidation: func(t *testing.T, stackInfo integration.RuntimeValidationStackInfo) {
-			v, ok := stackInfo.Outputs["ingressIP"]
-			if !ok {
-				pFatalf(t, "expected ingressIP as stack output, output: %s", v)
-			}
+			Config:               config,
+			ExpectRefreshChanges: true,
+			Quick:                false,
 
-			ip, ok := v.(string)
-			if !ok {
-				pFatalf(t, "unable to cast ingressIP to string, ip:%s", v)
-			}
-
-			if ip == "" {
-				pFatalf(t, "expected non-empty ip, got: %q", ip)
-			}
-
-			err := PingURL(fmt.Sprintf("http://%s", ip))
-			if err != nil {
-				pErrorf(t, "unable to ping frontend url, err: %s", err)
-			}
-		},
+			ExtraRuntimeValidation: ValidateFrontendIsReachable,
+		})
 	})
 }
 
-func baseConfig() (map[string]string, error) {
+func Config() (map[string]string, error) {
 	config := map[string]string{}
 
 	for env, key := range map[string]string{
 		"TEST_GCP_PROJECT":        "gcp:config:project",
 		"TEST_GCP_ZONE":           "gcp:config:zone",
 		"TEST_GCP_USERNAME":       "gcpUsername",
-		"BUILD_CREATOR":           "buildCreator",
 		"DEPLOY_SOURCEGRAPH_ROOT": "deploySourcegraphRoot",
+		"BUILD_CREATOR":           "buildCreator",
 	} {
 		value, present := os.LookupEnv(env)
 		if !present {
@@ -70,23 +55,46 @@ func baseConfig() (map[string]string, error) {
 	return config, nil
 }
 
-func PingURL(url string) error {
-	client := pester.New()
+func ValidateFrontendIsReachable(t *testing.T, stackInfo integration.RuntimeValidationStackInfo) {
+	c := qt.New(t)
 
-	client.Concurrency = 3
-	client.MaxRetries = 5
-	client.Backoff = pester.ExponentialJitterBackoff
-	client.KeepLog = true
+	ip, err := ingressIP(stackInfo.Outputs)
 
-	rt := client.Transport
-	if rt == nil {
-		rt = http.DefaultTransport
+	if err != nil {
+		c.Fatalf("failed to extract ingressIP from outputs, outputs: %v, err: %s", stackInfo.Outputs, err)
 	}
 
-	defaultTransport := rt.(*http.Transport)
+	if ip == nil {
+		c.Fatalf("expected non-nil frontend IP address from outputs, outputs: %v", stackInfo.Outputs)
+	}
+
+	url := fmt.Sprintf("http://%s", ip)
+	err = pingURL(url)
+	if err != nil {
+		c.Fatalf("failed to contact frontend url, url: %q, err: %s", url, err)
+	}
+}
+
+func pingURL(url string) error {
+	client := newPesterIgnoreSSL()
+
+	_, err := client.Get(url)
+
+	return err
+}
+
+func newPesterIgnoreSSL() *pester.Client {
+	c := pester.New()
+
+	t := c.Transport
+	if t == nil {
+		t = http.DefaultTransport
+	}
+
+	defaultTransport := t.(*http.Transport)
 
 	// Create new Transport that ignores self-signed SSL from ingress controllers
-	client.Transport = &http.Transport{
+	c.Transport = &http.Transport{
 		Proxy:                 defaultTransport.Proxy,
 		DialContext:           defaultTransport.DialContext,
 		MaxIdleConns:          defaultTransport.MaxIdleConns,
@@ -96,25 +104,19 @@ func PingURL(url string) error {
 		TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
 	}
 
-	_, err := client.Get(url)
+	return c
+}
 
-	if err != nil {
-		return pretty.Errorf("unable to ping url: %q, err: %s", url, err)
+func ingressIP(outputs map[string]interface{}) (net.IP, error) {
+	raw, ok := outputs["ingressIP"]
+	if !ok {
+		return nil, fmt.Errorf("expected ingressIP in stack output")
 	}
 
-	return nil
-}
+	ipStr, ok := raw.(string)
+	if !ok {
+		return nil, fmt.Errorf("unable to cast ingressIP to string, ip:%v", raw)
+	}
 
-func pErrorf(t *testing.T, format string, args ...interface{}) {
-	t.Error(pretty.Sprintf(format, args))
-}
-
-func pFatalf(t *testing.T, format string, args ...interface{}) {
-	t.Fatal(pretty.Sprintf(format, args))
-}
-
-func SortResourcesByURN(stackInfo integration.RuntimeValidationStackInfo) {
-	sort.Slice(stackInfo.Deployment.Resources, func(i, j int) bool {
-		return stackInfo.Deployment.Resources[i].URN < stackInfo.Deployment.Resources[j].URN
-	})
+	return net.ParseIP(ipStr), nil
 }

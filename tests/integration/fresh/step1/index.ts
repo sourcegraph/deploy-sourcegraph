@@ -2,14 +2,9 @@ import * as os from 'os'
 import * as path from 'path'
 
 import * as k8s from '@pulumi/kubernetes'
-import * as pulumi from '@pulumi/pulumi'
 
 import { k8sProvider } from './cluster'
-
-const config = new pulumi.Config()
-
-const deploySourcegraphRoot = config.require('deploySourcegraphRoot')
-const gcpUsername = config.require('gcpUsername')
+import { deploySourcegraphRoot, gcpUsername } from './config'
 
 const clusterAdmin = new k8s.rbac.v1.ClusterRoleBinding(
     'cluster-admin-role-binding',
