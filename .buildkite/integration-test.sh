@@ -12,7 +12,7 @@ export BUILD_CREATOR=$BUILDKITE_BUILD_CREATOR
 
 maybe_short_flag=""
 
-if [[ $BUILDKITE_PULL_REQUEST ~= ^[0-9]+$ ]]; then
+if [[ $BUILDKITE_PULL_REQUEST =~ ^[0-9]+$ ]]; then
     maybe_short_flag="-short"
 fi 
 
