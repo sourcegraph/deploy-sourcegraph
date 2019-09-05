@@ -1,4 +1,4 @@
-module github.com/sourcegraph/deploy
+module github.com/sourcegraph/deploy-sourcegraph
 
 go 1.12
 
