@@ -18,7 +18,6 @@ const cluster = new gcp.container.Cluster(`${name}-cluster`, {
 
     nodeConfig: {
         diskType: 'pd-ssd',
-        localSsdCount: 1,
         machineType: 'n1-standard-16',
 
         oauthScopes: [
@@ -74,3 +73,5 @@ users:
 export const k8sProvider = new k8s.Provider(`${name}-provider`, {
     kubeconfig,
 })
+
+export const clusterName = cluster.name
