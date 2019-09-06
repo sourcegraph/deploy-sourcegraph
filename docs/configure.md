@@ -52,13 +52,13 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 
 - [Configure gitserver replica count](#configure-gitserver-replica-count)
 - [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
-- [Configure Prometheus](../configure/prometheus/README.md)
-  - [Configure Alertmanager](../configure/prometheus/alertmanager/README.md)
+- [Configure Alertmanager](../configure/prometheus/alertmanager/README.md)
 - [Configure Jaeger tracing](../configure/jaeger/README.md)
 - [Configure Lightstep tracing](#configure-lightstep-tracing)
 - [Configure custom Redis](#configure-custom-redis)
 - [Configure custom PostgreSQL](#configure-custom-redis)
 - [Install without RBAC](#install-without-rbac)
+- [Use namespace](#use-namespace)
 
 ## Configure network access
 
@@ -498,3 +498,8 @@ Sourcegraph's Kubernetes deployment [requires an Enterprise license key](https:/
 1. Create an account on or sign in to sourcegraph.com, and go to https://sourcegraph.com/subscriptions/new to obtain a license key.
 
 1. Once you have a license key, add it to your configuration by setting it [in the management console](https://docs.sourcegraph.com/admin/management_console).
+
+## Use namespace
+
+If you use a namespace make sure cluster role binding and service account for one of the services are in the same namespace 
+(for example the Prometheus service or the Grafana service).

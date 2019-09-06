@@ -30,6 +30,18 @@ spec:
           value: "true"
         terminationMessagePolicy: FallbackToLogsOnError
         name: prometheus
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
         ports:
         - containerPort: 9090
           name: http
@@ -38,6 +50,13 @@ spec:
           name: data
         - mountPath: /sg_prometheus_add_ons
           name: config
+        resources:
+          limits:
+            cpu: "2"
+            memory: 2G
+          requests:
+            cpu: 500m
+            memory: 500M
       serviceAccountName: prometheus
       securityContext:
         runAsUser: 0
