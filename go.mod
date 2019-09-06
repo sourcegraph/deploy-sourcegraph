@@ -1,6 +1,6 @@
 module github.com/sourcegraph/deploy-sourcegraph
 
-go 1.12
+go 1.13
 
 require (
 	github.com/docker/docker v1.13.1 // indirect
