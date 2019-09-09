@@ -6,8 +6,7 @@ version you are upgrading to should be applied (unless otherwise noted).
 
 ## 3.8
 
-When you upgrade to v3.8 and you use namespaces make sure cluster role binding and service account have the same
-value for the namespace key.
+If you're deploying Sourcegraph into a non-default namespace, refer to [base/prometheus/README.md#namespace](../base/prometheus/README.md#namespace) for further configuration instructions.
 
 ## 3.7.1 (downgrading)
 

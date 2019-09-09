@@ -499,7 +499,6 @@ Sourcegraph's Kubernetes deployment [requires an Enterprise license key](https:/
 
 1. Once you have a license key, add it to your configuration by setting it [in the management console](https://docs.sourcegraph.com/admin/management_console).
 
-## Use namespace
+## Non-default namespace
 
-If you use a namespace make sure cluster role binding and service account for one of the services are in the same namespace 
-(for example the Prometheus service or the Grafana service).
+If you're deploying Sourcegraph into a non-default namespace, refer to [base/prometheus/README.md#namespace](../base/prometheus/README.md#namespace) for further configuration instructions.
