@@ -11,3 +11,5 @@ require (
 	golang.org/x/net v0.0.0-20190620200207-3b0461eec859 // indirect
 	google.golang.org/appengine v1.5.0 // indirect
 )
+
+replace golang.org/x/xerrors v0.0.0-20190410155217-1f06c39b4373 => golang.org/x/xerrors v0.0.0-20190717185122-a985d3407aa7
