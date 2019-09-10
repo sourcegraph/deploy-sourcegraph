@@ -501,4 +501,6 @@ Sourcegraph's Kubernetes deployment [requires an Enterprise license key](https:/
 
 ## Non-default namespace
 
-If you're deploying Sourcegraph into a non-default namespace, refer to [base/prometheus/README.md#namespace](../base/prometheus/README.md#namespace) for further configuration instructions.
+If you're deploying Sourcegraph into a non-default namespace, 
+refer to [base/prometheus/README.md#Namespaces](../base/prometheus/README.md#Namespaces) and 
+[base/grafana/README.md#Namespaces](../base/grafana/README.md#Namespaces) for further configuration instructions.
