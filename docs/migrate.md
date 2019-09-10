@@ -6,7 +6,7 @@ version you are upgrading to should be applied (unless otherwise noted).
 
 ## 3.8
 
-If you're deploying Sourcegraph into a non-default namespace, refer to  [docs/configure.md](configure.md) for further configuration instructions.
+If you're deploying Sourcegraph into a non-default namespace, refer to  [docs/configure.md](configure.md#use-non-default-namespace) for further configuration instructions.
 
 ## 3.7.1 (downgrading)
 

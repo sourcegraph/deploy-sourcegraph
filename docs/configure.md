@@ -58,7 +58,7 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 - [Configure custom Redis](#configure-custom-redis)
 - [Configure custom PostgreSQL](#configure-custom-redis)
 - [Install without RBAC](#install-without-rbac)
-- [Use namespace](#use-namespace)
+- [Use non-default namespace](#use-non-default-namespace)
 
 ## Configure network access
 
@@ -499,7 +499,7 @@ Sourcegraph's Kubernetes deployment [requires an Enterprise license key](https:/
 
 1. Once you have a license key, add it to your configuration by setting it [in the management console](https://docs.sourcegraph.com/admin/management_console).
 
-## Non-default namespace
+## Use non-default namespace
 
 If you're deploying Sourcegraph into a non-default namespace, 
 refer to [base/prometheus/README.md#Namespaces](../base/prometheus/README.md#Namespaces) and 
