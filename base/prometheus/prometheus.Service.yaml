@@ -3,14 +3,13 @@ kind: Service
 metadata:
   labels:
     app: prometheus
-    deploy: prometheus
-  name: prometheus-node-port
+    deploy: sourcegraph
+  name: prometheus
 spec:
   ports:
   - name: http
-    nodePort: 30010
-    port: 30010
+    port: 80
     targetPort: http
   selector:
     app: prometheus
-  type: NodePort
+  type: ClusterIP

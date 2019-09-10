@@ -1,0 +1,16 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    category: rbac
+    deploy: sourcegraph
+  name: grafana
+roleRef:
+  apiGroup: ""
+  kind: ClusterRole
+  name: grafana
+subjects:
+- kind: ServiceAccount
+  name: grafana
+  # value of namespace needs to match namespace value in base/grafana/grafana.ServiceAccount.yaml
+  namespace: default

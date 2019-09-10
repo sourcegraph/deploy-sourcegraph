@@ -4,6 +4,10 @@ This document records manual migrations that are necessary to apply when upgradi
 Sourcegraph versions. All manual migrations between the version you are upgrading from and the
 version you are upgrading to should be applied (unless otherwise noted).
 
+## 3.8
+
+If you're deploying Sourcegraph into a non-default namespace, refer to ["Use non-default namespace" in docs/configure.md](configure.md#use-non-default-namespace) for further configuration instructions.
+
 ## 3.7.1 (downgrading)
 
 **If you upgrade to v3.7.1 and intend to downgrade back to v3.6 for any reason, please note that reindexing must occur and in the meantime search will effectively be unindexed and performance will suffer substantially.**

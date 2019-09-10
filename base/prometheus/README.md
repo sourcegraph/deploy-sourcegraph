@@ -1,6 +1,7 @@
 # Prometheus
 
-[Prometheus](https://prometheus.io/) is an open-source application monitoring system and time series database. It is commonly used to track key performance metrics over time, such as the following:
+[Prometheus](https://prometheus.io/) is an open-source application monitoring system and time series database.
+ It is commonly used to track key performance metrics over time, such as the following:
 
 - QPS
 - Application requests by URL route name
@@ -10,7 +11,9 @@
 
 <img src="../../docs/images/prometheus.png" />
 
-## Steps
+A Prometheus instance is part of the default Sourcegraph cluster installation. 
+
+## Optional Steps
 
 1. Edit `extra.rules` in [prometheus.ConfigMap.yaml](prometheus.ConfigMap.yaml) to define custom [Prometheus recording rules](https://prometheus.io/docs/practices/rules/).
 
@@ -22,13 +25,7 @@
    myCustomMetric2 = sum by (route, ns, le)(task:src_http_request_duration_seconds_bucket:rate5m)
    ```
 
-1. Optional: [Enable Alertmanager](alertmanager/README.md).
-
-1. Append the `kubectl apply` command for the Prometheus resources to your cluster.
-
-   ```bash
-   echo kubectl apply --prune -l deploy=prometheus -f configure/prometheus --recursive >> kubectl-apply-all.sh
-   ```
+1. [Enable Alertmanager](../../config/prometheus/alertmanager/README.md).
 
 1. Apply your changes to Prometheus to the cluster.
 
@@ -36,7 +33,10 @@
    ./kubectl-apply-all.sh
    ```
 
-_Note: If you are deploying Sourcegraph to a non-default namespace, you'll have to change the namespace specified in [configure/prometheus/prometheus.ClusterRoleBinding.yaml](prometheus.ClusterRoleBinding.yaml) to the one that you created._
+## Namespaces
+
+If you are deploying Sourcegraph to a non-default namespace, you'll have to change the namespace specified in
+ [prometheus.ClusterRoleBinding.yaml](prometheus.ClusterRoleBinding.yaml) to the one that you created.
 
 ## Making Prometheus accessible
 
@@ -108,7 +108,8 @@ ingress rules. On most infrastructure providers, the steps are roughly the follo
 Some customers may want to make the Prometheus API endpoint accessible to other services like the
 following:
 
-- An analytics visualization tool like Grafana
+- An analytics visualization tool like Grafana 
+(note: an instance of Grafana is part of the default Sourcegraph cluster installation)
 - An metrics ingestion pipeline
 
 To expose the Prometheus API to such a service, follow the steps to expose Prometheus via Kubernetes
