@@ -48,7 +48,9 @@ spec:
         # archives of repositories at a commit.
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: index.docker.io/sourcegraph/frontend:3.7.1@sha256:424bb8616fe7d042c77e91ab862fe9005c715badf6c656d13245f79ff0d03a1b
+        - name: SRC_GRAFANA_SERVER_URL
+          value: http://grafana:30070
+        image: index.docker.io/sourcegraph/frontend:3.8-internal-uwe
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:

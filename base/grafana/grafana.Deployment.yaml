@@ -24,8 +24,21 @@ spec:
         app: grafana
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/grafana:6.3.3@sha256:2f68b9b1542e7d75459d983b606d2fdd1c11a75610464e3d7a6ced4f3ac474bf
+      - image: index.docker.io/sourcegraph/grafana:6.3.3-1-internal-uwe
         terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        - name: GF_AUTH_ANONYMOUS_ENABLED
+          value: "true"
+        - name: GF_AUTH_ANONYMOUS_ORG_NAME
+          value: "Main Org."
+        - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+          value: "Editor"
+        - name: GF_USERS_ALLOW_SIGN_UP
+          value: "false"
+        - name: GF_USERS_AUTO_ASSIGN_ORG
+          value: "true"
+        - name: GF_USERS_AUTO_ASSIGN_ORG_ROLE
+          value: "Editor"
         name: grafana
         ports:
         - containerPort: 3000
