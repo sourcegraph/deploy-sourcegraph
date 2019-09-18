@@ -2,9 +2,18 @@ import * as os from 'os'
 import * as path from 'path'
 
 import * as k8s from '@pulumi/kubernetes'
+import * as fs from 'fs-extra'
 
 import { k8sProvider } from './cluster'
 import { deploySourcegraphRoot, gcpUsername } from './config'
+
+const deploySourcegraphYAML = async () => {
+    const localYAMLPath = path.join('.', 'kubernetes')
+
+    await fs.symlink(deploySourcegraphRoot, localYAMLPath)
+
+    return localYAMLPath
+}
 
 const clusterAdmin = new k8s.rbac.v1.ClusterRoleBinding(
     'cluster-admin-role-binding',
@@ -46,6 +55,7 @@ const storageClass = new k8s.storage.v1.StorageClass(
     },
     { provider: k8sProvider }
 )
+
 
 const baseDeployment = new k8s.yaml.ConfigGroup(
     'base',
