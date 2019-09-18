@@ -4,7 +4,7 @@ import * as path from 'path'
 import * as k8s from '@pulumi/kubernetes'
 import * as fs from 'fs-extra'
 
-import { k8sProvider, clusterName, kubeconfig } from './cluster'
+import { k8sProvider } from './cluster'
 import { deploySourcegraphRoot, gcpUsername } from './config'
 
 async function linkYAML(): Promise<string> { 
@@ -71,25 +71,18 @@ async function main() {
         }
     )
 
-    const ingressNginx = new k8s.yaml.ConfigGroup(
+    return new k8s.yaml.ConfigGroup(
         'ingress-nginx',
         {
             files: `${path.posix.join(deploySourcegraphYAML, 'configure', 'ingress-nginx')}/**/*.yaml`,
         },
         { providers: { kubernetes: k8sProvider }, dependsOn: clusterAdmin }
     )
+}
 
-    const ingressIP = ingressNginx
+
+export const ingressIP = main().then(ing => ing
         .getResource('v1/Service', 'ingress-nginx', 'ingress-nginx')
         .apply(svc => svc.status)
         .apply(status => status.loadBalancer.ingress.map(i => i.ip))
-        .apply(ips => (ips.length === 1 ? ips[0] : undefined))
-
-    return {
-        ingressIP,
-        clusterName,
-        kubeconfig,
-    }
-}
-
-module.exports = main()
+        .apply(ips => (ips.length === 1 ? ips[0] : undefined)))
