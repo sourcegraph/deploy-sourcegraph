@@ -4,10 +4,10 @@ import * as path from 'path'
 import * as k8s from '@pulumi/kubernetes'
 import * as fs from 'fs-extra'
 
-import { k8sProvider } from './cluster'
+import { k8sProvider, clusterName, kubeconfig } from './cluster'
 import { deploySourcegraphRoot, gcpUsername } from './config'
 
-const deploySourcegraphYAML = async () => {
+async function linkYAML(): Promise<string> {
     const localYAMLPath = path.join('.', 'kubernetes')
 
     await fs.symlink(deploySourcegraphRoot, localYAMLPath)
@@ -15,71 +15,78 @@ const deploySourcegraphYAML = async () => {
     return localYAMLPath
 }
 
-const clusterAdmin = new k8s.rbac.v1.ClusterRoleBinding(
-    'cluster-admin-role-binding',
-    {
-        metadata: { name: `${os.userInfo().username}-cluster-admin-role-binding` },
+async function main() {
+    const deploySourcegraphYAML = await linkYAML()
 
-        roleRef: {
-            apiGroup: 'rbac.authorization.k8s.io',
-            kind: 'ClusterRole',
-            name: 'cluster-admin',
-        },
+    const clusterAdmin = new k8s.rbac.v1.ClusterRoleBinding(
+        'cluster-admin-role-binding',
+        {
+            metadata: { name: `${os.userInfo().username}-cluster-admin-role-binding` },
 
-        subjects: [
-            {
+            roleRef: {
                 apiGroup: 'rbac.authorization.k8s.io',
-                kind: 'User',
-                name: gcpUsername,
+                kind: 'ClusterRole',
+                name: 'cluster-admin',
             },
-        ],
-    },
-    { provider: k8sProvider }
-)
 
-const storageClass = new k8s.storage.v1.StorageClass(
-    'sourcegraph-storage-class',
-    {
-        metadata: {
-            name: 'sourcegraph',
+            subjects: [
+                {
+                    apiGroup: 'rbac.authorization.k8s.io',
+                    kind: 'User',
+                    name: gcpUsername,
+                },
+            ],
+        },
+        { provider: k8sProvider }
+    )
 
-            labels: {
-                deploy: 'sourcegraph',
+    const storageClass = new k8s.storage.v1.StorageClass(
+        'sourcegraph-storage-class',
+        {
+            metadata: {
+                name: 'sourcegraph',
+
+                labels: {
+                    deploy: 'sourcegraph',
+                },
+            },
+            provisioner: 'kubernetes.io/gce-pd',
+
+            parameters: {
+                type: 'pd-ssd',
             },
         },
-        provisioner: 'kubernetes.io/gce-pd',
+        { provider: k8sProvider }
+    )
 
-        parameters: {
-            type: 'pd-ssd',
+    const baseDeployment = new k8s.yaml.ConfigGroup(
+        'base',
+        {
+            files: `${path.posix.join(deploySourcegraphYAML, 'base')}/**/*.yaml`,
         },
-    },
-    { provider: k8sProvider }
-)
+        {
+            providers: { kubernetes: k8sProvider },
+            dependsOn: [clusterAdmin, storageClass],
+        }
+    )
 
+    const ingressNginx = new k8s.yaml.ConfigGroup(
+        'ingress-nginx',
+        {
+            files: `${path.posix.join(deploySourcegraphYAML, 'configure', 'ingress-nginx')}/**/*.yaml`,
+        },
+        { providers: { kubernetes: k8sProvider }, dependsOn: clusterAdmin }
+    )
 
-const baseDeployment = new k8s.yaml.ConfigGroup(
-    'base',
-    {
-        files: `${path.posix.join(deploySourcegraphRoot, 'base')}/**/*.yaml`,
-    },
-    {
-        providers: { kubernetes: k8sProvider },
-        dependsOn: [clusterAdmin, storageClass],
+    const ingressIP = ingressNginx
+        .getResource('v1/Service', 'ingress-nginx', 'ingress-nginx')
+        .apply(svc => svc.status)
+        .apply(status => status.loadBalancer.ingress.map(i => i.ip))
+        .apply(ips => (ips.length === 1 ? ips[0] : undefined))
+
+    return {
+        ingressIP,
+        clusterName,
+        kubeconfig,
     }
-)
-
-const ingressNginx = new k8s.yaml.ConfigGroup(
-    'ingress-nginx',
-    {
-        files: `${path.posix.join(deploySourcegraphRoot, 'configure', 'ingress-nginx')}/**/*.yaml`,
-    },
-    { providers: { kubernetes: k8sProvider }, dependsOn: clusterAdmin }
-)
-
-export const ingressIP = ingressNginx
-    .getResource('v1/Service', 'ingress-nginx', 'ingress-nginx')
-    .apply(svc => svc.status)
-    .apply(status => status.loadBalancer.ingress.map(i => i.ip))
-    .apply(ips => (ips.length === 1 ? ips[0] : undefined))
-
-export * from './cluster'
+}
