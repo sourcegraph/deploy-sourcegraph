@@ -7,7 +7,6 @@ import * as fs from 'fs-extra'
 import { k8sProvider, clusterName, kubeconfig } from './cluster'
 import { deploySourcegraphRoot, gcpUsername } from './config'
 
-
 async function linkYAML(): Promise<string> {
     const localYAMLPath = path.join('.', 'kubernetes')
 
@@ -18,10 +17,6 @@ async function linkYAML(): Promise<string> {
 
 async function main() {
     const deploySourcegraphYAML = await linkYAML()
-    console.log(deploySourcegraphYAML)
-    fs.readdirSync(deploySourcegraphYAML).forEach(file => {
-        console.log(file);
-     });
 
     const clusterAdmin = new k8s.rbac.v1.ClusterRoleBinding(
         'cluster-admin-role-binding',
@@ -95,3 +90,5 @@ async function main() {
         kubeconfig,
     }
 }
+
+module.exports = main()
