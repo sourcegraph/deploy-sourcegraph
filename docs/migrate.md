@@ -8,30 +8,9 @@ version you are upgrading to should be applied (unless otherwise noted).
 
 If you're deploying Sourcegraph into a non-default namespace, refer to ["Use non-default namespace" in docs/configure.md](configure.md#use-non-default-namespace) for further configuration instructions.
 
-## 3.7.1 (downgrading)
+## 3.7.2
 
-**If you upgrade to v3.7.1 and intend to downgrade back to v3.6 for any reason, please note that reindexing must occur and in the meantime search will effectively be unindexed and performance will suffer substantially.**
-
-**Instead of downgrading**, we suggest turning off indexed symbol search if you suffer issues: set `search.index.symbols.enabled` to `false` in your site configuration, then wait for reindexing to finish (approximately 6,000 repositories will be indexed per hour, you can check the status at e.g. https://sourcegraph.example.com/site-admin/repositories?filter=needs-index).
-
-If you must downgrade, prepare a window when you can do this with acceptable downtime. Expect roughly 1 hour per 6,000 repositories. Upon downgrade from v3.7.x to v3.6.x:
-
-1. Reindexing will begin generating index files in the format used by v3.6.
-2. The v3.7 index files will remain on disk (in the indexed-search pod / zoekt data directory). You may run out of disk space if you do not have enough spare space, so we advise manually deleting the new format files immediately before / after downgrading:
-
-```sh
-# Grab a shell:
-$ kubectl exec -it indexed-search --container zoekt-webserver -- /bin/sh
-
-# Confirm how many index files in the new format will be deleted:
-$ ls /data/*_v16*.zoekt | wc -l
-12793
-
-# Delete the new format index files:
-$ sudo rm -rf /data/*_v16*.zoekt
-```
-
-Proceed with the downgrade to v3.6, then wait for reindexing to finish.
+Before upgrading or downgrading 3.7, please consult the [v3.7.2 migration guide](https://docs.sourcegraph.com/admin/migration/3_7) to ensure you have enough free disk space.
 
 ## 3.0
 
