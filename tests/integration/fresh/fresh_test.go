@@ -37,11 +37,11 @@ func TestDeployments(t *testing.T) {
 		},
 		test{
 			name:             "two previous versions -> current commit upgrade",
-			previousVersions: []string{"3.6.2"},
+			previousVersions: []string{"3.6.3"},
 		},
 		test{
 			name:             "two previous versions -> previous version -> current commit upgrade",
-			previousVersions: []string{"3.6.2", "3.7.2"},
+			previousVersions: []string{"3.6.3", "3.7.2"},
 		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
