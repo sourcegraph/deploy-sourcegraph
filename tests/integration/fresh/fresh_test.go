@@ -52,7 +52,6 @@ func TestDeployments(t *testing.T) {
 
 func testUpgradePath(t *testing.T, previousVersions []string) {
 	c := qt.New(t)
-	c.Parallel()
 
 	defer c.Done()
 
