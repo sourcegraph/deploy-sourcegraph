@@ -7,9 +7,10 @@ import * as fs from 'fs-extra'
 import { k8sProvider, clusterName, kubeconfig } from './cluster'
 import { deploySourcegraphRoot, gcpUsername } from './config'
 
-async function linkYAML(): Promise<string> {
+async function linkYAML(): Promise<string> { 
     const localYAMLPath = path.join('.', 'kubernetes')
 
+    await fs.remove(localYAMLPath)
     await fs.symlink(deploySourcegraphRoot, localYAMLPath)
 
     return localYAMLPath
