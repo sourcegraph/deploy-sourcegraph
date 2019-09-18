@@ -96,9 +96,13 @@ func testUpgradePath(t *testing.T, previousVersions []string) {
 
 	envVars := []string{}
 	for i, dir := range stepYamlDirs {
+		absPath, err := filepath.Abs(dir)
+		if err != nil {
+			c.Fatalf("failed to get absolute path, err: %s", err)
+		}
 		envVars = append(
 			envVars,
-			fmt.Sprintf("DEPLOY_SOURCEGRAPH_ROOT_STEP_%d=%s", i+1, dir),
+			fmt.Sprintf("DEPLOY_SOURCEGRAPH_ROOT_STEP_%d=%s", i+1, absPath),
 		)
 	}
 
