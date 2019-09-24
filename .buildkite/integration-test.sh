@@ -16,4 +16,4 @@ if [[ $BUILDKITE_PULL_REQUEST =~ ^[0-9]+$ ]]; then
     maybe_short_flag="-short"
 fi 
 
-go test ./... -v -timeout 25m ${maybe_short_flag}
+go test ./... -v -timeout 35m ${maybe_short_flag}
