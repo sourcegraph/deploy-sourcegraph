@@ -3,6 +3,7 @@ import * as path from 'path'
 
 import * as k8s from '@pulumi/kubernetes'
 import * as fs from 'fs-extra'
+import { ls }  from 'shelljs'
 
 import { k8sProvider } from './cluster'
 import { deploySourcegraphRoot, gcpUsername } from './config'
@@ -12,6 +13,12 @@ async function linkYAML(): Promise<string> {
 
     await fs.remove(localYAMLPath)
     await fs.symlink(deploySourcegraphRoot, localYAMLPath)
+    
+    const localLS = await ls(localYAMLPath)
+    console.log(`local LS ${localLS} `)
+
+    const remoteLS = await ls(deploySourcegraphRoot)
+    console.log(`real LS ${remoteLS} `)
 
     return localYAMLPath
 }
@@ -79,8 +86,6 @@ async function main() {
         { providers: { kubernetes: k8sProvider }, dependsOn: clusterAdmin }
     )
 }
-
-
 export const ingressIP = main().then(ing => ing
         .getResource('v1/Service', 'ingress-nginx', 'ingress-nginx')
         .apply(svc => svc.status)
