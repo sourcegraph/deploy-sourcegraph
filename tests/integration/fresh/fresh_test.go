@@ -110,7 +110,7 @@ func testUpgradePath(t *testing.T, previousVersions []string) {
 	editDirs := []integration.EditDir{}
 	for i := range stepYamlDirs[1:] {
 		editDirs = append(editDirs, integration.EditDir{
-			Dir:                    fmt.Sprintf("step%d", i+1),
+			Dir:                    fmt.Sprintf("step%d", i+2),
 			Additive:               true,
 			ExtraRuntimeValidation: ValidateFrontendIsReachable,
 		})
