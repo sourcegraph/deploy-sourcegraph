@@ -253,7 +253,7 @@ func prepareOldReleaseYAML(version, destination string) error {
 }
 
 func unarchive(source, destination string) error {
-	c := exec.Command("tar", "-xvf", source, "-C", destination)
+	c := exec.Command("tar", "-xvf", source, "--strip-components=1", "-C", destination)
 
 	out, err := c.CombinedOutput()
 	if err != nil {
