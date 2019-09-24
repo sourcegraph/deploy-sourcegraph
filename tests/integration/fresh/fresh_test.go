@@ -11,10 +11,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	qt "github.com/frankban/quicktest"
-	"github.com/mholt/archiver"
 	"github.com/otiai10/copy"
 	"github.com/pulumi/pulumi/pkg/testing/integration"
 	"github.com/sethgrid/pester"
@@ -217,16 +217,16 @@ func ingressIP(outputs map[string]interface{}) (net.IP, error) {
 	return net.ParseIP(ipStr), nil
 }
 
-func prepareCurrentCommitYAML(dir string) error {
+func prepareCurrentCommitYAML(destination string) error {
 	rootDir, present := os.LookupEnv("DEPLOY_SOURCEGRAPH_ROOT")
 	if !present {
 		return errors.New("'DEPLOY_SOURCEGRAPH_ROOT' env var not set")
 	}
 
-	return copy.Copy(rootDir, dir)
+	return copy.Copy(rootDir, destination)
 }
 
-func prepareOldReleaseYAML(version, dir string) error {
+func prepareOldReleaseYAML(version, destination string) error {
 	archiveName := fmt.Sprintf("v%s.tar.gz", version)
 
 	url := fmt.Sprintf("https://github.com/sourcegraph/deploy-sourcegraph/archive/%s", archiveName)
@@ -244,18 +244,21 @@ func prepareOldReleaseYAML(version, dir string) error {
 	}
 	defer os.RemoveAll(tarDir)
 
-	err = archiver.Unarchive(tarPath, dir)
+	err = unarchive(tarPath, destination)
 	if err != nil {
 		return fmt.Errorf("unable to extract %q: %w", tarPath, err)
 	}
 
-	c := exec.Command("ls", dir)
-	b, err := c.CombinedOutput()
-	str := string(b)
+	return nil
+}
+
+func unarchive(source, destination string) error {
+	c := exec.Command("tar", "-xvf", source, "-C", destination)
+
+	out, err := c.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("unable to run ls, output: %s, err: %w", str, err)
+		return fmt.Errorf("unable to run 'tar %s', output: %s, err: %w", strings.Join(c.Args, ""), string(out), err)
 	}
-	fmt.Printf("ls output: %q\n", str)
 
 	return nil
 }
