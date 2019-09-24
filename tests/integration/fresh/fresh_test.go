@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"testing"
 
@@ -247,6 +248,14 @@ func prepareOldReleaseYAML(version, dir string) error {
 	if err != nil {
 		return fmt.Errorf("unable to extract %q: %w", tarPath, err)
 	}
+
+	c := exec.Command("ls", dir)
+	b, err := c.CombinedOutput()
+	str := string(b)
+	if err != nil {
+		return fmt.Errorf("unable to run ls, output: %s, err: %w", str, err)
+	}
+	fmt.Printf("ls output: %q\n", str)
 
 	return nil
 }
