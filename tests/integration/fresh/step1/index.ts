@@ -1,30 +1,14 @@
 import * as os from 'os'
 import * as path from 'path'
+import * as process from 'process'
 
 import * as k8s from '@pulumi/kubernetes'
-import * as fs from 'fs-extra'
-import { ls }  from 'shelljs'
 
 import { k8sProvider } from './cluster'
 import { deploySourcegraphRoot, gcpUsername } from './config'
 
-async function linkYAML(): Promise<string> { 
-    const localYAMLPath = path.join('.', 'kubernetes')
-
-    await fs.remove(localYAMLPath)
-    await fs.symlink(deploySourcegraphRoot, localYAMLPath)
-    
-    const localLS = await ls(localYAMLPath)
-    console.log(`local LS ${localLS} `)
-
-    const remoteLS = await ls(deploySourcegraphRoot)
-    console.log(`real LS ${remoteLS} `)
-
-    return localYAMLPath
-}
-
 async function main() {
-    const deploySourcegraphYAML = await linkYAML()
+    process.chdir(deploySourcegraphRoot)
 
     const clusterAdmin = new k8s.rbac.v1.ClusterRoleBinding(
         'cluster-admin-role-binding',
@@ -70,7 +54,7 @@ async function main() {
     const baseDeployment = new k8s.yaml.ConfigGroup(
         'base',
         {
-            files: `${path.posix.join(deploySourcegraphYAML, 'base')}/**/*.yaml`,
+            files: `${path.posix.join('.', 'base')}/**/*.yaml`,
         },
         {
             providers: { kubernetes: k8sProvider },
@@ -81,13 +65,16 @@ async function main() {
     return new k8s.yaml.ConfigGroup(
         'ingress-nginx',
         {
-            files: `${path.posix.join(deploySourcegraphYAML, 'configure', 'ingress-nginx')}/**/*.yaml`,
+            files: `${path.posix.join('.', 'configure', 'ingress-nginx')}/**/*.yaml`,
         },
         { providers: { kubernetes: k8sProvider }, dependsOn: clusterAdmin }
     )
 }
-export const ingressIP = main().then(ing => ing
+
+export const ingressIP = main().then(ing =>
+    ing
         .getResource('v1/Service', 'ingress-nginx', 'ingress-nginx')
         .apply(svc => svc.status)
         .apply(status => status.loadBalancer.ingress.map(i => i.ip))
-        .apply(ips => (ips.length === 1 ? ips[0] : undefined)))
+        .apply(ips => (ips.length === 1 ? ips[0] : undefined))
+)
