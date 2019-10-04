@@ -472,12 +472,13 @@ To enable this, you must first purchase Lightstep and create a project correspon
 Sourcegraph supports specifying a custom Redis server for:
 
 - caching information (specified via the `REDIS_CACHE_ENDPOINT` environment variable)
-- storing information (session data) (specified via the `REDIS_STORE_ENDPOINT` environment variable)
+- storing information (session data and job queues) (specified via the `REDIS_STORE_ENDPOINT` environment variable)
 
 If you want to specify a custom Redis server, you'll need specify the corresponding environment variable for each of the following deployments:
 
 - `sourcegraph-frontend`
 - `repo-updater`
+- `lsif-server`
 
 ## Configure custom PostgreSQL
 
