@@ -36,23 +36,21 @@ spec:
         name: lsif-server
         livenessProbe:
           httpGet:
-            path: /healthz
-            port: server
+            path: /ping
+            port: http
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
-            path: /healthz
-            port: server
+            path: /ping
+            port: http
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
         - containerPort: 3186
-          name: server
-        - containerPort: 3187
-          name: worker
+          name: http
         resources:
           limits:
             cpu: "2"
