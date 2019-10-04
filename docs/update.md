@@ -93,8 +93,9 @@ command:
 - **Snapshot of A:** Configure `kubectl` to access cluster A and then run `sourcegraph-server-gen snapshot create`.
 - **Restore A's snapshot to B:**
   - Configure `kubectl` to access B.
-  - Spin down `sourcegraph-frontend` replicas to 0. (This is important, because otherwise
-    `sourcegraph-frontend` may apply changes to the database that corrupt the snapshot restoration.)
+  - Spin down `sourcegraph-frontend` replicas to 0. (**Note:** this is very important, because
+    otherwise `sourcegraph-frontend` may apply changes to the database that corrupt the snapshot
+    restoration.)
 
     ```
     kubectl scale --replicas=0 deployment/sourcegraph-frontend
