@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   annotations:
     description: Backend for indexed text search operations.
@@ -7,17 +7,12 @@ metadata:
     deploy: sourcegraph
   name: indexed-search
 spec:
-  minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: indexed-search
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
+  serviceName: indexed-search
   template:
     metadata:
       labels:
@@ -47,7 +42,7 @@ spec:
             memory: 2Gi
         volumeMounts:
         - mountPath: /data
-          name: disk
+          name: data
       - env:
         image: index.docker.io/sourcegraph/zoekt-indexserver:0.0.20190924205126-699d5c5@sha256:1ad7236a7c0cae4c0d49462ff8c22a66748cf08b78ad85656f08ff98919e61fc
         terminationMessagePolicy: FallbackToLogsOnError
@@ -66,10 +61,24 @@ spec:
             memory: 4G
         volumeMounts:
         - mountPath: /data
-          name: disk
+          name: data
       securityContext:
         runAsUser: 0
       volumes:
-      - name: disk
-        persistentVolumeClaim:
-          claimName: indexed-search
+      - name: data
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      labels:
+        deploy: sourcegraph
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          # The size of disk to used for search indexes.
+          # This should typically be gitserver disk size multipled by the number of gitserver shards.
+          storage: 200Gi
+      storageClassName: sourcegraph
