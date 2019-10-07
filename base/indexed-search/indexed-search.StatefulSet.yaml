@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   annotations:
     description: Backend for indexed text search operations.
@@ -7,17 +7,12 @@ metadata:
     deploy: sourcegraph
   name: indexed-search
 spec:
-  minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: indexed-search
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
+  serviceName: indexed-search
   template:
     metadata:
       labels:
@@ -25,7 +20,7 @@ spec:
     spec:
       containers:
       - env:
-        image: index.docker.io/sourcegraph/zoekt-webserver:0.0.20190822193830-5baf23e@sha256:e2cfb9e420e4c7dcf3cd65cb41d820fd3f4c1badff4cd9d38356eeec1360cfd9
+        image: index.docker.io/sourcegraph/zoekt-webserver:0.0.20191004191623-73044be@sha256:a15845cc4b124af97c5f366556124e4979588d1ab0dc3418e726ff9114456748
         terminationMessagePolicy: FallbackToLogsOnError
         name: zoekt-webserver
         ports:
@@ -47,9 +42,9 @@ spec:
             memory: 2G
         volumeMounts:
         - mountPath: /data
-          name: disk
+          name: data
       - env:
-        image: index.docker.io/sourcegraph/zoekt-indexserver:0.0.20190822193826-5baf23e@sha256:2664de3de1e969ea834ac471844f60e0da0f76914f6fe7f17bdd26b0ae2032b6
+        image: index.docker.io/sourcegraph/zoekt-indexserver:0.0.20190924205126-699d5c5@sha256:1ad7236a7c0cae4c0d49462ff8c22a66748cf08b78ad85656f08ff98919e61fc
         terminationMessagePolicy: FallbackToLogsOnError
         name: zoekt-indexserver
         ports:
@@ -66,10 +61,24 @@ spec:
             memory: 4G
         volumeMounts:
         - mountPath: /data
-          name: disk
+          name: data
       securityContext:
         runAsUser: 0
       volumes:
-      - name: disk
-        persistentVolumeClaim:
-          claimName: indexed-search
+      - name: data
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      labels:
+        deploy: sourcegraph
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          # The size of disk to used for search indexes.
+          # This should typically be gitserver disk size multipled by the number of gitserver shards.
+          storage: 200Gi
+      storageClassName: sourcegraph

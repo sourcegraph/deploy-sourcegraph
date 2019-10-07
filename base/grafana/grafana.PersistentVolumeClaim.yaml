@@ -3,13 +3,11 @@ kind: PersistentVolumeClaim
 metadata:
   labels:
     deploy: sourcegraph
-  name: indexed-search
+  name: grafana
 spec:
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
-      # The size of disk to used for search indexes.
-      # This should typically be gitserver disk size multipled by the number of gitserver shards.
       storage: 200Gi
   storageClassName: sourcegraph

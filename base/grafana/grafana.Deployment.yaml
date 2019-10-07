@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Metrics/monitoring dashboards and alerts.
+  labels:
+    deploy: sourcegraph
+  name: grafana
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: grafana
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+      - image: index.docker.io/sourcegraph/grafana:10.0.0@sha256:f84e4260dce4e36f5d5e9c6deb393ac1e9c930ffae622c432fa86640a1f2699f
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: grafana
+        ports:
+        - containerPort: 3000
+          name: http
+        volumeMounts:
+        - mountPath: /var/lib/grafana
+          name: data
+        - mountPath: /sg_config_grafana/provisioning/datasources
+          name: config
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+      serviceAccountName: grafana
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: grafana
+      - configMap:
+          defaultMode: 0777
+          name: grafana
+        name: config

@@ -52,13 +52,13 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 
 - [Configure gitserver replica count](#configure-gitserver-replica-count)
 - [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
-- [Configure Prometheus](../configure/prometheus/README.md)
-  - [Configure Alertmanager](../configure/prometheus/alertmanager/README.md)
+- [Configure Alertmanager](../configure/prometheus/alertmanager/README.md)
 - [Configure Jaeger tracing](../configure/jaeger/README.md)
 - [Configure Lightstep tracing](#configure-lightstep-tracing)
 - [Configure custom Redis](#configure-custom-redis)
 - [Configure custom PostgreSQL](#configure-custom-redis)
 - [Install without RBAC](#install-without-rbac)
+- [Use non-default namespace](#use-non-default-namespace)
 
 ## Configure network access
 
@@ -71,7 +71,7 @@ There are a few approaches, but using an ingress controller is recommended.
 For production environments, we recommend using the [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/).
 
 As part of our base configuration we install an ingress for [sourcegraph-frontend](../base/frontend/sourcegraph-frontend.Ingress.yaml). It installs rules for the default ingress, see comments to restrict it to a specific host.
- 
+
 In addition to the sourcegraph-frontend ingress, you'll need to install the NGINX ingress controller (ingress-nginx). Follow the instructions at https://kubernetes.github.io/ingress-nginx/deploy/ to create the ingress controller. Add the files to [configure/ingress-nginx](../configure/ingress-nginx), including an [install.sh](configure/ingress-nginx/install.sh) file which applies the relevant manifests. We include sample generic-cloud manifests as part of this repository, but please follow the official instructions for your cloud provider.
 
 Add the [configure/ingress-nginx/install.sh](configure/ingress-nginx/install.sh) command to [create-new-cluster.sh](../create-new-cluster.sh) and commit the change:
@@ -272,7 +272,7 @@ your fork is private **and** you are okay with storing secrets in it).
 
 ## Configure language servers
 
-Code intelligence is provided through [Sourcegraph extensions](https://docs.sourcegraph.com/extensions). These language extensions communicate with language servers that are deployed inside your Sourcegraph cluster. See the README.md for each language for configuration information: 
+Code intelligence is provided through [Sourcegraph extensions](https://docs.sourcegraph.com/extensions). These language extensions communicate with language servers that are deployed inside your Sourcegraph cluster. See the README.md for each language for configuration information:
 
 - Go: [configure/lang/go/README.md](../configure/lang/go/README.md)
 - JavaScript/TypeScript: [configure/lang/typescript/README.md](../configure/lang/typescript/README.md)
@@ -485,6 +485,8 @@ You may prefer to configure Sourcegraph to store data in an external PostgreSQL 
 
 Simply edit the relevant PostgreSQL environment variables (e.g. PGHOST, PGPORT, PGUSER, [etc.](http://www.postgresql.org/docs/current/static/libpq-envars.html)) in [base/frontend/sourcegraph-frontend.Deployment.yaml](../base/frontend/sourcegraph-frontend.Deployment.yaml) to point to your existing PostgreSQL instance.
 
+Note: Sourcegraph will create a secondary database in the same PostgreSQL instance with a name of the form `{PGDATABASE}_lsif`. It is assumed the PostgreSQL instance is dedicated solely to Sourcegraph.
+
 ## Install without RBAC
 
 Sourcegraph Data Center communicates with the Kubernetes API for service discovery. It also has some janitor DaemonSets that clean up temporary cache data. To do that we need to create RBAC resources.
@@ -498,3 +500,9 @@ Sourcegraph's Kubernetes deployment [requires an Enterprise license key](https:/
 1. Create an account on or sign in to sourcegraph.com, and go to https://sourcegraph.com/subscriptions/new to obtain a license key.
 
 1. Once you have a license key, add it to your configuration by setting it [in the management console](https://docs.sourcegraph.com/admin/management_console).
+
+## Use non-default namespace
+
+If you're deploying Sourcegraph into a non-default namespace,
+refer to [base/prometheus/README.md#Namespaces](../base/prometheus/README.md#Namespaces) and
+[base/grafana/README.md#Namespaces](../base/grafana/README.md#Namespaces) for further configuration instructions.

@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Collects metrics and aggregates them into graphs.
+  labels:
+    deploy: sourcegraph
+  name: prometheus
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: prometheus
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+      - image: index.docker.io/sourcegraph/prometheus:10.0.1@sha256:ba6dd9e33621801d553651191b4d4c64f866a6620374d48aedb92abad305e7ca
+        env:
+        - name: USE_KUBERNETES_DISCOVERY
+          value: "true"
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: prometheus
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        ports:
+        - containerPort: 9090
+          name: http
+        volumeMounts:
+        - mountPath: /prometheus
+          name: data
+        - mountPath: /sg_prometheus_add_ons
+          name: config
+        resources:
+          limits:
+            cpu: "2"
+            memory: 2G
+          requests:
+            cpu: 500m
+            memory: 500M
+      serviceAccountName: prometheus
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: prometheus
+      - configMap:
+          defaultMode: 0777
+          name: prometheus
+        name: config
