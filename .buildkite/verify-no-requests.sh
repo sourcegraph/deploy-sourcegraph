@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -ex
+set -e
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 if grep -r --include=\*.Deployment.yaml -H -e requests: -A 2 .; then
