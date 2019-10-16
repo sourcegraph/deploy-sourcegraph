@@ -12,3 +12,8 @@ steps:
     concurrency: 4
     concurrency_group: deploy-sourcegraph/integration
     command: .buildkite/integration-test.sh
+
+  - wait
+  
+  - label: ":gcompute: :floppy_disk: 🧹"
+    command: .buildkite/cleanup-unused-disks.sh
