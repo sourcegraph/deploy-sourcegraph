@@ -11,6 +11,7 @@ gcloud_command() {
 
 echo "--- Deleting unattached GCP disks from the $PROJECT project"
 
+# See https://groups.google.com/d/msg/gce-discussion/RLrwOx8fazo/9ve7lIdsBQAJ for more information.
 for disk in $(gcloud_command compute disks list --filter="-users:*" --format="value(selfLink)")
 do
     echo "Deleting disk: $disk"
