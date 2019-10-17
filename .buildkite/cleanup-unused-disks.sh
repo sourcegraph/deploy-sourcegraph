@@ -9,7 +9,7 @@ gcloud_command() {
     gcloud --quiet --project="$SOURCEGRAPH_AUXILIARY_PROJECT" "$@"
 }
 
-echo "--- Deleting unattached GCP disks from the $SOURCEGRAPH_AUXILIARY_PROJECT project"
+echo "--- Deleting unattached GCP disks from the '$SOURCEGRAPH_AUXILIARY_PROJECT' project"
 
 # See https://groups.google.com/d/msg/gce-discussion/RLrwOx8fazo/9ve7lIdsBQAJ for more information.
 unattached_disks=$(gcloud_command compute disks list --filter="-users:*" --format="value(selfLink)")
