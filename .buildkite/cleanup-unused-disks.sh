@@ -14,7 +14,7 @@ echo "--- Deleting unattached GCP disks from the '$SOURCEGRAPH_AUXILIARY_PROJECT
 # See https://groups.google.com/d/msg/gce-discussion/RLrwOx8fazo/9ve7lIdsBQAJ for more information.
 unattached_disks=$(gcloud_command compute disks list --filter="-users:*" --format="value(selfLink)")
 
-for disk in unattached_disks
+for disk in $unattached_disks
 do
     echo "Deleting disk: $disk"
     
