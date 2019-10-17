@@ -3,19 +3,24 @@
 
 set -euxo pipefail
 
-PROJECT=sourcegraph-server
+SOURCEGRAPH_AUXILIARY_PROJECT=sourcegraph-server
 
 gcloud_command() {
-    gcloud --quiet --project="$PROJECT" "$@"
+    gcloud --quiet --project="$SOURCEGRAPH_AUXILIARY_PROJECT" "$@"
 }
 
-echo "--- Deleting unattached GCP disks from the $PROJECT project"
+echo "--- Deleting unattached GCP disks from the '$SOURCEGRAPH_AUXILIARY_PROJECT' project"
 
 # See https://groups.google.com/d/msg/gce-discussion/RLrwOx8fazo/9ve7lIdsBQAJ for more information.
-for disk in $(gcloud_command compute disks list --filter="-users:*" --format="value(selfLink)")
+unattached_disks=$(gcloud_command compute disks list --filter="-users:*" --format="value(selfLink)")
+
+for disk in $unattached_disks
 do
     echo "Deleting disk: $disk"
+    
+    # "gcloud compute disks delete ..." will never delete an attached disk.
+    # See https://cloud.google.com/sdk/gcloud/reference/compute/disks/delete for more information.
     gcloud_command compute disks delete $disk
 done
 
-echo "Done"
+echo "done"
