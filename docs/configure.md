@@ -486,8 +486,6 @@ You may prefer to configure Sourcegraph to store data in an external PostgreSQL 
 
 Simply edit the relevant PostgreSQL environment variables (e.g. PGHOST, PGPORT, PGUSER, [etc.](http://www.postgresql.org/docs/current/static/libpq-envars.html)) in [base/frontend/sourcegraph-frontend.Deployment.yaml](../base/frontend/sourcegraph-frontend.Deployment.yaml) to point to your existing PostgreSQL instance.
 
-Note: Sourcegraph will create a secondary database in the same PostgreSQL instance with a name of the form `{PGDATABASE}_lsif`. It is assumed the PostgreSQL instance is dedicated solely to Sourcegraph.
-
 ## Install without RBAC
 
 Sourcegraph Data Center communicates with the Kubernetes API for service discovery. It also has some janitor DaemonSets that clean up temporary cache data. To do that we need to create RBAC resources.
