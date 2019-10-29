@@ -9,6 +9,11 @@ steps:
   - wait
 
   - label: ":pulumi: :k8s:"
-    concurrency: 4
+    concurrency: 5
     concurrency_group: deploy-sourcegraph/integration
     command: .buildkite/integration-test.sh
+
+  - wait
+  
+  - label: ":gcompute: :floppy_disk: 🧹"
+    command: .buildkite/cleanup-unused-disks.sh

@@ -22,7 +22,7 @@ kubectl delete pvc indexed-search
 kubectl patch pv -p '{"spec":{"claimRef":{"name":"data-indexed-search-0","uuid":null}}}' $(kubectl get pv -o json | jq -r '.items[] | select(.spec.claimRef.name == "indexed-search").metadata.name') 
 
 # Create the stateful set
-kubectl -f base/indexed-search/indexed-search.StatefulSet.yaml
+kubectl apply -f base/indexed-search/indexed-search.StatefulSet.yaml
 ```
 
 ## 3.8

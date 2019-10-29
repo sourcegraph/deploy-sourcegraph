@@ -11,11 +11,11 @@
    cat $AD | yj | jq "(.spec.template.spec.containers[] | select(.name == \"alertmanager\") | .args) |= (. + [\"--web.external-url=$ALERT_MANAGER_URL\"] | unique)" | jy -o $AD
    ```
 
-3. Update [../prometheus.Deployment.yaml](prometheus.Deployment.yaml) with the URL to your Alertmanager instance.
+3. Update [prometheus.Deployment.yaml](../../../base/prometheus/prometheus.Deployment.yaml) with the URL to your Alertmanager instance.
 
    ```bash
    ALERT_MANAGER_URL="https://alertmanager.example.com" # update this url
-   PD=configure/prometheus/prometheus.Deployment.yaml
+   PD=base/prometheus/prometheus.Deployment.yaml
    cat $PD | yj | jq "(.spec.template.spec.containers[] | select(.name == \"prometheus\") | .args) |= (. + [\"--web.external-url=$ALERT_MANAGER_URL\"] | unique)" | jy -o $PD
    ```
 
@@ -28,5 +28,5 @@
 5. Apply the Prometheus resources to your cluster.
 
    ```bash
-   kubectl apply --prune -l deploy=prometheus -f configure/prometheus --recursive
+   kubectl apply --prune -l deploy=sourcegraph -f base/prometheus --recursive
    ```

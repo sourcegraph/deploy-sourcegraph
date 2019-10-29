@@ -163,5 +163,5 @@ UI:
 - Average (5-minute) HTTP requests per second: `job:src_http_request_count:rate5m`
 - Average (5-minute) HTTP requests per second, bucketed by request duration:
   `route:src_http_request_duration_seconds_bucket:rate5m`
-- CPU utilization by container: `max by (container_name)(task:container_cpu_usage_seconds_total:sum{container_name=~"$name"})`
-- Memory utilization by container: `max by (container_name)(container_memory_rss{container_name=~"$name"}) / 1024 / 1024 / 1024`
+- CPU usage by container: `max by (container_name)(task:container_cpu_usage_seconds_total:sum{container_name=~"$name"})`
+- Memory usage by container: `max by (container_name)(container_memory_usage_bytes{container_name=~"$name"}) / 1024 / 1024 / 1024`

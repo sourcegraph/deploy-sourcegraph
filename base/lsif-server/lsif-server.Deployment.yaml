@@ -31,26 +31,28 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/lsif-server:3.8.2@sha256:3cb45e91217929e3547c235c5d3e7145e20fac46b0d4f051dd464203ffbd31bd
+        image: index.docker.io/sourcegraph/lsif-server:3.9.3@sha256:746e0e8a5c84c0c9bca6d04ec684bdd4fa683d847b6f27a51e75c727fdb91851
         terminationMessagePolicy: FallbackToLogsOnError
         name: lsif-server
         livenessProbe:
           httpGet:
             path: /ping
-            port: http
+            port: server
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /ping
-            port: http
+            port: server
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
         - containerPort: 3186
-          name: http
+          name: server
+        - containerPort: 3187
+          name: worker
         resources:
           limits:
             cpu: "2"
