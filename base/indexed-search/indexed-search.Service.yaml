@@ -2,16 +2,17 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
+    description: Headless service that provides a stable network identity for the
+      indexed-search stateful set.
     prometheus.io/scrape: "true"
   labels:
     app: indexed-search
     deploy: sourcegraph
   name: indexed-search
 spec:
+  clusterIP: None
   ports:
-  - name: http
-    port: 80
-    targetPort: http
+  - port: 6070
   selector:
     app: indexed-search
   type: ClusterIP
