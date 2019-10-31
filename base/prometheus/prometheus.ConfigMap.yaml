@@ -120,7 +120,7 @@ data:
       - role: endpoints
 
       relabel_configs:
-      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+      - source_labels: [__meta_kubernetes_service_annotation_sourcegraph_prometheus_scrape]
         action: keep
         regex: true
       - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
@@ -203,7 +203,7 @@ data:
       - role: pod
 
       relabel_configs:
-      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+      - source_labels: [__meta_kubernetes_service_annotation_sourcegraph_prometheus_scrape]
         action: keep
         regex: true
       - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
