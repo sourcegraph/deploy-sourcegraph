@@ -332,7 +332,7 @@ Commit the outstanding changes.
 
 ## Configure indexed-search replica count
 
-Increasing the number of `indexed-search` replicas can improve performance and reliability when your instance contains a large number of repositories. Repository indexes are consistently striped across all `indexed-search` replicas.
+Increasing the number of `indexed-search` replicas can improve performance and reliability when your instance contains a large number of repositories. Repository indexes are distributed evenly across all `indexed-search` replicas.
 
 By default `indexed-search` relies on kubernetes service discovery, so adjusting the number of replicas just requires updating the `replicas` field in [indexed-search.StatefulSet.yaml](../base/indexed-search/indexed-search.StatefulSet.yaml).
 
