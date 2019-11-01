@@ -51,6 +51,7 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 ### Less common configuration
 
 - [Configure gitserver replica count](#configure-gitserver-replica-count)
+- [Configure indexed-search replica count](#configure-indexed-search-replica-count)
 - [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
 - [Configure Alertmanager](../configure/prometheus/alertmanager/README.md)
 - [Configure Jaeger tracing](../configure/jaeger/README.md)
@@ -283,10 +284,6 @@ If your instance contains a large number of repositories or monorepos, changing 
 
 ## Configure gitserver replica count
 
-**Note:** If you're creating a new cluster and would like to change `gitserver`'s replica count, do
-so _before_ running `./kubectl-apply-all.sh` for the first time. Changing this after the cluster
-configuration has been applied will require manually resizing the `indexed-search` volume.
-
 Increasing the number of `gitserver` replicas can improve performance when your instance contains a large number of repositories. Repository clones are consistently striped across all `gitserver` replicas. Other services need to be aware of how many `gitserver` replicas exist so they can resolve an individual repo.
 
 To change the number of `gitserver` replicas:
@@ -302,17 +299,7 @@ To change the number of `gitserver` replicas:
          value: gitserver-0.gitserver:3178 gitserver-1.gitserver:3178
    ```
 
-1. Update the requested `storage` capacity in [base/indexed-search/indexed-search.PersistentVolumeClaim.yaml](../base/indexed-search/indexed-search.PersistentVolumeClaim.yaml) to be `200Gi` multiplied by the number of `gitserver` replicas.
-
-   For example, if there are 2 `gitserver` replicas then the `storage` requested in [base/indexed-search/indexed-search.PersistentVolumeClaim.yaml](../base/indexed-search/indexed-search.PersistentVolumeClaim.yaml) should have the value `400Gi`.
-
-   ```yaml
-   # base/indexed-search/indexed-search.PersistentVolumeClaim.yaml
-   spec:
-     resources:
-       requests:
-         storage: 400Gi
-   ```
+1. Recommended: Increase [indexed-search replica count](#configure-indexed-search-replica-count)
 
 Here is a convenience script that performs all three steps:
 
@@ -332,16 +319,24 @@ GITSERVERS=$(for i in `seq 0 $(($REPLICA_COUNT-1))`; do echo -n "gitserver-$i.gi
 # Update SRC_GIT_SERVERS environment variable in other services
 find . -name "*yaml" -exec sed -i.sedibak -e "s/value: gitserver-0.gitserver:3178.*/value: $GITSERVERS/g" {} +
 
-IDX_SEARCH=base/indexed-search/indexed-search.PersistentVolumeClaim.yaml
+IDX_SEARCH=base/indexed-search/indexed-search.StatefulSet.yaml
 
-# Update the storage requested in indexed-search's persistent volume claim
-cat $IDX_SEARCH | yj | jq --arg REPLICA_COUNT "$REPLICA_COUNT" '.spec.resources.requests.storage = ((($REPLICA_COUNT |tonumber)  * 200) | tostring)+"Gi"' | jy -o $IDX_SEARCH
+# Update indexed-search replica count
+cat $IDX_SEARCH | yj | jq ".spec.replicas = $REPLICA_COUNT" | jy -o $IDX_SEARCH
 
 # Delete sed's backup files
 find . -name "*.sedibak" -delete
 ```
 
 Commit the outstanding changes.
+
+## Configure indexed-search replica count
+
+Increasing the number of `indexed-search` replicas can improve performance and reliability when your instance contains a large number of repositories. Repository indexes are consistently striped across all `indexed-search` replicas.
+
+By default `indexed-search` relies on kubernetes service discovery, so adjusting the number of replicas just requires updating the `replicas` field in [indexed-search.StatefulSet.yaml](../base/indexed-search/indexed-search.StatefulSet.yaml).
+
+Not Recommended: To use a static list of indexed-search servers you can configure `INDEXED_SEARCH_SERVERS` on `sourcegraph-frontend`. It uses the same format as `SRC_GIT_SERVERS` above. Adjusting replica counts will require the same steps as gitserver.
 
 ## Assign resource-hungry pods to larger nodes
 

@@ -9,14 +9,13 @@ version you are upgrading to should be applied (unless otherwise noted).
 In 3.9 we migrated `indexed-search` to a StatefulSet. However, we didn't migrate the `indexed-search` service to a headless service. You can't mutate a service, so you will need to replace the service before running `kubectl-apply-all.sh`:
 
 ``` bash
-# REQUIRED: Replace since we can't mutate services
+# Replace since we can't mutate services
 kubectl replace --force -f base/indexed-search/indexed-search.Service.yaml
 
-# OPTIONAL: Update indexed-search to be accessed via headless service (old default was indexed-search:80)
-kubectl set env deploy/sourcegraph-frontend ZOEKT_HOST=indexed-search-0.indexed-search:6070
+# Now apply all so frontend knows how to speak to the new service address
+# for indexed-search
+./kubectl-apply-all.sh
 ```
-
-The second step is optional but recommended. It will allow indexed-search to continue working until you have run `kubectl-apply-all.sh`.
 
 ## 3.9
 
