@@ -57,7 +57,7 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 - [Configure Jaeger tracing](../configure/jaeger/README.md)
 - [Configure Lightstep tracing](#configure-lightstep-tracing)
 - [Configure custom Redis](#configure-custom-redis)
-- [Configure custom PostgreSQL](#configure-custom-redis)
+- [Configure custom PostgreSQL](#configure-custom-postgres)
 - [Install without RBAC](#install-without-rbac)
 - [Use non-default namespace](#use-non-default-namespace)
 
@@ -477,7 +477,7 @@ If you want to specify a custom Redis server, you'll need specify the correspond
 
 ## Configure custom PostgreSQL
 
-You may prefer to configure Sourcegraph to store data in an external PostgreSQL instance if you already have existing database management or backup infrastructure.
+You can use your own PostgreSQL v9.6+ server with Sourcegraph if you wish. For example, you may prefer this if you already have existing backup infrastructure around your own PostgreSQL server, wish to use Amazon RDS, etc.
 
 Simply edit the relevant PostgreSQL environment variables (e.g. PGHOST, PGPORT, PGUSER, [etc.](http://www.postgresql.org/docs/current/static/libpq-envars.html)) in [base/frontend/sourcegraph-frontend.Deployment.yaml](../base/frontend/sourcegraph-frontend.Deployment.yaml) to point to your existing PostgreSQL instance.
 
