@@ -37,12 +37,6 @@ spec:
           value: disable
         - name: PGUSER
           value: sg
-        # ZOEKT_HOST default is indexed-search:80, but for 3.10 the
-        # indexed-search svc has changed to a headless service. So for
-        # installations that still rely on ZOEKT_HOST we need to set it to the
-        # first pod. See 3.10 in migrate.md
-        - name: ZOEKT_HOST
-          value: indexed-search-0.indexed-search:6070
         - name: SRC_GIT_SERVERS
           value: gitserver-0.gitserver:3178
         # POD_NAME is used by CACHE_DIR
