@@ -290,6 +290,18 @@ data:
               help: Alerts when a node has less than 5% available disk space.
               summary: Critical! {{`{{`}}$labels.exported_name{{`}}`}} has less than 5% available
                 disk space
+          - alert: GitserverDiskSpaceLow
+            expr: src_gitserver_disk_space_available / src_gitserver_disk_space_total < 0.1
+            annotations:
+              help: Alerts when gitserverdisk space is low.
+              summary: gitserver {{`{{`}}$labels.instance{{`}}`}} disk space is less than 10% of available disk space
+          - alert: GitserverDiskSpaceLowCritical
+            expr: src_gitserver_disk_space_available / src_gitserver_disk_space_total < 0.05
+            labels:
+              severity: page
+            annotations:
+              help: Alerts when gitserverdisk space is critically low.
+              summary: Critical! gitserver {{`{{`}}$labels.instance{{`}}`}} disk space is less than 5% of available disk space
           - alert: SearcherErrorRatioTooHigh
             expr: searcher_errors:ratio10m > 0.1
             for: 20m
