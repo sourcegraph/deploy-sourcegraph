@@ -4,6 +4,19 @@ This document records manual migrations that are necessary to apply when upgradi
 Sourcegraph versions. All manual migrations between the version you are upgrading from and the
 version you are upgrading to should be applied (unless otherwise noted).
 
+## 3.10
+
+In 3.9 we migrated `indexed-search` to a StatefulSet. However, we didn't migrate the `indexed-search` service to a headless service. You can't mutate a service, so you will need to replace the service before running `kubectl-apply-all.sh`:
+
+``` bash
+# Replace since we can't mutate services
+kubectl replace --force -f base/indexed-search/indexed-search.Service.yaml
+
+# Now apply all so frontend knows how to speak to the new service address
+# for indexed-search
+./kubectl-apply-all.sh
+```
+
 ## 3.9
 
 In 3.9 `indexed-search` is migrated from a Kubernetes [Deployment](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) to a [StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/). By default Kubernetes will assign a new volume to `indexed-search`, leading to it being unavailable while it reindexes. To avoid that we need to update the [PersistentVolume](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)'s claim to the new indexed-search pod (from `indexed-search` to `data-indexed-search-0`. This can be achieved by running the commands in the script below before upgrading. Please read the script closely to understand what it does before following it.
