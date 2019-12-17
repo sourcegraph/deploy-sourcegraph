@@ -11,7 +11,7 @@
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) v1.9.7 or later
 - Access to server infrastructure on which you can create a Kubernetes cluster (see
   [resource allocation guidelines](scale.md)).
-- Sourcegraph's Kubernetes deployment requires an Enterprise license key. See ["Add a license key"](./configure.md#add-license-key) for instructions to obtain one.
+- [Sourcegraph Enterprise license](./configure.md#add-license-key). You can run through these instructions without one, but you must obtain a license for instances of more than 10 users.
 
 
 ## Steps
