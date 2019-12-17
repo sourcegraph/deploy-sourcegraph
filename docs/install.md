@@ -11,6 +11,8 @@
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) v1.9.7 or later
 - Access to server infrastructure on which you can create a Kubernetes cluster (see
   [resource allocation guidelines](scale.md)).
+- Sourcegraph's Kubernetes deployment requires an Enterprise license key. See ["Add a license key"](./configure.md#add-license-key) for instructions to obtain one.
+
 
 ## Steps
 
@@ -33,8 +35,6 @@
 1. Configure the `sourcegraph` storage class for the cluster by reading through ["Configure a storage class"](./configure.md#configure-a-storage-class).
 
 1. If you want to add a large number of repositories to your instance, you should [configure the number of gitserver replicas](configure.md#configure-gitserver-replica-count) _before_ you continue with the next step.
-
-1. Beginning with version 2.12.0, Sourcegraph's Kubernetes deployment requires an Enterprise license key. See ["Add a license key"](./configure.md#add-license-key) for instructions.
 
 1. Deploy the desired version of Sourcegraph to your cluster:
 
