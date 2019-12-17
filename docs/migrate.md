@@ -4,6 +4,10 @@ This document records manual migrations that are necessary to apply when upgradi
 Sourcegraph versions. All manual migrations between the version you are upgrading from and the
 version you are upgrading to should be applied (unless otherwise noted).
 
+## 3.11
+
+In 3.11 we removed the management console. If you make use of `CRITICAL_CONFIG_FILE` or `SITE_CONFIG_FILE`, please refer to the [migration notes for Sourcegraph 3.11+](https://docs.sourcegraph.com/admin/migration/3_11).
+
 ## 3.10
 
 In 3.9 we migrated `indexed-search` to a StatefulSet. However, we didn't migrate the `indexed-search` service to a headless service. You can't mutate a service, so you will need to replace the service before running `kubectl-apply-all.sh`:

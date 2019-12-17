@@ -96,7 +96,6 @@ kubectl create ns src
 kubens src
 ./kubectl-apply-all.sh
 kubectl expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph
-kubectl expose deployment management-console --type=NodePort --name admin
 minikube service list
 ```
 
