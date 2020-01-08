@@ -96,7 +96,7 @@ Add the following fields to your Sourcegraph global settings (`$PASSWORD` is the
 
 ```js
 "typescript.serverUrl": "wss://langserveruser:$PASSWORD@$TYPESCRIPT_DOMAIN_NAME/",
-"typescript.sourcegraphUrl": "http://sourcegraph-frontend:30080",
+"typescript.sourcegraphUrl": "http://frontend:30080",
 ```
 
 If you haven't setup SSL/TLS and HTTP basic authentication yet `typescript.serverUrl` should look like this:

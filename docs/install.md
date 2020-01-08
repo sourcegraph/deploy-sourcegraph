@@ -53,13 +53,13 @@
    kubectl 1.9.x:
 
    ```bash
-   kubectl port-forward $(kubectl get pod -l app=sourcegraph-frontend -o template --template="{{(index .items 0).metadata.name}}") 3080
+   kubectl port-forward $(kubectl get pod -l app=frontend -o template --template="{{(index .items 0).metadata.name}}") 3080
    ```
 
    kubectl 1.10.0 or later:
 
    ```
-   kubectl port-forward svc/sourcegraph-frontend 3080:30080
+   kubectl port-forward svc/frontend 3080:30080
    ```
 
    Open http://localhost:3080 in your browser and you will see a setup page. Congrats, you have Sourcegraph up and running!

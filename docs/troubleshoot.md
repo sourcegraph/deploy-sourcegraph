@@ -6,7 +6,7 @@ cause of the failure. The most useful commands are:
 - `kubectl get pods -o=wide` — lists all pods in your cluster and the corresponding health status of each.
 - `kubectl logs -f $POD_NAME` — tails the logs for the specified pod.
 
-If Sourcegraph is unavailable and the `sourcegraph-frontend-*` pod(s) are not in status `Running`, then view their logs with `kubectl logs -f sourcegraph-frontend-$POD_ID` (filling in `$POD_ID` from the `kubectl get pods` output). Inspect both the log messages printed at startup (at the beginning of the log output) and recent log messages.
+If Sourcegraph is unavailable and the `frontend-*` pod(s) are not in status `Running`, then view their logs with `kubectl logs -f frontend-$POD_ID` (filling in `$POD_ID` from the `kubectl get pods` output). Inspect both the log messages printed at startup (at the beginning of the log output) and recent log messages.
 
 Less frequently used commands:
 
@@ -20,7 +20,7 @@ Less frequently used commands:
 
 ### Common errors
 
-- `Error from server (Forbidden): error when creating "base/frontend/sourcegraph-frontend.Role.yaml": roles.rbac.authorization.k8s.io "sourcegraph-frontend" is forbidden: attempt to grant extra privileges`
+- `Error from server (Forbidden): error when creating "base/frontend/frontend.Role.yaml": roles.rbac.authorization.k8s.io "frontend" is forbidden: attempt to grant extra privileges`
 
   - The account you are using to apply the Kubernetes configuration doesn't have sufficient permissions to create roles.
   - GCP: `kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user $YOUR_EMAIL`

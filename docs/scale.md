@@ -9,14 +9,14 @@ parameters can yield a drastic improvement in performance.
 
 ## Tuning replica counts for horizontal scalability
 
-By default, your cluster has a single pod for each of `sourcegraph-frontend`, `searcher`, and `gitserver`. You can
+By default, your cluster has a single pod for each of `frontend`, `searcher`, and `gitserver`. You can
 increase the number of replicas of each of these services to handle higher scale.
 
-We recommend setting the `sourcegraph-frontend`, `searcher`, and `gitserver` replica counts according to the following tables:
+We recommend setting the `frontend`, `searcher`, and `gitserver` replica counts according to the following tables:
 
 <div class="table">
 
-| Users      | Number of `sourcegraph-frontend` replicas |
+| Users      | Number of `frontend` replicas |
 | ---------- | ----------------------------------------- |
 | 10-500     | 1                                         |
 | 500-2000   | 2                                         |
@@ -24,7 +24,7 @@ We recommend setting the `sourcegraph-frontend`, `searcher`, and `gitserver` rep
 | 4000-10000 | 18                                        |
 | 10000+     | 28                                        |
 
-_You can change the replica count of `sourcegraph-frontend` by editing [base/frontend/sourcegraph-frontend.Deployment.yaml](../base/frontend/sourcegraph-frontend.Deployment.yaml)._
+_You can change the replica count of `frontend` by editing [base/frontend/frontend.Deployment.yaml](../base/frontend/frontend.Deployment.yaml)._
 
 <br>
 
@@ -64,7 +64,7 @@ the replica count of `gitserver`._
 
 When you're using Sourcegraph with many repositories (100s-10,000s), the most important parameters to tune are:
 
-- `sourcegraph-frontend` CPU/memory resource allocations
+- `frontend` CPU/memory resource allocations
 - `searcher` replica count
 - `indexedSearch` CPU/memory resource allocations
 - `gitserver` replica count
@@ -93,7 +93,7 @@ Notes:
 When you're using Sourcegraph with a large monorepo (or several large monorepos), the most important parameters to tune
 are:
 
-- `sourcegraph-frontend` CPU/memory resource allocations
+- `frontend` CPU/memory resource allocations
 - `searcher` CPU/memory resource allocations (allocate enough memory to hold all non-binary files in your repositories)
 - `indexedSearch` CPU/memory resource allocations (for the `zoekt-indexserver` pod, allocate enough memory to hold all non-binary files in your largest repository; for the `zoekt-webserver` pod, allocate enough memory to hold ~2.7x the size of all non-binary files in your repositories)
 - `symbols` CPU/memory resource allocations

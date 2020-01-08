@@ -251,7 +251,7 @@ data:
               help: Alerts when no pods are running for a service.
               summary: No pods are running for {{`{{`}} $labels.app {{`}}`}}
           - alert: ProdPageLoadLatency
-            expr: histogram_quantile(0.9, sum by(le) (rate(src_http_request_duration_seconds_bucket{job="sourcegraph-frontend",route!="raw"}[10m])))
+            expr: histogram_quantile(0.9, sum by(le) (rate(src_http_request_duration_seconds_bucket{job="frontend",route!="raw"}[10m])))
               > 20
             labels:
               severity: page

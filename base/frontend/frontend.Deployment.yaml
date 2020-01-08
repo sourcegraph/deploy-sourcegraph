@@ -5,14 +5,14 @@ metadata:
     description: Serves the frontend of Sourcegraph via HTTP(S).
   labels:
     deploy: sourcegraph
-  name: sourcegraph-frontend
+  name: frontend
 spec:
   minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: sourcegraph-frontend
+      app: frontend
   strategy:
     rollingUpdate:
       maxSurge: 2
@@ -21,7 +21,7 @@ spec:
   template:
     metadata:
       labels:
-        app: sourcegraph-frontend
+        app: frontend
     spec:
       containers:
       - args:
@@ -84,7 +84,7 @@ spec:
           name: cache-ssd
       securityContext:
         runAsUser: 0
-      serviceAccountName: sourcegraph-frontend
+      serviceAccountName: frontend
       volumes:
       - emptyDir: {}
         name: cache-ssd

@@ -71,9 +71,9 @@ There are a few approaches, but using an ingress controller is recommended.
 
 For production environments, we recommend using the [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) [ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/).
 
-As part of our base configuration we install an ingress for [sourcegraph-frontend](../base/frontend/sourcegraph-frontend.Ingress.yaml). It installs rules for the default ingress, see comments to restrict it to a specific host.
+As part of our base configuration we install an ingress for [frontend](../base/frontend/frontend.Ingress.yaml). It installs rules for the default ingress, see comments to restrict it to a specific host.
 
-In addition to the sourcegraph-frontend ingress, you'll need to install the NGINX ingress controller (ingress-nginx). Follow the instructions at https://kubernetes.github.io/ingress-nginx/deploy/ to create the ingress controller. Add the files to [configure/ingress-nginx](../configure/ingress-nginx), including an [install.sh](configure/ingress-nginx/install.sh) file which applies the relevant manifests. We include sample generic-cloud manifests as part of this repository, but please follow the official instructions for your cloud provider.
+In addition to the frontend ingress, you'll need to install the NGINX ingress controller (ingress-nginx). Follow the instructions at https://kubernetes.github.io/ingress-nginx/deploy/ to create the ingress controller. Add the files to [configure/ingress-nginx](../configure/ingress-nginx), including an [install.sh](configure/ingress-nginx/install.sh) file which applies the relevant manifests. We include sample generic-cloud manifests as part of this repository, but please follow the official instructions for your cloud provider.
 
 Add the [configure/ingress-nginx/install.sh](configure/ingress-nginx/install.sh) command to [create-new-cluster.sh](../create-new-cluster.sh) and commit the change:
 
@@ -91,7 +91,7 @@ If you are having trouble accessing Sourcegraph, ensure ingress-nginx IP is acce
 
 #### Configuration
 
-`ingress-nginx` has extensive configuration documented at [NGINX Configuration](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/). We expect most administrators to modify [ingress-nginx annotations](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/) in [sourcegraph-frontend.Ingress.yaml](../base/frontend/sourcegraph-frontend.Ingress.yaml). Some settings are modified globally (such as HSTS). In that case we expect administrators to modify the [ingress-nginx configmap](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/) in [configure/ingress-nginx/mandatory.yaml](../configure/ingress-nginx/mandatory.yaml).
+`ingress-nginx` has extensive configuration documented at [NGINX Configuration](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/). We expect most administrators to modify [ingress-nginx annotations](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/) in [frontend.Ingress.yaml](../base/frontend/frontend.Ingress.yaml). Some settings are modified globally (such as HSTS). In that case we expect administrators to modify the [ingress-nginx configmap](https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/) in [configure/ingress-nginx/mandatory.yaml](../configure/ingress-nginx/mandatory.yaml).
 
 ### NGINX service
 
@@ -122,10 +122,10 @@ Add a network rule that allows ingress traffic to port 30080 (HTTP) on at least 
   1. Expose the necessary ports.
 
      ```bash
-     gcloud compute --project=$PROJECT firewall-rules create sourcegraph-frontend-http --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:30080
+     gcloud compute --project=$PROJECT firewall-rules create frontend-http --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:30080
      ```
 
-  1. Change the type of the `sourcegraph-frontend` service in [base/frontend/sourcegraph-frontend.Service.yaml](../base/frontend/sourcegraph-frontend.Service.yaml) from `ClusterIP` to `NodePort`:
+  1. Change the type of the `frontend` service in [base/frontend/frontend.Service.yaml](../base/frontend/frontend.Service.yaml) from `ClusterIP` to `NodePort`:
 
      ```diff
      spec:
@@ -140,14 +140,14 @@ Add a network rule that allows ingress traffic to port 30080 (HTTP) on at least 
   1. Directly applying this change to the service [will fail](https://github.com/kubernetes/kubernetes/issues/42282). Instead, you must delete the old service and then create the new one (this will result in a few seconds of downtime):
 
   ```shell
-  kubectl delete svc sourcegraph-frontend
-  kubectl apply -f base/frontend/sourcegraph-frontend.Service.yaml
+  kubectl delete svc frontend
+  kubectl apply -f base/frontend/frontend.Service.yaml
   ```
 
   1. Find a node name.
 
      ```bash
-     kubectl get pods -l app=sourcegraph-frontend -o=custom-columns=NODE:.spec.nodeName
+     kubectl get pods -l app=frontend -o=custom-columns=NODE:.spec.nodeName
      ```
 
   1. Get the EXTERNAL-IP address (will be ephemeral unless you [make it static](https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address#promote_ephemeral_ip)).
@@ -183,10 +183,10 @@ If you exposed your Sourcegraph instance via an ingress controller as described 
    echo kubectl create secret tls sourcegraph-tls --key $PATH_TO_KEY --cert $PATH_TO_CERT >> create-new-cluster.sh
    ```
 
-1. Add the tls configuration to [base/frontend/sourcegraph-frontend.Ingress.yaml](../base/frontend/sourcegraph-frontend.Ingress.yaml).
+1. Add the tls configuration to [base/frontend/frontend.Ingress.yaml](../base/frontend/frontend.Ingress.yaml).
 
    ```yaml
-   # base/frontend/sourcegraph-frontend.Ingress.yaml
+   # base/frontend/frontend.Ingress.yaml
    tls:
      - hosts:
          #  Replace 'sourcegraph.example.com' with the real domain that you want to use for your Sourcegraph instance.
@@ -197,7 +197,7 @@ If you exposed your Sourcegraph instance via an ingress controller as described 
          paths:
          - path: /
            backend:
-             serviceName: sourcegraph-frontend
+             serviceName: frontend
              servicePort: 30080
        # Replace 'sourcegraph.example.com' with the real domain that you want to use for your Sourcegraph instance.
        host: sourcegraph.example.com
@@ -333,7 +333,7 @@ Increasing the number of `indexed-search` replicas can improve performance and r
 
 By default `indexed-search` relies on kubernetes service discovery, so adjusting the number of replicas just requires updating the `replicas` field in [indexed-search.StatefulSet.yaml](../base/indexed-search/indexed-search.StatefulSet.yaml).
 
-Not Recommended: To use a static list of indexed-search servers you can configure `INDEXED_SEARCH_SERVERS` on `sourcegraph-frontend`. It uses the same format as `SRC_GIT_SERVERS` above. Adjusting replica counts will require the same steps as gitserver.
+Not Recommended: To use a static list of indexed-search servers you can configure `INDEXED_SEARCH_SERVERS` on `frontend`. It uses the same format as `SRC_GIT_SERVERS` above. Adjusting replica counts will require the same steps as gitserver.
 
 ## Assign resource-hungry pods to larger nodes
 
@@ -341,7 +341,7 @@ If you have a heterogeneous cluster where you need to ensure certain more resour
 
 This is useful if, for example, you have a very large monorepo that performs best when `gitserver`
 and `searcher` are on very large nodes, but you want to use smaller nodes for
-`sourcegraph-frontend`, `repo-updater`, etc. Node constraints can also be useful to ensure fast
+`frontend`, `repo-updater`, etc. Node constraints can also be useful to ensure fast
 updates by ensuring certain pods are assigned to specific nodes, preventing the need for manual pod
 shuffling.
 
@@ -468,7 +468,7 @@ Sourcegraph supports specifying a custom Redis server for:
 
 If you want to specify a custom Redis server, you'll need specify the corresponding environment variable for each of the following deployments:
 
-- `sourcegraph-frontend`
+- `frontend`
 - `repo-updater`
 - `lsif-server`
 
@@ -476,7 +476,7 @@ If you want to specify a custom Redis server, you'll need specify the correspond
 
 You can use your own PostgreSQL v9.6+ server with Sourcegraph if you wish. For example, you may prefer this if you already have existing backup infrastructure around your own PostgreSQL server, wish to use Amazon RDS, etc.
 
-Simply edit the relevant PostgreSQL environment variables (e.g. PGHOST, PGPORT, PGUSER, [etc.](http://www.postgresql.org/docs/current/static/libpq-envars.html)) in [base/frontend/sourcegraph-frontend.Deployment.yaml](../base/frontend/sourcegraph-frontend.Deployment.yaml) to point to your existing PostgreSQL instance.
+Simply edit the relevant PostgreSQL environment variables (e.g. PGHOST, PGPORT, PGUSER, [etc.](http://www.postgresql.org/docs/current/static/libpq-envars.html)) in [base/frontend/frontend.Deployment.yaml](../base/frontend/frontend.Deployment.yaml) to point to your existing PostgreSQL instance.
 
 Note: Sourcegraph will create a secondary database in the same PostgreSQL instance with a name of the form `{PGDATABASE}_lsif`. It is assumed the PostgreSQL instance is dedicated solely to Sourcegraph.
 

@@ -93,19 +93,19 @@ command:
 - **Snapshot of A:** Configure `kubectl` to access cluster A and then run `sourcegraph-server-gen snapshot create`.
 - **Restore A's snapshot to B:**
   - Configure `kubectl` to access B.
-  - Spin down `sourcegraph-frontend` replicas to 0. (**Note:** this is very important, because
-    otherwise `sourcegraph-frontend` may apply changes to the database that corrupt the snapshot
+  - Spin down `frontend` replicas to 0. (**Note:** this is very important, because
+    otherwise `frontend` may apply changes to the database that corrupt the snapshot
     restoration.)
 
     ```
-    kubectl scale --replicas=0 deployment/sourcegraph-frontend
+    kubectl scale --replicas=0 deployment/frontend
     ```
 
   - `sourcegraph-server-gen snapshot restore` from the same directory where you ran the snapshot creation earlier.
-  - Spin up `sourcegraph-frontend` replicas to what it was before:
+  - Spin up `frontend` replicas to what it was before:
 
     ```
-    kubectl scale --replicas=$N deployment/sourcegraph-frontend
+    kubectl scale --replicas=$N deployment/frontend
     ```
 - **Upgrade cluster B** to the new Sourcegraph version. Perform some quick checks to verify it is
   functioning.

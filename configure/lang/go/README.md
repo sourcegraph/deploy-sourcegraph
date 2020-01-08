@@ -95,7 +95,7 @@ Add the following fields to your Sourcegraph global settings (`$PASSWORD` is the
 
 ```js
 "go.serverUrl": "wss://langserveruser:$PASSWORD@$GO_DOMAIN_NAME/",
-"go.sourcegraphUrl": "http://sourcegraph-frontend:30080",
+"go.sourcegraphUrl": "http://frontend:30080",
 ```
 
 If you haven't setup SSL/TLS and HTTP basic authentication yet `go.serverUrl` should look like this:

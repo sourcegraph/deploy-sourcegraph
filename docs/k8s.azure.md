@@ -60,5 +60,5 @@ az aks browse --resource-group sourcegraphResourceGroup --name sourcegraphCluste
 Set up a load balancer to make the main web server accessible over the network to external users:
 
 ```
-kubectl expose deployment sourcegraph-frontend --type=LoadBalancer --name=sourcegraphloadbalancer --port=80 --target-port=3080
+kubectl expose deployment frontend --type=LoadBalancer --name=sourcegraphloadbalancer --port=80 --target-port=3080
 ```
