@@ -22,10 +22,14 @@ cluster.
    in the Kubernetes cluster.
 
 1. Deploy Jaeger using the [AllInOne
-   strategy](https://www.jaegertracing.io/docs/1.16/operator/#quick-start-deploying-the-allinone-image).<br/>
-   You can optionally choose one of the other strategies (e.g., Production, Streaming). In our
-   experience, most use cases of Jaeger with Sourcegraph are for live-debugging purposes, so the
-   AllInOne strategy (which stores traces in-memory) should suffice and is easiest to deploy.
+   strategy](https://www.jaegertracing.io/docs/1.16/operator/#quick-start-deploying-the-allinone-image).
+   1. You can optionally choose one of the other strategies (e.g., Production, Streaming). In our
+      experience, most use cases of Jaeger with Sourcegraph are for live-debugging purposes, so the
+      AllInOne strategy (which stores traces in-memory) should suffice and is easiest to deploy.
+   1. After following the default instructions, you should observe `kubectl get svc` returns a few
+      additional services (`simplest-agent`, `simplest-collector`, `simplest-collector-headless`,
+      `simplest-query`) and `kubectl get deploy simplest` should yield a deployment of the Jaeger
+      all-in-one image.
 
 1. Add the annotation `sidecar.jaegertracing.io/inject: "true"` to inject the Jaeger Agent sidecar
    containers into the relevant pods. You can use the following script:
