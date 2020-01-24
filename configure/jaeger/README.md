@@ -7,7 +7,7 @@ remedy (typically scaling up one of the services). If you are experiencing perfo
 Sourcegraph, anticipate a high volume of traffic, or have a large amount of code, we recommend
 connecting Sourcegraph to a Jaeger instance.
 
-There are two options for connecting Sourcegraph to Jaeger:
+nThere are two options for connecting Sourcegraph to Jaeger:
 
 * [Deploy-a-new-Jaeger-instance-inside-the-Sourcegraph-cluster](#Deploying-a-new-Jaeger-instance-alongside-Sourcegraph)
 * [Connect to an existing Jaeger instance](#Connecting-Sourcegraph-to-an-existing-Jaeger-instance)
@@ -106,3 +106,41 @@ This YAML snippet should be added to the following Sourcegraph deployment files:
 Finally, update Sourcegraph site configuration to contain `"useJaeger": true`. Restart the frontend
 pods by deleting them to ensure the configuration change takes effect: `kubectl delete pods
 --selector=app=sourcegraph-frontend`.
+
+## Migrating from old Jaeger configuration
+
+If you are using Sourcegraph 3.12 or earlier, you might have installed an older version of Jaeger as
+prescribed by an earlier version of these docs. If you are upgrading to 3.13 or later, we recommend
+updating Jaeger as the older version will be unsupported after Sourcegraph 3.14. To migrate, do the
+following:
+
+1. First, set `"useJaeger": false` in site config. This will prevent errors from appearing in the
+   logs during the migration process.
+
+1. Remove the Jaeger Agent sidecar containers from the Sourcegraph deployments to which it has been
+   added. If you followed the previous version of these docs to add the sidecar containers, the
+   following files should be modified:
+   ```
+   github-proxy/github-proxy.Deployment.yaml
+   query-runner/query-runner.Deployment.yaml
+   repo-updater/repo-updater.Deployment.yaml
+   searcher/searcher.Deployment.yaml
+   replacer/replacer.Deployment.yaml
+   frontend/sourcegraph-frontend.Deployment.yaml
+   symbols/symbols.Deployment.yaml
+   gitserver/gitserver.StatefulSet.yaml
+   ```
+
+   In each file, remove the `jaeger-agent` container from the deployment configuration. Run
+   `kubectl-apply-all.sh` afterward to update the cluster.
+
+1. Remove the old Jaeger installation. (Note: this will delete all existing trace data.)
+
+   ```bash
+   kubectl delete svc jaeger-cassandra jaeger-collector jaeger-query
+   kubectl delete deploy jaeger-cassandra jaeger-collector jaeger-query
+   kubectl delete pvc jaeger
+   ```
+
+1. Follow the instructions in the section above to deploy a new Jaeger instance alongside
+   Sourcegraph.
