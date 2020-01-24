@@ -31,10 +31,13 @@ cluster.
       `simplest-query`) and `kubectl get deploy simplest` should yield a deployment of the Jaeger
       all-in-one image.
 
-1. Add the annotation `sidecar.jaegertracing.io/inject: "true"` to inject the Jaeger Agent sidecar
-   containers into the relevant pods. You can use the following script:
+1. Inject the Jaeger Agent sidecar container into the relevant pods. You can use the following
+   scripts:
 
    ```bash
+   # This adds the annotation `sidecar.jaegertracing.io/inject: "true"` to each Deployment,
+   # and the Jaeger Operator takes care of the rest.
+
    COLLECTOR_PATCH=$(echo 'sidecar.jaegertracing.io/inject: "true"' | yj)
 
    COLLECTOR_DEPLOYMENTS=(
@@ -45,12 +48,57 @@ cluster.
        "replacer/replacer.Deployment.yaml"
        "frontend/sourcegraph-frontend.Deployment.yaml"
        "symbols/symbols.Deployment.yaml"
-       "gitserver/gitserver.StatefulSet.yaml"
    )
 
    for FILE in "${COLLECTOR_DEPLOYMENTS[@]}"; do
        F="base/$FILE"
        cat $F | yj | jq ".metadata.annotations += $COLLECTOR_PATCH" | jy -o $F
+   done
+   ```
+
+   ```bash
+   # This adds the Jaeger Agent sidecar container to the gitserver StatefulSet. (The Jaeger
+   # Operator does not yet support auto-injecting the container using the annotation.)
+
+   COLLECTOR_PATCH=$(yj <<EOM
+   args:
+   - --reporter.grpc.host-port=dns:///simplest-collector-headless.default:14250
+   - --reporter.type=grpc
+   env:
+   - name: POD_NAME
+     valueFrom:
+       fieldRef:
+         apiVersion: v1
+         fieldPath: metadata.name
+   image: jaegertracing/jaeger-agent:1.16.0
+   imagePullPolicy: IfNotPresent
+   name: jaeger-agent
+   ports:
+   - containerPort: 5775
+     name: zk-compact-trft
+     protocol: UDP
+   - containerPort: 5778
+     name: config-rest
+     protocol: TCP
+   - containerPort: 6831
+     name: jg-compact-trft
+     protocol: UDP
+   - containerPort: 6832
+     name: jg-binary-trft
+     protocol: UDP
+   resources: {}
+   terminationMessagePath: /dev/termination-log
+   terminationMessagePolicy: File
+   EOM
+   )
+
+   COLLECTOR_DEPLOYMENTS=(
+       "gitserver/gitserver.StatefulSet.yaml"
+   )
+
+   for FILE in "${COLLECTOR_DEPLOYMENTS[@]}"; do
+       F="base/$FILE"
+       cat $F | yj | jq ".spec.template.spec.containers += [$COLLECTOR_PATCH]" | jy -o $F
    done
    ```
 
