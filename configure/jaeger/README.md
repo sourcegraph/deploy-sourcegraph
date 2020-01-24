@@ -21,15 +21,23 @@ cluster.
    Operator](https://www.jaegertracing.io/docs/1.16/operator/#installing-the-operator-on-kubernetes)
    in the Kubernetes cluster.
 
-1. Deploy Jaeger using the [AllInOne
-   strategy](https://www.jaegertracing.io/docs/1.16/operator/#quick-start-deploying-the-allinone-image).
-   1. You can optionally choose one of the other strategies (e.g., Production, Streaming). In our
-      experience, most use cases of Jaeger with Sourcegraph are for live-debugging purposes, so the
-      AllInOne strategy (which stores traces in-memory) should suffice and is easiest to deploy.
-   1. After following the default instructions, you should observe `kubectl get svc` returns a few
-      additional services (`simplest-agent`, `simplest-collector`, `simplest-collector-headless`,
-      `simplest-query`) and `kubectl get deploy simplest` should yield a deployment of the Jaeger
-      all-in-one image.
+1. Deploy Jaeger as a Custom Resource Definition object:
+
+   ```bash
+   echo kubectl apply --prune -l deploy=jaeger -f configure/jaeger --recursive >> kubectl-apply-all.sh
+   ./kubectl-apply-all.sh
+   ```
+
+   By default, we use the [AllInOne
+   strategy](https://www.jaegertracing.io/docs/1.16/operator/#quick-start-deploying-the-allinone-image)
+   with in-memory storage of traces, which suffices for most debugging scenarios in
+   Sourcegraph. Refer to the [Jaeger docs for customizing the Custom Resource
+   Definition](https://www.jaegertracing.io/docs/1.16/operator/#understanding-custom-resource-definitions).
+
+   After following the default instructions, you should observe `kubectl get svc` returns a few
+   additional services (`jaeger-agent`, `jaeger-collector`, `jaeger-collector-headless`,
+   `jaeger-query`) and `kubectl get deploy jaeger` should yield a deployment of the Jaeger
+   all-in-one image.
 
 1. Inject the Jaeger Agent sidecar container into the relevant pods. You can use the following
    scripts:
@@ -62,7 +70,7 @@ cluster.
 
    COLLECTOR_PATCH=$(yj <<EOM
    args:
-   - --reporter.grpc.host-port=dns:///simplest-collector-headless.default:14250
+   - --reporter.grpc.host-port=dns:///jaeger-collector-headless.default:14250
    - --reporter.type=grpc
    env:
    - name: POD_NAME
@@ -114,7 +122,7 @@ cluster.
 1. Update Sourcegraph site configuration to contain `"useJaeger": true`. Restart the frontend
    pods by deleting them: `kubectl delete pods --selector=app=sourcegraph-frontend`.
 
-1. Run `kubectl port-forward svc/simplest-query 16686` and navigate to http://localhost:16686 in
+1. Run `kubectl port-forward svc/jaeger-query 16686` and navigate to http://localhost:16686 in
    your browser. Verify you see traces for `frontend` and other Sourcegraph components.
 
 
