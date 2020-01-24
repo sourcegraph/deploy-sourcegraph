@@ -7,7 +7,7 @@ remedy (typically scaling up one of the services). If you are experiencing perfo
 Sourcegraph, anticipate a high volume of traffic, or have a large amount of code, we recommend
 connecting Sourcegraph to a Jaeger instance.
 
-nThere are two options for connecting Sourcegraph to Jaeger:
+There are two options for connecting Sourcegraph to Jaeger:
 
 * [Deploy-a-new-Jaeger-instance-inside-the-Sourcegraph-cluster](#Deploying-a-new-Jaeger-instance-alongside-Sourcegraph)
 * [Connect to an existing Jaeger instance](#Connecting-Sourcegraph-to-an-existing-Jaeger-instance)
