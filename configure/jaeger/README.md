@@ -93,15 +93,16 @@ resources:
 
 This YAML snippet should be added to the following Sourcegraph deployment files:
 
-* `github-proxy/github-proxy.Deployment.yaml`
-* `query-runner/query-runner.Deployment.yaml`
-* `repo-updater/repo-updater.Deployment.yaml`
-* `searcher/searcher.Deployment.yaml`
-* `replacer/replacer.Deployment.yaml`
-* `frontend/sourcegraph-frontend.Deployment.yaml`
-* `symbols/symbols.Deployment.yaml`
-* `gitserver/gitserver.StatefulSet.yaml`
-
+```
+github-proxy/github-proxy.Deployment.yaml
+query-runner/query-runner.Deployment.yaml
+repo-updater/repo-updater.Deployment.yaml
+searcher/searcher.Deployment.yaml
+replacer/replacer.Deployment.yaml
+frontend/sourcegraph-frontend.Deployment.yaml
+symbols/symbols.Deployment.yaml
+gitserver/gitserver.StatefulSet.yaml
+```
 
 Finally, update Sourcegraph site configuration to contain `"useJaeger": true`. Restart the frontend
 pods by deleting them to ensure the configuration change takes effect: `kubectl delete pods
