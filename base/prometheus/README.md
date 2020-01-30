@@ -36,7 +36,7 @@ A Prometheus instance is part of the default Sourcegraph cluster installation.
 ## Namespaces
 
 If you are deploying Sourcegraph to a non-default namespace, you'll have to change the namespace specified in
- [prometheus.ClusterRoleBinding.yaml](prometheus.ClusterRoleBinding.yaml) to the one that you created.
+ [prometheus.ClusterRoleBinding.yaml](prometheus.RoleBinding.yaml) to the one that you created.
 
 ## Making Prometheus accessible
 

@@ -1,16 +1,16 @@
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
   labels:
     category: rbac
     deploy: sourcegraph
   name: prometheus
+  namespace: ns-sourcegraph
 roleRef:
   apiGroup: ""
-  kind: ClusterRole
-  name: prometheus
+  kind: Role
+  name: system:discovery
 subjects:
 - kind: ServiceAccount
   name: prometheus
-  # value of namespace needs to match namespace value in base/prometheus/prometheus.ServiceAccount.yaml
-  namespace: default
+  namespace: ns-sourcegraph
