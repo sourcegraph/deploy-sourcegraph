@@ -505,8 +505,9 @@ refer to [base/prometheus/README.md#Namespaces](../base/prometheus/README.md#Nam
 
 In some cases, a site admin may want to pull all Docker images used in the cluster locally. For
 example, if your organization requires use of a private registry, you may need to do this as an
-intermediate step to mirroring them on the private registry. The following script accomplishes this:
+intermediate step to mirroring them on the private registry. The following script accomplishes this
+for all images under `base/`:
 
 ```bash
-for IMAGE in $(grep -FR 'image:' . | awk '{ print $(NF) }'); do docker pull $IMAGE; done;
+for IMAGE in $(grep --include '*.yaml' -FR 'image:' base | awk '{ print $(NF) }'); do docker pull "$IMAGE"; done;
 ```
