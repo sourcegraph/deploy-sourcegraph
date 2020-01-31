@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - env:
-        image: index.docker.io/sourcegraph/redis-cache:19-04-16_6891de82@sha256:4cbfac8af0abb673899250d4fd859cc477d6426de519e9deb71e454e18322499
+        image: index.docker.io/sourcegraph/redis-cache:20-01-30_c903717e@sha256:c069a4589420bc6d18a7d09ebaf5416fa6407666770cf650566dfd450bba65cf
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 30
@@ -44,11 +44,8 @@ spec:
             cpu: "1"
             memory: 6Gi
           requests:
-            cpu: "1" 
+            cpu: "1"
             memory: 6Gi
-        volumeMounts:
-        - mountPath: /redis-data
-          name: redis-data
       - image: index.docker.io/sourcegraph/redis_exporter:18-02-07_bb60087_v0.15.0@sha256:282d59b2692cca68da128a4e28d368ced3d17945cd1d273d3ee7ba719d77b753
         terminationMessagePolicy: FallbackToLogsOnError
         name: redis-exporter
@@ -64,7 +61,3 @@ spec:
             memory: 100Mi
       securityContext:
         runAsUser: 0
-      volumes:
-      - name: redis-data
-        persistentVolumeClaim:
-          claimName: redis-cache
