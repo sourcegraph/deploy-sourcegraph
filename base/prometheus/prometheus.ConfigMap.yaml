@@ -9,6 +9,9 @@ data:
       alertmanagers:
         - kubernetes_sd_configs:
           - role: endpoints
+            namespaces:
+              names:
+              - ns-sourcegraph
           relabel_configs:
             - source_labels: [__meta_kubernetes_service_name]
               regex: alertmanager
@@ -38,6 +41,9 @@ data:
 
       kubernetes_sd_configs:
       - role: endpoints
+        namespaces:
+          names:
+            - ns-sourcegraph
 
       # Default to scraping over https. If required, just disable this or change to
       # `http`.
@@ -93,6 +99,9 @@ data:
 
       kubernetes_sd_configs:
       - role: node
+        namespaces:
+          names:
+          - ns-sourcegraph
 
       relabel_configs:
       - action: labelmap
@@ -119,6 +128,9 @@ data:
 
       kubernetes_sd_configs:
       - role: endpoints
+        namespaces:
+          names:
+          - ns-sourcegraph
 
       relabel_configs:
       - source_labels: [__meta_kubernetes_service_annotation_sourcegraph_prometheus_scrape]
@@ -170,6 +182,9 @@ data:
 
       kubernetes_sd_configs:
       - role: service
+        namespaces:
+          names:
+          - ns-sourcegraph
 
       relabel_configs:
       - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_probe]
@@ -202,6 +217,9 @@ data:
 
       kubernetes_sd_configs:
       - role: pod
+        namespaces:
+          names:
+          - ns-sourcegraph
 
       relabel_configs:
       - source_labels: [__meta_kubernetes_service_annotation_sourcegraph_prometheus_scrape]
