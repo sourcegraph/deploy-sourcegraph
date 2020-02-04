@@ -20,8 +20,7 @@ spec:
         app: indexed-search
     spec:
       containers:
-      - env:
-        image: index.docker.io/sourcegraph/zoekt-webserver:0.0.20200127195558-ca66753@sha256:f15faab65d5e398656d0c9100eab9264eb976ef00d03e1aaf5b6d3e1aa05e9db
+      - image: index.docker.io/sourcegraph/zoekt-webserver:0.0.20200127195558-ca66753@sha256:f15faab65d5e398656d0c9100eab9264eb976ef00d03e1aaf5b6d3e1aa05e9db
         terminationMessagePolicy: FallbackToLogsOnError
         name: zoekt-webserver
         ports:
@@ -63,6 +62,8 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: data
+        securityContext:
+          fsGroup: 100
       volumes:
       - name: data
   updateStrategy:

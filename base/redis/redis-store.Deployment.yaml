@@ -25,8 +25,7 @@ spec:
         app: redis-store
     spec:
       containers:
-      - env:
-        image: index.docker.io/sourcegraph/redis-store:19-04-16_6891de821@sha256:56426d601ce1f6d63088fea1cefa61f69a2e809c7d90fc1d157cca63cf81b277
+      - image: index.docker.io/sourcegraph/redis-store:19-04-16_6891de821@sha256:56426d601ce1f6d63088fea1cefa61f69a2e809c7d90fc1d157cca63cf81b277
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 30
@@ -63,6 +62,8 @@ spec:
           requests:
             cpu: 10m
             memory: 100Mi
+      securityContext:
+        fsGroup: 100
       volumes:
       - name: redis-data
         persistentVolumeClaim:
