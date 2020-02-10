@@ -1,0 +1,4 @@
+package base
+
+serviceAccount: grafana: {
+}

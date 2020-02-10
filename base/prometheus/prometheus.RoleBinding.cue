@@ -1,0 +1,4 @@
+package base
+
+roleBinding: prometheus: {
+}
