@@ -154,6 +154,6 @@ data:
                     POSTGRES_USER="$PGUSERNEW" POSTGRES_DB="$PGDATABASENEW" PGDATA="$PGDATANEW" /initdb.sh
             fi
 
-            PGDATA="$PGDATANEW" /conf.sh
+            PGDATA="$PGDATANEW" cp /conf/postgresql.conf "$PGDATA/postgresql.conf"
 
             PGDATA="$PGDATANEW" exec postgres
