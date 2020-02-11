@@ -26,8 +26,9 @@ spec:
         group: backend
     spec:
       containers:
-      - env:
-        image: index.docker.io/sourcegraph/postgres-11.4:19-11-14_b084311b@sha256:072481559d559cfd9a53ad77c3688b5cf583117457fd452ae238a20405923297
+      - image: index.docker.io/sourcegraph/postgres-11.4:19-11-14_b084311b@sha256:072481559d559cfd9a53ad77c3688b5cf583117457fd452ae238a20405923297
+        command:
+          - /altentry/altpostgres.sh
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
           exec:
@@ -54,6 +55,8 @@ spec:
           name: disk
         - mountPath: /conf
           name: pgsql-conf
+        - mountPath: /altentry
+          name: pgsql-entry
       - env:
         - name: DATA_SOURCE_NAME
           value: postgres://sg:@localhost:5432/?sslmode=disable
@@ -77,3 +80,7 @@ spec:
         configMap:
           defaultMode: 0777
           name: pgsql-conf
+      - name: pgsql-entry
+        configMap:
+          defaultMode: 0777
+          name: pgsql-entry
