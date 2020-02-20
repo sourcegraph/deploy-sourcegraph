@@ -1,6 +1,7 @@
-> 🚨 If you are updating from a 2.10.x or previous deployment, follow the migration steps in [docs/helm.migrate.md](docs/helm.migrate.md).
+> 🚨  IMPORTANT: When upgrading Sourcegraph, please check [docs/migrate.md](docs/migrate.md) to check if any manual migrations are necessary.
 
-> 🚨  IMPORTANT: When upgrading to any particular version of Sourcegraph (**including Sourcegraph 3.0**), please check [docs/migrate.md](docs/migrate.md) to check if any manual migrations are necessary.
+> `master` branch tracks development. Use the revision of this repository corresponding to the
+> version of Sourcegraph you wish to deploy. E.g., `git checkout v3.10.4`.
 
 # Sourcegraph Data Center
 [![sourcegraph: search](https://img.shields.io/badge/sourcegraph-search-brightgreen.svg)](https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph)

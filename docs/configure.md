@@ -161,10 +161,7 @@ Sourcegraph should now be accessible at `$EXTERNAL_ADDR:30080`, where `$EXTERNAL
 
 ## Update site configuration
 
-Sourcegraph's application configuration is stored in the PostgreSQL database. For editing this configuration you may use the web UI and management console, respectively. Please refer to the following documentation:
-
-- [Site configuration](https://docs.sourcegraph.com/admin/config/site_config)
-- [Critical configuration](https://docs.sourcegraph.com/admin/config/critical_config) (external URL, auth, etc.)
+Sourcegraph's application configuration is stored in the PostgreSQL database. For editing this configuration you may use the web UI. See [site configuration](https://docs.sourcegraph.com/admin/config/site_config) for more information.
 
 ## Configure TLS/SSL
 
@@ -206,7 +203,7 @@ If you exposed your Sourcegraph instance via an ingress controller as described 
        host: sourcegraph.example.com
    ```
 
-1. Change your `externalURL` in [the management console](https://docs.sourcegraph.com/admin/management_console) to e.g. `https://sourcegraph.example.com`:
+1. Change your `externalURL` in [the site configuration](https://docs.sourcegraph.com/admin/config/site_config) to e.g. `https://sourcegraph.example.com`:
 
 **WARNING:** Do NOT commit the actual TLS cert and key files to your fork (unless your fork is
 private **and** you are okay with storing secrets in it).
@@ -495,7 +492,7 @@ Sourcegraph's Kubernetes deployment [requires an Enterprise license key](https:/
 
 1. Create an account on or sign in to sourcegraph.com, and go to https://sourcegraph.com/subscriptions/new to obtain a license key.
 
-1. Once you have a license key, add it to your configuration by setting it [in the management console](https://docs.sourcegraph.com/admin/management_console).
+1. Once you have a license key, add it to your [site configuration](https://docs.sourcegraph.com/admin/config/site_config).
 
 ## Use non-default namespace
 

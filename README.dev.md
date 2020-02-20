@@ -83,66 +83,6 @@ The version numbers for [sourcegraph/deploy-sourcegraph](https://github.com/sour
 
 #### [sourcegraph/deploy-sourcegraph](https://github.com/sourcegraph/deploy-sourcegraph)'s branching strategy
 
-##### Cutting a new minor version (e.g. `v2.12.0`)
-
-- Make a branch named `2.12` that stems from the current `master` branch and push it. `2.12` will be used as the base for all `v2.12.x` images, and future changes to the `v2.12.x` series will be cherry-picked onto it and tagged from there.
-
-  ```bash
-  git checkout master
-  git pull # make sure that you're up to date
-  git checkout -b 2.12
-  git push --set-upstream origin 2.12
-  ```
-
-- Follow [the tagging instructions below](#Create-a-git-tag-and-push-it-to-the-repository) to tag the `v2.12.0` release from the `2.12` branch.
-
-##### Cutting a new patch version (e.g. `v2.12.1`)
-
-- Cherry-pick the relevant commits from `master` that update the image tags to `v2.12.1` onto the `2.12` branch (which should have been created as mentioned above).
-
-  ```bash
-  git checkout 2.12
-  git pull # make sure that you're up to date
-  git cherry-pick commit0 commit1 ... # all relevant commits from the master branch
-  git push
-  ```
-
-- Follow [the tagging instructions below](#Create-a-git-tag-and-push-it-to-the-repository) to tag the `v2.12.1` release from the `2.12` branch.
-
-##### Only updating Kubernetes manifests/docs
-
-_See [this commit](https://github.com/sourcegraph/deploy-sourcegraph/commit/1d1846f67c01ad2a81741cf95ee867405d3de3ab) as an example of a change that would fall into this category._
-
-- Cherry-pick the relevant commits from `master` that update the manifests/docs onto the `2.12` branch.
-
-  ```bash
-  git checkout 2.12
-  git pull # make sure that you're up to date
-  git cherry-pick commit0 commit1 ... # all relevant commits from the master branch
-  git push
-  ```
-
-- We mark these kinds of releases with a version number that looks like `v2.12.0-2`. Note the `-2` suffix, which increments with each update like this that affects the `v2.12.0` series. Look at [the releases page](https://github.com/sourcegraph/deploy-sourcegraph/releases), and pick the `suffix` that's next in the series.
-
-- Follow [the tagging instructions below](#Create-a-git-tag-and-push-it-to-the-repository) to tag the `v2.12.0-2` release from the `2.12` branch.
-
-#### Create a git tag and push it to the repository
-
-```bash
-VERSION = vX.Y.Z
-
-# If this is a release candidate: VERSION = `vX.Y.Z-pre${N}` (where `N` starts at 0 and increments as you test/cut new versions)
-
-# 🚨 Make sure that you have the commit that you want to tag as $VERSION checked out!
-
-git tag $VERSION
-git push origin $VERSION
-```
-
-### Update the `latestReleaseKubernetesBuild` value in `sourcegraph/sourcegraph`
-
-See https://sourcegraph.sgdev.org/github.com/sourcegraph/sourcegraph/-/blob/cmd/frontend/internal/app/pkg/updatecheck/handler.go#L29:5
-
 ## Minikube
 
 You can use minikube to run Sourcegraph Cluster on your development machine. However, due to minikube requirements and reduced available resources we need to modify the resources to remove `resources` requests/limits and `storageClassNames`. Here is the shell commands you can use to spin up minikube:
@@ -156,7 +96,6 @@ kubectl create ns src
 kubens src
 ./kubectl-apply-all.sh
 kubectl expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph
-kubectl expose deployment management-console --type=NodePort --name admin
 minikube service list
 ```
 
