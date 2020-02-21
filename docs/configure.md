@@ -60,6 +60,7 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 - [Configure custom PostgreSQL](#configure-custom-postgres)
 - [Install without RBAC](#install-without-rbac)
 - [Use non-default namespace](#use-non-default-namespace)
+- [Pulling images locally](#pulling-images-locally)
 
 ## Configure network access
 
@@ -499,3 +500,14 @@ Sourcegraph's Kubernetes deployment [requires an Enterprise license key](https:/
 If you're deploying Sourcegraph into a non-default namespace,
 refer to [base/prometheus/README.md#Namespaces](../base/prometheus/README.md#Namespaces) and
 [base/grafana/README.md#Namespaces](../base/grafana/README.md#Namespaces) for further configuration instructions.
+
+## Pulling images locally
+
+In some cases, a site admin may want to pull all Docker images used in the cluster locally. For
+example, if your organization requires use of a private registry, you may need to do this as an
+intermediate step to mirroring them on the private registry. The following script accomplishes this
+for all images under `base/`:
+
+```bash
+for IMAGE in $(grep --include '*.yaml' -FR 'image:' base | awk '{ print $(NF) }'); do docker pull "$IMAGE"; done;
+```
