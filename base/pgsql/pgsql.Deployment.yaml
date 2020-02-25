@@ -27,7 +27,7 @@ spec:
       initContainers:
       - name: correct-data-dir-permissions
         image: sourcegraph/alpine:3.10@sha256:4d05cd5669726fc38823e92320659a6d1ef7879e62268adec5df658a0bacf65c
-        command: ["sh", "-c", "chmod 750 /data/pgdata-11"]
+        command: ["sh", "-c", "if [-f /data/pgdata-11 ]; then chmod 750 /data/pgdata-11; fi"]
         volumeMounts:
         - mountPath: /data
           name: disk
