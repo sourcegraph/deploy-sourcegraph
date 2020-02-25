@@ -23,6 +23,15 @@ spec:
       labels:
         app: lsif-server
     spec:
+      initContainers:
+      - name: transfer-file-ownership
+        image: sourcegraph/alpine:3.10@sha256:4d05cd5669726fc38823e92320659a6d1ef7879e62268adec5df658a0bacf65c
+        command: ["sh", "-c", "chown -R 100:100 /lsif-storage"]
+        volumeMounts:
+        - mountPath: /lsif-storage
+          name: lsif-storage
+        securityContext:
+          runAsUser: 0
       containers:
       - env:
         - name: LSIF_STORAGE_ROOT
@@ -63,8 +72,11 @@ spec:
         volumeMounts:
         - mountPath: /lsif-storage
           name: lsif-storage
+        securityContext:
+          runAsUser: 100
+          runAsGroup: 100
       securityContext:
-        runAsUser: 0
+        fsGroup: 100
       volumes:
       - name: lsif-storage
         persistentVolumeClaim:

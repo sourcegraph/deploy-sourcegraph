@@ -24,6 +24,15 @@ spec:
         app: pgsql
         group: backend
     spec:
+      initContainers:
+      - name: correct-data-dir-permissions
+        image: sourcegraph/alpine:3.10@sha256:4d05cd5669726fc38823e92320659a6d1ef7879e62268adec5df658a0bacf65c
+        command: ["sh", "-c", "chmod 750 /data/pgdata-11"]
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+        securityContext:
+          runAsUser: 999
       containers:
       - env:
         image: index.docker.io/sourcegraph/postgres-11.4:19-11-14_b084311b@sha256:072481559d559cfd9a53ad77c3688b5cf583117457fd452ae238a20405923297
@@ -53,6 +62,9 @@ spec:
           name: disk
         - mountPath: /conf
           name: pgsql-conf
+        securityContext:
+          runAsUser: 999
+          runAsGroup: 999
       - env:
         - name: DATA_SOURCE_NAME
           value: postgres://sg:@localhost:5432/?sslmode=disable
@@ -66,8 +78,11 @@ spec:
           requests:
             cpu: 10m
             memory: 50Mi
+        securityContext:
+          runAsUser: 100
+          runAsGroup: 100
       securityContext:
-        runAsUser: 0
+        fsGroup: 999
       volumes:
       - name: disk
         persistentVolumeClaim:
