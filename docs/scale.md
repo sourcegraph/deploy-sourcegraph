@@ -1,11 +1,10 @@
 # Scaling
 
-Sourcegraph Data Center can be configured to scale to very large codebases and large numbers of
+Sourcegraph can be configured to scale to very large codebases and large numbers of
 users. If you notice latency for search or code intelligence is higher than desired, changing these
 parameters can yield a drastic improvement in performance.
 
-> For assistance scaling and tuning
-> Sourcegraph, [contact us](https://about.sourcegraph.com/contact/). We're happy to help!
+> For assistance when scaling and tuning Sourcegraph, [contact us](https://about.sourcegraph.com/contact/). We're happy to help!
 
 ## Tuning replica counts for horizontal scalability
 
