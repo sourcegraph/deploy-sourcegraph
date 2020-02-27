@@ -74,45 +74,6 @@ data:
         action: keep
         regex: default;kubernetes;https
 
-    - job_name: 'kubernetes-nodes'
-
-      # Default to scraping over https. If required, just disable this or change to
-      # `http`.
-      scheme: https
-
-      # This TLS & bearer token file config is used to connect to the actual scrape
-      # endpoints for cluster components. This is separate to discovery auth
-      # configuration because discovery & scraping are two separate concerns in
-      # Prometheus. The discovery auth config is automatic if Prometheus runs inside
-      # the cluster. Otherwise, more config options have to be provided within the
-      # <kubernetes_sd_config>.
-      tls_config:
-        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-        # If your node certificates are self-signed or use a different CA to the
-        # master CA, then disable certificate verification below. Note that
-        # certificate verification is an integral part of a secure infrastructure
-        # so this should only be disabled in a controlled environment. You can
-        # disable certificate verification by uncommenting the line below.
-        #
-        insecure_skip_verify: true
-      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-
-      kubernetes_sd_configs:
-      - role: node
-        namespaces:
-          names:
-          - ns-sourcegraph
-
-      relabel_configs:
-      - action: labelmap
-        regex: __meta_kubernetes_node_label_(.+)
-      - target_label: __address__
-        replacement: kubernetes.default.svc:443
-      - source_labels: [__meta_kubernetes_node_name]
-        regex: (.+)
-        target_label: __metrics_path__
-        replacement: /api/v1/nodes/${1}/proxy/metrics
-
     # Scrape config for service endpoints.
     #
     # The relabeling allows the actual service scrape endpoint to be configured
@@ -335,19 +296,7 @@ data:
               summary: '{{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.ns{{`}}`}} is probably
             leaking metrics (unbounded attribute)'
   extra_rules.yml: ""
-  node_rules.yml: |
-    groups:
-      - name: nodes.rules
-        rules:
-          - record: node:container_cpu_usage_seconds_total:ratio_rate5m
-            expr: sum by(instance) (rate(container_cpu_usage_seconds_total{kubernetes_pod_name=""}[5m]))
-              / max by(instance) (machine_cpu_cores)
-          - record: task:container_memory_usage_bytes:max
-            expr: max by(namespace, container_name) (container_memory_usage_bytes{container_name!=""})
-          - record: task:container_cpu_usage_seconds_total:sum
-            expr: sum by(id, namespace, container_name) (irate(container_cpu_usage_seconds_total{container_name!=""}[1m]))
-          - record: node:k8snode_filesystem_avail_bytes:ratio
-            expr: min by(exported_name) (k8snode_filesystem_avail_bytes / k8snode_filesystem_size_bytes)
+  node_rules.yml: ""
   sourcegraph_rules.yml: |
     groups:
       - name: sourcegraph.rules
