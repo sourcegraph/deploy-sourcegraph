@@ -24,15 +24,6 @@ spec:
         app: pgsql
         group: backend
     spec:
-      initContainers:
-      - name: correct-data-dir-permissions
-        image: sourcegraph/alpine:3.10@sha256:4d05cd5669726fc38823e92320659a6d1ef7879e62268adec5df658a0bacf65c
-        command: ["sh", "-c", "if [ -d /data/pgdata-11 ]; then chmod 750 /data/pgdata-11; fi"]
-        volumeMounts:
-        - mountPath: /data
-          name: disk
-        securityContext:
-          runAsUser: 999
       containers:
       - env:
         image: index.docker.io/sourcegraph/postgres-11.4:19-11-14_b084311b@sha256:072481559d559cfd9a53ad77c3688b5cf583117457fd452ae238a20405923297

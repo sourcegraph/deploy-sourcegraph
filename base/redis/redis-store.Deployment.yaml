@@ -23,15 +23,6 @@ spec:
       labels:
         app: redis-store
     spec:
-      initContainers:
-      - name: transfer-file-ownership
-        image: sourcegraph/alpine:3.10@sha256:4d05cd5669726fc38823e92320659a6d1ef7879e62268adec5df658a0bacf65c
-        command: ["sh", "-c", "chown -R 999:999 /redis-data"]
-        volumeMounts:
-        - mountPath: /redis-data
-          name: redis-data
-        securityContext:
-          runAsUser: 0
       containers:
       - env:
         image: index.docker.io/sourcegraph/redis-store:20-01-30_c903717e@sha256:e8467a8279832207559bdfbc4a89b68916ecd5b44ab5cf7620c995461c005168
