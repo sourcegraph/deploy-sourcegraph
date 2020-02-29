@@ -12,9 +12,21 @@ This allows running Sourcegraph in clusters with restrictive security policies.
 Existing installations that have been run as root before need to migrate their persistent volumes to work in 3.14.
 We are providing a [kustomization](https://kustomize.io/) that needs to be run once to execute the migration:
 
+> NOTE: This needs kubectl client version >= 1.14. If you don't have that you can still install the kustomize
+> binary and generate the yaml file with it and then apply it with -f.
+
 ```shell script
 cd overlays/migrate-to-nonroot
 kubectl apply -k .
+```
+
+> NOTE: This needs kubectl client version >= 1.14. If you don't have that you can still install the kustomize
+> binary and generate the yaml file with it and then apply it with -f like so:
+
+```shell script
+cd overlays/migrate-to-nonroot
+kustomize build -o nonroot-migration.yaml
+kubectl apply -f nonroot-migration.yaml
 ```
 
 This will inject `initContainers` that do the `chown` command for containers that have persistent volumes and then 
