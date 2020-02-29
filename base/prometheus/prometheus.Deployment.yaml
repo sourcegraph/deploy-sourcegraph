@@ -56,7 +56,9 @@ spec:
             memory: 500M
       serviceAccountName: prometheus
       securityContext:
-        runAsUser: 0
+        runAsUser: 100
+        runAsGroup: 100
+        fsGroup: 100
       volumes:
       - name: data
         persistentVolumeClaim:

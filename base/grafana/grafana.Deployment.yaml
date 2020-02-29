@@ -42,9 +42,12 @@ spec:
           requests:
             cpu: 100m
             memory: 100Mi
+        securityContext:
+          runAsUser: 472
+          runAsGroup: 472
       serviceAccountName: grafana
       securityContext:
-        runAsUser: 0
+        fsGroup: 472
       volumes:
       - name: data
         persistentVolumeClaim:

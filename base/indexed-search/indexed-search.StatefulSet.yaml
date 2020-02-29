@@ -43,6 +43,9 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: data
+        securityContext:
+          runAsUser: 100
+          runAsGroup: 100
       - env:
         image: index.docker.io/sourcegraph/zoekt-indexserver:0.0.20200221095506-2880d98@sha256:91643d83223bb72f4aa2b5031ceb774c8e604a227c58ed54375bd341f25e2ef3
         terminationMessagePolicy: FallbackToLogsOnError
@@ -62,8 +65,11 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: data
+        securityContext:
+          runAsUser: 100
+          runAsGroup: 100
       securityContext:
-        runAsUser: 0
+        fsGroup: 100
       volumes:
       - name: data
   updateStrategy:

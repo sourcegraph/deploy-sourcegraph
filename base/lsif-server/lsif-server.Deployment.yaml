@@ -63,8 +63,11 @@ spec:
         volumeMounts:
         - mountPath: /lsif-storage
           name: lsif-storage
+        securityContext:
+          runAsUser: 100
+          runAsGroup: 100
       securityContext:
-        runAsUser: 0
+        fsGroup: 100
       volumes:
       - name: lsif-storage
         persistentVolumeClaim:

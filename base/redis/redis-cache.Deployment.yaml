@@ -49,6 +49,9 @@ spec:
         volumeMounts:
         - mountPath: /redis-data
           name: redis-data
+        securityContext:
+          runAsUser: 999
+          runAsGroup: 999
       - image: index.docker.io/sourcegraph/redis_exporter:18-02-07_bb60087_v0.15.0@sha256:282d59b2692cca68da128a4e28d368ced3d17945cd1d273d3ee7ba719d77b753
         terminationMessagePolicy: FallbackToLogsOnError
         name: redis-exporter
@@ -62,8 +65,11 @@ spec:
           requests:
             cpu: 10m
             memory: 100Mi
+        securityContext:
+          runAsUser: 999
+          runAsGroup: 999
       securityContext:
-        runAsUser: 0
+        fsGroup: 999
       volumes:
       - name: redis-data
         persistentVolumeClaim:
