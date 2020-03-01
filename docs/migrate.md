@@ -37,6 +37,17 @@ restart the necessary containers.
 New installations do not need this `kustomization` and existing installations can operate from base again after the
 migration.
 
+New installations on clusters with restrictive security policies can now use a kustomization to accomodate those restrictions:
+
+```shell script
+cd overlays/non-privileged
+kubectl -n ns-sourcegraph apply -l deploy=sourcegraph,rbac-admin!=escalated -k .
+```
+
+The only requirement for the installer is `admin` cluster role in a given namespace.
+
+> IMPORTANT NOTE: If you change the namespace please change all three occurences in this directory tree to the new value. 
+
 ## 3.11
 
 In 3.11 we removed the management console. If you make use of `CRITICAL_CONFIG_FILE` or `SITE_CONFIG_FILE`, please refer to the [migration notes for Sourcegraph 3.11+](https://docs.sourcegraph.com/admin/migration/3_11).

@@ -4,12 +4,11 @@ metadata:
   labels:
     category: rbac
     deploy: sourcegraph
-    rbac-admin: escalated
-  name: sourcegraph-frontend
+  name: prometheus-nonprivileged
 roleRef:
   apiGroup: ""
-  kind: Role
-  name: sourcegraph-frontend
+  kind: ClusterRole
+  name: view
 subjects:
-- kind: ServiceAccount
-  name: sourcegraph-frontend
+  - kind: ServiceAccount
+    name: prometheus
