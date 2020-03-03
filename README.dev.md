@@ -107,3 +107,5 @@ IMAGE=repo-updater:dev ./cmd/repo-updater/build.sh
 kubectl edit deployment/repo-updater # set imagePullPolicy to Never
 kubectl set image deployment repo-updater '*=repo-updater:dev'
 ```
+
+You can also use the [minikube overlay](overlays/minikube/README.md). This avoids modifying the config files in `base`. 
