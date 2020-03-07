@@ -65,7 +65,7 @@ const getAllButKustomizeYAMLFiles = dir =>
 const baseDeployment = new k8s.yaml.ConfigGroup(
     'base',
     {
-        files: getAllButKustomizeYAMLFiles('base'),
+        files: getAllButKustomizeYAMLFiles(path.posix.join(deploySourcegraphRoot, 'base')),
     },
     {
         providers: { kubernetes: k8sProvider },
