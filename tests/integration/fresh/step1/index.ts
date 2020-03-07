@@ -5,6 +5,7 @@ import * as k8s from '@pulumi/kubernetes'
 
 import { k8sProvider } from './cluster'
 import { deploySourcegraphRoot, gcpUsername } from './config'
+import * as fs from "fs";
 
 const clusterAdmin = new k8s.rbac.v1.ClusterRoleBinding(
     'cluster-admin-role-binding',
@@ -47,10 +48,24 @@ const storageClass = new k8s.storage.v1.StorageClass(
     { provider: k8sProvider }
 )
 
+const getAllButKustomizeYAMLFiles = dir =>
+    fs.readdirSync(dir).reduce((files, file) => {
+        if (file == 'kustomization.yaml') {
+            return files;
+        }
+        const ext = file.substr(file.lastIndexOf('.') + 1);
+        const name = path.join(dir, file);
+        const isDirectory = fs.statSync(name).isDirectory();
+        if (!isDirectory && ext != 'yaml') {
+            return files;
+        }
+        return isDirectory ? [...files, ...getAllButKustomizeYAMLFiles(name)] : [...files, name];
+    }, []);
+
 const baseDeployment = new k8s.yaml.ConfigGroup(
     'base',
     {
-        files: `${path.posix.join(deploySourcegraphRoot, 'base')}/**/*.yaml`,
+        files: getAllButKustomizeYAMLFiles(path.posix.join(deploySourcegraphRoot, 'base')),
     },
     {
         providers: { kubernetes: k8sProvider },
