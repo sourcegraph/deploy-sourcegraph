@@ -6,6 +6,8 @@ version you are upgrading to should be applied (unless otherwise noted).
 
 ## 3.14 (Unreleased)
 
+### Migrating from container user root to non-root user
+
 Version 3.14 changes the security context of the installation by switching to a non-root user for all containers.
 This allows running Sourcegraph in clusters with restrictive security policies.
 
@@ -36,6 +38,8 @@ restart the necessary containers.
 
 New installations do not need this `kustomization` and existing installations can operate from base again after the
 migration.
+
+### New installations with restrictive security policies
 
 New installations on clusters with restrictive security policies can now use a kustomization to accomodate those restrictions:
 
