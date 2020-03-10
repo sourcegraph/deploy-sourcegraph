@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
 
-set -eu
+set -euxo pipefail
 cd $BUILDKITE_BUILD_CHECKOUT_PATH
 
-echo "Installing asdf dependencies as defined in '$BUILDKITE_BUILD_CHECKOUT_PATH/.tool-versions':"
-asdf install
+TOOL_VERSION_FILES=$(fd .tool-versions --hidden --absolute-path)
 
-asdf global kubectl 1.17.3
-
+for file in "${TOOL_VERSION_FILES[@]}"
+do
+    echo "Installing asdf dependencies as defined in '${file}':"
+    parent=$(dirname "${file}")
+    cd "${parent}"
+    
+    asdf install
+done
