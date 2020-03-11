@@ -39,7 +39,7 @@ restart the necessary containers.
 New installations do not need this `kustomization` and existing installations can operate from base again after the
 migration.
 
-### New installations with restrictive security policies
+### New installations: accommodate clusters with restrictive security policies
 
 New installations on clusters with restrictive security policies can now use a kustomization to accomodate those restrictions:
 
