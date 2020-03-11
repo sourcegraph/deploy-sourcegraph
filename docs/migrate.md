@@ -6,7 +6,7 @@ version you are upgrading to should be applied (unless otherwise noted).
 
 ## 3.14 (Unreleased)
 
-### Migrating from container user root to non-root user
+### Existing installations: Migrating the container user from root to non-root
 
 Version 3.14 changes the security context of the installation by switching to a non-root user for all containers.
 This allows running Sourcegraph in clusters with restrictive security policies.
@@ -139,4 +139,3 @@ Sourcegraph 3.0 ships with Postgres 11.1. The upgrade procedure is mostly automa
 ## 2.12
 
 Beginning in version 2.12.0, Sourcegraph's Kubernetes deployment [requires an Enterprise license key](https://about.sourcegraph.com/pricing). Follow the steps in [docs/configure.md](docs/configure.md#add-a-license-key).
-
