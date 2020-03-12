@@ -5,19 +5,19 @@ metadata:
     prometheus.io/port: "9090"
     sourcegraph.prometheus/federate: "true"
   labels:
-    app: lsif-server
+    app: lsif-worker
     deploy: sourcegraph
-  name: lsif-server
+  name: lsif-worker
 spec:
   ports:
-    # HTTP API and health endpoint
-  - name: server
-    port: 3186
-    targetPort: server
-    # For metrics and federation  
+    # For health endpoint ONLY
+  - name: worker
+    port: 3187
+    targetPort: worker
+    # For metrics and federation
   - name: prometheus
     port: 9090
     targetPort: prometheus
   selector:
-    app: lsif-server
+    app: lsif-worker
   type: ClusterIP
