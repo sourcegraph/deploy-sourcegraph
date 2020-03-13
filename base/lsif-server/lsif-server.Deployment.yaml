@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: LSIF HTTP server for LSIF-based precise code intelligence.
+    description: HTTP server for LSIF-based precise code intelligence.
   labels:
     deploy: sourcegraph
   name: lsif-server
@@ -25,10 +25,6 @@ spec:
     spec:
       containers:
       - env:
-        - name: LSIF_NUM_SERVERS
-          value: '1'
-        - name: LSIF_NUM_WORKERS
-          value: '0'
         - name: LSIF_STORAGE_ROOT
           value: /lsif-storage
         - name: POD_NAME
@@ -55,6 +51,8 @@ spec:
         ports:
         - containerPort: 3186
           name: server
+        - containerPort: 3187
+          name: worker
         - containerPort: 9090
           name: prometheus
         resources:
