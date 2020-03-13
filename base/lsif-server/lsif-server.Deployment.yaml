@@ -25,13 +25,15 @@ spec:
     spec:
       containers:
       - env:
+        - name: LSIF_NUM_WORKERS
+          value: '4'
         - name: LSIF_STORAGE_ROOT
           value: /lsif-storage
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: sourcegraph/lsif-server:efritz-dev-temp3 # index.docker.io/sourcegraph/lsif-server:3.13.2@sha256:27d6f82702cd770d02de57a8a74b8b1f338ee3de53eb3979bd2a06f12216bf7e
+        image: index.docker.io/sourcegraph/lsif-server:3.13.2@sha256:27d6f82702cd770d02de57a8a74b8b1f338ee3de53eb3979bd2a06f12216bf7e
         terminationMessagePolicy: FallbackToLogsOnError
         name: lsif-server
         livenessProbe:
