@@ -8,7 +8,7 @@ spec:
       initContainers:
         - name: transfer-file-ownership
           image: sourcegraph/alpine:3.10@sha256:4d05cd5669726fc38823e92320659a6d1ef7879e62268adec5df658a0bacf65c
-          command: ["sh", "-c", "if [[ \"$(stat -c '%u' /data/repos)\" -ne 100 ]]; then chown -R 100:100 /data/repos; fi"]
+          command: ["sh", "-c", "if [[ \"$(stat -c '%u' /data/repos)\" -ne 100 ]]; then chown -R 100:101 /data/repos; fi"]
           volumeMounts:
             - mountPath: /data/repos
               name: repos
