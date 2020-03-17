@@ -25,8 +25,12 @@ spec:
     spec:
       containers:
       - env:
-        - name: LSIF_NUM_WORKERS
-          value: '4'
+        - name: LSIF_NUM_SERVERS
+          value: '1'
+        - name: LSIF_NUM_DUMP_MANAGERS
+          value: '1'
+        - name: LSIF_NUM_DUMP_PROCESSORS
+          value: '1'
         - name: LSIF_STORAGE_ROOT
           value: /lsif-storage
         - name: POD_NAME
@@ -54,7 +58,9 @@ spec:
         - containerPort: 3186
           name: server
         - containerPort: 3187
-          name: worker
+          name: dump-manager
+        - containerPort: 3188
+          name: dump-processor
         - containerPort: 9090
           name: prometheus
         resources:
