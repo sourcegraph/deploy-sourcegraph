@@ -1,0 +1,50 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: elasticsearch
+  labels:
+    deploy: sourcegraph
+    app: elasticsearch
+    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/component: storage-backend
+    app.kubernetes.io/part-of: jaeger
+spec:
+  serviceName: elasticsearch
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+        app.kubernetes.io/name: elasticsearch
+        app.kubernetes.io/component: storage-backend
+        app.kubernetes.io/part-of: jaeger
+    spec:
+      containers:
+        - name: elasticsearch
+          image: docker.elastic.co/elasticsearch/elasticsearch:5.6.0
+          imagePullPolicy: Always
+          command:
+            - bin/elasticsearch
+          args:
+            - "-Ehttp.host=0.0.0.0"
+            - "-Etransport.host=127.0.0.1"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          readinessProbe:
+            exec:
+              command:
+              - curl
+              - --fail
+              - --silent
+              - --output
+              - /dev/null
+              - --user
+              - elastic:changeme
+              - localhost:9200
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 4
+      volumes:
+        - name: data
+          emptyDir: {}
