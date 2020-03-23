@@ -4,7 +4,7 @@ This document records manual migrations that are necessary to apply when upgradi
 Sourcegraph versions. All manual migrations between the version you are upgrading from and the
 version you are upgrading to should be applied (unless otherwise noted).
 
-## 3.14 (Unreleased)
+## 3.14
 
 ### Existing installations: Migrating the container user from root to non-root
 
