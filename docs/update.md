@@ -1,9 +1,9 @@
 # Updating Sourcegraph
 
-> IMPORTANT: Please check [docs/migrate.md](docs/migrate.md) before upgrading to any particular
+> IMPORTANT: Please check [docs/migrate.md](migrate.md) before upgrading to any particular
 > version of Sourcegraph to check if any manual migrations are necessary.
 
-> 🚨 If you are updating from a 2.10.x or previous deployment, follow the migration steps in [docs/helm.migrate.md](docs/helm.migrate.md) before updating.
+> 🚨 If you are updating from a 2.10.x or previous deployment, follow the migration steps in [docs/helm.migrate.md](helm.migrate.md) before updating.
 
 A new version of Sourcegraph is released every month (with patch releases in between, released as needed). Check the [Sourcegraph blog](https://about.sourcegraph.com/blog) for release announcements.
 
