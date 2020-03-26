@@ -54,6 +54,7 @@ spec:
           requests:
             cpu: 500m
             memory: 500M
+            ephemeral-storage: "10Gi"
       serviceAccountName: prometheus
       securityContext:
         runAsUser: 100
@@ -61,8 +62,7 @@ spec:
         fsGroup: 100
       volumes:
       - name: data
-        persistentVolumeClaim:
-          claimName: prometheus
+        emptyDir: {}
       - configMap:
           defaultMode: 0777
           name: prometheus
