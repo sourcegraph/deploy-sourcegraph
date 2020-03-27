@@ -6,6 +6,23 @@ version you are upgrading to should be applied (unless otherwise noted).
 
 ## 3.14
 
+### Harmless error message
+
+When running `./kubectl-apply-all.sh` you will see this error message:
+
+```text
+error: unable to recognize "base/kustomization.yaml": no matches for kind "Kustomization" in version "kustomize.config.k8s.io/v1beta1"
+```
+
+It is a harmless error message from `kubectl` which can be safely ignored (`kubectl` when using `-f` flag does not accept kustomizations).
+
+Instead of running `./kubectl-apply-all.sh` please run
+
+```text
+cd base
+kubectl apply -k .
+```
+ 
 ### Existing installations: Migrating the container user from root to non-root
 
 Version 3.14 changes the security context of the installation by switching to a non-root user for all containers.
