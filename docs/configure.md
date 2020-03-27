@@ -215,7 +215,7 @@ If you exposed your Sourcegraph instance via the altenative nginx service as des
 
 ## Configure repository cloning via SSH
 
-Sourcegraph will clone repositories using SSH credentials if they are mounted at `/root/.ssh` in the `gitserver` deployment.
+Sourcegraph will clone repositories using SSH credentials if they are mounted at `/home/sourcegraph/.ssh` in the `gitserver` deployment.
 
 1. [Create a secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains the base64 encoded contents of your SSH private key (_make sure it doesn't require a password_) and known_hosts file.
 
@@ -242,7 +242,7 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
    spec:
      containers:
        volumeMounts:
-         - mountPath: /root/.ssh
+         - mountPath: /home/sourcegraph/.ssh
            name: ssh
      volumes:
        - name: ssh
@@ -256,7 +256,7 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
    ```bash
    # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
    GS=base/gitserver/gitserver.StatefulSet.yaml
-   cat $GS | yj | jq '.spec.template.spec.containers[].volumeMounts += [{mountPath: "/root/.ssh", name: "ssh"}]' | jy -o $GS
+   cat $GS | yj | jq '.spec.template.spec.containers[].volumeMounts += [{mountPath: "/home/sourcegraph/.ssh", name: "ssh"}]' | jy -o $GS
    cat $GS | yj | jq '.spec.template.spec.volumes += [{name: "ssh", secret: {defaultMode: 384, secretName:"gitserver-ssh"}}]' | jy -o $GS
    ```
 
