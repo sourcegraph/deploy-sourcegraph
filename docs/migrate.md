@@ -19,8 +19,7 @@ It is a harmless error message from `kubectl` which can be safely ignored (`kube
 Instead of running `./kubectl-apply-all.sh` please run
 
 ```text
-cd base
-kubectl apply -k .
+kubectl apply -k base
 ```
  
 ### Existing installations: Migrating the container user from root to non-root
