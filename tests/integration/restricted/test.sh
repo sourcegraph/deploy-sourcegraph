@@ -34,11 +34,11 @@ kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph ap
 
 # wait for it all to finish (we list out the ones with persistent volume claim because they take longer)
 
-kubectl -n ns-sourcegraph rollout status -w deployment/indexed-search
+kubectl -n ns-sourcegraph rollout status -w statefulset/indexed-search
 kubectl -n ns-sourcegraph rollout status -w deployment/lsif-server
 kubectl -n ns-sourcegraph rollout status -w deployment/prometheus
 kubectl -n ns-sourcegraph rollout status -w deployment/redis-cache
 kubectl -n ns-sourcegraph rollout status -w deployment/redis-store
-kubectl -n ns-sourcegraph rollout status -w deployment/gitserver
+kubectl -n ns-sourcegraph rollout status -w statefulset/gitserver
 kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
 
