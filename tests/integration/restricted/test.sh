@@ -46,5 +46,5 @@ kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
 
 # delete cluster
 
-gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --quiet
+gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet
 
