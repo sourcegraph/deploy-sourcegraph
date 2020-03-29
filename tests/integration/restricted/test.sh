@@ -10,7 +10,7 @@ cd $(dirname "${BASH_SOURCE[0]}")
 
 # set up the cluster, set up the fake user and restricted policy and then deploy the non-privileged overlay as that user
 
-gcloud container clusters create ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --release-channel regular --num-nodes 3 --machine-type n1-standard-16 --disk-type pd-ssd --project ${TEST_GCP_PROJECT}
+gcloud container clusters create ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --num-nodes 3 --machine-type n1-standard-16 --disk-type pd-ssd --project ${TEST_GCP_PROJECT}
 
 gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT}
 
