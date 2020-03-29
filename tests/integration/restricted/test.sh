@@ -2,9 +2,9 @@
 
 set -ex
 
-RANDOM_CLUSTER_NAME_SUFFIX=`cat /dev/urandom | tr -cd 'a-f0-9' | head -c 16`
+RANDOM_CLUSTER_NAME_SUFFIX=`cat /dev/urandom | tr -cd 'a-f0-9' | head -c 7`
 
-CLUSTER_NAME="ds-integ-restricted--${RANDOM_CLUSTER_NAME_SUFFIX}"
+CLUSTER_NAME="ds-test-restricted--${RANDOM_CLUSTER_NAME_SUFFIX}"
 
 cd $(dirname "${BASH_SOURCE[0]}")
 
