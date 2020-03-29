@@ -11,3 +11,6 @@ export TEST_GCP_USERNAME=buildkite@sourcegraph-dev.iam.gserviceaccount.com
 export BUILD_CREATOR=$BUILDKITE_BUILD_CREATOR
 
 go test ./... -v -timeout 25m ${maybe_short_flag}
+
+tests/integration/fresh/restricted/test.sh
+
