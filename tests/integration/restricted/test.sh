@@ -42,3 +42,9 @@ kubectl -n ns-sourcegraph rollout status -w deployment/redis-store
 kubectl -n ns-sourcegraph rollout status -w statefulset/gitserver
 kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
 
+# TODO(uwedeportivo): hit it with a request (we need ingress or nodeport)
+
+# delete cluster
+
+gcloud container clusters delete ${CLUSTER_NAME} --quiet
+
