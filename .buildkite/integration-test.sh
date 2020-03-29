@@ -12,5 +12,5 @@ export BUILD_CREATOR=$BUILDKITE_BUILD_CREATOR
 
 #go test ./... -v -timeout 25m ${maybe_short_flag}
 
-${DEPLOY_SOURCEGRAPH_ROOT}/tests/integration/fresh/restricted/test.sh
+${DEPLOY_SOURCEGRAPH_ROOT}/tests/integration/restricted/test.sh
 
