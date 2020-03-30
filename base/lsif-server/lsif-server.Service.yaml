@@ -2,7 +2,8 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    sourcegraph.prometheus/scrape: "true"
+    prometheus.io/port: "9090"
+    sourcegraph.prometheus/federate: "true"
   labels:
     app: lsif-server
     deploy: sourcegraph
@@ -12,9 +13,9 @@ spec:
   - name: server
     port: 3186
     targetPort: server
-  - name: worker
-    port: 3187
-    targetPort: worker
+  - name: prometheus
+    port: 9090
+    targetPort: prometheus
   selector:
     app: lsif-server
   type: ClusterIP
