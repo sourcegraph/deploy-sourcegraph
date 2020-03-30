@@ -31,13 +31,17 @@ spec:
           value: '1'
         - name: NUM_WORKERS
           value: '1'
+        - name: PRECISE_CODE_INTEL_BUNDLE_MANAGER_URL
+          value: http://localhost:3187
+        - name: PRECISE_CODE_INTEL_API_SERVER_URL
+          value: http://localhost:3186
         - name: LSIF_STORAGE_ROOT
           value: /lsif-storage
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/lsif-server:3.13.2@sha256:27d6f82702cd770d02de57a8a74b8b1f338ee3de53eb3979bd2a06f12216bf7e
+        image: index.docker.io/sourcegraph/lsif-server:3.14.1@sha256:cffcc125955718d7f349c13eab13c7ee7204ca214fba8d7a0e15382c95702ea3
         terminationMessagePolicy: FallbackToLogsOnError
         name: lsif-server
         livenessProbe:
@@ -71,9 +75,9 @@ spec:
           name: lsif-storage
         securityContext:
           runAsUser: 100
-          runAsGroup: 100
+          runAsGroup: 101
       securityContext:
-        fsGroup: 100
+        fsGroup: 101
       volumes:
       - name: lsif-storage
         persistentVolumeClaim:

@@ -50,7 +50,13 @@ spec:
           value: /mnt/cache/$(POD_NAME)
         - name: GRAFANA_SERVER_URL
           value: http://grafana:30070
-        image: index.docker.io/sourcegraph/frontend:3.13.2@sha256:189c714c6a3881760db4c9df28696a50745af1b1f8051e0105f0ec9252ba2381
+          # old value during transition
+        - name: LSIF_API_SERVER_URL
+          value: k8s+http://lsif-server:3186
+          # new value after transition
+        - name: PRECISE_CODE_INTEL_API_SERVER_URL
+          value: k8s+http://lsif-server:3186
+        image: index.docker.io/sourcegraph/frontend:3.14.1@sha256:7a1f46f046ebef30a311674439ca707a9d1a4da1bb464b10d9054ac183ddff0b
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
