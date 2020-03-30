@@ -2,17 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: HTTP server for LSIF-based precise code intelligence.
+    description: Precise code intelligence services for Sourcegraph
   labels:
     deploy: sourcegraph
-  name: lsif-server
+  name: precise-code-intel
 spec:
   minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: lsif-server
+      app: precise-code-intel
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -21,7 +21,7 @@ spec:
   template:
     metadata:
       labels:
-        app: lsif-server
+        app: precise-code-intel
     spec:
       containers:
       - env:
@@ -43,7 +43,7 @@ spec:
               fieldPath: metadata.name
         image: index.docker.io/sourcegraph/lsif-server:3.14.1@sha256:cffcc125955718d7f349c13eab13c7ee7204ca214fba8d7a0e15382c95702ea3
         terminationMessagePolicy: FallbackToLogsOnError
-        name: lsif-server
+        name: precise-code-intel
         livenessProbe:
           httpGet:
             path: /healthz
