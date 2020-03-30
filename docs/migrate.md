@@ -4,6 +4,19 @@ This document records manual migrations that are necessary to apply when upgradi
 Sourcegraph versions. All manual migrations between the version you are upgrading from and the
 version you are upgrading to should be applied (unless otherwise noted).
 
+## 3.15
+
+### Existing installations: Migrating lsif-server
+
+Version 3.15 splits lsif-server into multiple services, but retains the same persistent volume. In order for the
+update to succeed, the old lsif-server service and deployment must be detached from the persistent volume. The
+following commands need to be run once after the updates have been applied to your cluster:
+
+```shell script
+kubectl delete svc lsif-server
+kubectl delete deployment lsif-server
+```
+
 ## 3.14
 
 ### Existing installations: Migrating the container user from root to non-root
