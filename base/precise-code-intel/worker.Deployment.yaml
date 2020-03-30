@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Precise code intelligence services for Sourcegraph
+  labels:
+    deploy: sourcegraph
+  name: pci-worker
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: pci-worker
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: pci-worker
+    spec:
+      containers:
+      - env:
+        - name: PCI_NUM_APIS
+          value: '0'
+        - name: PCI_NUM_BUNDLE_MANAGERS
+          value: '0'
+        - name: PCI_NUM_WORKERS
+          value: '1'
+        - name: PCI_BUNDLE_MANAGER_URL
+          value: http://localhost:3187
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        image: index.docker.io/sourcegraph/precise-code-intel:efritz-rename
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: pci-worker
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: server
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: server
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 3188
+          name: server
+        - containerPort: 9090
+          name: prometheus
+        resources:
+          limits:
+            cpu: "2"
+            memory: 2G
+          requests:
+            cpu: 500m
+            memory: 500M
+        securityContext:
+          runAsUser: 100
+          runAsGroup: 101
+      securityContext:
+        fsGroup: 101

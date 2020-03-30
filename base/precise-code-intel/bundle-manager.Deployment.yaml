@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Precise code intelligence services for Sourcegraph
+  labels:
+    deploy: sourcegraph
+  name: pci-bundle-manager
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: pci-bundle-manager
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: pci-bundle-manager
+    spec:
+      containers:
+      - env:
+        - name: PCI_NUM_APIS
+          value: '0'
+        - name: PCI_NUM_BUNDLE_MANAGERS
+          value: '1'
+        - name: PCI_NUM_WORKERS
+          value: '0'
+        - name: PCI_API_SERVER_URL
+          value: http://localhost:3186
+        - name: LSIF_STORAGE_ROOT
+          value: /bundle-storage
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        image: index.docker.io/sourcegraph/precise-code-intel:efritz-rename
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: pci-bundle-manager
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: server
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: server
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 3187
+          name: server
+        - containerPort: 9090
+          name: prometheus
+        resources:
+          limits:
+            cpu: "2"
+            memory: 2G
+          requests:
+            cpu: 500m
+            memory: 500M
+        volumeMounts:
+        - mountPath: /bundle-storage
+          name: bundle-storage
+        securityContext:
+          runAsUser: 100
+          runAsGroup: 101
+      securityContext:
+        fsGroup: 101
+      volumes:
+      - name: bundle-storage
+        persistentVolumeClaim:
+          claimName: pci-bundle-storage

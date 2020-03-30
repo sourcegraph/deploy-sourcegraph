@@ -5,14 +5,14 @@ metadata:
     description: Precise code intelligence services for Sourcegraph
   labels:
     deploy: sourcegraph
-  name: precise-code-intel
+  name: pci-api-server
 spec:
   minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: precise-code-intel
+      app: pci-api-server
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -21,23 +21,25 @@ spec:
   template:
     metadata:
       labels:
-        app: precise-code-intel
+        app: pci-api-server
     spec:
       containers:
       - env:
+        - name: PCI_NUM_APIS
+          value: '1'
+        - name: PCI_NUM_BUNDLE_MANAGERS
+          value: '0'
+        - name: PCI_NUM_WORKERS
+          value: '0'
         - name: PCI_BUNDLE_MANAGER_URL
           value: http://localhost:3187
-        - name: PCI_API_SERVER_URL
-          value: http://localhost:3186
-        - name: LSIF_STORAGE_ROOT
-          value: /bundle-storage
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/lsif-server:3.14.1@sha256:cffcc125955718d7f349c13eab13c7ee7204ca214fba8d7a0e15382c95702ea3
+        image: index.docker.io/sourcegraph/precise-code-intel:efritz-rename
         terminationMessagePolicy: FallbackToLogsOnError
-        name: precise-code-intel
+        name: pci-api-server
         livenessProbe:
           httpGet:
             path: /healthz
@@ -64,15 +66,8 @@ spec:
           requests:
             cpu: 500m
             memory: 500M
-        volumeMounts:
-        - mountPath: /bundle-storage
-          name: bundle-storage
         securityContext:
           runAsUser: 100
           runAsGroup: 101
       securityContext:
         fsGroup: 101
-      volumes:
-      - name: bundle-storage
-        persistentVolumeClaim:
-          claimName: precise-code-intel
