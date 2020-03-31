@@ -43,11 +43,10 @@ kubectl -n ns-sourcegraph rollout status -w deployment/redis-cache
 kubectl -n ns-sourcegraph rollout status -w deployment/redis-store
 kubectl -n ns-sourcegraph rollout status -w statefulset/gitserver
 kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
-kubectl -n ns-sourcegraph rollout status -w service/sourcegraph
 
 # hit it with one request
 
-SOURCEGRAPH_IP=`kubectl  -n ns-sourcegraph describe service sourcegraph | grep "LoadBalancer Ingress:" | cut -d ":" -f 2 | tr -d " "`
+SOURCEGRAPH_IP=`kubectl -n ns-sourcegraph describe service sourcegraph | grep "LoadBalancer Ingress:" | cut -d ":" -f 2 | tr -d " "`
 
 curl -m 10 https://${SOURCEGRAPH_IP}:3080
 
