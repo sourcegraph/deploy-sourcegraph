@@ -6,5 +6,6 @@
 #   * When the cluster is first created
 #   * Whenever the configuration for any resource has been updated
 
-# Apply the base Soucegraph deployment 
-kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+# Apply the base Soucegraph deployment
+kubectl apply -l deploy=sourcegraph -k base/rbac-roles
+kubectl apply -l deploy=sourcegraph -k base
