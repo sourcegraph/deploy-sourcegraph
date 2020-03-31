@@ -32,7 +32,7 @@ kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --ro
 
 kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph apply -k ${DEPLOY_SOURCEGRAPH_ROOT}/overlays/non-privileged
 
-kubectl expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph --type=LoadBalancer
+kubectl  -n ns-sourcegraph expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph --type=LoadBalancer
 
 # wait for it all to finish (we list out the ones with persistent volume claim because they take longer)
 
@@ -47,7 +47,7 @@ kubectl -n ns-sourcegraph rollout status -w service/sourcegraph
 
 # hit it with one request
 
-SOURCEGRAPH_IP=`kubectl describe service sourcegraph | grep "LoadBalancer Ingress:" | cut -d ":" -f 2 | tr -d " "`
+SOURCEGRAPH_IP=`kubectl  -n ns-sourcegraph describe service sourcegraph | grep "LoadBalancer Ingress:" | cut -d ":" -f 2 | tr -d " "`
 
 curl -m 10 https://${SOURCEGRAPH_IP}:3080
 
