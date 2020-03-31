@@ -6,9 +6,9 @@ version you are upgrading to should be applied (unless otherwise noted).
 
 ## 3.14
 
-The `kubectl-apply-all.sh` command now uses `kustomize` and requires client version 1.14 of `kubectl`. 
+The `kubectl-apply-all.sh` command now uses `kustomize` and requires `kubectl` client version >= 1.14. 
 
-If your kubectl version is older and doesn't support `apply -k` you need to 
+If your kubectl client version is older and doesn't support `apply -k` you need to 
 install the standalone [kustomize](https://kustomize.io/) binary, generate the YAML files with `kustomize build` and
 then use the built YAML with `kubectl apply -f`. For example use:
 
