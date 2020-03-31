@@ -5,14 +5,14 @@ metadata:
     description: Precise code intelligence services for Sourcegraph
   labels:
     deploy: sourcegraph
-  name: pci-api-server
+  name: precise-code-intel-api-server
 spec:
   minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: pci-api-server
+      app: precise-code-intel-api-server
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -21,17 +21,17 @@ spec:
   template:
     metadata:
       labels:
-        app: pci-api-server
+        app: precise-code-intel-api-server
     spec:
       containers:
       - env:
-        - name: PCI_NUM_APIS
-          value: '1'
-        - name: PCI_NUM_BUNDLE_MANAGERS
+        - name: PRECISE_CODE_INTEL_NUM_APIS
+          value: '2'
+        - name: PRECISE_CODE_INTEL_NUM_BUNDLE_MANAGERS
           value: '0'
-        - name: PCI_NUM_WORKERS
+        - name: PRECISE_CODE_INTEL_NUM_WORKERS
           value: '0'
-        - name: PCI_BUNDLE_MANAGER_URL
+        - name: PRECISE_CODE_INTEL_BUNDLE_MANAGER_URL
           value: http://localhost:3187
         - name: POD_NAME
           valueFrom:
@@ -39,7 +39,7 @@ spec:
               fieldPath: metadata.name
         image: index.docker.io/sourcegraph/precise-code-intel:efritz-rename
         terminationMessagePolicy: FallbackToLogsOnError
-        name: pci-api-server
+        name: precise-code-intel-api-server
         livenessProbe:
           httpGet:
             path: /healthz
