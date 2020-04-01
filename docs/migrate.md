@@ -6,15 +6,42 @@ version you are upgrading to should be applied (unless otherwise noted).
 
 ## 3.15
 
-### Delete the old lsif-server deployment
+### Migrating LSIF data
 
-Version 3.15 splits lsif-server into multiple services, but retains the same persistent volume. In order for the
-update to succeed, the old lsif-server service and deployment must be detached from the persistent volume. The
-following commands need to be run once after the updates have been applied to your cluster:
+The lsif-server service has been replaced by a trio of services defined in [precise-code-intel](../base/precise-code-intel),
+and the persistent volume claim in which lsif-server  stored converted LSIF uploads has been replaced by
+[bundle storage](../base/precise-code-intel/bundle-storage.PersistentVolume.yaml).
+
+Upgrading to 3.15 will create a new empty volume for LSIF data. Without any action, the LSIF data previously uploaded
+to the instance will be lost. To retain old LSIF data, perform teh following migration steps. This will cause some
+temporary downtime for precise code intelligence.
+
+1. Deploy 3.15. This will create a `bundle-storage` persistent volume claim.
+2. Release the claims to old and new persistent volumes by taking down `lsif-server` and `precise-code-intel-bundle-manager`.
 
 ```shell script
 kubectl delete svc lsif-server
 kubectl delete deployment lsif-server
+kubectl delete deployment precise-code-intel-bundle-manager
+```
+
+3. Deploy the `lsif-server-migrator` deployment to transfer the data from the old volume to the new volume.
+
+```shell script
+kubectl apply -f configure/lsif-server-migrator/lsif-server-migrator.Deployment.yaml
+```
+
+4. Watch the output of the `lsif-server-migrator` until the copy completes.
+
+```shell script
+kubectl logs lsif-server-migrator
+```
+
+5. Tear down the deployment and re-create the bundle manager deployment.
+
+```shell script
+kubectl delete deployment lsif-server-migrator
+./kubectl-apply-all.sh
 ```
 
 ## 3.14
