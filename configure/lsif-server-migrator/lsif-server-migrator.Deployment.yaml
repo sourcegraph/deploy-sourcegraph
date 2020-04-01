@@ -15,7 +15,8 @@ spec:
       containers:
         - name: lsif-server-migrator
           image: sourcegraph/alpine:3.10@sha256:4d05cd5669726fc38823e92320659a6d1ef7879e62268adec5df658a0bacf65c
-          command: ["cp", "-a", "/old-lsif-storage/*", "/new-lsif-storage/", "&&", "echo", "Copy complete!"]
+          command: ["/bin/sh", "-c"]
+          args: ["cp -a /old-lsif-storage/* /new-lsif-storage/; echo 'Copy complete!'"]
           volumeMounts:
             - mountPath: /old-lsif-storage
               name: lsif-server
