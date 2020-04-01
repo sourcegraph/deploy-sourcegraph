@@ -16,7 +16,7 @@ Upgrading to 3.15 will create a new empty volume for LSIF data. Without any acti
 to the instance will be lost. To retain old LSIF data, perform teh following migration steps. This will cause some
 temporary downtime for precise code intelligence.
 
-1. Deploy 3.15. This will create a `bundle-storage` persistent volume claim.
+1. Deploy 3.15. This will create a `precise-code-intel-storage` persistent volume claim.
 2. Release the claims to old and new persistent volumes by taking down `lsif-server` and `precise-code-intel-bundle-manager`.
 
 ```shell script
