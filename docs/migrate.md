@@ -6,7 +6,7 @@ version you are upgrading to should be applied (unless otherwise noted).
 
 ## 3.15
 
-### Existing installations: Migrating lsif-server
+### Delete the old lsif-server deployment
 
 Version 3.15 splits lsif-server into multiple services, but retains the same persistent volume. In order for the
 update to succeed, the old lsif-server service and deployment must be detached from the persistent volume. The
