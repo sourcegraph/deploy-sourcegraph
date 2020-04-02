@@ -2,17 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: Backend for symbols operations.
+    description: Handles conversion of uploaded precise code intelligence bundles.
   labels:
     deploy: sourcegraph
-  name: symbols
+  name: precise-code-intel-worker
 spec:
   minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: symbols
+      app: precise-code-intel-worker
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -21,40 +21,40 @@ spec:
   template:
     metadata:
       labels:
-        app: symbols
+        app: precise-code-intel-worker
     spec:
       containers:
       - env:
-        - name: SYMBOLS_CACHE_SIZE_MB
-          value: "100000"
+        - name: NUM_WORKERS
+          value: '4'
+        - name: PRECISE_CODE_INTEL_BUNDLE_MANAGER_URL
+          value: http://precise-code-intel-bundle-manager:3187
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: CACHE_DIR
-          value: /mnt/cache/$(POD_NAME)
-        image: index.docker.io/sourcegraph/symbols:59913_2020-04-02_5ae630c
+        image: index.docker.io/sourcegraph/precise-code-intel-worker:59913_2020-04-02_5ae630c
         terminationMessagePolicy: FallbackToLogsOnError
-        name: symbols
+        name: precise-code-intel-worker
         livenessProbe:
           httpGet:
             path: /healthz
-            port: http
+            port: server
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /healthz
-            port: http
+            port: server
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
-        - containerPort: 3184
-          name: http
-        - containerPort: 6060
-          name: debug
+        - containerPort: 3188
+          name: server
+        - containerPort: 9090
+          name: prometheus
         resources:
           limits:
             cpu: "2"
@@ -62,9 +62,8 @@ spec:
           requests:
             cpu: 500m
             memory: 500M
-        volumeMounts:
-        - mountPath: /mnt/cache
-          name: cache-ssd
-      volumes:
-      - emptyDir: {}
-        name: cache-ssd
+        securityContext:
+          runAsUser: 100
+          runAsGroup: 101
+      securityContext:
+        fsGroup: 101

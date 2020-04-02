@@ -156,6 +156,64 @@ data:
         action: replace
         target_label: instance
 
+    # Scrape config for federated Prometheus instance endpoints. This is currently only
+    # used to proxy the metrics from multiple processes inside the precise code intel
+    # containers to be made available (as we can't have Prometheus scrape a dynamic port
+    # range based on a ConfigMap value).
+    #
+    # The relabeling allows the actual service scrape endpoint to be configured
+    # via the following annotations:
+    #
+    # * `prometheus.io/federate`: Only scrape services that have a value of `true`
+    # * `prometheus.io/scheme`: If the metrics endpoint is secured then you will need
+    # to set this to `https` & most likely set the `tls_config` of the scrape config.
+    # * `prometheus.io/port`: The port the Prometheus cluster is exposed on (usually 9090).
+    #
+    # TODO(efritz,uwedeportivo) - see if the value for 'match[]' can be supplied as an
+    # annotation so that this selector can be generalized if we want to use federation for
+    # another application in the future.
+    - job_name: 'kubernetes-federate'
+      honor_labels: true
+      metrics_path: '/federate'
+      params:
+        'match[]':
+          - '{__name__=~"lsif_.*"}'
+
+      kubernetes_sd_configs:
+      - role: endpoints
+
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_annotation_sourcegraph_prometheus_federate]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+        action: replace
+        target_label: __scheme__
+        regex: (https?)
+      - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+        action: replace
+        target_label: __address__
+        regex: (.+)(?::\d+);(\d+)
+        replacement: $1:$2
+      - action: labelmap
+        regex: __meta_kubernetes_service_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        # Sourcegraph specific customization. We want a more convenient to type label.
+        # target_label: kubernetes_namespace
+        target_label: ns
+      - source_labels: [__meta_kubernetes_service_name]
+        action: replace
+        target_label: kubernetes_name
+      # Sourcegraph specific customization. We want a nicer name for job
+      - source_labels: [app]
+        action: replace
+        target_label: job
+      # Sourcegraph specific customization. We want a nicer name for instance
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: instance
+
     # Example scrape config for probing services via the Blackbox Exporter.
     #
     # The relabeling allows the actual service scrape endpoint to be configured

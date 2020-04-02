@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: lsif-server
+  name: sourcegraph-frontend
 spec:
   template:
     spec:
       initContainers:
-        - name: transfer-file-ownership
+        - name: transfer-cache
           image: sourcegraph/alpine:3.10@sha256:4d05cd5669726fc38823e92320659a6d1ef7879e62268adec5df658a0bacf65c
-          command: ["sh", "-c", "chown -R 100:101 /lsif-storage"]
+          command: ["sh", "-c", "if [[ \"$(stat -c '%u' /mnt/cache)\" -ne 100 ]]; then chown -R 100:101 /mnt/cache; fi"]
           volumeMounts:
-            - mountPath: /lsif-storage
-              name: lsif-storage
+          - mountPath: /mnt/cache
+            name: cache-ssd
           securityContext:
             runAsUser: 0

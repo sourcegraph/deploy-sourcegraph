@@ -37,7 +37,19 @@ patchesJson6902:
     path: indexed-search-patch.yaml
   - target:
       kind: Deployment
-      name: lsif-server
+      name: precise-code-intel-api-server
+      group: apps
+      version: v1
+    path: delete-resources.yaml
+  - target:
+      kind: Deployment
+      name: precise-code-intel-bundle-manager
+      group: apps
+      version: v1
+    path: delete-resources.yaml
+  - target:
+      kind: Deployment
+      name: precise-code-intel-worker
       group: apps
       version: v1
     path: delete-resources.yaml
@@ -108,7 +120,7 @@ patchesJson6902:
     path: delete-storageclassname.yaml
   - target:
       kind: PersistentVolumeClaim
-      name: lsif-server
+      name: bundle-manager
       version: v1
     path: delete-storageclassname.yaml
   - target:
