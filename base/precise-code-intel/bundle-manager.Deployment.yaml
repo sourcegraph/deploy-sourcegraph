@@ -25,21 +25,15 @@ spec:
     spec:
       containers:
       - env:
-        - name: PRECISE_CODE_INTEL_NUM_APIS
-          value: '0'
-        - name: PRECISE_CODE_INTEL_NUM_BUNDLE_MANAGERS
-          value: '1'
-        - name: PRECISE_CODE_INTEL_NUM_WORKERS
-          value: '0'
         - name: PRECISE_CODE_INTEL_API_SERVER_URL
           value: http://localhost:3186
         - name: LSIF_STORAGE_ROOT
-          value: /bundle-storage
+          value: /lsif-storage
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/precise-code-intel:59615_2020-03-31_bf8119e
+        image: index.docker.io/sourcegraph/precise-code-intel-bundle-manager:59615_2020-03-31_bf8119e
         terminationMessagePolicy: FallbackToLogsOnError
         name: precise-code-intel-bundle-manager
         livenessProbe:
@@ -69,14 +63,14 @@ spec:
             cpu: 500m
             memory: 500M
         volumeMounts:
-        - mountPath: /bundle-storage
-          name: precise-code-intel-storage
+        - mountPath: /lsif-storage
+          name: bundle-manager
         securityContext:
           runAsUser: 100
           runAsGroup: 101
       securityContext:
         fsGroup: 101
       volumes:
-      - name: precise-code-intel-storage
+      - name: bundle-manager
         persistentVolumeClaim:
-          claimName: precise-code-intel-storage
+          claimName: bundle-manager

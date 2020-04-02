@@ -18,7 +18,7 @@ temporary downtime for precise code intelligence.
 
 **Migrating**
 
-1. Deploy 3.15. This will create a `precise-code-intel-storage` persistent volume claim.
+1. Deploy 3.15. This will create a `bundle-manager` persistent volume claim.
 2. Release the claims to old and new persistent volumes by taking down `lsif-server` and `precise-code-intel-bundle-manager`.
 
 ```shell script

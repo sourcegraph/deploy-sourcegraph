@@ -25,19 +25,15 @@ spec:
     spec:
       containers:
       - env:
-        - name: PRECISE_CODE_INTEL_NUM_APIS
-          value: '0'
-        - name: PRECISE_CODE_INTEL_NUM_BUNDLE_MANAGERS
-          value: '0'
         - name: PRECISE_CODE_INTEL_NUM_WORKERS
-          value: '2'
+          value: '4'
         - name: PRECISE_CODE_INTEL_BUNDLE_MANAGER_URL
           value: http://localhost:3187
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/precise-code-intel:59615_2020-03-31_bf8119e
+        image: index.docker.io/sourcegraph/precise-code-intel-worker:59615_2020-03-31_bf8119e
         terminationMessagePolicy: FallbackToLogsOnError
         name: precise-code-intel-worker
         livenessProbe:
