@@ -471,7 +471,6 @@ If you want to specify a custom Redis server, you'll need specify the correspond
 
 - `sourcegraph-frontend`
 - `repo-updater`
-- `lsif-server`
 
 ## Configure custom PostgreSQL
 

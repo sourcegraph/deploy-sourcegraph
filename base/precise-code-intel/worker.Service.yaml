@@ -5,17 +5,17 @@ metadata:
     prometheus.io/port: "9090"
     sourcegraph.prometheus/federate: "true"
   labels:
-    app: lsif-server
+    app: precise-code-intel-worker
     deploy: sourcegraph
-  name: lsif-server
+  name: precise-code-intel-worker
 spec:
   ports:
   - name: server
-    port: 3186
+    port: 3188
     targetPort: server
   - name: prometheus
     port: 9090
     targetPort: prometheus
   selector:
-    app: lsif-server
+    app: precise-code-intel-worker
   type: ClusterIP
