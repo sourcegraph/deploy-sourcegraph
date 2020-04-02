@@ -6,7 +6,23 @@ version you are upgrading to should be applied (unless otherwise noted).
 
 ## 3.15
 
-### Migrating LSIF data
+### (optional) Keep LSIF data through manual migration
+
+If you have previously uploaded LSIF precise code intelligence data and wish to retain it after upgrading, you will need to perform this migration.
+
+**Skipping the migration**
+
+If you choose not to migrate the data, Sourcegraph will use basic code intelligence until you upload LSIF data again.
+
+You may run the following commands to remove the now unused resources:
+
+```shell script
+kubectl delete svc lsif-server
+kubectl delete deployment lsif-server
+kubectl delete pvc lsif-server
+```
+
+**Migrating**
 
 The lsif-server service has been replaced by a trio of services defined in [precise-code-intel](../base/precise-code-intel),
 and the persistent volume claim in which lsif-server  stored converted LSIF uploads has been replaced by
@@ -49,16 +65,6 @@ kubectl delete deployment lsif-server-migrator
 6. Remove the old persistent volume claim.
 
 ```shell script
-kubectl delete pvc lsif-server
-```
-
-**Skipping the migration**
-
-If you choose not to migrate, the following commands should be run to tear down the old service.
-
-```shell script
-kubectl delete svc lsif-server
-kubectl delete deployment lsif-server
 kubectl delete pvc lsif-server
 ```
 
