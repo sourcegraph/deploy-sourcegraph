@@ -10,4 +10,4 @@
 
 FILES=`find base -name "*.yaml" \( ! -name kustomization.yaml \)  | tr "\n" "," | sed 's/,$/ /' | tr " " "\n"`
 
-kubectl apply --prune -l deploy=sourcegraph -f ${FILES} --recursive
+kubectl apply --prune -l deploy=sourcegraph -f ${FILES}
