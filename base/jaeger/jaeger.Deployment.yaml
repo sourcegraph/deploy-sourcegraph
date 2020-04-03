@@ -22,7 +22,7 @@ spec:
         prometheus.io/port: "16686"
     spec:
         containers:
-            image: jaegertracing/all-in-one:1.17.1
+          - image: jaegertracing/all-in-one:1.17.1
             name: jaeger
             ports:
               - containerPort: 5775
@@ -42,3 +42,10 @@ spec:
                 path: "/"
                 port: 14269
               initialDelaySeconds: 5
+            resources:
+              limits:
+                cpu: "8"
+                memory: 6G
+              requests:
+                cpu: "6"
+                memory: 4G
