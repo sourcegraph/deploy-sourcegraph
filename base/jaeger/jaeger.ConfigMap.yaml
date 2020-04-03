@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jaeger-configuration
+  labels:
+    deploy: sourcegraph
+    app: jaeger
+    app.kubernetes.io/name: jaeger
+data:
+  span-storage-type: elasticsearch
+  collector: |
+    es:
+      server-urls: http://elasticsearch:9200
+      username: elastic
+      password: changeme
+    # collector:
+    #   zipkin:
+    #     http-port: 9411
+  query: |
+    es:
+      server-urls: http://elasticsearch:9200
+      username: elastic
+      password: changeme
+
+
+# apiVersion: v1
+# kind: ConfigMap
+# metadata:
+#   name: jaeger-configuration
+#   labels:
+#     deploy: sourcegraph
+#     app: jaeger
+#     app.kubernetes.io/name: jaeger
+# data:
+#   span-storage-type: cassandra
+#   collector: |
+#     # collector:
+#     #   zipkin:
+#     #     http-port: 9411
+#     cassandra:
+#       servers: cassandra
+#       keyspace: jaeger_v1_dc1
+#   query: |
+#     cassandra:
+#       servers: cassandra
+#       keyspace: jaeger_v1_dc1
