@@ -46,6 +46,7 @@ func Config() (map[string]string, error) {
 		"TEST_GCP_USERNAME":       "gcpUsername",
 		"DEPLOY_SOURCEGRAPH_ROOT": "deploySourcegraphRoot",
 		"BUILD_CREATOR":           "buildCreator",
+		"GENERATED_BASE":          "generatedBase",
 	} {
 		value, present := os.LookupEnv(env)
 		if !present {
