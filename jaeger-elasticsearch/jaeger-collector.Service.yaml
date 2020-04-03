@@ -17,11 +17,15 @@ spec:
     port: 14268
     protocol: TCP
     targetPort: 14268
+  - name: jaeger-collector-zipkin
+    port: 9411
+    protocol: TCP
+    targetPort: 9411
   - name: jaeger-collector-grpc
     port: 14250
     protocol: TCP
     targetPort: 14250
   selector:
     app.kubernetes.io/name: jaeger
-    app.kubernetes.io/component: all-in-one
+    app.kubernetes.io/component: collector
   type: ClusterIP
