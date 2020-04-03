@@ -7,4 +7,4 @@
 #   * Whenever the configuration for any resource has been updated
 
 # Apply the base Soucegraph deployment 
-kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+kubectl apply --prune -l deploy=sourcegraph -f base/files/ --recursive
