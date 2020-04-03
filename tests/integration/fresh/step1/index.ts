@@ -5,7 +5,7 @@ import * as fg from 'fast-glob'
 import * as k8s from '@pulumi/kubernetes'
 
 import { k8sProvider } from './cluster'
-import {deploySourcegraphRoot, gcpUsername, generatedBase} from './config'
+import { deploySourcegraphRoot, gcpUsername, generatedBase } from './config'
 
 const clusterAdmin = new k8s.rbac.v1.ClusterRoleBinding(
     'cluster-admin-role-binding',
