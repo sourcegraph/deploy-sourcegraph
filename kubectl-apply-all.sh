@@ -16,7 +16,7 @@ apply () {
 
   local FILES=`find ${DIR} -name "*.yaml" \( ! -name kustomization.yaml \)  | tr "\n" "," | sed 's/,$/ /' | tr " " "\n"`
 
-  kubectl apply --prune -l deploy=${LABEL} -f ${FILES} --dry-run
+  kubectl apply --prune -l deploy=${LABEL} -f ${FILES}
 }
 
 apply base sourcegraph
