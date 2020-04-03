@@ -8,6 +8,9 @@
 
 # Apply the base Soucegraph deployment
 
-FILES=`find base -name "*.yaml" \( ! -name kustomization.yaml \)  | tr "\n" "," | sed 's/,$/ /' | tr " " "\n"`
+apply () {
+  local FILES=`find $1 -name "*.yaml" \( ! -name kustomization.yaml \)  | tr "\n" "," | sed 's/,$/ /' | tr " " "\n"`
+  kubectl apply --prune -l deploy=sourcegraph -f ${FILES}
+}
 
-kubectl apply --prune -l deploy=sourcegraph -f ${FILES}
+apply base
