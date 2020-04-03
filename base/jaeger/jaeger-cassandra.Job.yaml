@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jaeger-cassandra-schema-job
+  labels:
+    deploy: sourcegraph
+    app: cassandra-schema
+    app.kubernetes.io/name: cassandra-schema
+    app.kubernetes.io/component: storage-backend
+    app.kubernetes.io/part-of: jaeger
+spec:
+  activeDeadlineSeconds: 86400
+  template:
+    metadata:
+      name: cassandra-schema
+    spec:
+      activeDeadlineSeconds: 320
+      containers:
+      - name: jaeger-cassandra-schema
+        image: jaegertracing/jaeger-cassandra-schema:1.6.0
+        env:
+          - name: MODE
+            value: "prod"
+          - name: DATACENTER
+            value: "dc1"
+          - name: TRACE_TTL
+            value: "172800"  # TTL in seconds (default: 2 days)
+      restartPolicy: OnFailure

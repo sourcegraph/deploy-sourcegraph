@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cassandra
+  labels:
+    deploy: sourcegraph
+    app: cassandra
+    app.kubernetes.io/name: cassandra
+    app.kubernetes.io/component: storage-backend
+    app.kubernetes.io/part-of: jaeger
+spec:
+  ports:
+  - port: 7000
+    name: intra-node
+  - port: 7001
+    name: tls-intra-node
+  - port: 7199
+    name: jmx
+  - port: 9042
+    name: cql
+  - port: 9160
+    name: thrift
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: cassandra
+    app.kubernetes.io/component: storage-backend
+    app.kubernetes.io/part-of: jaeger
