@@ -4,7 +4,6 @@ ARG JAEGER_VERSION
 FROM jaegertracing/all-in-one:$JAEGER_VERSION as base
 
 FROM alpine:3.11.5
-
 RUN apk update
 RUN apk add bash curl
 
