@@ -37,7 +37,7 @@ kubectl  -n ns-sourcegraph expose deployment sourcegraph-frontend --type=NodePor
 # wait for it all to finish (we list out the ones with persistent volume claim because they take longer)
 
 kubectl -n ns-sourcegraph rollout status -w statefulset/indexed-search
-kubectl -n ns-sourcegraph rollout status -w deployment/lsif-server
+kubectl -n ns-sourcegraph rollout status -w deployment/precise-code-intel-bundle-manager
 kubectl -n ns-sourcegraph rollout status -w deployment/prometheus
 kubectl -n ns-sourcegraph rollout status -w deployment/redis-cache
 kubectl -n ns-sourcegraph rollout status -w deployment/redis-store
