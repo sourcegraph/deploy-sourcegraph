@@ -54,7 +54,7 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 - [Configure indexed-search replica count](#configure-indexed-search-replica-count)
 - [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
 - [Configure Alertmanager](../configure/prometheus/alertmanager/README.md)
-- [Configure Jaeger tracing](../configure/jaeger/README.md)
+- [Disable or customize Jaeger tracing](../configure/jaeger/README.md)
 - [Configure Lightstep tracing](#configure-lightstep-tracing)
 - [Configure custom Redis](#configure-custom-redis)
 - [Configure custom PostgreSQL](#configure-custom-postgres)
