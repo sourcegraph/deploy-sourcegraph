@@ -88,6 +88,33 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
+      - image: jaegertracing/jaeger-agent:1.17.1
+        name: jaeger-agent
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+        ports:
+        - containerPort: 5775
+          protocol: UDP
+        - containerPort: 5778
+          protocol: TCP
+        - containerPort: 6831
+          protocol: UDP
+        - containerPort: 6832
+          protocol: UDP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 500M
+          requests:
+            cpu: 100m
+            memory: 100M
+        args:
+          - --reporter.grpc.host-port=jaeger-collector:14250
+          - --reporter.type=grpc
       serviceAccountName: sourcegraph-frontend
       volumes:
       - emptyDir: {}
