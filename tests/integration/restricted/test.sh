@@ -30,7 +30,7 @@ kubectl create role -n ns-sourcegraph nonroot:unprivileged --verb=use --resource
 
 kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --role=nonroot:unprivileged --serviceaccount=ns-sourcegraph:fake-user
 
-kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph apply -k ${DEPLOY_SOURCEGRAPH_ROOT}/overlays/non-privileged
+kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph apply -k ${DEPLOY_SOURCEGRAPH_ROOT}/overlays/non-privileged-create-cluster
 
 kubectl  -n ns-sourcegraph expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph --type=LoadBalancer
 
