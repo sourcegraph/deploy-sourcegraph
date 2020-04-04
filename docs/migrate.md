@@ -6,6 +6,18 @@ version you are upgrading to should be applied (unless otherwise noted).
 
 ## 3.14 (Unreleased)
 
+The `kubectl-apply-all.sh` command now uses `kustomize` and requires `kubectl` client version >= 1.14. 
+
+If your kubectl client version is older and doesn't support `apply -k` you need to 
+install the standalone [kustomize](https://kustomize.io/) binary, generate the YAML files with `kustomize build` and
+then use the built YAML with `kubectl apply -f`. For example use:
+
+```shell script
+kustomize build base | kubectl apply -f -
+kustomize build base/rbac-roles | kubectl apply -f -
+```
+in your version of `kubectl-apply-all.sh` if you cannot upgrade `kubectl` to a client version >= 1.14.
+
 ### Existing installations: Migrating the container user from root to non-root
 
 Version 3.14 changes the security context of the installation by switching to a non-root user for all containers.

@@ -15,6 +15,11 @@ steps:
     concurrency_group: deploy-sourcegraph/integration
     command: .buildkite/integration-test.sh
 
+  - label: ":k8s:"
+    concurrency: 5
+    concurrency_group: deploy-sourcegraph/integration-restricted
+    command: .buildkite/integration-restricted-test.sh
+
   - wait
   
   - label: ":gcompute: :floppy_disk: 🧹"
