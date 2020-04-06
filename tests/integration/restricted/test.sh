@@ -48,7 +48,7 @@ kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
 
 SOURCEGRAPH_IP=`kubectl -n ns-sourcegraph describe service sourcegraph | grep "LoadBalancer Ingress:" | cut -d ":" -f 2 | tr -d " "`
 
-curl -m 10 http://${SOURCEGRAPH_IP}:3080
+curl -m 60 http://${SOURCEGRAPH_IP}:3080
 
 # delete cluster
 
