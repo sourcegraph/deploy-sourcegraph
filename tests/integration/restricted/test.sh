@@ -32,7 +32,7 @@ kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --ro
 
 kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph apply -k ${DEPLOY_SOURCEGRAPH_ROOT}/overlays/non-privileged-create-cluster
 
-kubectl  -n ns-sourcegraph expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph --type=LoadBalancer
+kubectl -n ns-sourcegraph expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph --type=LoadBalancer --port=3080 --target-port=3080
 
 # wait for it all to finish (we list out the ones with persistent volume claim because they take longer)
 
