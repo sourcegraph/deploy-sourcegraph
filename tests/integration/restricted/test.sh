@@ -6,10 +6,10 @@ CLUSTER_NAME_SUFFIX=`echo ${BUILD_UUID} | head -c 8`
 
 CLUSTER_NAME="ds-test-restricted-${CLUSTER_NAME_SUFFIX}"
 
-function finish {
-  #gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet
-}
-trap finish EXIT
+#function finish {
+#  gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet
+#}
+#trap finish EXIT
 
 cd $(dirname "${BASH_SOURCE[0]}")
 
