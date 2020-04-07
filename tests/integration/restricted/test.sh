@@ -37,9 +37,7 @@ kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --ro
 
 kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph apply -k ${DEPLOY_SOURCEGRAPH_ROOT}/overlays/non-privileged-create-cluster
 
-kubectl -n ns-sourcegraph expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph
-
-kubectl -n ns-sourcegraph apply -f ingress.yaml
+kubectl  -n ns-sourcegraph expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph --type=LoadBalancer --port=3080 --target-port=3080
 
 # wait for it all to finish (we list out the ones with persistent volume claim because they take longer)
 
@@ -51,23 +49,23 @@ kubectl -n ns-sourcegraph rollout status -w deployment/redis-store
 kubectl -n ns-sourcegraph rollout status -w statefulset/gitserver
 kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
 
-# hit it with one request
+ hit it with one request
 
-#SOURCEGRAPH_IP=`kubectl -n ns-sourcegraph describe ingress sourcegraph-ingress | grep "Address:" | cut -d ":" -f 2 | tr -d " "`
-#
-#attempt_counter=0
-#max_attempts=6
-#
-#status_code=$(curl -o /dev/null -s -w "%{http_code}\n" http://${SOURCEGRAPH_IP})
-#
-#while [ ${status_code} -ge 400 ]
-#do
-#    if [ ${attempt_counter} -eq ${max_attempts} ];then
-#      echo "Max attempts reached"
-#      exit 1
-#    fi
-#
-#    status_code=$(curl -o /dev/null -s -w "%{http_code}\n" http://${SOURCEGRAPH_IP})
-#    attempt_counter=$(($attempt_counter+1))
-#    sleep 10
-#done
+SOURCEGRAPH_IP=`kubectl -n ns-sourcegraph describe service sourcegraph | grep "LoadBalancer Ingress:" | cut -d ":" -f 2 | tr -d " "`
+
+attempt_counter=0
+max_attempts=6
+
+status_code=$(curl -o /dev/null -s -w "%{http_code}\n" http://${SOURCEGRAPH_IP}:3080)
+
+while [ ${status_code} -ge 400 ]
+do
+    if [ ${attempt_counter} -eq ${max_attempts} ];then
+      echo "Max attempts reached"
+      exit 1
+    fi
+
+    status_code=$(curl -o /dev/null -s -w "%{http_code}\n" http://${SOURCEGRAPH_IP}:3080)
+    attempt_counter=$(($attempt_counter+1))
+    sleep 10
+done
