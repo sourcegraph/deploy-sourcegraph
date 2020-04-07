@@ -58,7 +58,7 @@ SOURCEGRAPH_IP=`kubectl -n ns-sourcegraph describe ingress sourcegraph-ingress |
 attempt_counter=0
 max_attempts=6
 
-status_code=$(curl -o /dev/null -s -w "%{http_code}\n" http://${SOURCEGRAPH_IP}/site-admin/init)
+status_code=$(curl -o /dev/null -s -w "%{http_code}\n" http://${SOURCEGRAPH_IP})
 
 while [ ${status_code} -ge 400 ]
 do
@@ -67,7 +67,7 @@ do
       exit 1
     fi
 
-    status_code=$(curl -o /dev/null -s -w "%{http_code}\n" http://${SOURCEGRAPH_IP}/site-admin/init)
+    status_code=$(curl -o /dev/null -s -w "%{http_code}\n" http://${SOURCEGRAPH_IP})
     attempt_counter=$(($attempt_counter+1))
     sleep 10
 done
