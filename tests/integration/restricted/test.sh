@@ -6,6 +6,11 @@ CLUSTER_NAME_SUFFIX=`echo ${BUILD_UUID} | head -c 8`
 
 CLUSTER_NAME="ds-test-restricted-${CLUSTER_NAME_SUFFIX}"
 
+function finish {
+  gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet
+}
+trap finish EXIT
+
 cd $(dirname "${BASH_SOURCE[0]}")
 
 # set up the cluster, set up the fake user and restricted policy and then deploy the non-privileged overlay as that user
@@ -50,9 +55,15 @@ kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
 
 SOURCEGRAPH_IP=`kubectl -n ns-sourcegraph describe ingress sourcegraph-ingress | grep "Address:" | cut -d ":" -f 2 | tr -d " "`
 
-curl -m 60 http://${SOURCEGRAPH_IP}
+attempt_counter=0
+max_attempts=6
 
-# delete cluster
+until $(curl --output /dev/null --silent --head --fail http://${SOURCEGRAPH_IP}); do
+    if [ ${attempt_counter} -eq ${max_attempts} ];then
+      echo "Max attempts reached"
+      exit 1
+    fi
 
-gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet
-
+    attempt_counter=$(($attempt_counter+1))
+    sleep 10
+done
