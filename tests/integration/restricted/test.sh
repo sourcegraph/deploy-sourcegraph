@@ -58,7 +58,7 @@ SOURCEGRAPH_IP=`kubectl -n ns-sourcegraph describe ingress sourcegraph-ingress |
 attempt_counter=0
 max_attempts=6
 
-until $(curl --output /dev/null --silent --head --fail http://${SOURCEGRAPH_IP}); do
+until $(curl --output /dev/null --silent --fail http://${SOURCEGRAPH_IP}); do
     if [ ${attempt_counter} -eq ${max_attempts} ];then
       echo "Max attempts reached"
       exit 1
