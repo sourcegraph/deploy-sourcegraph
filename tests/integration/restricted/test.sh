@@ -49,7 +49,7 @@ kubectl -n ns-sourcegraph rollout status -w deployment/redis-store
 kubectl -n ns-sourcegraph rollout status -w statefulset/gitserver
 kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
 
- hit it with one request
+# hit it with one request
 
 SOURCEGRAPH_IP=`kubectl -n ns-sourcegraph describe service sourcegraph | grep "LoadBalancer Ingress:" | cut -d ":" -f 2 | tr -d " "`
 
