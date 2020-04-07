@@ -4,8 +4,7 @@ ARG JAEGER_VERSION
 FROM jaegertracing/jaeger-agent:$JAEGER_VERSION as base
 
 FROM alpine:3.11.5
-RUN apk update
-RUN apk add bash curl
+RUN apk --no-cache bash curl
 
 COPY --from=base /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=base /go/bin/agent-linux /go/bin/agent-linux
