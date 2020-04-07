@@ -6,10 +6,10 @@ CLUSTER_NAME_SUFFIX=`echo ${BUILD_UUID} | head -c 8`
 
 CLUSTER_NAME="ds-test-restricted-${CLUSTER_NAME_SUFFIX}"
 
-#function finish {
-#  gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet
-#}
-#trap finish EXIT
+function finish {
+  gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet
+}
+trap finish EXIT
 
 cd $(dirname "${BASH_SOURCE[0]}")
 
@@ -53,21 +53,21 @@ kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
 
 # hit it with one request
 
-SOURCEGRAPH_IP=`kubectl -n ns-sourcegraph describe ingress sourcegraph-ingress | grep "Address:" | cut -d ":" -f 2 | tr -d " "`
-
-attempt_counter=0
-max_attempts=6
-
-status_code=$(curl -o /dev/null -s -w "%{http_code}\n" http://${SOURCEGRAPH_IP})
-
-while [ ${status_code} -ge 400 ]
-do
-    if [ ${attempt_counter} -eq ${max_attempts} ];then
-      echo "Max attempts reached"
-      exit 1
-    fi
-
-    status_code=$(curl -o /dev/null -s -w "%{http_code}\n" http://${SOURCEGRAPH_IP})
-    attempt_counter=$(($attempt_counter+1))
-    sleep 10
-done
+#SOURCEGRAPH_IP=`kubectl -n ns-sourcegraph describe ingress sourcegraph-ingress | grep "Address:" | cut -d ":" -f 2 | tr -d " "`
+#
+#attempt_counter=0
+#max_attempts=6
+#
+#status_code=$(curl -o /dev/null -s -w "%{http_code}\n" http://${SOURCEGRAPH_IP})
+#
+#while [ ${status_code} -ge 400 ]
+#do
+#    if [ ${attempt_counter} -eq ${max_attempts} ];then
+#      echo "Max attempts reached"
+#      exit 1
+#    fi
+#
+#    status_code=$(curl -o /dev/null -s -w "%{http_code}\n" http://${SOURCEGRAPH_IP})
+#    attempt_counter=$(($attempt_counter+1))
+#    sleep 10
+#done
