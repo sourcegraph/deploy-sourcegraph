@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 
-set -ex
+set -xeuo
+
+BUILD_CREATOR="${BUILD_CREATOR:-dev}"
+BUILD_BRANCH="${BUILD_BRANCH:-dev}"
+BUILD_UUID="${BUILD_UUID:-dev}"
+[ ! -z "$TEST_GCP_ZONE" ]
+[ ! -z "$TEST_GCP_PROJECT" ]
+[ ! -z "$TEST_GCP_USERNAME" ]
+
+CLEANUP=""
+trap 'bash -c "$CLEANUP"' EXIT
 
 CLUSTER_NAME_SUFFIX=`echo ${BUILD_UUID} | head -c 8`
 
@@ -13,6 +23,8 @@ cd $(dirname "${BASH_SOURCE[0]}")
 gcloud container clusters create ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --num-nodes 3 --machine-type n1-standard-16 --disk-type pd-ssd --project ${TEST_GCP_PROJECT} --labels="cost-category=build,build-creator=${BUILD_CREATOR},build-branch=${BUILD_BRANCH},integration-test=fresh"
 
 gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT}
+CLUSTER_CLEANUP="gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
+CLEANUP="$CLUSTER_CLEANUP; $CLEANUP"
 
 kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user ${TEST_GCP_USERNAME}
 
@@ -30,9 +42,9 @@ kubectl create role -n ns-sourcegraph nonroot:unprivileged --verb=use --resource
 
 kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --role=nonroot:unprivileged --serviceaccount=ns-sourcegraph:fake-user
 
-kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph apply -k ${DEPLOY_SOURCEGRAPH_ROOT}/overlays/non-privileged-create-cluster
+kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph apply -k ../../../overlays/non-privileged-create-cluster
 
-kubectl -n ns-sourcegraph expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph --type=LoadBalancer --port=3080 --target-port=3080
+# kubectl -n ns-sourcegraph expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph --type=LoadBalancer --port=3080 --target-port=3080
 
 # wait for it all to finish (we list out the ones with persistent volume claim because they take longer)
 
@@ -48,9 +60,7 @@ kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
 
 SOURCEGRAPH_IP=`kubectl -n ns-sourcegraph describe service sourcegraph | grep "LoadBalancer Ingress:" | cut -d ":" -f 2 | tr -d " "`
 
-curl --retry 10 --retry-delay 60 -m 60 http://${SOURCEGRAPH_IP}:3080
+kubectl -n ns-sourcegraph port-forward svc/sourcegraph-frontend 30080 &
+CLEANUP="kill $!; $CLEANUP"
 
-# delete cluster
-
-gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet
-
+curl --retry 2 --retry-delay 10 -m 30 http://${SOURCEGRAPH_IP}:30080
