@@ -7,13 +7,21 @@ import { paramCase } from 'change-case'
 import { buildCreator } from './config'
 
 const name = `ds-integ-fresh-test`
+const location = gcp.config.zone
+
+const masterVersion = gcp.container.getEngineVersions({
+    location,
+    versionPrefix: '1.14',
+}).latestNodeVersion
 
 const cluster = new gcp.container.Cluster(`${name}-cluster`, {
     description: 'Scratch cluster used for testing sourcegraph/deploy-sourcegraph',
 
-    location: gcp.config.zone,
+    location,
     project: gcp.config.project,
 
+    minMasterVersion: masterVersion,
+    nodeVersion: masterVersion,
     initialNodeCount: 3,
 
     nodeConfig: {
