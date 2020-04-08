@@ -22,7 +22,6 @@ func TestFreshDeployment(t *testing.T) {
 		k8sVersion := k8sVersion
 
 		t.Run(fmt.Sprintf("Test GKE version %q cluster", k8sVersion), func(t *testing.T) {
-			t.Parallel()
 
 			config, err := commonConfig()
 			if err != nil {
