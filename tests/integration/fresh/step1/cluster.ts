@@ -4,14 +4,14 @@ import * as pulumi from '@pulumi/pulumi'
 
 import { paramCase } from 'change-case'
 
-import { buildCreator } from './config'
+import { buildCreator, kubernetesVersionPrefix } from './config'
 
 const name = `ds-integ-fresh-test`
 const location = gcp.config.zone
 
 const gkeVersion = gcp.container.getEngineVersions({
     location,
-    versionPrefix: '1.14',
+    versionPrefix: kubernetesVersionPrefix,
 }).latestNodeVersion
 
 const cluster = new gcp.container.Cluster(`${name}-cluster`, {
