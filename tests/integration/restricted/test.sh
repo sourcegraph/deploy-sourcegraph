@@ -65,9 +65,7 @@ kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
 
 # hit it with one request
 
-SOURCEGRAPH_IP=`kubectl -n ns-sourcegraph describe service sourcegraph | grep "LoadBalancer Ingress:" | cut -d ":" -f 2 | tr -d " "`
-
 kubectl -n ns-sourcegraph port-forward svc/sourcegraph-frontend 30080 &
 CLEANUP="kill $!; $CLEANUP"
 
-curl --retry 2 --retry-delay 10 -m 30 http://${SOURCEGRAPH_IP}:30080
+curl --retry 2 --retry-delay 10 -m 30 http://localhost:30080
