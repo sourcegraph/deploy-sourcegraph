@@ -18,7 +18,8 @@ GENERATED_BASE=$(mktemp -d)
 export GENERATED_BASE
 
 cleanup() {
-	rm -rf "${GENERATED_BASE}"
+    echo "--- Cleaning up test artifacts"
+    rm -rf "${GENERATED_BASE}"
 }
 trap cleanup EXIT
 
@@ -27,7 +28,7 @@ kustomize build overlays/non-root-create-cluster -o "${GENERATED_BASE}"
 TEST_ARGS=("test" "-timeout" "25m")
 
 if [[ "${VERBOSE:-"false"}" == "true" ]]; then
-	TEST_ARGS+=("-v")
+    TEST_ARGS+=("-v")
 fi
 
 TEST_ARGS+=("./...")
