@@ -14,5 +14,14 @@ export GENERATED_BASE=`mktemp -d`
 
 kustomize build overlays/non-root-create-cluster -o ${GENERATED_BASE}
 
-go test ./... -v -timeout 25m ${maybe_short_flag}
+TEST_ARGS=( "test" "-timeout" "25m")
 
+if [[ "${VERBOSE:-"false"}" == "true" ]]; then
+    TEST_ARGS+=( "-v" )
+fi
+
+TEST_ARGS+=( "./..." )
+
+echo "--- Running integration tests"
+
+go "${TEST_ARGS[@]}"

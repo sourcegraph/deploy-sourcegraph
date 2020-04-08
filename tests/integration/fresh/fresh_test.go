@@ -21,7 +21,7 @@ func TestFreshDeployment(t *testing.T) {
 	for _, k8sVersion := range []string{"1.14", "1.15", "1.16"} {
 		k8sVersion := k8sVersion
 
-		t.Run(fmt.Sprintf("Test GKE version %q cluster", k8sVersion), func(t *testing.T) {
+		t.Run(fmt.Sprintf("GKE version %q", k8sVersion), func(t *testing.T) {
 
 			config, err := commonConfig()
 			if err != nil {
@@ -35,7 +35,7 @@ func TestFreshDeployment(t *testing.T) {
 				Config:               config,
 				ExpectRefreshChanges: true,
 				Quick:                false,
-				Verbose:              true,
+				Verbose:              testing.Verbose(),
 
 				ExtraRuntimeValidation: ValidateFrontendIsReachable,
 			})
