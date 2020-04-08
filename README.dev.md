@@ -95,7 +95,7 @@ minikube start
 kubectl create ns src
 kubens src
 ./kubectl-apply-all.sh
-kubectl expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph
+kubectl expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph --port=3080 --target-port=3080
 minikube service list
 ```
 
