@@ -67,5 +67,5 @@ kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
 
 kubectl -n ns-sourcegraph port-forward svc/sourcegraph-frontend 30080 &
 CLEANUP="kill $!; $CLEANUP"
-
-curl --retry 2 --retry-delay 10 -m 30 http://localhost:30080
+sleep 2  # (initial delay in port-forward activating)
+curl --retry-connrefused --retry 2 --retry-delay 10 -m 30 http://localhost:30080
