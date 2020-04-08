@@ -8,27 +8,25 @@ import (
 	"os"
 	"testing"
 
-	qt "github.com/frankban/quicktest"
 	"github.com/pulumi/pulumi/pkg/testing/integration"
 	"github.com/sethgrid/pester"
 )
 
 func TestFreshDeployment(t *testing.T) {
-	c := qt.New(t)
 
 	if testing.Short() {
-		c.Skip("skipping fresh cluster integration test in short mode")
+		t.Skip("skipping fresh cluster integration test in short mode")
 	}
 
 	for _, k8sVersion := range []string{"1.14", "1.15", "1.16"} {
 		k8sVersion := k8sVersion
 
-		c.Run(fmt.Sprintf("Test GKE version %q cluster", k8sVersion), func(c *qt.C) {
-			c.Parallel()
+		t.Run(fmt.Sprintf("Test GKE version %q cluster", k8sVersion), func(t *testing.T) {
+			t.Parallel()
 
 			config, err := commonConfig()
 			if err != nil {
-				c.Fatalf("unable to generate pulumi configuration, err: %s", err)
+				t.Fatalf("unable to generate pulumi configuration, err: %s", err)
 			}
 
 			config["kubernetesVersionPrefix"] = k8sVersion
@@ -69,22 +67,20 @@ func commonConfig() (map[string]string, error) {
 }
 
 func ValidateFrontendIsReachable(t *testing.T, stackInfo integration.RuntimeValidationStackInfo) {
-	c := qt.New(t)
-
 	ip, err := ingressIP(stackInfo.Outputs)
 
 	if err != nil {
-		c.Fatalf("failed to extract ingressIP from outputs, outputs: %v, err: %s", stackInfo.Outputs, err)
+		t.Fatalf("failed to extract ingressIP from outputs, outputs: %v, err: %s", stackInfo.Outputs, err)
 	}
 
 	if ip == nil {
-		c.Fatalf("expected non-nil frontend IP address from outputs, outputs: %v", stackInfo.Outputs)
+		t.Fatalf("expected non-nil frontend IP address from outputs, outputs: %v", stackInfo.Outputs)
 	}
 
 	url := fmt.Sprintf("http://%s", ip)
 	err = pingURL(url)
 	if err != nil {
-		c.Fatalf("failed to contact frontend url, url: %q, err: %s", url, err)
+		t.Fatalf("failed to contact frontend url, url: %q, err: %s", url, err)
 	}
 }
 
