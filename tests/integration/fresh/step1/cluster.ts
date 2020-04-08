@@ -9,7 +9,7 @@ import { buildCreator } from './config'
 const name = `ds-integ-fresh-test`
 const location = gcp.config.zone
 
-const masterVersion = gcp.container.getEngineVersions({
+const gkeVersion = gcp.container.getEngineVersions({
     location,
     versionPrefix: '1.14',
 }).latestNodeVersion
@@ -20,8 +20,8 @@ const cluster = new gcp.container.Cluster(`${name}-cluster`, {
     location,
     project: gcp.config.project,
 
-    minMasterVersion: masterVersion,
-    nodeVersion: masterVersion,
+    minMasterVersion: gkeVersion,
+    nodeVersion: gkeVersion,
     initialNodeCount: 3,
 
     nodeConfig: {
