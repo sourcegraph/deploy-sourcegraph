@@ -3,8 +3,8 @@
 cd $(dirname "${BASH_SOURCE[0]}")/..
 set -euxo pipefail
 
-cd tests/integration/fresh/step1 
+cd tests/integration/fresh/step1
 
 yarn
 
-yarn run prettier-check 
+yarn run prettier-check
