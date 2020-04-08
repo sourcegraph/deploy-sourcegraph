@@ -17,7 +17,7 @@ BUILD_UUID="${BUILD_UUID:-dev}"
 CLEANUP=""
 trap 'bash -c "$CLEANUP"' EXIT
 
-CLUSTER_NAME_SUFFIX=`echo ${BUILD_UUID} | head -c 8`
+CLUSTER_NAME_SUFFIX=$(echo ${BUILD_UUID} | head -c 8)
 
 CLUSTER_NAME="ds-test-restricted-${CLUSTER_NAME_SUFFIX}"
 
@@ -29,8 +29,8 @@ gcloud container clusters create ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --num-n
 
 gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT}
 if [ -z "${NOCLEANUP:-}" ]; then
-    CLUSTER_CLEANUP="gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
-    CLEANUP="$CLUSTER_CLEANUP; $CLEANUP"
+	CLUSTER_CLEANUP="gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
+	CLEANUP="$CLUSTER_CLEANUP; $CLEANUP"
 fi
 
 kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user ${TEST_GCP_USERNAME}
@@ -67,5 +67,5 @@ kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
 
 kubectl -n ns-sourcegraph port-forward svc/sourcegraph-frontend 30080 &
 CLEANUP="kill $!; $CLEANUP"
-sleep 2  # (initial delay in port-forward activating)
+sleep 2 # (initial delay in port-forward activating)
 curl --retry-connrefused --retry 2 --retry-delay 10 -m 30 http://localhost:30080

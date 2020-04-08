@@ -12,4 +12,3 @@ export BUILD_UUID=$BUILDKITE_BUILD_ID
 export BUILD_BRANCH="$(echo $BUILDKITE_BRANCH | tr ' @./' '_' | tr 'A-Z' 'a-z')"
 
 ./tests/integration/restricted/test.sh
-
