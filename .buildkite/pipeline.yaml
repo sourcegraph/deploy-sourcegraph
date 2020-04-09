@@ -22,7 +22,8 @@ steps:
     concurrency_group: deploy-sourcegraph/integration-restricted
     command: .buildkite/integration-restricted-test.sh
 
-  - wait
+  - wait: ~
+    continue_on_failure: true
   
   - label: ":gcompute: :floppy_disk: 🧹"
     concurrency: 1
