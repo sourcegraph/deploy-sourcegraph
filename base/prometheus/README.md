@@ -156,7 +156,7 @@ Prometheus metrics.
 
 ## Sample queries
 
-Sourcegraph Data Center's Prometheus includes by default many useful metrics for tracking
+Sourcegraph's Prometheus includes by default many useful metrics for tracking
 application performance. The following are some commonly used queries that you can try out in the
 UI:
 

@@ -1,8 +1,8 @@
 # Admin guide
 
-This guide is intended for system administrators and operations engineers who are responsible for maintaining a
-Sourcegraph Data Center installation. Each section covers a topic or tool that may be helpful in managing a Data Center
-cluster.
+This guide is intended for system administrators and operations engineers who are responsible for
+maintaining a Sourcegraph Kubernetes cluster. Each section covers a topic or tool that may be
+helpful in managing the cluster.
 
 ## Debugging
 
@@ -58,7 +58,7 @@ Follow the [steps to deploy Prometheus](../configure/prometheus/README.md).
 
 After updating the cluster, the running Prometheus pod will be visible in the list printed by
 `kubectl get pods`. Once this is enabled, Prometheus will begin recording performance metrics across
-all services running in Sourcegraph Data Center.
+all services running in Sourcegraph.
 
 ## Distributed tracing
 

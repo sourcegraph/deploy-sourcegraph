@@ -1,4 +1,4 @@
-# Migrating from Data Center's old helm deployment (2.10.x and prior)
+# Migrating from the legacy Sourcegraph Helm chart (2.10.x and prior)
 
 Two things have changed in 2.11.x that require migration:
 

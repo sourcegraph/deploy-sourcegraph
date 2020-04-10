@@ -1,9 +1,9 @@
 # Configuring Sourcegraph
 
-Sourcegraph Data Center is configured by applying Kubernetes YAML files and simple `kubectl` commands.
-
-Since everything is vanilla Kubernetes, you can configure Sourcegraph as flexibly as you need to meet the requirements of your deployment environment.
-We provide simple instructions for common things like setting up TLS, enabling code intelligence, and exposing Sourcegraph to external traffic below.
+Configuring a Sourcegraph Kubernetes cluster is done by applying manifest files and with simple
+`kubectl` commands. You can configure Sourcegraph as flexibly as you need to meet the requirements
+of your deployment environment.  We provide simple instructions for common things like setting up
+TLS, enabling code intelligence, and exposing Sourcegraph to external traffic below.
 
 ## Fork this repository
 
@@ -16,7 +16,7 @@ This will make upgrades far easier and is a good practice not just for Sourcegra
    - We recommend not storing secrets in the repository itself and these instructions document how.
 
 1. Create a release branch to track all of your customizations to Sourcegraph.
-   When you upgrade Sourcegraph Data Center, you will merge upstream into this branch.
+   When you upgrade Sourcegraph, you will merge upstream into this branch.
 
    ```bash
    git checkout HEAD -b release
@@ -482,7 +482,7 @@ Note: Sourcegraph will create a secondary database in the same PostgreSQL instan
 
 ## Install without RBAC
 
-Sourcegraph Data Center communicates with the Kubernetes API for service discovery. It also has some janitor DaemonSets that clean up temporary cache data. To do that we need to create RBAC resources.
+Sourcegraph communicates with the Kubernetes API for service discovery. It also has some janitor DaemonSets that clean up temporary cache data. To do that we need to create RBAC resources.
 
 If using RBAC is not an option, then you will not want to apply `*.Role.yaml` and `*.RoleBinding.yaml` files.
 

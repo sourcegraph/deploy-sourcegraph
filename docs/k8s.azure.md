@@ -6,7 +6,7 @@ Install the [Azure CLI tool](https://docs.microsoft.com/en-us/cli/azure/install-
 az login
 ```
 
-Sourcegraph Data Center requires at least **16 cores** in the **DSv3** family in the Azure location of your choice (e.g. `eastus`), so make sure you have enough available (if not, [request a quota increase](https://docs.microsoft.com/en-us/azure/azure-supportability/resource-manager-core-quotas-request)):
+Sourcegraph on Kubernetes requires at least **16 cores** in the **DSv3** family in the Azure location of your choice (e.g. `eastus`), so make sure you have enough available (if not, [request a quota increase](https://docs.microsoft.com/en-us/azure/azure-supportability/resource-manager-core-quotas-request)):
 
 ```
 $ az vm list-usage -l eastus -o table
