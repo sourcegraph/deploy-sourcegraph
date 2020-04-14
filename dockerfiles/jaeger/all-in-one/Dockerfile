@@ -1,5 +1,7 @@
-# This Dockerfile tracks jaegertracing/all-in-one, but includes more debugging tools and runs as a
-# non-root user. It requires JAEGER_VERSION to be set as an argument to build.
+# This Dockerfile tracks jaegertracing/all-in-one
+# (https://github.com/jaegertracing/jaeger/blob/master/cmd/all-in-one/Dockerfile), but includes more
+# debugging tools and runs as a non-root user. It requires JAEGER_VERSION to be set as an argument
+# to build.
 ARG JAEGER_VERSION
 FROM jaegertracing/all-in-one:$JAEGER_VERSION as base
 
@@ -37,6 +39,12 @@ EXPOSE 14250
 # Web HTTP
 EXPOSE 16686
 
+# Ensure the /tmp directory is chown'd to user jaeger
+USER root
+RUN mkdir -p /tmp
+RUN chown -R jaeger /tmp
+USER jaeger
 VOLUME ["/tmp"]
+
 ENTRYPOINT ["/go/bin/all-in-one-linux"]
 CMD ["--sampling.strategies-file=/etc/jaeger/sampling_strategies.json"]
