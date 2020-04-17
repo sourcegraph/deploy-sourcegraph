@@ -6,6 +6,15 @@ version you are upgrading to should be applied (unless otherwise noted).
 
 ## 3.15
 
+### Note: Prometheus and Grafana resource requirements increase
+
+Resource _requests and limits_ for Grafana and Prometheus are now equal to the following:
+
+- Grafana 100Mi -> 512Mi
+- Prometheus: 500M -> 3G
+
+This change was made to ensure that even if another Sourcegraph service starts consuming more memory than expected and the Kubernetes node has been over-provisioned, that Sourcegraph's monitoring will still have enough memory to run and monitor / send alerts to the site admin. For additional information see [#638](https://github.com/sourcegraph/deploy-sourcegraph/pull/638)
+
 ### (optional) Keep LSIF data through manual migration
 
 If you have previously uploaded LSIF precise code intelligence data and wish to retain it after upgrading, you will need to perform this migration.
