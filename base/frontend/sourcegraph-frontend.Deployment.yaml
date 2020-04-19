@@ -56,7 +56,7 @@ spec:
           # new value after transition
         - name: PRECISE_CODE_INTEL_API_SERVER_URL
           value: k8s+http://precise-code-intel-api-server:3186
-        image: index.docker.io/sourcegraph/frontend:60605_2020-04-09_34ab38e@sha256:64f2b0ffc4ddcb36ee89be1d0666d966ae8fba50318328cf2e82061b967b9948
+        image: index.docker.io/sourcegraph/frontend:3.15.0@sha256:9c76835c7052472e4ef3759e62cb619d1edeed893dd9fc30500ce9dab58beadc
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -88,7 +88,7 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: sourcegraph/jaeger-agent:insiders@sha256:c75bb146c5924a16892b8fa8065c0812c58080c33b3930b00333e07279b0913a
+      - image: sourcegraph/jaeger-agent:3.15.0@sha256:dc476845a723dce8e44ce07a50b5abb218ec86cb9d75b0ca9601df76db1fb65b
         name: jaeger-agent
         env:
           - name: POD_NAME
