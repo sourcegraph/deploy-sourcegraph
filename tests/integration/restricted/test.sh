@@ -51,7 +51,7 @@ kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --ro
 
 mkdir generated-cluster
 CLEANUP="rm -rf generated-cluster; $CLEANUP"
-overlay-generate-cluster.sh non-privileged-create-cluster generated-cluster
+"${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh non-privileged-create-cluster generated-cluster
 
 kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph apply -f generated-cluster --recursive
 

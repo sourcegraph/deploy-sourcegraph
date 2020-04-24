@@ -23,7 +23,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-overlay-generate-cluster.sh non-root-create-cluster "${GENERATED_BASE}"
+"${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh non-root-create-cluster "${GENERATED_BASE}"
 
 TEST_ARGS=("test" "-timeout" "25m")
 
