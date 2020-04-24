@@ -23,7 +23,8 @@ CLUSTER_NAME="ds-test-restricted-${CLUSTER_NAME_SUFFIX}"
 
 cd $(dirname "${BASH_SOURCE[0]}")
 
-DEPLOY_SOURCEGRAPH_ROOT=$(pwd)/../../..
+CURRENT_DIR=$(pwd)
+DEPLOY_SOURCEGRAPH_ROOT=${CURRENT_DIR}/../../..
 
 # set up the cluster, set up the fake user and restricted policy and then deploy the non-privileged overlay as that user
 
@@ -51,11 +52,11 @@ kubectl create role -n ns-sourcegraph nonroot:unprivileged --verb=use --resource
 
 kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --role=nonroot:unprivileged --serviceaccount=ns-sourcegraph:fake-user
 
-mkdir "${DEPLOY_SOURCEGRAPH_ROOT}"/generated-cluster
-CLEANUP="rm -rf ${DEPLOY_SOURCEGRAPH_ROOT}/generated-cluster; $CLEANUP"
-"${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh non-privileged-create-cluster "${DEPLOY_SOURCEGRAPH_ROOT}"/generated-cluster
+mkdir generated-cluster
+CLEANUP="rm -rf generated-cluster; $CLEANUP"
+"${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh non-privileged-create-cluster ${CURRENT_DIR}/generated-cluster
 
-kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph apply -f generated-cluster --recursive
+kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph apply -f ${CURRENT_DIR}/generated-cluster --recursive
 
 # kubectl -n ns-sourcegraph expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph --type=LoadBalancer --port=3080 --target-port=3080
 
