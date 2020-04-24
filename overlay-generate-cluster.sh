@@ -1,7 +1,7 @@
- #!/usr/bin/env bash
+#!/usr/bin/env bash
 
 set -euf -o pipefail
-cd "$( dirname "${BASH_SOURCE[0]}" )"
+cd "$(dirname "${BASH_SOURCE[0]}")"
 
 BUILD_DIR=$(mktemp -d)
 export BUILD_DIR
