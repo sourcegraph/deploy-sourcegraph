@@ -56,6 +56,10 @@ spec:
           # new value after transition
         - name: PRECISE_CODE_INTEL_API_SERVER_URL
           value: k8s+http://precise-code-intel-api-server:3186
+        - name: SITE_CONFIG_FILE
+          value: /mnt/site.json
+        - name: GLOBAL_SETTINGS_FILE
+          value: /mnt/global-settings.json          
         image: index.docker.io/sourcegraph/frontend:3.15.0@sha256:9c76835c7052472e4ef3759e62cb619d1edeed893dd9fc30500ce9dab58beadc
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
@@ -88,6 +92,12 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
+        - mountPath: /mnt/site.json
+          name: config-volume
+          subPath: site.json
+        - mountPath: /mnt/global-settings.json
+          name: config-volume
+          subPath: global-settings.json
       - image: sourcegraph/jaeger-agent:3.15.0@sha256:dc476845a723dce8e44ce07a50b5abb218ec86cb9d75b0ca9601df76db1fb65b
         name: jaeger-agent
         env:
@@ -119,3 +129,6 @@ spec:
       volumes:
       - emptyDir: {}
         name: cache-ssd
+      - name: config-volume
+        configMap:
+          name: frontend-config-files  
