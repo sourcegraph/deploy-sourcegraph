@@ -6,6 +6,12 @@ To use it, execute the following command from the root directory of this reposit
 ./overlay-generate-cluster.sh namespaced generated-cluster
 ```
 
+You need to create the namespace if it doesn't exist yet (replace `ns-sourcegraph` with your namespace):
+
+```shell script
+kubectl create namespace ns-sourcegraph
+```
+
 After executing the script you can apply the generated manifests from the `generated-cluster` directory:
 
 ```shell script
