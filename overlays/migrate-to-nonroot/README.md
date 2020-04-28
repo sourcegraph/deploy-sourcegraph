@@ -1,10 +1,13 @@
 This kustomization injects initContainers in all pods with persistent volumes to transfer ownership of directories to
 specified non-root users. It is used for migrating existing installations to a non-root environment.
 
-This only needs to be run once for installations that want to upgrade to 3.14. Afterwards it can be ignored.
+```shell script
+./overlay-generate-cluster.sh migrate-to-nonroot generated-cluster
+```
+
+After executing the script you can apply the generated manifests from the `generated-cluster` directory:
 
 ```shell script
-cd overlays/migrate-to-nonroot
-kubectl apply -k .
+kubectl apply --prune -l deploy=sourcegraph -f generated-cluster --recursive
 ```
 
