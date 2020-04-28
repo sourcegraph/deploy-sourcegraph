@@ -4,6 +4,7 @@ This document records manual migrations that are necessary to apply when upgradi
 Sourcegraph versions. All manual migrations between the version you are upgrading from and the
 version you are upgrading to should be applied (unless otherwise noted).
 
+<<<<<<< HEAD
 ## 3.14 (Unreleased)
 
 The `kubectl-apply-all.sh` command now uses `kustomize` and requires `kubectl` client version >= 1.14. 
@@ -63,6 +64,80 @@ kubectl -n ns-sourcegraph apply -l deploy=sourcegraph,rbac-admin!=escalated -k .
 The only requirement for the installer is `admin` cluster role in a given namespace.
 
 > IMPORTANT NOTE: If you change the namespace please change all three occurences in this directory tree to the new value. 
+=======
+## 3.15
+
+### Note: Prometheus and Grafana resource requirements increase
+
+Resource _requests and limits_ for Grafana and Prometheus are now equal to the following:
+
+- Grafana 100Mi -> 512Mi
+- Prometheus: 500M -> 3G
+
+This change was made to ensure that even if another Sourcegraph service starts consuming more memory than expected and the Kubernetes node has been over-provisioned, that Sourcegraph's monitoring will still have enough memory to run and monitor / send alerts to the site admin. For additional information see [#638](https://github.com/sourcegraph/deploy-sourcegraph/pull/638)
+
+### (optional) Keep LSIF data through manual migration
+
+If you have previously uploaded LSIF precise code intelligence data and wish to retain it after upgrading, you will need to perform this migration.
+
+**Skipping the migration**
+
+If you choose not to migrate the data, Sourcegraph will use basic code intelligence until you upload LSIF data again.
+
+You may run the following commands to remove the now unused resources:
+
+```shell script
+kubectl delete svc lsif-server
+kubectl delete deployment lsif-server
+kubectl delete pvc lsif-server
+```
+
+**Migrating**
+
+The lsif-server service has been replaced by a trio of services defined in [precise-code-intel](../base/precise-code-intel),
+and the persistent volume claim in which lsif-server  stored converted LSIF uploads has been replaced by
+[bundle storage](../base/precise-code-intel/bundle-storage.PersistentVolume.yaml).
+
+Upgrading to 3.15 will create a new empty volume for LSIF data. Without any action, the LSIF data previously uploaded
+to the instance will be lost. To retain old LSIF data, perform the following migration steps. This will cause some
+temporary downtime for precise code intelligence.
+
+**Migrating**
+
+1. Deploy 3.15. This will create a `bundle-manager` persistent volume claim.
+2. Release the claims to old and new persistent volumes by taking down `lsif-server` and `precise-code-intel-bundle-manager`.
+
+```shell script
+kubectl delete svc lsif-server
+kubectl delete deployment lsif-server
+kubectl delete deployment precise-code-intel-bundle-manager
+```
+
+3. Deploy the `lsif-server-migrator` deployment to transfer the data from the old volume to the new volume.
+
+```shell script
+kubectl apply -f configure/lsif-server-migrator/lsif-server-migrator.Deployment.yaml
+```
+
+4. Watch the output of the `lsif-server-migrator` until the copy completes (`'Copy complete!'`).
+
+```shell script
+kubectl logs lsif-server-migrator
+```
+
+5. Tear down the deployment and re-create the bundle manager deployment.
+
+```shell script
+kubectl delete deployment lsif-server-migrator
+./kubectl-apply-all.sh
+```
+
+6. Remove the old persistent volume claim.
+
+```shell script
+kubectl delete pvc lsif-server
+```
+>>>>>>> 809b224b... back to root user (#656)
 
 ## 3.11
 

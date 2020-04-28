@@ -14,4 +14,8 @@
 # a YAML file that can be `kubectl apply`d to the cluster, version that file in this repository, and add 
 # the relevant `kubectl apply` command to ./kubectl-apply-all.sh
 
+<<<<<<< HEAD
 kubectl apply -l deploy=sourcegraph -k overlays/non-root-create-cluster
+=======
+./kubectl-apply-all.sh
+>>>>>>> 809b224b... back to root user (#656)

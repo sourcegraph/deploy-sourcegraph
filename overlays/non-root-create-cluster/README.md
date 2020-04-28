@@ -1,3 +1,5 @@
+This kustomization is for creating fresh Sourcegraph installations that want to run containers as non-root user.
+
 This kustomization injects a fsGroup security context in each pod so that the volumes are mounted with the
 specified supplemental group id and non-root pod users can write to the mounted volumes.
 
@@ -13,3 +15,15 @@ volumes we know that the pod user can write to it even without the fsGroup and s
 
 In Kubernetes 1.18 fsGroup gets an additional [feature](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#configure-volume-permission-and-ownership-change-policy-for-pods)
 called `fsGroupChangePolicy` that will allow us to control the chmod/chown better. 
+
+To use it execute the following command from the root directory of this repository:
+
+```shell script
+./overlay-generate-cluster.sh non-root-create-cluster generated-cluster
+```
+
+After executing the script you can apply the generated manifests from the `generated-cluster` directory:
+
+```shell script
+kubectl apply --prune -l deploy=sourcegraph -f generated-cluster --recursive
+```
