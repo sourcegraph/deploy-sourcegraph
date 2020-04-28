@@ -45,9 +45,6 @@ spec:
         volumeMounts:
         - mountPath: /data/repos
           name: repos
-        securityContext:
-          runAsUser: 100
-          runAsGroup: 101
         # See the customization guide (../../../docs/configure.md) for information
         # about configuring gitserver to use an SSH key
         # - mountPath: /root/.ssh
@@ -79,6 +76,8 @@ spec:
         args:
           - --reporter.grpc.host-port=jaeger-collector:14250
           - --reporter.type=grpc
+      securityContext:
+        runAsUser: 0
       volumes:
       - name: repos
       # See the customization guide (../../../docs/configure.md) for information

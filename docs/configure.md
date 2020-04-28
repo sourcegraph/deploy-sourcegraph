@@ -35,6 +35,9 @@ This will make upgrades far easier and is a good practice not just for Sourcegra
 Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 [yj](https://github.com/sourcegraph/yj) and [jy](https://github.com/sourcegraph/jy).
 
+If you choose to use [overlays](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/#bases-and-overlays)
+you need the [kustomize](https://kustomize.io/) tool installed.
+
 ## Table of contents
 
 ### Common configuration
@@ -61,6 +64,14 @@ Configuration steps in this file depend on [jq](https://stedolan.github.io/jq/),
 - [Install without RBAC](#install-without-rbac)
 - [Use non-default namespace](#use-non-default-namespace)
 - [Pulling images locally](#pulling-images-locally)
+
+### Working with overlays
+
+- [Overlay basic principles](#overlay-basic-principles)
+- [Handling overlays in this repository](#handling-overlays-in-this-repository)
+- [namespaced overlay](#namespaced-overlay)
+- [non-root overlay](#non-root-overlay)
+- [non-privileged overlay](#non-privileged-overlay)
 
 ## Configure network access
 
@@ -508,3 +519,88 @@ for all images under `base/`:
 ```bash
 for IMAGE in $(grep --include '*.yaml' -FR 'image:' base | awk '{ print $(NF) }'); do docker pull "$IMAGE"; done;
 ```
+
+### Overlay basic principles
+
+An overlay specifies customizations for a base directory of Kubernetes manifests. The base has no knowledge of the overlay.
+Overlays can be used for example to change the number of replicas, change a namespace, add a label etc. Overlays can refer to 
+other overlays that eventually refer to the base forming a directed acyclic graph with the base as the root.
+
+An overlay is defined in a `kustomization.yaml` file (the name of the file is fixed and there can be only one kustomization
+ file in one directory). To avoid complications with reference cycles an overlay can only reference resources inside the
+ directory subtree of the directory it resides in (symlinks are not allowed either).
+ 
+For more details about overlays please consult the `kustomize` [documentation](https://kubernetes.io/docs/tasks/manage-kubernetes-objects/kustomization/).
+
+Using overlays and applying them to the cluster
+can be done in two ways: by using `kubectl` or with the `kustomize` tool.
+
+Starting with `kubectl` client version 1.14 `kubectl` can handle `kustomization.yaml` files directly. 
+When using `kubectl` there is no intermediate step that generates actual manifest files. Instead the combined resources from the
+overlays and the base are directly sent to the cluster. This is done with the `kubectl apply -k` command. The argument to the
+command is a directory containing a `kustomization.yaml` file.
+
+The second way to use overlays is with the `kustomize` tool. This does generate manifest files that are then applied
+in the conventional way using `kubectl apply -f`.
+
+### Handling overlays in this repository
+
+The overlays provided in this repository rely on the `kustomize` tool and the `overlay-generate-cluster.sh` script in the
+root directory of this repository to generate the manifests. There are two reasons why it was set up like this:
+
+- It avoids having to put a `kustomization.yaml` file in the `base` directory and forcing users that don't use overlays
+to deal with it (unfortunately `kubectl apply -f` doesn't work if a `kustomization.yaml` file is in the directory).
+- It generates manifests instead of applying them directly. This provides opportunity to additionally validate the files
+and also allows using `kubectl apply -f` with `--prune` flag turned on (`apply -k` with `--prune` does not work correctly).
+
+To generate the manifests run the `overlay-generate-cluster.sh` with two arguments: the name of the overlay and a
+path to an output directory where the generated manifests will be. Example (assuming you are in the root directory of this
+repository):
+
+```shell script
+./overlay-generate-cluster.sh non-root generated-cluster
+```
+
+After executing the script you can apply the generated manifests from the `generated-cluster` directory:
+
+```shell script
+kubectl apply --prune -l deploy=sourcegraph -f generated-cluster --recursive
+```
+
+Available overlays are the subdirectories of `overlays` (only give the name of the subdirectory, not the full path as an argument).
+
+### Namespaced overlay
+
+This overlay adds a namespace declaration to all the manifests. You can change the namespace by editing
+ `overlays/namespaced/kustomization.yaml`.
+
+To use it, execute this from the root directory of this repository:
+
+```shell script
+./overlay-generate-cluster.sh namespaced generated-cluster
+```
+
+### Non-root overlay
+
+The manifests in the `base` directory specify user `root` for all containers. This overlay changes the specification to be
+a non-root user.
+
+If you are starting a fresh installation use the overlay `non-root-create-cluster`. After creation you can use the overlay
+`non-root`.
+
+If you already are running a Sourcegraph instance using user `root` and want to convert to running with non-root user then
+you need to apply a migration step that will change the permissions of all persistent volumes so that the volumes can be
+used by the non-root user. This migration is provided as overlay `migrate-to-nonroot`. After the migration you can use
+overlay `non-root`.
+
+### Non-privileged overlay
+
+This overlays goes one step further than the `non-root` overlay by also removing cluster roles and cluster role bindings.
+
+If you are starting a fresh installation use the overlay `non-privileged-create-cluster`. After creation you can use the overlay
+`non-privileged`.
+
+
+
+  
+

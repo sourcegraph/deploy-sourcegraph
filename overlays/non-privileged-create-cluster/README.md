@@ -4,7 +4,15 @@ and not require ClusterRole wide privileges when doing service discovery for scr
 
 This version and `non-privileged` need to stay in sync. This version is only used for cluster creation.
 
+To use it, execute the following command from the root directory of this repository:
+
 ```shell script
-cd overlays/non-privileged
-kubectl -n ns-sourcegraph apply -l deploy=sourcegraph,rbac-admin!=escalated -k .
+./overlay-generate-cluster.sh non-privileged generated-cluster
+```
+
+After executing the script you can apply the generated manifests from the `generated-cluster` directory:
+
+```shell script
+kubectl create namespace ns-sourcegraph
+kubectl apply --prune -l deploy=sourcegraph -f generated-cluster --recursive
 ```

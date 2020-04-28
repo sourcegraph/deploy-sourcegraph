@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repo-updater
+spec:
+  template:
+    spec:
+      containers:
+      - name: repo-updater
+        securityContext:
+          # Required to prevent escalations to root.
+          allowPrivilegeEscalation: false
+          runAsUser: 100
+          runAsGroup: 101
+      - name: jaeger-agent
+        securityContext:
+          # Required to prevent escalations to root.
+          allowPrivilegeEscalation: false
+          runAsUser: 100
+          runAsGroup: 101

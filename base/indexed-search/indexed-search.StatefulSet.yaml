@@ -43,9 +43,6 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: data
-        securityContext:
-          runAsUser: 100
-          runAsGroup: 100
       - env:
         image: index.docker.io/sourcegraph/search-indexer:3.15.0@sha256:354ed968e62a7d011b647476a63116813aea23bdada0a2fc4322df5381acb6b3
         terminationMessagePolicy: FallbackToLogsOnError
@@ -65,9 +62,8 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: data
-        securityContext:
-          runAsUser: 100
-          runAsGroup: 101
+      securityContext:
+        runAsUser: 0
       volumes:
       - name: data
   updateStrategy:
