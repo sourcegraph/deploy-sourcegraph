@@ -29,6 +29,8 @@ This will make upgrades far easier and is a good practice not just for Sourcegra
    - Commit manual modifications to Kubernetes YAML files.
    - Commit commands that should be run on every update (e.g. `kubectl apply`) to [./kubectl-apply-all.sh](../kubectl-apply-all.sh).
    - Commit commands that generally only need to be run once per cluster to (e.g. `kubectl create secret`, `kubectl expose`) to [./create-new-cluster.sh](../create-new-cluster.sh).
+   
+1. When you upgrade, merge the corresponding upstream release tag into your release branch.
 
 ## Dependencies
 
