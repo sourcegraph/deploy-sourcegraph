@@ -32,7 +32,7 @@ spec:
         - mountPath: /data
           name: disk
         securityContext:
-          runAsUser: 999
+          runAsUser: 0
       containers:
       - env:
         image: index.docker.io/sourcegraph/postgres-11.4:20-04-07_56b20163@sha256:63090799b34b3115a387d96fe2227a37999d432b774a1d9b7966b8c5d81b56ad
@@ -62,9 +62,6 @@ spec:
           name: disk
         - mountPath: /conf
           name: pgsql-conf
-        securityContext:
-          runAsUser: 999
-          runAsGroup: 999
       - env:
         - name: DATA_SOURCE_NAME
           value: postgres://sg:@localhost:5432/?sslmode=disable
@@ -78,9 +75,8 @@ spec:
           requests:
             cpu: 10m
             memory: 50Mi
-        securityContext:
-          runAsUser: 999
-          runAsGroup: 999
+      securityContext:
+        runAsUser: 0
       volumes:
       - name: disk
         persistentVolumeClaim:

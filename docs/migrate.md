@@ -4,66 +4,6 @@ This document records manual migrations that are necessary to apply when upgradi
 Sourcegraph versions. All manual migrations between the version you are upgrading from and the
 version you are upgrading to should be applied (unless otherwise noted).
 
-## 3.14 (Unreleased)
-
-The `kubectl-apply-all.sh` command now uses `kustomize` and requires `kubectl` client version >= 1.14. 
-
-If your kubectl client version is older and doesn't support `apply -k` you need to 
-install the standalone [kustomize](https://kustomize.io/) binary, generate the YAML files with `kustomize build` and
-then use the built YAML with `kubectl apply -f`. For example use:
-
-```shell script
-kustomize build base | kubectl apply -f -
-kustomize build base/rbac-roles | kubectl apply -f -
-```
-in your version of `kubectl-apply-all.sh` if you cannot upgrade `kubectl` to a client version >= 1.14.
-
-### Existing installations: Migrating the container user from root to non-root
-
-Version 3.14 changes the security context of the installation by switching to a non-root user for all containers.
-This allows running Sourcegraph in clusters with restrictive security policies.
-
-Existing installations that have been run as root before need to migrate their persistent volumes to work in 3.14.
-We are providing a [kustomization](https://kustomize.io/) that needs to be run once to execute the migration:
-
-> NOTE: This needs kubectl client version >= 1.14. If you don't have that you can still install the kustomize
-> binary and generate the yaml file with it and then apply it with -f.
-
-```shell script
-cd overlays/migrate-to-nonroot
-kubectl apply -k .
-```
-
-> NOTE: This needs kubectl client version >= 1.14. If you don't have that you can still install the kustomize
-> binary and generate the yaml file with it and then apply it with -f like so:
-
-```shell script
-cd overlays/migrate-to-nonroot
-kustomize build -o nonroot-migration.yaml
-kubectl apply -f nonroot-migration.yaml
-```
-
-This will inject `initContainers` that do the `chown` command for containers that have persistent volumes and then 
-restart the necessary containers.
-
-> NOTE: The migration still needs the elevated permissions because it needs to run as user root.
-
-New installations do not need this `kustomization` and existing installations can operate from base again after the
-migration.
-
-### New installations: accommodate clusters with restrictive security policies
-
-New installations on clusters with restrictive security policies can now use a kustomization to accomodate those restrictions:
-
-```shell script
-cd overlays/non-privileged
-kubectl -n ns-sourcegraph apply -l deploy=sourcegraph,rbac-admin!=escalated -k .
-```
-
-The only requirement for the installer is `admin` cluster role in a given namespace.
-
-> IMPORTANT NOTE: If you change the namespace please change all three occurences in this directory tree to the new value. 
-
 ## 3.11
 
 In 3.11 we removed the management console. If you make use of `CRITICAL_CONFIG_FILE` or `SITE_CONFIG_FILE`, please refer to the [migration notes for Sourcegraph 3.11+](https://docs.sourcegraph.com/admin/migration/3_11).

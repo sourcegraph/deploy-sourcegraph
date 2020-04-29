@@ -8,6 +8,9 @@ CLUSTER_NAME="ds-test-restricted-${CLUSTER_NAME_SUFFIX}"
 
 cd $(dirname "${BASH_SOURCE[0]}")
 
+CURRENT_DIR=$(pwd)
+DEPLOY_SOURCEGRAPH_ROOT=${CURRENT_DIR}/../../..
+
 # set up the cluster, set up the fake user and restricted policy and then deploy the non-privileged overlay as that user
 
 gcloud container clusters create ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --num-nodes 3 --machine-type n1-standard-16 --disk-type pd-ssd --project ${TEST_GCP_PROJECT} --labels=cost-category=build,build-creator=${BUILD_CREATOR},build-branch=${BUILD_BRANCH},integration-test=fresh
@@ -30,7 +33,11 @@ kubectl create role -n ns-sourcegraph nonroot:unprivileged --verb=use --resource
 
 kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --role=nonroot:unprivileged --serviceaccount=ns-sourcegraph:fake-user
 
-kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph apply -k ${DEPLOY_SOURCEGRAPH_ROOT}/overlays/non-privileged-create-cluster
+mkdir generated-cluster
+CLEANUP="rm -rf generated-cluster; $CLEANUP"
+"${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh non-privileged-create-cluster ${CURRENT_DIR}/generated-cluster
+
+kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph apply -f ${CURRENT_DIR}/generated-cluster --recursive
 
 kubectl  -n ns-sourcegraph expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph --type=LoadBalancer
 
