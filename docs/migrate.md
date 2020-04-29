@@ -91,4 +91,3 @@ Sourcegraph 3.0 ships with Postgres 11.1. The upgrade procedure is mostly automa
 ## 2.12
 
 Beginning in version 2.12.0, Sourcegraph's Kubernetes deployment [requires an Enterprise license key](https://about.sourcegraph.com/pricing). Follow the steps in [docs/configure.md](docs/configure.md#add-a-license-key).
-
