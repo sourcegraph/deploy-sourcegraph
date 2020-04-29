@@ -19,7 +19,7 @@ for disk in $unattached_disks; do
 
   # "gcloud compute disks delete ..." will never delete an attached disk.
   # See https://cloud.google.com/sdk/gcloud/reference/compute/disks/delete for more information.
-  gcloud_command compute disks delete "$disk"
+  gcloud_command compute disks delete "$disk" || true  # <-- suppress exit code, as this may sometimes fail
 done
 
 echo "done"
