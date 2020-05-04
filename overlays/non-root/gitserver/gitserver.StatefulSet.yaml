@@ -12,9 +12,20 @@ spec:
           allowPrivilegeEscalation: false
           runAsUser: 100
           runAsGroup: 101
+      # See the customization guide (../../../docs/configure.md) for information
+      # about configuring gitserver to use an SSH key. Note that the mount path changes
+      # from /root to /home/sourcegraph with this non-root overlay. Don't forget to uncomment
+      # the volumes section below also.
+      # - mountPath: /home/sourcegraph/.ssh
+      #   name: ssh
       - name: jaeger-agent
         securityContext:
           # Required to prevent escalations to root.
           allowPrivilegeEscalation: false
           runAsUser: 100
           runAsGroup: 101
+      # volumes:
+      # - name: ssh
+      #   secret:
+      #     defaultMode: 384
+      #     secretName: gitserver-ssh
