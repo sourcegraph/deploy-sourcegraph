@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   annotations:
     description: Metrics/monitoring dashboards and alerts.
@@ -7,17 +7,14 @@ metadata:
     deploy: sourcegraph
   name: grafana
 spec:
-  minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: grafana
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
+  serviceName: grafana
+  updateStrategy:
+     type: RollingUpdate
   template:
     metadata:
       labels:
@@ -32,7 +29,7 @@ spec:
           name: http
         volumeMounts:
         - mountPath: /var/lib/grafana
-          name: data
+          name: grafana-data
         - mountPath: /sg_config_grafana/provisioning/datasources
           name: config
         # Grafana is relied upon to send alerts to site admins when something is wrong with
@@ -50,10 +47,16 @@ spec:
       securityContext:
         runAsUser: 0
       volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: grafana
-      - configMap:
+      - name: config
+        configMap:
           defaultMode: 0777
           name: grafana
-        name: config
+  volumeClaimTemplates:
+  - metadata:
+      name: grafana-data
+    spec:
+      accessModes: [ "ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi
+      storageClassName: sourcegraph
