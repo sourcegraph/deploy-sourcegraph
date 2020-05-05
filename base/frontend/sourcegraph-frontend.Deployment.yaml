@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: Serves the frontend of Sourcegraph via HTTP(S).
+    description: 'Serves the frontend of Sourcegraph via HTTP(S).'
   labels:
     deploy: sourcegraph
   name: sourcegraph-frontend
@@ -24,100 +24,95 @@ spec:
         app: sourcegraph-frontend
     spec:
       containers:
-      - args:
-        - serve
-        env:
-        - name: PGDATABASE
-          value: sg
-        - name: PGHOST
-          value: pgsql
-        - name: PGPORT
-          value: "5432"
-        - name: PGSSLMODE
-          value: disable
-        - name: PGUSER
-          value: sg
-        - name: SRC_GIT_SERVERS
-          value: gitserver-0.gitserver:3178
-        # POD_NAME is used by CACHE_DIR
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        # CACHE_DIR stores larger items we cache. Majority of it is zip
-        # archives of repositories at a commit.
-        - name: CACHE_DIR
-          value: /mnt/cache/$(POD_NAME)
-        - name: GRAFANA_SERVER_URL
-          value: http://grafana:30070
-          # old value during transition
-        - name: LSIF_API_SERVER_URL
-          value: k8s+http://precise-code-intel-api-server:3186
-          # new value after transition
-        - name: PRECISE_CODE_INTEL_API_SERVER_URL
-          value: k8s+http://precise-code-intel-api-server:3186
-        image: index.docker.io/sourcegraph/frontend:3.15.1@sha256:d6a2253ef0f1b40acb5a6dab7ea785302214c47ae27c4738ad1f9d67f8453ff8
-        terminationMessagePolicy: FallbackToLogsOnError
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: http
-            scheme: HTTP
-          initialDelaySeconds: 300
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: http
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
-        name: frontend
-        ports:
-        - containerPort: 3080
-          name: http
-        - containerPort: 3090
-          name: http-internal
-        resources:
-          limits:
-            cpu: "2"
-            memory: 4G
-          requests:
-            cpu: "2"
-            memory: 2G
-        volumeMounts:
-        - mountPath: /mnt/cache
-          name: cache-ssd
-      - image: sourcegraph/jaeger-agent:3.15.0@sha256:dc476845a723dce8e44ce07a50b5abb218ec86cb9d75b0ca9601df76db1fb65b
-        name: jaeger-agent
-        env:
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                apiVersion: v1
-                fieldPath: metadata.name
-        ports:
-        - containerPort: 5775
-          protocol: UDP
-        - containerPort: 5778
-          protocol: TCP
-        - containerPort: 6831
-          protocol: UDP
-        - containerPort: 6832
-          protocol: UDP
-        resources:
-          limits:
-            cpu: "1"
-            memory: 500M
-          requests:
-            cpu: 100m
-            memory: 100M
-        args:
-          - --reporter.grpc.host-port=jaeger-collector:14250
-          - --reporter.type=grpc
+        - args:
+            - serve
+          env:
+            - name: PGDATABASE
+              value: sg
+            - name: PGHOST
+              value: pgsql
+            - name: PGPORT
+              value: '5432'
+            - name: PGSSLMODE
+              value: disable
+            - name: PGUSER
+              value: sg
+            - name: SRC_GIT_SERVERS
+              value: gitserver-0.gitserver:3178
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: CACHE_DIR
+              value: '/mnt/cache/$(POD_NAME)'
+            - name: GRAFANA_SERVER_URL
+              value: http://grafana:30070
+            - name: LSIF_API_SERVER_URL
+              value: 'k8s+http://precise-code-intel-api-server:3186'
+            - name: PRECISE_CODE_INTEL_API_SERVER_URL
+              value: 'k8s+http://precise-code-intel-api-server:3186'
+          image: 'index.docker.io/sourcegraph/frontend:3.15.1@sha256:d6a2253ef0f1b40acb5a6dab7ea785302214c47ae27c4738ad1f9d67f8453ff8'
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 300
+            timeoutSeconds: 5
+          name: frontend
+          ports:
+            - containerPort: 3080
+              name: http
+            - containerPort: 3090
+              name: http-internal
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: '2'
+              memory: '4G'
+            requests:
+              cpu: '2'
+              memory: '2G'
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /mnt/cache
+              name: cache-ssd
+        - args:
+            - '--reporter.grpc.host-port=jaeger-collector:14250'
+            - '--reporter.type=grpc'
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+          image: 'sourcegraph/jaeger-agent:3.15.0@sha256:dc476845a723dce8e44ce07a50b5abb218ec86cb9d75b0ca9601df76db1fb65b'
+          name: jaeger-agent
+          ports:
+            - containerPort: 5775
+              protocol: UDP
+            - containerPort: 5778
+              protocol: TCP
+            - containerPort: 6831
+              protocol: UDP
+            - containerPort: 6832
+              protocol: UDP
+          resources:
+            limits:
+              cpu: '1'
+              memory: '500M'
+            requests:
+              cpu: '100m'
+              memory: '100M'
       securityContext:
         runAsUser: 0
       serviceAccountName: sourcegraph-frontend
       volumes:
-      - emptyDir: {}
-        name: cache-ssd
+        - emptyDir: {}
+          name: cache-ssd

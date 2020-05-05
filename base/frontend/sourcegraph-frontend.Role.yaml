@@ -7,14 +7,12 @@ metadata:
     rbac-admin: escalated
   name: sourcegraph-frontend
 rules:
-- apiGroups:
-  - ""
-  resources:
-  # necessary for resolving k8s+http://fooservice URLs (see for example searcher URL)
-  - endpoints
-  # necessary to populate Site Admin/Instrumentation page (/-/debug) in the cluster deployment
-  - services
-  verbs:
-  - get
-  - list
-  - watch
+  - apiGroups:
+      - ''
+    resources:
+      - endpoints
+      - services
+    verbs:
+      - get
+      - list
+      - watch
