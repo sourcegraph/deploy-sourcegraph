@@ -24,43 +24,43 @@ spec:
         app: precise-code-intel-worker
     spec:
       containers:
-      - env:
-        - name: NUM_WORKERS
-          value: '4'
-        - name: PRECISE_CODE_INTEL_BUNDLE_MANAGER_URL
-          value: http://precise-code-intel-bundle-manager:3187
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/precise-code-intel-worker:3.15.1@sha256:00642b4bd6f37ff3e80b4b94a5699cef5ededae6875a5010c4202fd91ad0dfaf
-        terminationMessagePolicy: FallbackToLogsOnError
-        name: precise-code-intel-worker
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: server
-            scheme: HTTP
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: server
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
-        ports:
-        - containerPort: 3188
-          name: server
-        - containerPort: 9090
-          name: prometheus
-        resources:
-          limits:
-            cpu: "2"
-            memory: 2G
-          requests:
-            cpu: 500m
-            memory: 500M
+        - env:
+            - name: NUM_WORKERS
+              value: '4'
+            - name: PRECISE_CODE_INTEL_BUNDLE_MANAGER_URL
+              value: http://precise-code-intel-bundle-manager:3187
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          image: 'index.docker.io/sourcegraph/precise-code-intel-worker:3.15.1@sha256:00642b4bd6f37ff3e80b4b94a5699cef5ededae6875a5010c4202fd91ad0dfaf'
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: server
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          name: precise-code-intel-worker
+          ports:
+            - containerPort: 3188
+              name: server
+            - containerPort: 9090
+              name: prometheus
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: server
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: '2'
+              memory: '2G'
+            requests:
+              cpu: '500m'
+              memory: '500M'
+          terminationMessagePolicy: FallbackToLogsOnError
       securityContext:
         runAsUser: 0

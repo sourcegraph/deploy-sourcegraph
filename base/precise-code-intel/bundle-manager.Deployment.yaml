@@ -24,48 +24,48 @@ spec:
         app: precise-code-intel-bundle-manager
     spec:
       containers:
-      - env:
-        - name: PRECISE_CODE_INTEL_API_SERVER_URL
-          value: http://precise-code-intel-api-server:3186
-        - name: LSIF_STORAGE_ROOT
-          value: /lsif-storage
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/precise-code-intel-bundle-manager:3.15.1@sha256:73ea3f5995e745be2b1918943e02038ca4528feed848b969d1f5f6376417600a
-        terminationMessagePolicy: FallbackToLogsOnError
-        name: precise-code-intel-bundle-manager
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: server
-            scheme: HTTP
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: server
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
-        ports:
-        - containerPort: 3187
-          name: server
-        resources:
-          limits:
-            cpu: "2"
-            memory: 2G
-          requests:
-            cpu: 500m
-            memory: 500M
-        volumeMounts:
-        - mountPath: /lsif-storage
-          name: bundle-manager
+        - env:
+            - name: PRECISE_CODE_INTEL_API_SERVER_URL
+              value: http://precise-code-intel-api-server:3186
+            - name: LSIF_STORAGE_ROOT
+              value: /lsif-storage
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          image: 'index.docker.io/sourcegraph/precise-code-intel-bundle-manager:3.15.1@sha256:73ea3f5995e745be2b1918943e02038ca4528feed848b969d1f5f6376417600a'
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: server
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          name: precise-code-intel-bundle-manager
+          ports:
+            - containerPort: 3187
+              name: server
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: server
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: '2'
+              memory: '2G'
+            requests:
+              cpu: '500m'
+              memory: '500M'
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /lsif-storage
+              name: bundle-manager
       securityContext:
         runAsUser: 0
       volumes:
-      - name: bundle-manager
-        persistentVolumeClaim:
-          claimName: bundle-manager
+        - name: bundle-manager
+          persistentVolumeClaim:
+            claimName: bundle-manager

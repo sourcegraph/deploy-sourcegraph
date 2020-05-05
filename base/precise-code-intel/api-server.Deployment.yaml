@@ -24,39 +24,39 @@ spec:
         app: precise-code-intel-api-server
     spec:
       containers:
-      - env:
-        - name: PRECISE_CODE_INTEL_BUNDLE_MANAGER_URL
-          value: http://precise-code-intel-bundle-manager:3187
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/precise-code-intel-api-server:3.15.1@sha256:ee80ffbd8b2d50c9cd8a38ed2e02f4e4be0886557089d56525d71e601d3a74e7
-        terminationMessagePolicy: FallbackToLogsOnError
-        name: precise-code-intel-api-server
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: server
-            scheme: HTTP
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: server
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
-        ports:
-        - containerPort: 3186
-          name: server
-        resources:
-          limits:
-            cpu: "2"
-            memory: 2G
-          requests:
-            cpu: 500m
-            memory: 500M
+        - env:
+            - name: PRECISE_CODE_INTEL_BUNDLE_MANAGER_URL
+              value: http://precise-code-intel-bundle-manager:3187
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          image: 'index.docker.io/sourcegraph/precise-code-intel-api-server:3.15.1@sha256:ee80ffbd8b2d50c9cd8a38ed2e02f4e4be0886557089d56525d71e601d3a74e7'
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: server
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          name: precise-code-intel-api-server
+          ports:
+            - containerPort: 3186
+              name: server
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: server
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: '2'
+              memory: '2G'
+            requests:
+              cpu: '500m'
+              memory: '500M'
+          terminationMessagePolicy: FallbackToLogsOnError
       securityContext:
         runAsUser: 0
