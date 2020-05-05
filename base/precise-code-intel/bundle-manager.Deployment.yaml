@@ -2,17 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: LSIF HTTP server for code intelligence.
+    description: Stores and manages precise code intelligence bundles.
   labels:
     deploy: sourcegraph
-  name: lsif-server
+  name: precise-code-intel-bundle-manager
 spec:
   minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: lsif-server
+      app: precise-code-intel-bundle-manager
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -21,38 +21,38 @@ spec:
   template:
     metadata:
       labels:
-        app: lsif-server
+        app: precise-code-intel-bundle-manager
     spec:
       containers:
       - env:
+        - name: PRECISE_CODE_INTEL_API_SERVER_URL
+          value: http://precise-code-intel-api-server:3186
         - name: LSIF_STORAGE_ROOT
           value: /lsif-storage
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/lsif-server:3.14.4
+        image: index.docker.io/sourcegraph/precise-code-intel-bundle-manager:3.15.1@sha256:73ea3f5995e745be2b1918943e02038ca4528feed848b969d1f5f6376417600a
         terminationMessagePolicy: FallbackToLogsOnError
-        name: lsif-server
+        name: precise-code-intel-bundle-manager
         livenessProbe:
           httpGet:
-            path: /ping
+            path: /healthz
             port: server
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
-            path: /ping
+            path: /healthz
             port: server
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
-        - containerPort: 3186
-          name: server
         - containerPort: 3187
-          name: worker
+          name: server
         resources:
           limits:
             cpu: "2"
@@ -62,10 +62,10 @@ spec:
             memory: 500M
         volumeMounts:
         - mountPath: /lsif-storage
-          name: lsif-storage
+          name: bundle-manager
       securityContext:
         runAsUser: 0
       volumes:
-      - name: lsif-storage
+      - name: bundle-manager
         persistentVolumeClaim:
-          claimName: lsif-server
+          claimName: bundle-manager

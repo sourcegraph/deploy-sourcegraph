@@ -1,8 +1,8 @@
 # Prometheus metrics
 
-This guide covers the performance metrics availabe through Prometheus and assumes Prometheus in
-Sourcegraph Data Center has already been set up. For a Prometheus overview and setup guide, see
-the [Data Center admin guide](admin-guide.md).
+This guide covers the performance metrics availabe through Prometheus and assumes Prometheus has
+already been set up. For a Prometheus overview and setup guide, see the [admin
+guide](admin-guide.md).
 
 ## Recommended metrics
 

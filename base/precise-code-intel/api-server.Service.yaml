@@ -2,19 +2,17 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
+    prometheus.io/port: "3186"
     sourcegraph.prometheus/scrape: "true"
   labels:
-    app: lsif-server
+    app: precise-code-intel-api-server
     deploy: sourcegraph
-  name: lsif-server
+  name: precise-code-intel-api-server
 spec:
   ports:
   - name: server
     port: 3186
     targetPort: server
-  - name: worker
-    port: 3187
-    targetPort: worker
   selector:
-    app: lsif-server
+    app: precise-code-intel-api-server
   type: ClusterIP

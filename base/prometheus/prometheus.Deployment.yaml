@@ -24,7 +24,7 @@ spec:
         app: prometheus
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/prometheus:10.0.10@sha256:4d73d99f3b18d8e4e09f63671c51eabcba956e357ab33d682de8cf1540e3b863
+      - image: index.docker.io/sourcegraph/prometheus:3.15.1@sha256:18c0faddbddb8007e3120a2926b970119ceb031ab3eaa9632c2f481e4cc3f2bb
         terminationMessagePolicy: FallbackToLogsOnError
         name: prometheus
         readinessProbe:
@@ -47,6 +47,14 @@ spec:
           name: data
         - mountPath: /sg_prometheus_add_ons
           name: config
+        # Prometheus is relied upon to monitor services for sending alerts to site admins when
+        # something is wrong with Sourcegraph, thus its memory requests and limits are the same to
+        # guarantee it has enough memory to perform its job reliably and prevent conflicts with
+        # other pods on the same host node.
+        #
+        # Its average memory usage may be much lower than 3G if Sourcegraph itself does not have
+        # much traffic, the 3G number chosen here is what works reliably on Sourcegraph.com with
+        # lots of traffic.
         resources:
           limits:
             cpu: "2"

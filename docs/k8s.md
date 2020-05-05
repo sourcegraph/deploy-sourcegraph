@@ -14,9 +14,9 @@ Follow the instructions linked in the table below to provision a Kubernetes clus
 infrastructure provider of your choice, using the recommended node and list types in the
 table.
 
-> Note: Sourcegraph Data Center can run on any Kubernetes cluster, so if your infrastructure
-> provider is not listed, see the "Other" row. Pull requests to add rows for more infrastructure
-> providers are welcome!
+> Note: Sourcegraph can run on any Kubernetes cluster, so if your infrastructure provider is not
+> listed, see the "Other" row. Pull requests to add rows for more infrastructure providers are
+> welcome!
 
 <div class="resources">
 <table class="table">

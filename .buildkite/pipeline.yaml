@@ -7,20 +7,25 @@ steps:
     command: .buildkite/verify-rbac-labels.sh
   - label: ':lipstick:'
     command: .buildkite/prettier-check.sh
+  - label: ':lipstick:'
+    command: .buildkite/shfmt.sh
 
   - wait
 
   - label: ":pulumi: :k8s:"
-    concurrency: 5
+    concurrency: 3
     concurrency_group: deploy-sourcegraph/integration
     command: .buildkite/integration-test.sh
+    env:
+      VERBOSE: "true"
 
   - label: ":k8s:"
-    concurrency: 5
+    concurrency: 3
     concurrency_group: deploy-sourcegraph/integration-restricted
     command: .buildkite/integration-restricted-test.sh
 
-  - wait
+  - wait: ~
+    continue_on_failure: true
   
   - label: ":gcompute: :floppy_disk: 🧹"
     concurrency: 1

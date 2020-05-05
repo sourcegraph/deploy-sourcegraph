@@ -8,36 +8,42 @@ import (
 	"os"
 	"testing"
 
-	qt "github.com/frankban/quicktest"
 	"github.com/pulumi/pulumi/pkg/testing/integration"
 	"github.com/sethgrid/pester"
 )
 
 func TestFreshDeployment(t *testing.T) {
-	c := qt.New(t)
 
 	if testing.Short() {
-		c.Skip("skipping fresh cluster integration test in short mode")
+		t.Skip("skipping fresh cluster integration test in short mode")
 	}
 
-	config, err := Config()
-	if err != nil {
-		c.Fatalf("unable to generate pulumi configuration, err: %s", err)
+	for _, k8sVersion := range []string{"1.14", "1.15", "1.16"} {
+		k8sVersion := k8sVersion
+
+		t.Run(fmt.Sprintf("GKE version %q", k8sVersion), func(t *testing.T) {
+
+			config, err := commonConfig()
+			if err != nil {
+				t.Fatalf("unable to generate pulumi configuration, err: %s", err)
+			}
+
+			config["kubernetesVersionPrefix"] = k8sVersion
+			integration.ProgramTest(t, &integration.ProgramTestOptions{
+				Dir: "step1",
+
+				Config:               config,
+				ExpectRefreshChanges: true,
+				Quick:                false,
+				Verbose:              testing.Verbose(),
+
+				ExtraRuntimeValidation: ValidateFrontendIsReachable,
+			})
+		})
 	}
-
-	integration.ProgramTest(t, &integration.ProgramTestOptions{
-		Dir: "step1",
-
-		Config:               config,
-		ExpectRefreshChanges: true,
-		Quick:                false,
-		Verbose:              true,
-
-		ExtraRuntimeValidation: ValidateFrontendIsReachable,
-	})
 }
 
-func Config() (map[string]string, error) {
+func commonConfig() (map[string]string, error) {
 	config := map[string]string{}
 
 	for env, key := range map[string]string{
@@ -60,22 +66,20 @@ func Config() (map[string]string, error) {
 }
 
 func ValidateFrontendIsReachable(t *testing.T, stackInfo integration.RuntimeValidationStackInfo) {
-	c := qt.New(t)
-
 	ip, err := ingressIP(stackInfo.Outputs)
 
 	if err != nil {
-		c.Fatalf("failed to extract ingressIP from outputs, outputs: %v, err: %s", stackInfo.Outputs, err)
+		t.Fatalf("failed to extract ingressIP from outputs, outputs: %v, err: %s", stackInfo.Outputs, err)
 	}
 
 	if ip == nil {
-		c.Fatalf("expected non-nil frontend IP address from outputs, outputs: %v", stackInfo.Outputs)
+		t.Fatalf("expected non-nil frontend IP address from outputs, outputs: %v", stackInfo.Outputs)
 	}
 
 	url := fmt.Sprintf("http://%s", ip)
 	err = pingURL(url)
 	if err != nil {
-		c.Fatalf("failed to contact frontend url, url: %q, err: %s", url, err)
+		t.Fatalf("failed to contact frontend url, url: %q, err: %s", url, err)
 	}
 }
 

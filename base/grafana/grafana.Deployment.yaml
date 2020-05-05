@@ -24,7 +24,7 @@ spec:
         app: grafana
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/grafana:10.0.12@sha256:2cde7e16fa56e81237fb05e228018015385f6498c4642d4ae073799a02b2b68c
+      - image: index.docker.io/sourcegraph/grafana:3.15.1@sha256:5af40ae6b3a2c4187ad5d57c462684026823231f8efda46fbaa607940d2886ff
         terminationMessagePolicy: FallbackToLogsOnError
         name: grafana
         ports:
@@ -35,13 +35,17 @@ spec:
           name: data
         - mountPath: /sg_config_grafana/provisioning/datasources
           name: config
+        # Grafana is relied upon to send alerts to site admins when something is wrong with
+        # Sourcegraph, thus its memory requests and limits are the same to guarantee it has enough
+        # memory to perform its job reliably and prevent conflicts with other pods on the same
+        # host node.
         resources:
           limits:
-            cpu: 100m
-            memory: 100Mi
+            cpu: 1
+            memory: 512Mi
           requests:
             cpu: 100m
-            memory: 100Mi
+            memory: 512Mi
       serviceAccountName: grafana
       securityContext:
         runAsUser: 0

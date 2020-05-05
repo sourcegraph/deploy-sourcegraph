@@ -1,9 +1,9 @@
 # Configuring Sourcegraph
 
-Sourcegraph Data Center is configured by applying Kubernetes YAML files and simple `kubectl` commands.
-
-Since everything is vanilla Kubernetes, you can configure Sourcegraph as flexibly as you need to meet the requirements of your deployment environment.
-We provide simple instructions for common things like setting up TLS, enabling code intelligence, and exposing Sourcegraph to external traffic below.
+Configuring a Sourcegraph Kubernetes cluster is done by applying manifest files and with simple
+`kubectl` commands. You can configure Sourcegraph as flexibly as you need to meet the requirements
+of your deployment environment.  We provide simple instructions for common things like setting up
+TLS, enabling code intelligence, and exposing Sourcegraph to external traffic below.
 
 ## Fork this repository
 
@@ -16,7 +16,7 @@ This will make upgrades far easier and is a good practice not just for Sourcegra
    - We recommend not storing secrets in the repository itself and these instructions document how.
 
 1. Create a release branch to track all of your customizations to Sourcegraph.
-   When you upgrade Sourcegraph Data Center, you will merge upstream into this branch.
+   When you upgrade Sourcegraph, you will merge upstream into this branch.
 
    ```bash
    git checkout HEAD -b release
@@ -57,7 +57,7 @@ you need the [kustomize](https://kustomize.io/) tool installed.
 - [Configure indexed-search replica count](#configure-indexed-search-replica-count)
 - [Assign resource-hungry pods to larger nodes](#assign-resource-hungry-pods-to-larger-nodes)
 - [Configure Alertmanager](../configure/prometheus/alertmanager/README.md)
-- [Configure Jaeger tracing](../configure/jaeger/README.md)
+- [Disable or customize Jaeger tracing](../configure/jaeger/README.md)
 - [Configure Lightstep tracing](#configure-lightstep-tracing)
 - [Configure custom Redis](#configure-custom-redis)
 - [Configure custom PostgreSQL](#configure-custom-postgres)
@@ -226,7 +226,7 @@ If you exposed your Sourcegraph instance via the altenative nginx service as des
 
 ## Configure repository cloning via SSH
 
-Sourcegraph will clone repositories using SSH credentials if they are mounted at `/root/.ssh` in the `gitserver` deployment.
+Sourcegraph will clone repositories using SSH credentials if they are mounted at `/home/sourcegraph/.ssh` in the `gitserver` deployment.
 
 1. [Create a secret](https://kubernetes.io/docs/concepts/configuration/secret/#using-secrets-as-environment-variables) that contains the base64 encoded contents of your SSH private key (_make sure it doesn't require a password_) and known_hosts file.
 
@@ -253,12 +253,12 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
    spec:
      containers:
        volumeMounts:
-         - mountPath: /root/.ssh
+         - mountPath: /home/sourcegraph/.ssh
            name: ssh
      volumes:
        - name: ssh
          secret:
-           defaultMode: 384
+           defaultMode: 0644
            secretName: gitserver-ssh
    ```
 
@@ -267,7 +267,7 @@ Sourcegraph will clone repositories using SSH credentials if they are mounted at
    ```bash
    # This script requires https://github.com/sourcegraph/jy and https://github.com/sourcegraph/yj
    GS=base/gitserver/gitserver.StatefulSet.yaml
-   cat $GS | yj | jq '.spec.template.spec.containers[].volumeMounts += [{mountPath: "/root/.ssh", name: "ssh"}]' | jy -o $GS
+   cat $GS | yj | jq '.spec.template.spec.containers[].volumeMounts += [{mountPath: "/home/sourcegraph/.ssh", name: "ssh"}]' | jy -o $GS
    cat $GS | yj | jq '.spec.template.spec.volumes += [{name: "ssh", secret: {defaultMode: 384, secretName:"gitserver-ssh"}}]' | jy -o $GS
    ```
 
@@ -482,7 +482,6 @@ If you want to specify a custom Redis server, you'll need specify the correspond
 
 - `sourcegraph-frontend`
 - `repo-updater`
-- `lsif-server`
 
 ## Configure custom PostgreSQL
 
@@ -490,11 +489,9 @@ You can use your own PostgreSQL v9.6+ server with Sourcegraph if you wish. For e
 
 Simply edit the relevant PostgreSQL environment variables (e.g. PGHOST, PGPORT, PGUSER, [etc.](http://www.postgresql.org/docs/current/static/libpq-envars.html)) in [base/frontend/sourcegraph-frontend.Deployment.yaml](../base/frontend/sourcegraph-frontend.Deployment.yaml) to point to your existing PostgreSQL instance.
 
-Note: Sourcegraph will create a secondary database in the same PostgreSQL instance with a name of the form `{PGDATABASE}_lsif`. It is assumed the PostgreSQL instance is dedicated solely to Sourcegraph.
-
 ## Install without RBAC
 
-Sourcegraph Data Center communicates with the Kubernetes API for service discovery. It also has some janitor DaemonSets that clean up temporary cache data. To do that we need to create RBAC resources.
+Sourcegraph communicates with the Kubernetes API for service discovery. It also has some janitor DaemonSets that clean up temporary cache data. To do that we need to create RBAC resources.
 
 If using RBAC is not an option, then you will not want to apply `*.Role.yaml` and `*.RoleBinding.yaml` files.
 
