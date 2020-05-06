@@ -14,5 +14,5 @@ After executing the script you can apply the generated manifests from the `gener
 
 ```shell script
 kubectl create namespace ns-sourcegraph
-kubectl apply --prune -l deploy=sourcegraph -f generated-cluster --recursive
+kubectl apply -n ns-sourcegraph --prune -l deploy=sourcegraph -f generated-cluster --recursive
 ```

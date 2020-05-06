@@ -12,7 +12,6 @@ After executing the script you can apply the generated manifests from the `gener
 
 ```shell script
 minikube start
-cd overlays/minikube
 kubectl create namespace ns-sourcegraph
 kubectl -n ns-sourcegraph apply --prune -l deploy=sourcegraph -f generated-cluster --recursive
 kubectl -n ns-sourcegraph expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph --port=3080 --target-port=3080
