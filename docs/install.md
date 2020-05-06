@@ -13,7 +13,7 @@
 - Access to server infrastructure on which you can create a Kubernetes cluster (see
   [resource allocation guidelines](scale.md)).
 - [Sourcegraph Enterprise license](./configure.md#add-license-key). You can run through these instructions without one, but you must obtain a license for instances of more than 10 users.
-- A domain name for your Sourcegraph instance ([to enable SSL/TLS](https://github.com/sourcegraph/deploy-sourcegraph/blob/master/docs/configure.md#configure-tlsssl))
+- A valid domain name for your Sourcegraph instance ([to enable SSL/TLS](https://github.com/sourcegraph/deploy-sourcegraph/blob/master/docs/configure.md#configure-tlsssl))
 - A certificate (self-signed or from a service such as [Let's Encrypt](https://letsencrypt.org/))
 - Access tokens or other credentials to [connect to your code hosts of choice](https://docs.sourcegraph.com/admin/external_service)
 - [Administrative access to your single sign-on (SSO) provider of choice](https://docs.sourcegraph.com/admin/auth)
