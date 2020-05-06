@@ -8,7 +8,7 @@
 ## Requirements
 
 - [Kubernetes](https://kubernetes.io/) v1.9 or later with an SSD storage class
-  - Cluster role administrator access
+  - [Cluster role administrator access](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) v1.9.7 or later
 - Access to server infrastructure on which you can create a Kubernetes cluster (see
   [resource allocation guidelines](scale.md)).
