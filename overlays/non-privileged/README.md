@@ -13,5 +13,5 @@ To use it, execute the following command from the root directory of this reposit
 After executing the script you can apply the generated manifests from the `generated-cluster` directory:
 
 ```shell script
-kubectl apply --prune -l deploy=sourcegraph -f generated-cluster --recursive
+kubectl apply -n ns-sourcegraph --prune -l deploy=sourcegraph -f generated-cluster --recursive
 ```
