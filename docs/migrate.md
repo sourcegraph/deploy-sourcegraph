@@ -1,8 +1,32 @@
 # Migrations
 
+
 This document records manual migrations that are necessary to apply when upgrading to certain
 Sourcegraph versions. All manual migrations between the version you are upgrading from and the
 version you are upgrading to should be applied (unless otherwise noted).
+
+## 3.16
+
+### Note: The following deployments have had their `strategy` changed from `rolling` to `recreate`:
+  - redis-cache
+  - redis-store
+  - pgsql
+  - precise-code-intel-bundle-manager
+  - prometheus
+  
+This change was made to avoid two pods writing to the same volume and causing corruption. 
+
+To implement these changes run the followng:
+
+```shell script
+kubectl apply -f base/precise-code-intel/bundle-manager.Deployment.yaml
+kubectl apply -f base/redis/redis-cache.Deployment.yaml
+kubectl apply -f base/redis/redis-store.Deployment.yaml
+kubectl apply -f base/prometheus/prometheus.Deployment.yaml
+kubectl apply -f base/pgsql/pgsql.Deployment
+```
+
+For more information see[#676](https://github.com/sourcegraph/deploy-sourcegraph/pull/676)
 
 ## 3.15
 
