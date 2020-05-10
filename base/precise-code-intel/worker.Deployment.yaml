@@ -36,25 +36,9 @@ spec:
         image: index.docker.io/sourcegraph/precise-code-intel-worker:3.15.1@sha256:00642b4bd6f37ff3e80b4b94a5699cef5ededae6875a5010c4202fd91ad0dfaf
         terminationMessagePolicy: FallbackToLogsOnError
         name: precise-code-intel-worker
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: server
-            scheme: HTTP
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: server
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
         ports:
-        - containerPort: 3188
-          name: server
-        - containerPort: 9090
-          name: prometheus
+        - containerPort: 6060
+          name: debug
         resources:
           limits:
             cpu: "2"
