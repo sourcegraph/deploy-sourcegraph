@@ -1,4 +1,4 @@
-> 🚨  IMPORTANT: When upgrading Sourcegraph, please check [docs/migrate.md](docs/migrate.md) to check if any manual migrations are necessary.
+> 🚨  IMPORTANT: When upgrading Sourcegraph, please check [upgrading docs](https://docs.sourcegraph.com/admin/updates/kubernetes) to check if any manual migrations are necessary.
 
 > `master` branch tracks development. Use the revision of this repository corresponding to the
 > version of Sourcegraph you wish to deploy. E.g., `git checkout v3.10.4`.
@@ -18,11 +18,11 @@ container](https://docs.sourcegraph.com/#quickstart-guide) or using [Docker
 Compose](https://docs.sourcegraph.com/admin/install/docker-compose). Migrating to Sourcegraph on
 Kubernetes is easy later.
 
-- [Installing](docs/install.md)
-- [Configuring](docs/configure.md)
-- [Updating](docs/update.md)
-- [Scaling](docs/scale.md)
-- [Troubleshooting](docs/troubleshoot.md)
+- [Installing](https://docs.sourcegraph.com/admin/install/kubernetes)
+- [Configuring](https://docs.sourcegraph.com/admin/install/kubernetes/configure)
+- [Updating](https://docs.sourcegraph.com/admin/updates/kubernetes)
+- [Scaling](https://docs.sourcegraph.com/admin/install/kubernetes/scale)
+- [Troubleshooting](https://docs.sourcegraph.com/admin/install/kubernetes/troubleshoot)
 - [Admin guide](docs/admin-guide.md) - useful guide for Sourcegraph admins
   - [Prometheus metrics](docs/admin-guide.md#prometheus) - list of all Prometheus metrics that can be used for
     application performance monitoring
