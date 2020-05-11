@@ -14,7 +14,7 @@ spec:
       app: grafana
   serviceName: grafana
   updateStrategy:
-     type: RollingUpdate
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -38,11 +38,11 @@ spec:
         # host node.
         resources:
           limits:
-            cpu: 1
-            memory: 512Mi
+            cpu: 100m
+            memory: 100Mi
           requests:
             cpu: 100m
-            memory: 512Mi
+            memory: 100Mi
       serviceAccountName: grafana
       securityContext:
         runAsUser: 0
@@ -55,7 +55,7 @@ spec:
   - metadata:
       name: grafana-data
     spec:
-      accessModes: [ "ReadWriteOnce"]
+      accessModes: ["ReadWriteOnce"]
       resources:
         requests:
           storage: 2Gi

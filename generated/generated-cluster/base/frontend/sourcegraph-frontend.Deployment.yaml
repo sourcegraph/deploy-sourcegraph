@@ -8,7 +8,7 @@ metadata:
   name: sourcegraph-frontend
 spec:
   minReadySeconds: 10
-  replicas: 5
+  replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -44,8 +44,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - # archives of repositories at a commit.
-          name: CACHE_DIR # CACHE_DIR stores larger items we cache. Majority of it is zip
+        - name: CACHE_DIR # CACHE_DIR stores larger items we cache. Majority of it is zip
           value: /mnt/cache/$(POD_NAME)
         - name: GRAFANA_SERVER_URL
           value: http://grafana:30070
@@ -55,7 +54,7 @@ spec:
           # new value after transition
         - name: PRECISE_CODE_INTEL_API_SERVER_URL
           value: k8s+http://precise-code-intel-api-server:3186
-        image: index.docker.io/sourcegraph/frontend:3.15.1@sha256:d6a2253ef0f1b40acb5a6dab7ea785302214c47ae27c4738ad1f9d67f8453ff8
+        image: index.docker.io/sourcegraph/frontend:insiders@sha256:6a69d89c7973bb286536fa0ff22624818ca51a2f0427dd32809190b940fe557a
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -79,11 +78,11 @@ spec:
           name: http-internal
         resources:
           limits:
-            cpu: "2"
-            memory: 4G
+            cpu: 8000m
+            memory: 6G
           requests:
-            cpu: "2"
-            memory: 2G
+            cpu: 6000m
+            memory: 4G
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd

@@ -77,3 +77,125 @@ function set_gitserver_replicas() {
   fi
   echo "$fileContents"
 }
+
+function set_container_image() {
+  local filename_matcher="$1"
+  local container_name="$2"
+
+  local image="$3"
+
+  local filename="$4"
+
+  fileContents=$(cat -)
+
+  echo "$fileContents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "spec.template.spec.containers.(name==${container_name}).image" "$image" "$filename"
+}
+
+function set_cpu_limit() {
+  local filename_matcher="$1"
+  local container_name="$2"
+
+  local cpu_value="$3"
+
+  local filename="$4"
+
+  fileContents=$(cat -)
+
+  container_path_expression="$(_generic_container_path_expression "$container_name")"
+
+  echo "$fileContents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "${container_path_expression}.resources.limits.cpu" "$cpu_value" "$filename"
+}
+
+function set_cpu_request() {
+  local filename_matcher="$1"
+  local container_name="$2"
+
+  local cpu_value="$3"
+
+  local filename="$4"
+
+  fileContents=$(cat -)
+
+  container_path_expression="$(_generic_container_path_expression "$container_name")"
+
+  echo "$fileContents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "${container_path_expression}.resources.requests.cpu" "$cpu_value" "$filename"
+}
+
+function set_memory_request() {
+  local filename_matcher="$1"
+  local container_name="$2"
+
+  local cpu_value="$3"
+
+  local filename="$4"
+
+  fileContents=$(cat -)
+
+  container_path_expression="$(_generic_container_path_expression "$container_name")"
+
+  echo "$fileContents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "${container_path_expression}.resources.requests.memory" "$cpu_value" "$filename"
+}
+
+function set_memory_limit() {
+  local filename_matcher="$1"
+  local container_name="$2"
+
+  local cpu_value="$3"
+
+  local filename="$4"
+
+  fileContents=$(cat -)
+
+  container_path_expression="$(_generic_container_path_expression "$container_name")"
+
+  echo "$fileContents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "${container_path_expression}.resources.limits.memory" "$cpu_value" "$filename"
+
+}
+
+function _generic_container_path_expression() {
+  local container_name="$1"
+  printf "spec.template.spec.containers.(name==%s)" "$container_name"
+}
+
+function _generic_container_path_expression() {
+  local container_name="$1"
+  printf "spec.template.spec.containers.(name==%s)" "$container_name"
+}
+
+function _set_generic() {
+  local filename_matcher="$1"
+
+  local kinds
+  kinds="$2"
+
+  local path_expression="$3"
+  local value="$4"
+
+  local filename="$5"
+
+  local fileContents
+  fileContents="$(cat -)"
+
+  if [[ ! "$filename" == *"$filename_matcher"* ]]; then
+    echo "$fileContents"
+    return
+  fi
+
+  IFS=',' read -r -a allowed_kinds <<<"$kinds"
+  kind=$(echo "$fileContents" | yq r - "kind")
+
+  if ! elementIn "$kind" "${allowed_kinds[@]}"; then
+    echo "$fileContents"
+    return
+  fi
+
+  echo "$fileContents" | yq w - "${path_expression}" "${value}"
+}
+
+# https://stackoverflow.com/a/8574392
+elementIn() {
+  local e match="$1"
+  shift
+  for e; do [[ "$e" == "$match" ]] && return 0; done
+  return 1
+}
