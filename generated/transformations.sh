@@ -51,12 +51,9 @@ function set_replicas() {
   replica_count="$2"
   filename="$3"
 
-  if [[ $filename == *"$filename_matcher"* && ($filename == *".Deployment.yaml" || $filename == *".StatefulSet.yaml") ]]; then
-    cat - |
-      yq w - "spec.replicas" "$replica_count"
-    return
-  fi
-  cat -
+  file_contents=$(cat -)
+
+  echo "$file_contents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "spec.replicas" "$replica_count" "$filename"
 }
 export -f set_replicas
 
@@ -194,8 +191,37 @@ function set_persistent_volume_claim_capacity() {
 
   echo "$file_contents" | _set_generic "$filename_matcher" "PersistentVolumeClaim" "${VOLUME_CAPACITY_PATH_EXPRESSION}" "$volume_capacity" "$filename"
 }
-
 export -f set_stateful_set_persistent_volume_claim_capacity
+
+function add_environment_variable() {
+  local filename_matcher="$1"
+  local container_name="$2"
+
+  local variable_name="$3"
+  local variable_value="$4"
+
+  local filename="$5"
+
+  file_contents=$(cat -)
+
+  file_contents=$(echo "$file_contents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "spec.template.spec.containers.(name==${container_name}).env[+].name" "$variable_name" "$filename")
+  echo "$file_contents" | set_environment_variable "$filename_matcher" "$container_name" "$variable_name" "$variable_value" "$filename"
+}
+export -f add_environment_variable
+
+function set_environment_variable() {
+  local filename_matcher="$1"
+  local container_name="$2"
+
+  local variable_name="$3"
+  local variable_value="$4"
+
+  local filename="$5"
+
+  file_contents=$(cat -)
+  echo "$file_contents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "spec.template.spec.containers.(name==${container_name}).env.(name==${variable_name}).value" "$variable_value" "$filename"
+}
+export -f set_environment_variable
 
 function _set_generic() {
   local filename_matcher="$1"

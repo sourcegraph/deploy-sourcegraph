@@ -21,7 +21,7 @@ makeNormalizedFile() {
 
   destFile="$dest${originalFile#"$root"}"
   mkdir -p "$(dirname "$destFile")"
-  yq read --tojson "$originalFile" | jq -S | yq read --prettyPrint --stripComments - >"$destFile"
+  yq read --tojson "$originalFile" | jq -S -f ./generated/sort_env_vars.jq | yq read --prettyPrint --stripComments - >"$destFile"
 }
 export -f makeNormalizedFile
 

@@ -15,6 +15,8 @@ export TRANSFORMATIONS=(
   'set_memory_limit frontend frontend 6G'
   'set_cpu_request frontend frontend 6000m'
   'set_memory_request frontend frontend 4G'
+  'add_environment_variable frontend frontend SENTRY_DSN_BACKEND <THE_VALUE>'
+  'add_environment_variable frontend frontend SENTRY_DSN_FRONTEND <THE_VALUE>'
 
   'set_container_image github-proxy github-proxy index.docker.io/sourcegraph/github-proxy:insiders@sha256:3a9e323988309c78c64745b0599e1b4c2b10ddcf2abbdb2283dbde038a4528ba'
 
@@ -26,6 +28,7 @@ export TRANSFORMATIONS=(
   'set_memory_limit grafana grafana 100Mi'
   'set_memory_request grafana grafana 100Mi'
   'set_container_image grafana grafana index.docker.io/sourcegraph/grafana:insiders@sha256:da9678fd7f79afb0b01b2a3f116a208d19c795f77f418186ba3a178055caa94f'
+  'add_environment_variable grafana grafana GF_SERVER_ROOT_URL <THE_VALUE>'
 
   'set_cpu_limit pgsql pgsql 16'
   'set_memory_limit pgsql pgsql 24Gi'
