@@ -19,7 +19,7 @@ Follow the [EKS Getting Started guide](https://docs.aws.amazon.com/eks/latest/us
 Continuing through the [EKS Getting Started guide](https://docs.aws.amazon.com/eks/latest/userguide/getting-started.html#eks-prereqs), create the EKS Cluster VPC:
 
 1. Open the [**AWS CloudFormation console**](https://console.aws.amazon.com/cloudformation/).
-2. Ensure the region in the top right navigation bar is `us-west-2`, `us-east-1`, or `eu-west-1` (others do not support EKS yet as of September 12, 2018).
+2. Ensure the region in the top right navigation bar is an EKS-supported region (see [this list](https://docs.aws.amazon.com/general/latest/gr/eks.html)). <!-- there does not seem to be a nicer list elsewhere -->
 3. Click **Create stack**.
 4. Select the very last **Specify an Amazon S3 template URL** option. Enter `https://amazon-eks.s3-us-west-2.amazonaws.com/cloudformation/2018-08-30/amazon-eks-vpc-sample.yaml`
 5. Under **Stack name**, enter `eks-vpc-sourcegraph`.
