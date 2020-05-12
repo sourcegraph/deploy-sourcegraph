@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - env:
-        image: index.docker.io/sourcegraph/query-runner:3.15.1@sha256:02df83ebcb0ee8ecc3728ba3904170755b2561d6402278df78dca122c03c34c3
+        image: index.docker.io/sourcegraph/query-runner:insiders@sha256:55d85a1315b2ec52c38a70671bc908a114cd5ad89fd2eadc95eb7208c69c952a
         terminationMessagePolicy: FallbackToLogsOnError
         name: query-runner
         ports:
@@ -41,11 +41,11 @@ spec:
       - image: sourcegraph/jaeger-agent:3.15.0@sha256:dc476845a723dce8e44ce07a50b5abb218ec86cb9d75b0ca9601df76db1fb65b
         name: jaeger-agent
         env:
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                apiVersion: v1
-                fieldPath: metadata.name
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
         ports:
         - containerPort: 5775
           protocol: UDP
@@ -63,7 +63,7 @@ spec:
             cpu: 100m
             memory: 100M
         args:
-          - --reporter.grpc.host-port=jaeger-collector:14250
-          - --reporter.type=grpc
+        - --reporter.grpc.host-port=jaeger-collector:14250
+        - --reporter.type=grpc
       securityContext:
         runAsUser: 0

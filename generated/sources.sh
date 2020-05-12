@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-SOURCES_BASEDIR=".."
-SOURCE_FILES=()
+export SOURCES_BASEDIR=".."
+export SOURCE_FILES=()
 
 for f in "${INPUT_SOURCE_FILES[@]}"; do
   SOURCE_FILES+=("${f#$SOURCES_BASEDIR/}")

@@ -25,7 +25,7 @@ spec:
     spec:
       containers:
       - env:
-        image: index.docker.io/sourcegraph/github-proxy:3.15.1@sha256:61d1a71d42a2f6feb71bd44a642afaeb388ef763f6e5d8c71056cd651479eed4
+        image: index.docker.io/sourcegraph/github-proxy:insiders@sha256:3a9e323988309c78c64745b0599e1b4c2b10ddcf2abbdb2283dbde038a4528ba
         terminationMessagePolicy: FallbackToLogsOnError
         name: github-proxy
         ports:
@@ -41,11 +41,11 @@ spec:
       - image: sourcegraph/jaeger-agent:3.15.0@sha256:dc476845a723dce8e44ce07a50b5abb218ec86cb9d75b0ca9601df76db1fb65b
         name: jaeger-agent
         env:
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                apiVersion: v1
-                fieldPath: metadata.name
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
         ports:
         - containerPort: 5775
           protocol: UDP
@@ -63,7 +63,7 @@ spec:
             cpu: 100m
             memory: 100M
         args:
-          - --reporter.grpc.host-port=jaeger-collector:14250
-          - --reporter.type=grpc
+        - --reporter.grpc.host-port=jaeger-collector:14250
+        - --reporter.type=grpc
       securityContext:
         runAsUser: 0

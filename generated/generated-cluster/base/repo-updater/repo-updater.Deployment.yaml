@@ -25,7 +25,7 @@ spec:
         app: repo-updater
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/repo-updater:3.15.1@sha256:8ef40206b30f24c9b671d924a287bff17bf803688447d9afcad0517870d5174b
+      - image: index.docker.io/sourcegraph/repo-updater:insiders@sha256:868f2ee00d3fdc58b164b2f802e1f7ba8404c8e88364b0cf4c89a1339c3702d3
         env:
         terminationMessagePolicy: FallbackToLogsOnError
         name: repo-updater
@@ -44,11 +44,11 @@ spec:
       - image: sourcegraph/jaeger-agent:3.15.0@sha256:dc476845a723dce8e44ce07a50b5abb218ec86cb9d75b0ca9601df76db1fb65b
         name: jaeger-agent
         env:
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                apiVersion: v1
-                fieldPath: metadata.name
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
         ports:
         - containerPort: 5775
           protocol: UDP
@@ -66,7 +66,7 @@ spec:
             cpu: 100m
             memory: 100M
         args:
-          - --reporter.grpc.host-port=jaeger-collector:14250
-          - --reporter.type=grpc
+        - --reporter.grpc.host-port=jaeger-collector:14250
+        - --reporter.type=grpc
       securityContext:
         runAsUser: 0

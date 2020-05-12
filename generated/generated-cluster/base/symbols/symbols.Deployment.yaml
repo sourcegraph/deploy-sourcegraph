@@ -33,7 +33,7 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: index.docker.io/sourcegraph/symbols:3.15.1@sha256:8db073ad787c7c509247a6d97e38a733271b118464742037b32d678a27796a52
+        image: index.docker.io/sourcegraph/symbols:insiders@sha256:59f8e39244d9a777b5d8f36a8686b470499bc465b35a5f2f07f3979c43da1a80
         terminationMessagePolicy: FallbackToLogsOnError
         name: symbols
         livenessProbe:
@@ -68,11 +68,11 @@ spec:
       - image: sourcegraph/jaeger-agent:3.15.0@sha256:dc476845a723dce8e44ce07a50b5abb218ec86cb9d75b0ca9601df76db1fb65b
         name: jaeger-agent
         env:
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                apiVersion: v1
-                fieldPath: metadata.name
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
         ports:
         - containerPort: 5775
           protocol: UDP
@@ -90,8 +90,8 @@ spec:
             cpu: 100m
             memory: 100M
         args:
-          - --reporter.grpc.host-port=jaeger-collector:14250
-          - --reporter.type=grpc
+        - --reporter.grpc.host-port=jaeger-collector:14250
+        - --reporter.type=grpc
       securityContext:
         runAsUser: 0
       volumes:

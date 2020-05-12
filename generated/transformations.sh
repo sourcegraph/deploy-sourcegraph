@@ -9,6 +9,7 @@ function remove_rbac() {
   fi
   cat -
 }
+export -f remove_rbac
 
 # set_namespace $GLOB $NAMESPACE sets the namespace of all resources in the cluster matching a glob pattern.
 function set_namespace() {
@@ -22,6 +23,7 @@ function set_namespace() {
   fi
   cat -
 }
+export -f set_namespace
 
 # ingress_node_port exposes the frontend as NodePort Service
 function ingress_node_port() {
@@ -40,6 +42,7 @@ function ingress_node_port() {
   fi
   cat -
 }
+export -f ingress_node_port
 
 # set_replicas $SUBSTRING_MATCH $REPLICA_COUNT sets the replica count of deployments and
 # statefulsets whose filename matches a substring.
@@ -55,15 +58,16 @@ function set_replicas() {
   fi
   cat -
 }
+export -f set_replicas
 
 function set_gitserver_replicas() {
   local replica_count="$1"
   local filename="$2"
 
-  local fileContents
-  fileContents=$(cat -)
+  local file_contents
+  file_contents=$(cat -)
 
-  fileContents=$(echo "$fileContents" | set_replicas "/gitserver.StatefulSet.yaml" "$replica_count" "$filename")
+  file_contents=$(echo "$file_contents" | set_replicas "/gitserver.StatefulSet.yaml" "$replica_count" "$filename")
 
   local SRC_GIT_SERVERS_ADDRESSES=()
   for ((i = 0; i < "$replica_count"; i++)); do
@@ -71,12 +75,13 @@ function set_gitserver_replicas() {
   done
 
   if [[ $filename == *"/sourcegraph-frontend.Deployment.yaml"* ]]; then
-    echo "$fileContents" |
+    echo "$file_contents" |
       yq w - "spec.template.spec.containers.(name==frontend).env.(name==SRC_GIT_SERVERS).value" "${SRC_GIT_SERVERS_ADDRESSES[*]}"
     return
   fi
-  echo "$fileContents"
+  echo "$file_contents"
 }
+export -f set_gitserver_replicas
 
 function set_container_image() {
   local filename_matcher="$1"
@@ -86,10 +91,11 @@ function set_container_image() {
 
   local filename="$4"
 
-  fileContents=$(cat -)
+  file_contents=$(cat -)
 
-  echo "$fileContents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "spec.template.spec.containers.(name==${container_name}).image" "$image" "$filename"
+  echo "$file_contents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "spec.template.spec.containers.(name==${container_name}).image" "$image" "$filename"
 }
+export -f set_container_image
 
 function set_cpu_limit() {
   local filename_matcher="$1"
@@ -99,12 +105,13 @@ function set_cpu_limit() {
 
   local filename="$4"
 
-  fileContents=$(cat -)
+  file_contents=$(cat -)
 
   container_path_expression="$(_generic_container_path_expression "$container_name")"
 
-  echo "$fileContents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "${container_path_expression}.resources.limits.cpu" "$cpu_value" "$filename"
+  echo "$file_contents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "${container_path_expression}.resources.limits.cpu" "$cpu_value" "$filename"
 }
+export -f set_cpu_limit
 
 function set_cpu_request() {
   local filename_matcher="$1"
@@ -114,12 +121,13 @@ function set_cpu_request() {
 
   local filename="$4"
 
-  fileContents=$(cat -)
+  file_contents=$(cat -)
 
   container_path_expression="$(_generic_container_path_expression "$container_name")"
 
-  echo "$fileContents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "${container_path_expression}.resources.requests.cpu" "$cpu_value" "$filename"
+  echo "$file_contents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "${container_path_expression}.resources.requests.cpu" "$cpu_value" "$filename"
 }
+export -f set_cpu_request
 
 function set_memory_request() {
   local filename_matcher="$1"
@@ -129,12 +137,13 @@ function set_memory_request() {
 
   local filename="$4"
 
-  fileContents=$(cat -)
+  file_contents=$(cat -)
 
   container_path_expression="$(_generic_container_path_expression "$container_name")"
 
-  echo "$fileContents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "${container_path_expression}.resources.requests.memory" "$cpu_value" "$filename"
+  echo "$file_contents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "${container_path_expression}.resources.requests.memory" "$cpu_value" "$filename"
 }
+export -f set_memory_request
 
 function set_memory_limit() {
   local filename_matcher="$1"
@@ -144,53 +153,79 @@ function set_memory_limit() {
 
   local filename="$4"
 
-  fileContents=$(cat -)
+  file_contents=$(cat -)
 
   container_path_expression="$(_generic_container_path_expression "$container_name")"
 
-  echo "$fileContents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "${container_path_expression}.resources.limits.memory" "$cpu_value" "$filename"
-
+  echo "$file_contents" | _set_generic "$filename_matcher" "Deployment,StatefulSet" "${container_path_expression}.resources.limits.memory" "$cpu_value" "$filename"
 }
-
-function _generic_container_path_expression() {
-  local container_name="$1"
-  printf "spec.template.spec.containers.(name==%s)" "$container_name"
-}
+export -f set_memory_limit
 
 function _generic_container_path_expression() {
   local container_name="$1"
   printf "spec.template.spec.containers.(name==%s)" "$container_name"
 }
+export -f _generic_container_path_expression
+
+export VOLUME_CAPACITY_PATH_EXPRESSION="spec.resources.requests.storage"
+
+function set_stateful_set_persistent_volume_claim_capacity() {
+  local filename_matcher="$1"
+
+  local volume_name="$2"
+  local volume_capacity="$3"
+
+  local filename="$4"
+
+  file_contents=$(cat -)
+
+  echo "$file_contents" | _set_generic "$filename_matcher" "StatefulSet" "spec.volumeClaimTemplates.(metadata.name==${volume_name}).${VOLUME_CAPACITY_PATH_EXPRESSION}" "$volume_capacity" "$filename"
+}
+export -f set_stateful_set_persistent_volume_claim_capacity
+
+function set_persistent_volume_claim_capacity() {
+  local filename_matcher="$1"
+
+  local volume_capacity="$2"
+
+  local filename="$3"
+
+  file_contents=$(cat -)
+
+  echo "$file_contents" | _set_generic "$filename_matcher" "PersistentVolumeClaim" "${VOLUME_CAPACITY_PATH_EXPRESSION}" "$volume_capacity" "$filename"
+}
+
+export -f set_stateful_set_persistent_volume_claim_capacity
 
 function _set_generic() {
   local filename_matcher="$1"
 
-  local kinds
-  kinds="$2"
+  local kinds="$2"
 
   local path_expression="$3"
   local value="$4"
 
   local filename="$5"
 
-  local fileContents
-  fileContents="$(cat -)"
+  local file_contents
+  file_contents="$(cat -)"
 
   if [[ ! "$filename" == *"$filename_matcher"* ]]; then
-    echo "$fileContents"
+    echo "$file_contents"
     return
   fi
 
   IFS=',' read -r -a allowed_kinds <<<"$kinds"
-  kind=$(echo "$fileContents" | yq r - "kind")
+  kind=$(echo "$file_contents" | yq r - "kind")
 
   if ! elementIn "$kind" "${allowed_kinds[@]}"; then
-    echo "$fileContents"
+    echo "$file_contents"
     return
   fi
 
-  echo "$fileContents" | yq w - "${path_expression}" "${value}"
+  echo "$file_contents" | yq w - "${path_expression}" "${value}"
 }
+export -f _set_generic
 
 # https://stackoverflow.com/a/8574392
 elementIn() {
@@ -199,3 +234,4 @@ elementIn() {
   for e; do [[ "$e" == "$match" ]] && return 0; done
   return 1
 }
+export -f elementIn
