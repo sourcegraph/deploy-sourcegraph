@@ -223,6 +223,20 @@ function set_environment_variable() {
 }
 export -f set_environment_variable
 
+function set_annotation() {
+  local filename_matcher="$1"
+  local kind="$2"
+
+  local annotation_name="$3"
+  local annotation_value="$4"
+
+  local filename="$5"
+
+  file_contents=$(cat -)
+  echo "$file_contents" | _set_generic "$filename_matcher" "$kind" "metadata.annotations.\"${annotation_name}\"" "$annotation_value" "$filename"
+}
+export -f set_annotation
+
 function _set_generic() {
   local filename_matcher="$1"
 
@@ -244,7 +258,7 @@ function _set_generic() {
   IFS=',' read -r -a allowed_kinds <<<"$kinds"
   kind=$(echo "$file_contents" | yq r - "kind")
 
-  if ! elementIn "$kind" "${allowed_kinds[@]}"; then
+  if ! elementIn "_ALL_" "${allowed_kinds[@]}" && ! elementIn "$kind" "${allowed_kinds[@]}"; then
     echo "$file_contents"
     return
   fi

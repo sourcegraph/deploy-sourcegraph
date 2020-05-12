@@ -8,6 +8,10 @@ metadata:
     # See
     # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/
     # for more nginx annotations.
+
+    certmanager.k8s.io/acme-challenge-type: http01
+    certmanager.k8s.io/issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-read-timeout: 1d
   labels:
     app: sourcegraph-frontend
     deploy: sourcegraph
