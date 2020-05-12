@@ -23,11 +23,23 @@ table.
   <tr>
     <th colspan="3">Compute nodes</th>
   </tr>
-  <tr><th>Provider</th><th>Node type</th><th>Boot/ephemeral disk size</th></tr>
-  <tr><td><a href="/docs/k8s.eks.md">Amazon EKS (better than plain EC2)</a> </td><td>m5.4xlarge</td><td>N/A</td></tr>
-  <tr><td><a href="https://kubernetes.io/docs/getting-started-guides/aws/">AWS EC2</a></td><td>m5.4xlarge</td><td>N/A</td></tr>
-  <tr><td><a href="https://cloud.google.com/kubernetes-engine/docs/quickstart">Google Kubernetes Engine (GKE)</a></td><td>n1-standard-16</td><td>100 GB (default)</td></tr>
-  <tr><td><a href="/docs/k8s.azure.md">Azure</a> </td><td>D16 v3</td><td>100 GB (SSD preferred)</td></tr>
-  <tr><td><a href="https://kubernetes.io/docs/setup/pick-right-solution/">Other</a></td><td>16 vCPU, 60 GiB memory per node</td><td>100 GB (SSD preferred)</td></tr>
+  <tr>
+    <th>Provider</th><th>Node type</th><th>Boot/ephemeral disk size</th><th>Reference</th>
+  </tr>
+  <tr>
+    <td><b>Amazon EKS (better than plain EC2)</b></td> <td>m5.4xlarge</td> <td>N/A</td> <td><a href="/docs/k8s.eks.md">Deploy Sourcegraph on EKS</a> </td>
+  </tr>
+  <tr>
+    <td><b>AWS EC2</b></td> <td>m5.4xlarge</td> <td>N/A</td> <td><a href="https://kubernetes.io/docs/setup/production-environment/turnkey/aws">Run Kubernetes on EC2</a></td>
+  </tr>
+  <tr>
+    <td><b>Google Kubernetes Engine (GKE)</b></td> <td>n1-standard-16</td> <td>100 GB (default)</td> <td><a href="https://cloud.google.com/kubernetes-engine/docs/quickstart">GKE Quickstart</a></td>
+  </tr>
+  <tr>
+    <td><b>Azure</b></td> <td>D16 v3</td><td>100 GB (SSD preferred)</td> <td><a href="/docs/k8s.azure.md">Deploy Sourcegraph on Azure</a> </td>
+    </tr>
+  <tr>
+    <td><b>Other</b></td> <td>16 vCPU, 60 GiB memory per node</td> <td>100 GB (SSD preferred)</td> <td><a href="https://kubernetes.io/partners/#kcsp">Kubernetes Service Providers</a></td>
+  </tr>
 </table>
 </div>
