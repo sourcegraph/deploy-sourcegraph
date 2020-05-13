@@ -248,12 +248,30 @@ function set_frontend_ingress_ssl() {
   file_contents=$(echo "$file_contents" | _set_generic frontend Ingress "spec.rules[0].host" "$domain_name" "$filename")
 
   file_contents=$(echo "$file_contents" | _set_generic frontend Ingress "spec.tls[+]" hosts "$filename")
-  file_contents=$(echo "$file_contents" | _set_generic frontend Ingress "spec.tls[0].hosts[+]" "$domain_name" "$filename")
-  file_contents=$(echo "$file_contents" | _set_generic frontend Ingress "spec.tls[0].secretName" "$secret_name" "$filename")
+  file_contents=$(echo "$file_contents" | _set_generic frontend Ingress "spec.tls[-1].hosts[+]" "$domain_name" "$filename")
+  file_contents=$(echo "$file_contents" | _set_generic frontend Ingress "spec.tls[-1].secretName" "$secret_name" "$filename")
 
   echo "$file_contents"
 }
 export -f set_frontend_ingress_ssl
+
+function set_gitserver_ssh_credentials() {
+  local secret_name="$1"
+
+  local filename="$2"
+
+  file_contents=$(cat -)
+
+  file_contents=$(echo "$file_contents" | _set_generic gitserver StatefulSet "spec.template.spec.containers.(name==gitserver).volumeMounts[+].name" "ssh" "$filename")
+  file_contents=$(echo "$file_contents" | _set_generic gitserver StatefulSet "spec.template.spec.containers.(name==gitserver).volumeMounts.(name==ssh).mountPath" "/root/.ssh" "$filename")
+
+  file_contents=$(echo "$file_contents" | _set_generic gitserver StatefulSet "spec.template.spec.volumes[+].name" "ssh" "$filename")
+  file_contents=$(echo "$file_contents" | _set_generic gitserver StatefulSet "spec.template.spec.volumes.(name==ssh).secret.defaultMode" "384" "$filename")
+  file_contents=$(echo "$file_contents" | _set_generic gitserver StatefulSet "spec.template.spec.volumes.(name==ssh).secret.secretName" "$secret_name" "$filename")
+
+  echo "$file_contents"
+}
+export -f set_gitserver_ssh_credentials
 
 function _set_generic() {
   local filename_matcher="$1"

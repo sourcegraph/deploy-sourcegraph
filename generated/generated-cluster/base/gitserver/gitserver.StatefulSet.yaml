@@ -49,6 +49,8 @@ spec:
           # about configuring gitserver to use an SSH key
           # - mountPath: /root/.ssh
           #   name: ssh
+        - name: ssh
+          mountPath: /root/.ssh
       - image: sourcegraph/jaeger-agent:3.15.0@sha256:dc476845a723dce8e44ce07a50b5abb218ec86cb9d75b0ca9601df76db1fb65b
         name: jaeger-agent
         env:
@@ -86,6 +88,10 @@ spec:
         #   secret:
         #     defaultMode: 384
         #     secretName: gitserver-ssh
+      - name: ssh
+        secret:
+          defaultMode: 384
+          secretName: gitserver-ssh
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:

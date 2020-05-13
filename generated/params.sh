@@ -3,7 +3,7 @@
 export INPUT_SOURCE_DIRS=("base")
 export INPUT_SOURCE_FILES=()
 export TRANSFORMATIONS=(
-  'remove_rbac'
+  # 'remove_rbac'
   # 'set_namespace * ns-sourcegraph'
   # 'ingress_node_port 30080'
   # 'set_replicas frontend 5'
@@ -27,6 +27,7 @@ export TRANSFORMATIONS=(
   'set_gitserver_replicas 4'
   'set_container_image gitserver gitserver index.docker.io/sourcegraph/gitserver:insiders@sha256:e46e61c702345fb55206b87973f7c6b7f07fac0735201080b5b1e119605ce75c'
   'set_stateful_set_persistent_volume_claim_capacity gitserver repos 1Ti'
+  'set_gitserver_ssh_credentials gitserver-ssh'
 
   'set_cpu_limit grafana grafana 100m'
   'set_memory_limit grafana grafana 100Mi'
