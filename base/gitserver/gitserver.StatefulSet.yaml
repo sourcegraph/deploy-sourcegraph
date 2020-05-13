@@ -5,6 +5,7 @@ metadata:
     description: Stores clones of repositories to perform Git operations.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: gitserver
 spec:
   replicas: 1
@@ -19,6 +20,7 @@ spec:
         app: gitserver
         group: backend
         type: gitserver
+        deploy: sourcegraph
     spec:
       containers:
       - args:

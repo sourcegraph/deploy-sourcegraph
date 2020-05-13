@@ -6,6 +6,7 @@ metadata:
       external code hosts and other similar services.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: repo-updater
 spec:
   minReadySeconds: 10
@@ -22,6 +23,7 @@ spec:
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: repo-updater
     spec:
       containers:

@@ -5,6 +5,7 @@ metadata:
     description: Handles conversion of uploaded precise code intelligence bundles.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: precise-code-intel-worker
 spec:
   minReadySeconds: 10
@@ -21,6 +22,7 @@ spec:
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: precise-code-intel-worker
     spec:
       containers:
