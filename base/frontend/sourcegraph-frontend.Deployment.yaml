@@ -5,6 +5,7 @@ metadata:
     description: Serves the frontend of Sourcegraph via HTTP(S).
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: sourcegraph-frontend
 spec:
   minReadySeconds: 10
@@ -22,6 +23,7 @@ spec:
     metadata:
       labels:
         app: sourcegraph-frontend
+        deploy: sourcegraph
     spec:
       containers:
       - args:

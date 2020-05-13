@@ -5,6 +5,7 @@ metadata:
     description: Redis for storing short-lived caches.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: redis-cache
 spec:
   minReadySeconds: 10
@@ -18,6 +19,7 @@ spec:
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: redis-cache
     spec:
       containers:

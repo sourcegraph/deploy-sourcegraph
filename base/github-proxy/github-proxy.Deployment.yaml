@@ -5,6 +5,7 @@ metadata:
     description: Rate-limiting proxy for the GitHub API.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: github-proxy
 spec:
   minReadySeconds: 10
@@ -22,6 +23,7 @@ spec:
     metadata:
       labels:
         app: github-proxy
+        deploy: sourcegraph
     spec:
       containers:
       - env:

@@ -5,6 +5,7 @@ metadata:
     description: Collects metrics and aggregates them into graphs.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: prometheus
 spec:
   minReadySeconds: 10
@@ -18,6 +19,7 @@ spec:
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: prometheus
     spec:
       containers:

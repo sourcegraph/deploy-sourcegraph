@@ -12,6 +12,7 @@ You need to create the namespace if it doesn't exist yet (replace `ns-sourcegrap
 
 ```shell script
 kubectl create namespace ns-sourcegraph
+kubectl label namespace ns-sourcegraph name=ns-sourcegraph
 ```
 
 After executing the script you can apply the generated manifests from the `generated-cluster` directory:

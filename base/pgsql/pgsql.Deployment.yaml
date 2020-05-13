@@ -5,6 +5,7 @@ metadata:
     description: Postgres database for various data.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: pgsql
 spec:
   minReadySeconds: 10
@@ -18,6 +19,7 @@ spec:
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: pgsql
         group: backend
     spec:
