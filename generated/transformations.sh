@@ -237,6 +237,24 @@ function set_annotation() {
 }
 export -f set_annotation
 
+function set_frontend_ingress_ssl() {
+  local domain_name="$1"
+  local secret_name="$2"
+
+  local filename="$3"
+
+  file_contents=$(cat -)
+
+  file_contents=$(echo "$file_contents" | _set_generic frontend Ingress "spec.rules[0].host" "$domain_name" "$filename")
+
+  file_contents=$(echo "$file_contents" | _set_generic frontend Ingress "spec.tls[+]" hosts "$filename")
+  file_contents=$(echo "$file_contents" | _set_generic frontend Ingress "spec.tls[0].hosts[+]" "$domain_name" "$filename")
+  file_contents=$(echo "$file_contents" | _set_generic frontend Ingress "spec.tls[0].secretName" "$secret_name" "$filename")
+
+  echo "$file_contents"
+}
+export -f set_frontend_ingress_ssl
+
 function _set_generic() {
   local filename_matcher="$1"
 

@@ -20,6 +20,7 @@ export TRANSFORMATIONS=(
   'set_annotation frontend Ingress certmanager.k8s.io/acme-challenge-type http01'
   'set_annotation frontend Ingress certmanager.k8s.io/issuer letsencrypt-prod'
   'set_annotation frontend Ingress nginx.ingress.kubernetes.io/proxy-read-timeout 1d'
+  'set_frontend_ingress_ssl k8s.sgdev.org sourcegraph-tls'
 
   'set_container_image github-proxy github-proxy index.docker.io/sourcegraph/github-proxy:insiders@sha256:3a9e323988309c78c64745b0599e1b4c2b10ddcf2abbdb2283dbde038a4528ba'
 
