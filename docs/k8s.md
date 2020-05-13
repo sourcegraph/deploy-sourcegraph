@@ -21,7 +21,7 @@ table.
 <div class="resources">
 <table class="table">
   <tr>
-    <th colspan="3">Compute nodes</th>
+    <th colspan="4">Compute nodes</th>
   </tr>
   <tr>
     <th>Provider</th><th>Node type</th><th>Boot/ephemeral disk size</th><th>Reference</th>
