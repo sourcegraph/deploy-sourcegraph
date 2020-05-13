@@ -81,8 +81,12 @@ On your dev machine:
 1. Install the `aws` CLI tool: [bundled installer](https://docs.aws.amazon.com/cli/latest/userguide/awscli-install-bundle.html), [other installation methods](https://docs.aws.amazon.com/cli/latest/userguide/installing.html).
 2. Follow [these instructions](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html) to create an access key and `aws configure` the CLI to use it.
 3. Install `kubectl` and `aws-iam-authenticator` by following [these steps](https://docs.aws.amazon.com/eks/latest/userguide/configure-kubectl.html).
-4. [Configure `kubectl` to interact with your cluster](https://docs.aws.amazon.com/eks/latest/userguide/create-kubeconfig.html).
-   - **Important**: If `kubectl` commands prompt you for username/password, be sure that `kubectl version` reports a client version of v1.10+. Older versions of kubectl do not work with the authentication configuration provided by Amazon EKS.
+4. [Configure `kubectl` to interact with your cluster](https://docs.aws.amazon.com/eks/latest/userguide/create-kubeconfig.html):
+   ```
+   aws eks update-kubeconfig --name ${cluster_name}
+   ```
+
+**Important**: If `kubectl` commands prompt you for username/password, be sure that `kubectl version` reports a client version of v1.10+. Older versions of kubectl do not work with the authentication configuration provided by Amazon EKS.
 
 At this point, `kubectl get svc` should show something like:
 
