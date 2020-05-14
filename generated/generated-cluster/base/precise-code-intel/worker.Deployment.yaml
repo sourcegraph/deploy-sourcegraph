@@ -5,6 +5,7 @@ metadata:
     description: Handles conversion of uploaded precise code intelligence bundles.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: precise-code-intel-worker
 spec:
   minReadySeconds: 10
@@ -21,6 +22,7 @@ spec:
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: precise-code-intel-worker
     spec:
       containers:
@@ -33,28 +35,28 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/precise-code-intel-worker:insiders@sha256:bc93f677e18f8f1cc63725e660e877b601465962676abd43f4fb8947783ce135
+        image: index.docker.io/sourcegraph/precise-code-intel-worker:insiders@sha256:9acc4feb17fab17a1c34afa0ac42f930af438bf6ca264a91aa00dccf5eac4ef1
         terminationMessagePolicy: FallbackToLogsOnError
         name: precise-code-intel-worker
         livenessProbe:
           httpGet:
             path: /healthz
-            port: server
+            port: http
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /healthz
-            port: server
+            port: http
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
         - containerPort: 3188
-          name: server
-        - containerPort: 9090
-          name: prometheus
+          name: http
+        - containerPort: 6060
+          name: debug
         resources:
           limits:
             cpu: "2"

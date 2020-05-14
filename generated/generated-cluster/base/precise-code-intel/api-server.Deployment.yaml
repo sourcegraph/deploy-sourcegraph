@@ -5,6 +5,7 @@ metadata:
     description: Serves precise code intelligence requests.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: precise-code-intel-api-server
 spec:
   minReadySeconds: 10
@@ -21,6 +22,7 @@ spec:
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: precise-code-intel-api-server
     spec:
       containers:
@@ -31,26 +33,28 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/precise-code-intel-api-server:insiders@sha256:aab8c6878c2625ac8a1a337707dd4abdfc321896983fc645ac21585276f60599
+        image: index.docker.io/sourcegraph/precise-code-intel-api-server:insiders@sha256:654499ae605b6a1480a7f8aab84dfc621e77214ba849cde12bce10a34bbece5d
         terminationMessagePolicy: FallbackToLogsOnError
         name: precise-code-intel-api-server
         livenessProbe:
           httpGet:
             path: /healthz
-            port: server
+            port: http
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /healthz
-            port: server
+            port: http
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
         - containerPort: 3186
-          name: server
+          name: http
+        - containerPort: 6060
+          name: debug
         resources:
           limits:
             cpu: "2"

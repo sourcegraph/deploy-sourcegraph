@@ -5,6 +5,7 @@ metadata:
     description: Stores and manages precise code intelligence bundles.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: precise-code-intel-bundle-manager
 spec:
   minReadySeconds: 10
@@ -14,45 +15,45 @@ spec:
     matchLabels:
       app: precise-code-intel-bundle-manager
   strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
+    type: Recreate
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: precise-code-intel-bundle-manager
     spec:
       containers:
       - env:
         - name: PRECISE_CODE_INTEL_API_SERVER_URL
           value: http://precise-code-intel-api-server:3186
-        - name: LSIF_STORAGE_ROOT
+        - name: PRECISE_CODE_INTEL_BUNDLE_DIR
           value: /lsif-storage
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/precise-code-intel-bundle-manager:insiders@sha256:12014e40198bb7b851a79965a67bc577ac4b491a77254ccf32ee3b1836421ce7
+        image: index.docker.io/sourcegraph/precise-code-intel-bundle-manager:insiders@sha256:7c38143e1648b3679766984ea75f8dcac4577e3a71768b814860cf12de9f44ff
         terminationMessagePolicy: FallbackToLogsOnError
         name: precise-code-intel-bundle-manager
         livenessProbe:
           httpGet:
             path: /healthz
-            port: server
+            port: http
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /healthz
-            port: server
+            port: http
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
         - containerPort: 3187
-          name: server
+          name: http
+        - containerPort: 6060
+          name: debug
         resources:
           limits:
             cpu: "2"

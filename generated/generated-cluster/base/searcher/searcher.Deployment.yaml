@@ -5,6 +5,7 @@ metadata:
     description: Backend for text search operations.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: searcher
 spec:
   minReadySeconds: 10
@@ -21,6 +22,7 @@ spec:
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: searcher
     spec:
       containers:
@@ -33,7 +35,7 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: index.docker.io/sourcegraph/searcher:insiders@sha256:df4a648676bc7e5d49cac3b1de0b6b8550c2fd9a6a0b3953efe1ea40fe371b0e
+        image: index.docker.io/sourcegraph/searcher:insiders@sha256:db7b6ed8be158e7f39a72be27310d3ae745e8be99215db52f7ac0a4bc6e830e7
         terminationMessagePolicy: FallbackToLogsOnError
         name: searcher
         ports:
@@ -58,7 +60,7 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: sourcegraph/jaeger-agent:3.15.0@sha256:dc476845a723dce8e44ce07a50b5abb218ec86cb9d75b0ca9601df76db1fb65b
+      - image: index.docker.io/sourcegraph/jaeger-agent:3.15.1@sha256:826c7466a4e00b048d7bb329aacb7f663d4af602c6ad9f8fec4c3d6ed37ce517
         name: jaeger-agent
         env:
         - name: POD_NAME

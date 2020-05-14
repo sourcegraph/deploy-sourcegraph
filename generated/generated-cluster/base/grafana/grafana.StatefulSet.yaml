@@ -5,6 +5,7 @@ metadata:
     description: Metrics/monitoring dashboards and alerts.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: grafana
 spec:
   replicas: 1
@@ -19,9 +20,10 @@ spec:
     metadata:
       labels:
         app: grafana
+        deploy: sourcegraph
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/grafana:insiders@sha256:da9678fd7f79afb0b01b2a3f116a208d19c795f77f418186ba3a178055caa94f
+      - image: index.docker.io/sourcegraph/grafana:insiders@sha256:f3fbf9845f0b65377f90a7a8eac253b90b77f9e53242e559031ccde247836776
         terminationMessagePolicy: FallbackToLogsOnError
         name: grafana
         ports:

@@ -5,6 +5,7 @@ metadata:
     description: Stores clones of repositories to perform Git operations.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: gitserver
 spec:
   replicas: 4
@@ -19,12 +20,13 @@ spec:
         app: gitserver
         group: backend
         type: gitserver
+        deploy: sourcegraph
     spec:
       containers:
       - args:
         - run
         env:
-        image: index.docker.io/sourcegraph/gitserver:insiders@sha256:e46e61c702345fb55206b87973f7c6b7f07fac0735201080b5b1e119605ce75c
+        image: index.docker.io/sourcegraph/gitserver:insiders@sha256:55b5c1c872811e289a0e69abbac3b83a9ce627e7c08f92165f4bdc979d570310
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 5
@@ -51,7 +53,7 @@ spec:
           #   name: ssh
         - name: ssh
           mountPath: /root/.ssh
-      - image: sourcegraph/jaeger-agent:3.15.0@sha256:dc476845a723dce8e44ce07a50b5abb218ec86cb9d75b0ca9601df76db1fb65b
+      - image: index.docker.io/sourcegraph/jaeger-agent:3.15.1@sha256:826c7466a4e00b048d7bb329aacb7f663d4af602c6ad9f8fec4c3d6ed37ce517
         name: jaeger-agent
         env:
         - name: POD_NAME

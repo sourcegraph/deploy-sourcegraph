@@ -6,6 +6,7 @@ metadata:
       external code hosts and other similar services.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: repo-updater
 spec:
   minReadySeconds: 10
@@ -22,10 +23,11 @@ spec:
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: repo-updater
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/repo-updater:insiders@sha256:868f2ee00d3fdc58b164b2f802e1f7ba8404c8e88364b0cf4c89a1339c3702d3
+      - image: index.docker.io/sourcegraph/repo-updater:insiders@sha256:5b2d5f6b62613d7da40c5fa16366fc3aba660426ec102692b7e30a2a3b708b36
         env:
         terminationMessagePolicy: FallbackToLogsOnError
         name: repo-updater
@@ -41,7 +43,7 @@ spec:
           requests:
             cpu: 100m
             memory: 500Mi
-      - image: sourcegraph/jaeger-agent:3.15.0@sha256:dc476845a723dce8e44ce07a50b5abb218ec86cb9d75b0ca9601df76db1fb65b
+      - image: index.docker.io/sourcegraph/jaeger-agent:3.15.1@sha256:826c7466a4e00b048d7bb329aacb7f663d4af602c6ad9f8fec4c3d6ed37ce517
         name: jaeger-agent
         env:
         - name: POD_NAME

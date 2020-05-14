@@ -5,6 +5,7 @@ metadata:
     description: Collects metrics and aggregates them into graphs.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: prometheus
 spec:
   minReadySeconds: 10
@@ -14,17 +15,15 @@ spec:
     matchLabels:
       app: prometheus
   strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
+    type: Recreate
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: prometheus
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/prometheus:insiders@sha256:473a5c94769bf9f73451f6727942202c920d6524f113b9f2cae7edaa033ca552
+      - image: index.docker.io/sourcegraph/prometheus:insiders@sha256:d0d80a7598b907624f106deebe5ecd7ba5c16ed47d913abee2085e18331f9a90
         terminationMessagePolicy: FallbackToLogsOnError
         name: prometheus
         readinessProbe:
