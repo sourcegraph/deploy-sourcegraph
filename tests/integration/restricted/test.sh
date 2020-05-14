@@ -76,3 +76,6 @@ kubectl -n ns-sourcegraph port-forward svc/sourcegraph-frontend 30080 &
 CLEANUP="kill $!; $CLEANUP"
 sleep 2 # (initial delay in port-forward activating)
 curl --retry-connrefused --retry 2 --retry-delay 10 -m 30 http://localhost:30080
+
+# run a validation script against it
+src-alpha -endpoint http://localhost:30080 validate -context github_token=$GITHUB_TOKEN validate.star
