@@ -5,7 +5,6 @@ set -ex
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 .buildkite/install-yj.sh
-.buildkite/install-src.sh
 
 if find base -name "*.yaml" -exec sh -c "cat {} | yj | jq --raw-output '.metadata.labels.deploy'" \; | tee /tmp/deploy-label | grep -v sourcegraph; then
   echo "> There exists a yaml file in base/ that does not contain .metadata.labels.deploy == sourcegraph"
