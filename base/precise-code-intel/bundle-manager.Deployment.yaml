@@ -5,6 +5,7 @@ metadata:
     description: Stores and manages precise code intelligence bundles.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: precise-code-intel-bundle-manager
 spec:
   minReadySeconds: 10
@@ -14,20 +15,18 @@ spec:
     matchLabels:
       app: precise-code-intel-bundle-manager
   strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
+    type: Recreate
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: precise-code-intel-bundle-manager
     spec:
       containers:
       - env:
         - name: PRECISE_CODE_INTEL_API_SERVER_URL
           value: http://precise-code-intel-api-server:3186
-        - name: LSIF_STORAGE_ROOT
+        - name: PRECISE_CODE_INTEL_BUNDLE_DIR
           value: /lsif-storage
         - name: POD_NAME
           valueFrom:
@@ -39,20 +38,22 @@ spec:
         livenessProbe:
           httpGet:
             path: /healthz
-            port: server
+            port: http
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /healthz
-            port: server
+            port: http
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
         - containerPort: 3187
-          name: server
+          name: http
+        - containerPort: 6060
+          name: debug
         resources:
           limits:
             cpu: "2"

@@ -5,6 +5,7 @@ metadata:
     description: Serves precise code intelligence requests.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: precise-code-intel-api-server
 spec:
   minReadySeconds: 10
@@ -21,6 +22,7 @@ spec:
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: precise-code-intel-api-server
     spec:
       containers:
@@ -37,20 +39,22 @@ spec:
         livenessProbe:
           httpGet:
             path: /healthz
-            port: server
+            port: http
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /healthz
-            port: server
+            port: http
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
         - containerPort: 3186
-          name: server
+          name: http
+        - containerPort: 6060
+          name: debug
         resources:
           limits:
             cpu: "2"

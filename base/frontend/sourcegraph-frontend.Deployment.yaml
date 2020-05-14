@@ -5,6 +5,7 @@ metadata:
     description: Serves the frontend of Sourcegraph via HTTP(S).
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: sourcegraph-frontend
 spec:
   minReadySeconds: 10
@@ -22,6 +23,7 @@ spec:
     metadata:
       labels:
         app: sourcegraph-frontend
+        deploy: sourcegraph
     spec:
       containers:
       - args:
@@ -88,7 +90,7 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: sourcegraph/jaeger-agent:3.15.0@sha256:dc476845a723dce8e44ce07a50b5abb218ec86cb9d75b0ca9601df76db1fb65b
+      - image: index.docker.io/sourcegraph/jaeger-agent:3.15.1@sha256:826c7466a4e00b048d7bb329aacb7f663d4af602c6ad9f8fec4c3d6ed37ce517
         name: jaeger-agent
         env:
           - name: POD_NAME

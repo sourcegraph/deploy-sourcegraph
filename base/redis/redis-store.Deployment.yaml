@@ -5,6 +5,7 @@ metadata:
     description: Redis for storing semi-persistent data like user sessions.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: redis-store
 spec:
   minReadySeconds: 10
@@ -14,13 +15,11 @@ spec:
     matchLabels:
       app: redis-store
   strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
+    type: Recreate
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: redis-store
     spec:
       containers:
