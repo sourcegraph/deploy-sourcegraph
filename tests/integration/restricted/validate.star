@@ -1,7 +1,7 @@
 def validate():
     if cloned:
        count = src_search_match_count("repo:^github.com/sourcegraph-testing/zap$ SugaredLogger count:99999")
-       return count == 16
+       return count > 0
     else:
        return False
 
