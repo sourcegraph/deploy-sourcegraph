@@ -60,7 +60,7 @@ spec:
           value: k8s+http://precise-code-intel-api-server:3186
         - name: PROMETHEUS_URL
           value: http://prometheus:30090
-        image: index.docker.io/sourcegraph/frontend:3.16.0-rc.5@sha256:7c256c3c9525450d0441e97ca2c583a82503fc7f779dc0e06d877ba29ad92ae2
+        image: index.docker.io/sourcegraph/frontend:3.16.0@sha256:055560401f9c06f0d56fdad9b9233a99770c573a48bd84d27b16609ac1c9658d
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -92,7 +92,7 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: index.docker.io/sourcegraph/jaeger-agent:3.16.0-rc.5@sha256:f818e8c99f5586f33f770d4ac639dcaa9786e68f3be39bdfeba36a402210754a
+      - image: index.docker.io/sourcegraph/jaeger-agent:3.16.0@sha256:ad1fc2f6b69ba3622f872bb105ef07dec5e5a539d30e733b006e88445dbe61e1
         name: jaeger-agent
         env:
           - name: POD_NAME
