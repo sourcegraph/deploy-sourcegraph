@@ -18,8 +18,3 @@ cp -R base "${BUILD_DIR}"/overlays/bases/rbac-roles/base
 mkdir -p $2
 
 kustomize build "${BUILD_DIR}"/overlays/$1 -o $2
-
-# strip out components for certain overlays
-if [[ $1 = non-privileged* ]]; then
-  find $2 -name *cadvisor* -type f -delete
-fi
