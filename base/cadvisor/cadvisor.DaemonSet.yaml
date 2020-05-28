@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    description: DaemonSet to ensure all nodes run a cAdvisor pod.
+    seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
+  labels:
+    deploy: sourcegraph
+    sourcegraph-resource-requires: cluster-admin
+  name: cadvisor
+spec:
+  selector:
+    matchLabels:
+      app: cadvisor
+  template:
+    metadata:
+      annotations:
+        description: Collects and exports container metrics.
+        prometheus.io/port: "48080"
+        sourcegraph.prometheus/scrape: "true"
+      labels:
+        deploy: sourcegraph
+        app: cadvisor
+    spec:
+      serviceAccountName: cadvisor
+      containers:
+      - name: cadvisor
+        image: index.docker.io/sourcegraph/cadvisor:insiders@sha256:4074c8bc608b78af3ca3d6e60b3794369a190ab2efd992e31b3079b075401efa
+        args:
+          - -port=48080
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 150m
+          limits:
+            memory: 2000Mi
+            cpu: 300m
+        volumeMounts:
+        - name: rootfs
+          mountPath: /rootfs
+          readOnly: true
+        - name: var-run
+          mountPath: /var/run
+          readOnly: true
+        - name: sys
+          mountPath: /sys
+          readOnly: true
+        - name: docker
+          mountPath: /var/lib/docker
+          readOnly: true
+        - name: disk
+          mountPath: /dev/disk
+          readOnly: true
+        ports:
+        - name: http
+          containerPort: 48080
+          protocol: TCP
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: rootfs
+        hostPath:
+          path: /
+      - name: var-run
+        hostPath:
+          path: /var/run
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: docker
+        hostPath:
+          path: /var/lib/docker
+      - name: disk
+        hostPath:
+          path: /dev/disk
