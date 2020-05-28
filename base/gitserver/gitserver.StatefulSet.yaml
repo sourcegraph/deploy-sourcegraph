@@ -8,7 +8,7 @@ metadata:
     sourcegraph-resource-requires: no-cluster-admin
   name: gitserver
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -39,11 +39,11 @@ spec:
           name: rpc
         resources:
           limits:
-            cpu: "4"
+            cpu: "8"
             memory: 8G
           requests:
             cpu: "4" 
-            memory: 8G
+            memory: 4G
         volumeMounts:
         - mountPath: /data/repos
           name: repos

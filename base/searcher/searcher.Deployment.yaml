@@ -9,7 +9,7 @@ metadata:
   name: searcher
 spec:
   minReadySeconds: 10
-  replicas: 1
+  replicas: 3
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -53,10 +53,10 @@ spec:
         resources:
           limits:
             cpu: "2"
-            memory: 2G
+            memory: 4G
           requests:
-            cpu: 500m
-            memory: 500M
+            cpu: 0.5
+            memory: 1G
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd

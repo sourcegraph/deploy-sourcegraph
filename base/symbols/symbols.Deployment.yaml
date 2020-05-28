@@ -9,7 +9,7 @@ metadata:
   name: symbols
 spec:
   minReadySeconds: 10
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -59,11 +59,11 @@ spec:
           name: debug
         resources:
           limits:
-            cpu: "2"
-            memory: 2G
+            cpu: "4"
+            memory: 4G
           requests:
-            cpu: 500m
-            memory: 500M
+            cpu: "1"
+            memory: 1G
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
