@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: grafana
 spec:
@@ -11,6 +11,6 @@ spec:
           command: ["sh", "-c", "chown -R 472:472 /var/lib/grafana"]
           volumeMounts:
             - mountPath: /var/lib/grafana
-              name: data
+              name: grafana-data
           securityContext:
             runAsUser: 0
