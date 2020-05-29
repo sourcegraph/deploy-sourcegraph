@@ -8,7 +8,7 @@ metadata:
     sourcegraph-resource-requires: no-cluster-admin
   name: indexed-search
 spec:
-  replicas: 1
+  replicas: 3
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -38,10 +38,10 @@ spec:
         resources:
           limits:
             cpu: "3"
-            memory: 36G
+            memory: 16G
           requests:
             cpu: "2"
-            memory: 36G
+            memory: 16G
         volumeMounts:
         - mountPath: /data
           name: data
