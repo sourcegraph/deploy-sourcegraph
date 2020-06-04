@@ -1,0 +1,48 @@
+package kube
+
+clusterRole: prometheus: {
+	apiVersion: "rbac.authorization.k8s.io/v1"
+	kind:       "ClusterRole"
+	metadata: {
+		labels: {
+			category:                        "rbac"
+			deploy:                          "sourcegraph"
+			"sourcegraph-resource-requires": "cluster-admin"
+		}
+		name: "prometheus"
+	}
+	rules: [{
+		apiGroups: [
+			"",
+		]
+		resources: [
+			"endpoints",
+			"namespaces",
+			"nodes",
+			"nodes/metrics",
+			"nodes/proxy",
+			"pods",
+			"services",
+		]
+		verbs: [
+			"get",
+			"list",
+			"watch",
+		]
+	}, {
+		apiGroups: [
+			"",
+		]
+		resources: [
+			"configmaps",
+		]
+		verbs: [
+			"get",
+		]
+	}, {
+		nonResourceURLs: [
+			"/metrics",
+		]
+		verbs: ["get"]
+	}]
+}

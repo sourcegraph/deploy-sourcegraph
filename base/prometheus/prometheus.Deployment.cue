@@ -1,0 +1,87 @@
+package kube
+
+deployment: prometheus: {
+	apiVersion: "apps/v1"
+	kind:       "Deployment"
+	metadata: {
+		annotations: description:                "Collects metrics and aggregates them into graphs."
+		labels: "sourcegraph-resource-requires": "no-cluster-admin"
+		name: "prometheus"
+	}
+	spec: {
+		minReadySeconds:      10
+		revisionHistoryLimit: 10
+		selector: matchLabels: app: "prometheus"
+		strategy: type: "Recreate"
+		template: {
+			metadata: labels: {
+				deploy: "sourcegraph"
+				app:    "prometheus"
+			}
+			spec: {
+				containers: [{
+					image:                    "index.docker.io/sourcegraph/prometheus:3.16.0@sha256:a1c1dd10d3deec10a20fef030c6fe26a7b72ccc93e9584b7b2db7fbf0ec0d311"
+					terminationMessagePolicy: "FallbackToLogsOnError"
+					name:                     "prometheus"
+					readinessProbe: {
+						httpGet: {
+							path: "/-/ready"
+							port: 9090
+						}
+						initialDelaySeconds: 30
+						timeoutSeconds:      30
+					}
+					livenessProbe: {
+						httpGet: {
+							path: "/-/healthy"
+							port: 9090
+						}
+						initialDelaySeconds: 30
+						timeoutSeconds:      30
+					}
+					ports: [{
+						containerPort: 9090
+						name:          "http"
+					}]
+					volumeMounts: [{
+						mountPath: "/prometheus"
+						name:      "data"
+					}, {
+						mountPath: "/sg_prometheus_add_ons"
+						name:      "config"
+					}]
+					// Prometheus is relied upon to monitor services for sending alerts to site admins when
+					// something is wrong with Sourcegraph, thus its memory requests and limits are the same to
+					// guarantee it has enough memory to perform its job reliably and prevent conflicts with
+					// other pods on the same host node.
+					//
+					// Its average memory usage may be much lower than 3G if Sourcegraph itself does not have
+					// much traffic, the 3G number chosen here is what works reliably on Sourcegraph.com with
+					// lots of traffic.
+					resources: {
+						limits: {
+							cpu:    *"2" | string | int
+							memory: *"3G" | string | int
+						}
+						requests: {
+							cpu:    *"500m" | string | int
+							memory: *"3G" | string | int
+						}
+					}
+				}]
+				securityContext: runAsUser: 0
+				serviceAccountName: "prometheus"
+				volumes: [{
+					name: "data"
+					persistentVolumeClaim: claimName: "prometheus"
+				}, {
+					configMap: {
+						defaultMode: 0o777
+						name:        "prometheus"
+					}
+					name: "config"
+				}]
+			}
+		}
+	}
+}

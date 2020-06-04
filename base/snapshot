@@ -1,0 +1,4397 @@
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    "sourcegraph-frontend-internal": {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "sourcegraph-frontend-internal"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "sourcegraph-frontend"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "http-internal"
+                port:       80
+                targetPort: "http-internal"
+            }]
+            selector: {
+                app: "sourcegraph-frontend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    "sourcegraph-frontend": {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "sourcegraph-frontend"
+            annotations: {
+                "prometheus.io/port":            "6060"
+                "sourcegraph.prometheus/scrape": "true"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "sourcegraph-frontend"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "http"
+                port:       30080
+                targetPort: "http"
+            }]
+            selector: {
+                app: "sourcegraph-frontend"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+ingress: {
+    "sourcegraph-frontend": {
+        apiVersion: "networking.k8s.io/v1beta1"
+        kind:       "Ingress"
+        metadata: {
+            name: "sourcegraph-frontend"
+            annotations: {
+                "kubernetes.io/ingress.class":                 "nginx"
+                "nginx.ingress.kubernetes.io/proxy-body-size": "150m"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "sourcegraph-frontend"
+            }
+        }
+        spec: {
+            rules: [{
+                http: {
+                    paths: [{
+                        path: "/"
+                        backend: {
+                            serviceName: "sourcegraph-frontend"
+                            servicePort: 30080
+                        }
+                    }]
+                }
+            }]
+        }
+    }
+}
+role: {
+    "sourcegraph-frontend": {
+        apiVersion: "rbac.authorization.k8s.io/v1"
+        kind:       "Role"
+        metadata: {
+            name: "sourcegraph-frontend"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "cluster-admin"
+                category:                        "rbac"
+            }
+        }
+        rules: [{
+            apiGroups: [""]
+            resources: ["endpoints", "services"]
+            verbs: ["get", "list", "watch"]
+        }]
+    }
+}
+roleBinding: {
+    "sourcegraph-frontend": {
+        apiVersion: "rbac.authorization.k8s.io/v1"
+        kind:       "RoleBinding"
+        metadata: {
+            name: "sourcegraph-frontend"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "cluster-admin"
+                category:                        "rbac"
+            }
+        }
+        roleRef: {
+            name:     "sourcegraph-frontend"
+            kind:     "Role"
+            apiGroup: ""
+        }
+        subjects: [{
+            name: "sourcegraph-frontend"
+            kind: "ServiceAccount"
+        }]
+    }
+}
+serviceAccount: {
+    "sourcegraph-frontend": {
+        apiVersion: "v1"
+        kind:       "ServiceAccount"
+        metadata: {
+            name: "sourcegraph-frontend"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                category:                        "rbac"
+            }
+        }
+        imagePullSecrets: [{
+            name: "docker-registry"
+        }]
+    }
+}
+deployment: {
+    "sourcegraph-frontend": {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "sourcegraph-frontend"
+            annotations: {
+                description: "Serves the frontend of Sourcegraph via HTTP(S)."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "sourcegraph-frontend"
+                }
+            }
+            minReadySeconds:      10
+            replicas:             1
+            revisionHistoryLimit: 10
+            strategy: {
+                type: "RollingUpdate"
+                rollingUpdate: {
+                    maxSurge:       2
+                    maxUnavailable: 0
+                }
+            }
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "sourcegraph-frontend"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "frontend"
+                        env: [{
+                            name:  "PGDATABASE"
+                            value: "sg"
+                        }, {
+                            name:  "PGHOST"
+                            value: "pgsql"
+                        }, {
+                            name:  "PGPORT"
+                            value: "5432"
+                        }, {
+                            name:  "PGSSLMODE"
+                            value: "disable"
+                        }, {
+                            name:  "PGUSER"
+                            value: "sg"
+                        }, {
+                            name:  "SRC_GIT_SERVERS"
+                            value: "gitserver-0.gitserver:3178"
+                        }, {
+                            name: "POD_NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    fieldPath: "metadata.name"
+                                }
+                            }
+                        }, {
+                            name:  "CACHE_DIR"
+                            value: "/mnt/cache/$(POD_NAME)"
+                        }, {
+                            name:  "GRAFANA_SERVER_URL"
+                            value: "http://grafana:30070"
+                        }, {
+                            name:  "PRECISE_CODE_INTEL_BUNDLE_MANAGER_URL"
+                            value: "http://precise-code-intel-bundle-manager:3187"
+                        }, {
+                            name:  "PROMETHEUS_URL"
+                            value: "http://prometheus:30090"
+                        }]
+                        ports: [{
+                            name:          "http"
+                            containerPort: 3080
+                        }, {
+                            name:          "http-internal"
+                            containerPort: 3090
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "2"
+                                memory: "4G"
+                            }
+                            requests: {
+                                cpu:    "2"
+                                memory: "2G"
+                            }
+                        }
+                        args: ["serve"]
+                        image:                    "index.docker.io/sourcegraph/frontend:3.16.0@sha256:055560401f9c06f0d56fdad9b9233a99770c573a48bd84d27b16609ac1c9658d"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        livenessProbe: {
+                            httpGet: {
+                                path:   "/healthz"
+                                port:   "http"
+                                scheme: "HTTP"
+                            }
+                            initialDelaySeconds: 300
+                            timeoutSeconds:      5
+                        }
+                        readinessProbe: {
+                            httpGet: {
+                                path:   "/healthz"
+                                port:   "http"
+                                scheme: "HTTP"
+                            }
+                            timeoutSeconds: 5
+                            periodSeconds:  5
+                        }
+                        volumeMounts: [{
+                            name:      "cache-ssd"
+                            mountPath: "/mnt/cache"
+                        }]
+                    }, {
+                        name: "jaeger-agent"
+                        env: [{
+                            name: "POD_NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    apiVersion: "v1"
+                                    fieldPath:  "metadata.name"
+                                }
+                            }
+                        }]
+                        ports: [{
+                            containerPort: 5775
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 5778
+                            protocol:      "TCP"
+                        }, {
+                            containerPort: 6831
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 6832
+                            protocol:      "UDP"
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "1"
+                                memory: "500M"
+                            }
+                            requests: {
+                                cpu:    "100m"
+                                memory: "100M"
+                            }
+                        }
+                        args: ["--reporter.grpc.host-port=jaeger-collector:14250", "--reporter.type=grpc"]
+                        image: "index.docker.io/sourcegraph/jaeger-agent:3.16.0@sha256:ad1fc2f6b69ba3622f872bb105ef07dec5e5a539d30e733b006e88445dbe61e1"
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                    serviceAccountName: "sourcegraph-frontend"
+                    volumes: [{
+                        name: "cache-ssd"
+                        emptyDir: {}
+                    }]
+                }
+            }
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    "github-proxy": {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "github-proxy"
+            annotations: {
+                "prometheus.io/port":            "6060"
+                "sourcegraph.prometheus/scrape": "true"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "github-proxy"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "http"
+                port:       80
+                targetPort: "http"
+            }]
+            selector: {
+                app: "github-proxy"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+deployment: {
+    "github-proxy": {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "github-proxy"
+            annotations: {
+                description: "Rate-limiting proxy for the GitHub API."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "github-proxy"
+                }
+            }
+            minReadySeconds:      10
+            replicas:             1
+            revisionHistoryLimit: 10
+            strategy: {
+                type: "RollingUpdate"
+                rollingUpdate: {
+                    maxSurge:       1
+                    maxUnavailable: 0
+                }
+            }
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "github-proxy"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "github-proxy"
+                        env:  null
+                        ports: [{
+                            name:          "http"
+                            containerPort: 3180
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "1"
+                                memory: "1G"
+                            }
+                            requests: {
+                                cpu:    "100m"
+                                memory: "250M"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/github-proxy:3.16.0@sha256:95bedbc3cd61cdbab1d413cdd44d3de7ae9c99261ab4bd6065520433c515a955"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                    }, {
+                        name: "jaeger-agent"
+                        env: [{
+                            name: "POD_NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    apiVersion: "v1"
+                                    fieldPath:  "metadata.name"
+                                }
+                            }
+                        }]
+                        ports: [{
+                            containerPort: 5775
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 5778
+                            protocol:      "TCP"
+                        }, {
+                            containerPort: 6831
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 6832
+                            protocol:      "UDP"
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "1"
+                                memory: "500M"
+                            }
+                            requests: {
+                                cpu:    "100m"
+                                memory: "100M"
+                            }
+                        }
+                        args: ["--reporter.grpc.host-port=jaeger-collector:14250", "--reporter.type=grpc"]
+                        image: "index.docker.io/sourcegraph/jaeger-agent:3.16.0@sha256:ad1fc2f6b69ba3622f872bb105ef07dec5e5a539d30e733b006e88445dbe61e1"
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                }
+            }
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    gitserver: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "gitserver"
+            annotations: {
+                description:                     "Headless service that provides a stable network identity for the gitserver stateful set."
+                "prometheus.io/port":            "6060"
+                "sourcegraph.prometheus/scrape": "true"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                type:                            "gitserver"
+                app:                             "gitserver"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                type: "gitserver"
+                app:  "gitserver"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+statefulSet: {
+    gitserver: {
+        apiVersion: "apps/v1"
+        kind:       "StatefulSet"
+        metadata: {
+            name: "gitserver"
+            annotations: {
+                description: "Stores clones of repositories to perform Git operations."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "gitserver"
+                }
+            }
+            serviceName:          "gitserver"
+            replicas:             1
+            revisionHistoryLimit: 10
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        group:  "backend"
+                        type:   "gitserver"
+                        app:    "gitserver"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "gitserver"
+                        env:  null
+                        ports: [{
+                            name:          "rpc"
+                            containerPort: 3178
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "4"
+                                memory: "8G"
+                            }
+                            requests: {
+                                cpu:    "4"
+                                memory: "8G"
+                            }
+                        }
+                        args: ["run"]
+                        image:                    "index.docker.io/sourcegraph/gitserver:3.16.0@sha256:31987e80f7137fe635add74f24d60872db8702d4fb07b5e00dcd4877ab9bcb21"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        livenessProbe: {
+                            initialDelaySeconds: 5
+                            timeoutSeconds:      5
+                            tcpSocket: {
+                                port: "rpc"
+                            }
+                        }
+                        volumeMounts: [{
+                            name:      "repos"
+                            mountPath: "/data/repos"
+                        }]
+                    }, {
+                        name: "jaeger-agent"
+                        env: [{
+                            name: "POD_NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    apiVersion: "v1"
+                                    fieldPath:  "metadata.name"
+                                }
+                            }
+                        }]
+                        ports: [{
+                            containerPort: 5775
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 5778
+                            protocol:      "TCP"
+                        }, {
+                            containerPort: 6831
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 6832
+                            protocol:      "UDP"
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "1"
+                                memory: "500M"
+                            }
+                            requests: {
+                                cpu:    "100m"
+                                memory: "100M"
+                            }
+                        }
+                        args: ["--reporter.grpc.host-port=jaeger-collector:14250", "--reporter.type=grpc"]
+                        image: "index.docker.io/sourcegraph/jaeger-agent:3.16.0@sha256:ad1fc2f6b69ba3622f872bb105ef07dec5e5a539d30e733b006e88445dbe61e1"
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                    volumes: [{
+                        name: "repos"
+                    }]
+                }
+            }
+            updateStrategy: {
+                type: "RollingUpdate"
+            }
+            volumeClaimTemplates: [{
+                metadata: {
+                    name: "repos"
+                }
+                spec: {
+                    resources: {
+                        requests: {
+                            storage: "200Gi"
+                        }
+                    }
+                    accessModes: ["ReadWriteOnce"]
+                    storageClassName: "sourcegraph"
+                }
+            }]
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    grafana: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "grafana"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "grafana"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "http"
+                port:       30070
+                targetPort: "http"
+            }]
+            selector: {
+                app: "grafana"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+serviceAccount: {
+    grafana: {
+        apiVersion: "v1"
+        kind:       "ServiceAccount"
+        metadata: {
+            name: "grafana"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                category:                        "rbac"
+            }
+        }
+        imagePullSecrets: [{
+            name: "docker-registry"
+        }]
+    }
+}
+statefulSet: {
+    grafana: {
+        apiVersion: "apps/v1"
+        kind:       "StatefulSet"
+        metadata: {
+            name: "grafana"
+            annotations: {
+                description: "Metrics/monitoring dashboards and alerts."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "grafana"
+                }
+            }
+            serviceName:          "grafana"
+            replicas:             1
+            revisionHistoryLimit: 10
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "grafana"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "grafana"
+                        ports: [{
+                            name:          "http"
+                            containerPort: 3370
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    1
+                                memory: "512Mi"
+                            }
+                            requests: {
+                                cpu:    "100m"
+                                memory: "512Mi"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/grafana:3.16.0@sha256:771dd20ea85af7ba188022078f6937f035cab48f312929b8056831b0418b8cfe"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        volumeMounts: [{
+                            name:      "grafana-data"
+                            mountPath: "/var/lib/grafana"
+                        }, {
+                            name:      "config"
+                            mountPath: "/sg_config_grafana/provisioning/datasources"
+                        }]
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                    serviceAccountName: "grafana"
+                    volumes: [{
+                        name: "config"
+                        configMap: {
+                            name:        "grafana"
+                            defaultMode: 511
+                        }
+                    }]
+                }
+            }
+            updateStrategy: {
+                type: "RollingUpdate"
+            }
+            volumeClaimTemplates: [{
+                metadata: {
+                    name: "grafana-data"
+                }
+                spec: {
+                    resources: {
+                        requests: {
+                            storage: "2Gi"
+                        }
+                    }
+                    accessModes: ["ReadWriteOnce"]
+                    storageClassName: "sourcegraph"
+                }
+            }]
+        }
+    }
+}
+configMap: {
+    grafana: {
+        apiVersion: "v1"
+        kind:       "ConfigMap"
+        metadata: {
+            name: "grafana"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        data: {
+            "prometheus.yml": """
+        apiVersion: 1
+        datasources:
+        - name: Prometheus
+          url: http://prometheus:30090
+          type: prometheus
+          access: proxy
+          isDefault: true
+          editable: false
+        
+        """
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    "indexed-search": {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "indexed-search"
+            annotations: {
+                description:                     "Headless service that provides a stable network identity for the indexed-search stateful set."
+                "sourcegraph.prometheus/scrape": "true"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "indexed-search"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                port: 6070
+            }]
+            selector: {
+                app: "indexed-search"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+statefulSet: {
+    "indexed-search": {
+        apiVersion: "apps/v1"
+        kind:       "StatefulSet"
+        metadata: {
+            name: "indexed-search"
+            annotations: {
+                description: "Backend for indexed text search operations."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "indexed-search"
+                }
+            }
+            serviceName:          "indexed-search"
+            replicas:             1
+            revisionHistoryLimit: 10
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "indexed-search"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "zoekt-webserver"
+                        env:  null
+                        ports: [{
+                            name:          "http"
+                            containerPort: 6070
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "2"
+                                memory: "4G"
+                            }
+                            requests: {
+                                cpu:    "500m"
+                                memory: "2G"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/indexed-searcher:3.16.0@sha256:d8b0fa59f7825acc51ef3cfe9d625019555dceb3272d44b52e396cc7748eaa06"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        readinessProbe: {
+                            httpGet: {
+                                path:   "/healthz"
+                                port:   "http"
+                                scheme: "HTTP"
+                            }
+                            periodSeconds:    1
+                            failureThreshold: 1
+                        }
+                        volumeMounts: [{
+                            name:      "data"
+                            mountPath: "/data"
+                        }]
+                    }, {
+                        name: "zoekt-indexserver"
+                        env:  null
+                        ports: [{
+                            name:          "index-http"
+                            containerPort: 6072
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "8"
+                                memory: "8G"
+                            }
+                            requests: {
+                                cpu:    "4"
+                                memory: "4G"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/search-indexer:3.16.0@sha256:fa1eaf045fbd2cab1cd2666046718e47d43012efbe07ad68beda0ac778f62875"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        volumeMounts: [{
+                            name:      "data"
+                            mountPath: "/data"
+                        }]
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                    volumes: [{
+                        name: "data"
+                    }]
+                }
+            }
+            updateStrategy: {
+                type: "RollingUpdate"
+            }
+            volumeClaimTemplates: [{
+                metadata: {
+                    name: "data"
+                    labels: {
+                        deploy: "sourcegraph"
+                    }
+                }
+                spec: {
+                    resources: {
+                        requests: {
+                            storage: "200Gi"
+                        }
+                    }
+                    accessModes: ["ReadWriteOnce"]
+                    storageClassName: "sourcegraph"
+                }
+            }]
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    "jaeger-collector": {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "jaeger-collector"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "jaeger"
+                "app.kubernetes.io/name":        "jaeger"
+                "app.kubernetes.io/component":   "collector"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "jaeger-collector-tchannel"
+                port:       14267
+                targetPort: 14267
+                protocol:   "TCP"
+            }, {
+                name:       "jaeger-collector-http"
+                port:       14268
+                targetPort: 14268
+                protocol:   "TCP"
+            }, {
+                name:       "jaeger-collector-grpc"
+                port:       14250
+                targetPort: 14250
+                protocol:   "TCP"
+            }]
+            selector: {
+                "app.kubernetes.io/name":      "jaeger"
+                "app.kubernetes.io/component": "all-in-one"
+            }
+            type: "ClusterIP"
+        }
+    }
+    "jaeger-query": {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "jaeger-query"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "jaeger"
+                "app.kubernetes.io/name":        "jaeger"
+                "app.kubernetes.io/component":   "query"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "query-http"
+                port:       16686
+                targetPort: 16686
+                protocol:   "TCP"
+            }]
+            selector: {
+                "app.kubernetes.io/name":      "jaeger"
+                "app.kubernetes.io/component": "all-in-one"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+deployment: {
+    jaeger: {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "jaeger"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "jaeger"
+                "app.kubernetes.io/name":        "jaeger"
+                "app.kubernetes.io/component":   "all-in-one"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app:                           "jaeger"
+                    "app.kubernetes.io/name":      "jaeger"
+                    "app.kubernetes.io/component": "all-in-one"
+                }
+            }
+            replicas: 1
+            strategy: {
+                type: "Recreate"
+            }
+            template: {
+                metadata: {
+                    annotations: {
+                        "prometheus.io/port":   "16686"
+                        "prometheus.io/scrape": "true"
+                    }
+                    labels: {
+                        deploy:                        "sourcegraph"
+                        app:                           "jaeger"
+                        "app.kubernetes.io/name":      "jaeger"
+                        "app.kubernetes.io/component": "all-in-one"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "jaeger"
+                        ports: [{
+                            containerPort: 5775
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 6831
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 6832
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 5778
+                            protocol:      "TCP"
+                        }, {
+                            containerPort: 16686
+                            protocol:      "TCP"
+                        }, {
+                            containerPort: 14250
+                            protocol:      "TCP"
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    1
+                                memory: "1G"
+                            }
+                            requests: {
+                                cpu:    "500m"
+                                memory: "500M"
+                            }
+                        }
+                        args: ["--memory.max-traces=20000"]
+                        image: "index.docker.io/sourcegraph/jaeger-all-in-one:3.16.0@sha256:5dc2e970804028fc945abffc6c961d755df3b1d7b0b6f6516e9f67cb218ed249"
+                        readinessProbe: {
+                            httpGet: {
+                                path: "/"
+                                port: 14269
+                            }
+                            initialDelaySeconds: 5
+                        }
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                }
+            }
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    pgsql: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "pgsql"
+            annotations: {
+                "prometheus.io/port":            "9187"
+                "sourcegraph.prometheus/scrape": "true"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "pgsql"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "pgsql"
+                port:       5432
+                targetPort: "pgsql"
+            }]
+            selector: {
+                app: "pgsql"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+deployment: {
+    pgsql: {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "pgsql"
+            annotations: {
+                description: "Postgres database for various data."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "pgsql"
+                }
+            }
+            minReadySeconds:      10
+            replicas:             1
+            revisionHistoryLimit: 10
+            strategy: {
+                type: "Recreate"
+            }
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        group:  "backend"
+                        app:    "pgsql"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "pgsql"
+                        env:  null
+                        ports: [{
+                            name:          "pgsql"
+                            containerPort: 5432
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "4"
+                                memory: "2Gi"
+                            }
+                            requests: {
+                                cpu:    "4"
+                                memory: "2Gi"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/postgres-11.4:3.16.0@sha256:63090799b34b3115a387d96fe2227a37999d432b774a1d9b7966b8c5d81b56ad"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        livenessProbe: {
+                            initialDelaySeconds: 15
+                            exec: {
+                                command: ["/liveness.sh"]
+                            }
+                        }
+                        readinessProbe: {
+                            exec: {
+                                command: ["/ready.sh"]
+                            }
+                        }
+                        volumeMounts: [{
+                            name:      "disk"
+                            mountPath: "/data"
+                        }, {
+                            name:      "pgsql-conf"
+                            mountPath: "/conf"
+                        }]
+                    }, {
+                        name: "pgsql-exporter"
+                        env: [{
+                            name:  "DATA_SOURCE_NAME"
+                            value: "postgres://sg:@localhost:5432/?sslmode=disable"
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "10m"
+                                memory: "50Mi"
+                            }
+                            requests: {
+                                cpu:    "10m"
+                                memory: "50Mi"
+                            }
+                        }
+                        image:                    "wrouesnel/postgres_exporter:v0.7.0@sha256:785c919627c06f540d515aac88b7966f352403f73e931e70dc2cbf783146a98b"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                    volumes: [{
+                        name: "disk"
+                        persistentVolumeClaim: {
+                            claimName: "pgsql"
+                        }
+                    }, {
+                        name: "pgsql-conf"
+                        configMap: {
+                            name:        "pgsql-conf"
+                            defaultMode: 511
+                        }
+                    }]
+                    initContainers: [{
+                        name:  "correct-data-dir-permissions"
+                        image: "sourcegraph/alpine:3.10@sha256:4d05cd5669726fc38823e92320659a6d1ef7879e62268adec5df658a0bacf65c"
+                        volumeMounts: [{
+                            name:      "disk"
+                            mountPath: "/data"
+                        }]
+                        securityContext: {
+                            runAsUser: 0
+                        }
+                        command: ["sh", "-c", "if [ -d /data/pgdata-11 ]; then chmod 750 /data/pgdata-11; fi"]
+                    }]
+                }
+            }
+        }
+    }
+}
+configMap: {
+    "pgsql-conf": {
+        apiVersion: "v1"
+        kind:       "ConfigMap"
+        metadata: {
+            name: "pgsql-conf"
+            annotations: {
+                description: "Configuration for PostgreSQL"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        data: {
+            "postgresql.conf": """
+        # -----------------------------
+        # PostgreSQL configuration file
+        # -----------------------------
+        #
+        # This file consists of lines of the form:
+        #
+        #   name = value
+        #
+        # (The \"=\" is optional.)  Whitespace may be used.  Comments are introduced with
+        # \"#\" anywhere on a line.  The complete list of parameter names and allowed
+        # values can be found in the PostgreSQL documentation.
+        #
+        # The commented-out settings shown in this file represent the default values.
+        # Re-commenting a setting is NOT sufficient to revert it to the default value;
+        # you need to reload the server.
+        #
+        # This file is read on server startup and when the server receives a SIGHUP
+        # signal.  If you edit the file on a running system, you have to SIGHUP the
+        # server for the changes to take effect, run \"pg_ctl reload\", or execute
+        # \"SELECT pg_reload_conf()\".  Some parameters, which are marked below,
+        # require a server shutdown and restart to take effect.
+        #
+        # Any parameter can also be given as a command-line option to the server, e.g.,
+        # \"postgres -c log_connections=on\".  Some parameters can be changed at run time
+        # with the \"SET\" SQL command.
+        #
+        # Memory units:  kB = kilobytes        Time units:  ms  = milliseconds
+        #                MB = megabytes                     s   = seconds
+        #                GB = gigabytes                     min = minutes
+        #                TB = terabytes                     h   = hours
+        #                                                   d   = days
+        
+        
+        #------------------------------------------------------------------------------
+        # FILE LOCATIONS
+        #------------------------------------------------------------------------------
+        
+        # The default values of these variables are driven from the -D command-line
+        # option or PGDATA environment variable, represented here as ConfigDir.
+        
+        #data_directory = 'ConfigDir'\t\t# use data in another directory
+        \t\t\t\t\t# (change requires restart)
+        #hba_file = 'ConfigDir/pg_hba.conf'\t# host-based authentication file
+        \t\t\t\t\t# (change requires restart)
+        #ident_file = 'ConfigDir/pg_ident.conf'\t# ident configuration file
+        \t\t\t\t\t# (change requires restart)
+        
+        # If external_pid_file is not explicitly set, no extra PID file is written.
+        #external_pid_file = ''\t\t\t# write an extra PID file
+        \t\t\t\t\t# (change requires restart)
+        
+        
+        #------------------------------------------------------------------------------
+        # CONNECTIONS AND AUTHENTICATION
+        #------------------------------------------------------------------------------
+        
+        # - Connection Settings -
+        
+        listen_addresses = '*'
+        \t\t\t\t\t# comma-separated list of addresses;
+        \t\t\t\t\t# defaults to 'localhost'; use '*' for all
+        \t\t\t\t\t# (change requires restart)
+        #port = 5432\t\t\t\t# (change requires restart)
+        max_connections = 100\t\t\t# (change requires restart)
+        #superuser_reserved_connections = 3\t# (change requires restart)
+        #unix_socket_directories = '/var/run/postgresql'\t# comma-separated list of directories
+        \t\t\t\t\t# (change requires restart)
+        #unix_socket_group = ''\t\t\t# (change requires restart)
+        #unix_socket_permissions = 0777\t\t# begin with 0 to use octal notation
+        \t\t\t\t\t# (change requires restart)
+        #bonjour = off\t\t\t\t# advertise server via Bonjour
+        \t\t\t\t\t# (change requires restart)
+        #bonjour_name = ''\t\t\t# defaults to the computer name
+        \t\t\t\t\t# (change requires restart)
+        
+        # - TCP Keepalives -
+        # see \"man 7 tcp\" for details
+        
+        #tcp_keepalives_idle = 0\t\t# TCP_KEEPIDLE, in seconds;
+        \t\t\t\t\t# 0 selects the system default
+        #tcp_keepalives_interval = 0\t\t# TCP_KEEPINTVL, in seconds;
+        \t\t\t\t\t# 0 selects the system default
+        #tcp_keepalives_count = 0\t\t# TCP_KEEPCNT;
+        \t\t\t\t\t# 0 selects the system default
+        
+        # - Authentication -
+        
+        #authentication_timeout = 1min\t\t# 1s-600s
+        #password_encryption = md5\t\t# md5 or scram-sha-256
+        #db_user_namespace = off
+        
+        # GSSAPI using Kerberos
+        #krb_server_keyfile = ''
+        #krb_caseins_users = off
+        
+        # - SSL -
+        
+        #ssl = off
+        #ssl_ca_file = ''
+        #ssl_cert_file = 'server.crt'
+        #ssl_crl_file = ''
+        #ssl_key_file = 'server.key'
+        #ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL' # allowed SSL ciphers
+        #ssl_prefer_server_ciphers = on
+        #ssl_ecdh_curve = 'prime256v1'
+        #ssl_dh_params_file = ''
+        #ssl_passphrase_command = ''
+        #ssl_passphrase_command_supports_reload = off
+        
+        
+        #------------------------------------------------------------------------------
+        # RESOURCE USAGE (except WAL)
+        #------------------------------------------------------------------------------
+        
+        # - Memory -
+        
+        shared_buffers = 128MB\t\t\t# min 128kB
+        \t\t\t\t\t# (change requires restart)
+        #huge_pages = try\t\t\t# on, off, or try
+        \t\t\t\t\t# (change requires restart)
+        #temp_buffers = 8MB\t\t\t# min 800kB
+        #max_prepared_transactions = 0\t\t# zero disables the feature
+        \t\t\t\t\t# (change requires restart)
+        # Caution: it is not advisable to set max_prepared_transactions nonzero unless
+        # you actively intend to use prepared transactions.
+        #work_mem = 4MB\t\t\t\t# min 64kB
+        #maintenance_work_mem = 64MB\t\t# min 1MB
+        #autovacuum_work_mem = -1\t\t# min 1MB, or -1 to use maintenance_work_mem
+        #max_stack_depth = 2MB\t\t\t# min 100kB
+        dynamic_shared_memory_type = posix\t# the default is the first option
+        \t\t\t\t\t# supported by the operating system:
+        \t\t\t\t\t#   posix
+        \t\t\t\t\t#   sysv
+        \t\t\t\t\t#   windows
+        \t\t\t\t\t#   mmap
+        \t\t\t\t\t# use none to disable dynamic shared memory
+        \t\t\t\t\t# (change requires restart)
+        
+        # - Disk -
+        
+        #temp_file_limit = -1\t\t\t# limits per-process temp file space
+        \t\t\t\t\t# in kB, or -1 for no limit
+        
+        # - Kernel Resources -
+        
+        #max_files_per_process = 1000\t\t# min 25
+        \t\t\t\t\t# (change requires restart)
+        
+        # - Cost-Based Vacuum Delay -
+        
+        #vacuum_cost_delay = 0\t\t\t# 0-100 milliseconds
+        #vacuum_cost_page_hit = 1\t\t# 0-10000 credits
+        #vacuum_cost_page_miss = 10\t\t# 0-10000 credits
+        #vacuum_cost_page_dirty = 20\t\t# 0-10000 credits
+        #vacuum_cost_limit = 200\t\t# 1-10000 credits
+        
+        # - Background Writer -
+        
+        #bgwriter_delay = 200ms\t\t\t# 10-10000ms between rounds
+        #bgwriter_lru_maxpages = 100\t\t# max buffers written/round, 0 disables
+        #bgwriter_lru_multiplier = 2.0\t\t# 0-10.0 multiplier on buffers scanned/round
+        #bgwriter_flush_after = 512kB\t\t# measured in pages, 0 disables
+        
+        # - Asynchronous Behavior -
+        
+        #effective_io_concurrency = 1\t\t# 1-1000; 0 disables prefetching
+        #max_worker_processes = 8\t\t# (change requires restart)
+        #max_parallel_maintenance_workers = 2\t# taken from max_parallel_workers
+        #max_parallel_workers_per_gather = 2\t# taken from max_parallel_workers
+        #parallel_leader_participation = on
+        #max_parallel_workers = 8\t\t# maximum number of max_worker_processes that
+        \t\t\t\t\t# can be used in parallel operations
+        #old_snapshot_threshold = -1\t\t# 1min-60d; -1 disables; 0 is immediate
+        \t\t\t\t\t# (change requires restart)
+        #backend_flush_after = 0\t\t# measured in pages, 0 disables
+        
+        
+        #------------------------------------------------------------------------------
+        # WRITE-AHEAD LOG
+        #------------------------------------------------------------------------------
+        
+        # - Settings -
+        
+        #wal_level = replica\t\t\t# minimal, replica, or logical
+        \t\t\t\t\t# (change requires restart)
+        #fsync = on\t\t\t\t# flush data to disk for crash safety
+        \t\t\t\t\t# (turning this off can cause
+        \t\t\t\t\t# unrecoverable data corruption)
+        #synchronous_commit = on\t\t# synchronization level;
+        \t\t\t\t\t# off, local, remote_write, remote_apply, or on
+        #wal_sync_method = fsync\t\t# the default is the first option
+        \t\t\t\t\t# supported by the operating system:
+        \t\t\t\t\t#   open_datasync
+        \t\t\t\t\t#   fdatasync (default on Linux)
+        \t\t\t\t\t#   fsync
+        \t\t\t\t\t#   fsync_writethrough
+        \t\t\t\t\t#   open_sync
+        #full_page_writes = on\t\t\t# recover from partial page writes
+        #wal_compression = off\t\t\t# enable compression of full-page writes
+        #wal_log_hints = off\t\t\t# also do full page writes of non-critical updates
+        \t\t\t\t\t# (change requires restart)
+        #wal_buffers = -1\t\t\t# min 32kB, -1 sets based on shared_buffers
+        \t\t\t\t\t# (change requires restart)
+        #wal_writer_delay = 200ms\t\t# 1-10000 milliseconds
+        #wal_writer_flush_after = 1MB\t\t# measured in pages, 0 disables
+        
+        #commit_delay = 0\t\t\t# range 0-100000, in microseconds
+        #commit_siblings = 5\t\t\t# range 1-1000
+        
+        # - Checkpoints -
+        
+        #checkpoint_timeout = 5min\t\t# range 30s-1d
+        max_wal_size = 1GB
+        min_wal_size = 80MB
+        #checkpoint_completion_target = 0.5\t# checkpoint target duration, 0.0 - 1.0
+        #checkpoint_flush_after = 256kB\t\t# measured in pages, 0 disables
+        #checkpoint_warning = 30s\t\t# 0 disables
+        
+        # - Archiving -
+        
+        #archive_mode = off\t\t# enables archiving; off, on, or always
+        \t\t\t\t# (change requires restart)
+        #archive_command = ''\t\t# command to use to archive a logfile segment
+        \t\t\t\t# placeholders: %p = path of file to archive
+        \t\t\t\t#               %f = file name only
+        \t\t\t\t# e.g. 'test ! -f /mnt/server/archivedir/%f && cp %p /mnt/server/archivedir/%f'
+        #archive_timeout = 0\t\t# force a logfile segment switch after this
+        \t\t\t\t# number of seconds; 0 disables
+        
+        
+        #------------------------------------------------------------------------------
+        # REPLICATION
+        #------------------------------------------------------------------------------
+        
+        # - Sending Servers -
+        
+        # Set these on the master and on any standby that will send replication data.
+        
+        #max_wal_senders = 10\t\t# max number of walsender processes
+        \t\t\t\t# (change requires restart)
+        #wal_keep_segments = 0\t\t# in logfile segments; 0 disables
+        #wal_sender_timeout = 60s\t# in milliseconds; 0 disables
+        
+        #max_replication_slots = 10\t# max number of replication slots
+        \t\t\t\t# (change requires restart)
+        #track_commit_timestamp = off\t# collect timestamp of transaction commit
+        \t\t\t\t# (change requires restart)
+        
+        # - Master Server -
+        
+        # These settings are ignored on a standby server.
+        
+        #synchronous_standby_names = ''\t# standby servers that provide sync rep
+        \t\t\t\t# method to choose sync standbys, number of sync standbys,
+        \t\t\t\t# and comma-separated list of application_name
+        \t\t\t\t# from standby(s); '*' = all
+        #vacuum_defer_cleanup_age = 0\t# number of xacts by which cleanup is delayed
+        
+        # - Standby Servers -
+        
+        # These settings are ignored on a master server.
+        
+        #hot_standby = on\t\t\t# \"off\" disallows queries during recovery
+        \t\t\t\t\t# (change requires restart)
+        #max_standby_archive_delay = 30s\t# max delay before canceling queries
+        \t\t\t\t\t# when reading WAL from archive;
+        \t\t\t\t\t# -1 allows indefinite delay
+        #max_standby_streaming_delay = 30s\t# max delay before canceling queries
+        \t\t\t\t\t# when reading streaming WAL;
+        \t\t\t\t\t# -1 allows indefinite delay
+        #wal_receiver_status_interval = 10s\t# send replies at least this often
+        \t\t\t\t\t# 0 disables
+        #hot_standby_feedback = off\t\t# send info from standby to prevent
+        \t\t\t\t\t# query conflicts
+        #wal_receiver_timeout = 60s\t\t# time that receiver waits for
+        \t\t\t\t\t# communication from master
+        \t\t\t\t\t# in milliseconds; 0 disables
+        #wal_retrieve_retry_interval = 5s\t# time to wait before retrying to
+        \t\t\t\t\t# retrieve WAL after a failed attempt
+        
+        # - Subscribers -
+        
+        # These settings are ignored on a publisher.
+        
+        #max_logical_replication_workers = 4\t# taken from max_worker_processes
+        \t\t\t\t\t# (change requires restart)
+        #max_sync_workers_per_subscription = 2\t# taken from max_logical_replication_workers
+        
+        
+        #------------------------------------------------------------------------------
+        # QUERY TUNING
+        #------------------------------------------------------------------------------
+        
+        # - Planner Method Configuration -
+        
+        #enable_bitmapscan = on
+        #enable_hashagg = on
+        #enable_hashjoin = on
+        #enable_indexscan = on
+        #enable_indexonlyscan = on
+        #enable_material = on
+        #enable_mergejoin = on
+        #enable_nestloop = on
+        #enable_parallel_append = on
+        #enable_seqscan = on
+        #enable_sort = on
+        #enable_tidscan = on
+        #enable_partitionwise_join = off
+        #enable_partitionwise_aggregate = off
+        #enable_parallel_hash = on
+        #enable_partition_pruning = on
+        
+        # - Planner Cost Constants -
+        
+        #seq_page_cost = 1.0\t\t\t# measured on an arbitrary scale
+        #random_page_cost = 4.0\t\t\t# same scale as above
+        #cpu_tuple_cost = 0.01\t\t\t# same scale as above
+        #cpu_index_tuple_cost = 0.005\t\t# same scale as above
+        #cpu_operator_cost = 0.0025\t\t# same scale as above
+        #parallel_tuple_cost = 0.1\t\t# same scale as above
+        #parallel_setup_cost = 1000.0\t# same scale as above
+        
+        #jit_above_cost = 100000\t\t# perform JIT compilation if available
+        \t\t\t\t\t# and query more expensive than this;
+        \t\t\t\t\t# -1 disables
+        #jit_inline_above_cost = 500000\t\t# inline small functions if query is
+        \t\t\t\t\t# more expensive than this; -1 disables
+        #jit_optimize_above_cost = 500000\t# use expensive JIT optimizations if
+        \t\t\t\t\t# query is more expensive than this;
+        \t\t\t\t\t# -1 disables
+        
+        #min_parallel_table_scan_size = 8MB
+        #min_parallel_index_scan_size = 512kB
+        #effective_cache_size = 4GB
+        
+        # - Genetic Query Optimizer -
+        
+        #geqo = on
+        #geqo_threshold = 12
+        #geqo_effort = 5\t\t\t# range 1-10
+        #geqo_pool_size = 0\t\t\t# selects default based on effort
+        #geqo_generations = 0\t\t\t# selects default based on effort
+        #geqo_selection_bias = 2.0\t\t# range 1.5-2.0
+        #geqo_seed = 0.0\t\t\t# range 0.0-1.0
+        
+        # - Other Planner Options -
+        
+        #default_statistics_target = 100\t# range 1-10000
+        #constraint_exclusion = partition\t# on, off, or partition
+        #cursor_tuple_fraction = 0.1\t\t# range 0.0-1.0
+        #from_collapse_limit = 8
+        #join_collapse_limit = 8\t\t# 1 disables collapsing of explicit
+        \t\t\t\t\t# JOIN clauses
+        #force_parallel_mode = off
+        #jit = off\t\t\t\t# allow JIT compilation
+        
+        
+        #------------------------------------------------------------------------------
+        # REPORTING AND LOGGING
+        #------------------------------------------------------------------------------
+        
+        # - Where to Log -
+        
+        #log_destination = 'stderr'\t\t# Valid values are combinations of
+        \t\t\t\t\t# stderr, csvlog, syslog, and eventlog,
+        \t\t\t\t\t# depending on platform.  csvlog
+        \t\t\t\t\t# requires logging_collector to be on.
+        
+        # This is used when logging to stderr:
+        #logging_collector = off\t\t# Enable capturing of stderr and csvlog
+        \t\t\t\t\t# into log files. Required to be on for
+        \t\t\t\t\t# csvlogs.
+        \t\t\t\t\t# (change requires restart)
+        
+        # These are only used if logging_collector is on:
+        #log_directory = 'log'\t\t\t# directory where log files are written,
+        \t\t\t\t\t# can be absolute or relative to PGDATA
+        #log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'\t# log file name pattern,
+        \t\t\t\t\t# can include strftime() escapes
+        #log_file_mode = 0600\t\t\t# creation mode for log files,
+        \t\t\t\t\t# begin with 0 to use octal notation
+        #log_truncate_on_rotation = off\t\t# If on, an existing log file with the
+        \t\t\t\t\t# same name as the new log file will be
+        \t\t\t\t\t# truncated rather than appended to.
+        \t\t\t\t\t# But such truncation only occurs on
+        \t\t\t\t\t# time-driven rotation, not on restarts
+        \t\t\t\t\t# or size-driven rotation.  Default is
+        \t\t\t\t\t# off, meaning append to existing files
+        \t\t\t\t\t# in all cases.
+        #log_rotation_age = 1d\t\t\t# Automatic rotation of logfiles will
+        \t\t\t\t\t# happen after that time.  0 disables.
+        #log_rotation_size = 10MB\t\t# Automatic rotation of logfiles will
+        \t\t\t\t\t# happen after that much log output.
+        \t\t\t\t\t# 0 disables.
+        
+        # These are relevant when logging to syslog:
+        #syslog_facility = 'LOCAL0'
+        #syslog_ident = 'postgres'
+        #syslog_sequence_numbers = on
+        #syslog_split_messages = on
+        
+        # This is only relevant when logging to eventlog (win32):
+        # (change requires restart)
+        #event_source = 'PostgreSQL'
+        
+        # - When to Log -
+        
+        #log_min_messages = warning\t\t# values in order of decreasing detail:
+        \t\t\t\t\t#   debug5
+        \t\t\t\t\t#   debug4
+        \t\t\t\t\t#   debug3
+        \t\t\t\t\t#   debug2
+        \t\t\t\t\t#   debug1
+        \t\t\t\t\t#   info
+        \t\t\t\t\t#   notice
+        \t\t\t\t\t#   warning
+        \t\t\t\t\t#   error
+        \t\t\t\t\t#   log
+        \t\t\t\t\t#   fatal
+        \t\t\t\t\t#   panic
+        
+        #log_min_error_statement = error\t# values in order of decreasing detail:
+        \t\t\t\t\t#   debug5
+        \t\t\t\t\t#   debug4
+        \t\t\t\t\t#   debug3
+        \t\t\t\t\t#   debug2
+        \t\t\t\t\t#   debug1
+        \t\t\t\t\t#   info
+        \t\t\t\t\t#   notice
+        \t\t\t\t\t#   warning
+        \t\t\t\t\t#   error
+        \t\t\t\t\t#   log
+        \t\t\t\t\t#   fatal
+        \t\t\t\t\t#   panic (effectively off)
+        
+        #log_min_duration_statement = -1\t# -1 is disabled, 0 logs all statements
+        \t\t\t\t\t# and their durations, > 0 logs only
+        \t\t\t\t\t# statements running at least this number
+        \t\t\t\t\t# of milliseconds
+        
+        
+        # - What to Log -
+        
+        #debug_print_parse = off
+        #debug_print_rewritten = off
+        #debug_print_plan = off
+        #debug_pretty_print = on
+        #log_checkpoints = off
+        #log_connections = off
+        #log_disconnections = off
+        #log_duration = off
+        #log_error_verbosity = default\t\t# terse, default, or verbose messages
+        #log_hostname = off
+        #log_line_prefix = '%m [%p] '\t\t# special values:
+        \t\t\t\t\t#   %a = application name
+        \t\t\t\t\t#   %u = user name
+        \t\t\t\t\t#   %d = database name
+        \t\t\t\t\t#   %r = remote host and port
+        \t\t\t\t\t#   %h = remote host
+        \t\t\t\t\t#   %p = process ID
+        \t\t\t\t\t#   %t = timestamp without milliseconds
+        \t\t\t\t\t#   %m = timestamp with milliseconds
+        \t\t\t\t\t#   %n = timestamp with milliseconds (as a Unix epoch)
+        \t\t\t\t\t#   %i = command tag
+        \t\t\t\t\t#   %e = SQL state
+        \t\t\t\t\t#   %c = session ID
+        \t\t\t\t\t#   %l = session line number
+        \t\t\t\t\t#   %s = session start timestamp
+        \t\t\t\t\t#   %v = virtual transaction ID
+        \t\t\t\t\t#   %x = transaction ID (0 if none)
+        \t\t\t\t\t#   %q = stop here in non-session
+        \t\t\t\t\t#        processes
+        \t\t\t\t\t#   %% = '%'
+        \t\t\t\t\t# e.g. '<%u%%%d> '
+        #log_lock_waits = off\t\t\t# log lock waits >= deadlock_timeout
+        #log_statement = 'none'\t\t\t# none, ddl, mod, all
+        #log_replication_commands = off
+        #log_temp_files = -1\t\t\t# log temporary files equal or larger
+        \t\t\t\t\t# than the specified size in kilobytes;
+        \t\t\t\t\t# -1 disables, 0 logs all temp files
+        log_timezone = 'Etc/UTC'
+        
+        #------------------------------------------------------------------------------
+        # PROCESS TITLE
+        #------------------------------------------------------------------------------
+        
+        #cluster_name = ''\t\t\t# added to process titles if nonempty
+        \t\t\t\t\t# (change requires restart)
+        #update_process_title = on
+        
+        
+        #------------------------------------------------------------------------------
+        # STATISTICS
+        #------------------------------------------------------------------------------
+        
+        # - Query and Index Statistics Collector -
+        
+        #track_activities = on
+        #track_counts = on
+        #track_io_timing = off
+        #track_functions = none\t\t\t# none, pl, all
+        #track_activity_query_size = 1024\t# (change requires restart)
+        #stats_temp_directory = 'pg_stat_tmp'
+        
+        
+        # - Monitoring -
+        
+        #log_parser_stats = off
+        #log_planner_stats = off
+        #log_executor_stats = off
+        #log_statement_stats = off
+        
+        
+        #------------------------------------------------------------------------------
+        # AUTOVACUUM
+        #------------------------------------------------------------------------------
+        
+        #autovacuum = on\t\t\t# Enable autovacuum subprocess?  'on'
+        \t\t\t\t\t# requires track_counts to also be on.
+        #log_autovacuum_min_duration = -1\t# -1 disables, 0 logs all actions and
+        \t\t\t\t\t# their durations, > 0 logs only
+        \t\t\t\t\t# actions running at least this number
+        \t\t\t\t\t# of milliseconds.
+        #autovacuum_max_workers = 3\t\t# max number of autovacuum subprocesses
+        \t\t\t\t\t# (change requires restart)
+        #autovacuum_naptime = 1min\t\t# time between autovacuum runs
+        #autovacuum_vacuum_threshold = 50\t# min number of row updates before
+        \t\t\t\t\t# vacuum
+        #autovacuum_analyze_threshold = 50\t# min number of row updates before
+        \t\t\t\t\t# analyze
+        #autovacuum_vacuum_scale_factor = 0.2\t# fraction of table size before vacuum
+        #autovacuum_analyze_scale_factor = 0.1\t# fraction of table size before analyze
+        #autovacuum_freeze_max_age = 200000000\t# maximum XID age before forced vacuum
+        \t\t\t\t\t# (change requires restart)
+        #autovacuum_multixact_freeze_max_age = 400000000\t# maximum multixact age
+        \t\t\t\t\t# before forced vacuum
+        \t\t\t\t\t# (change requires restart)
+        #autovacuum_vacuum_cost_delay = 20ms\t# default vacuum cost delay for
+        \t\t\t\t\t# autovacuum, in milliseconds;
+        \t\t\t\t\t# -1 means use vacuum_cost_delay
+        #autovacuum_vacuum_cost_limit = -1\t# default vacuum cost limit for
+        \t\t\t\t\t# autovacuum, -1 means use
+        \t\t\t\t\t# vacuum_cost_limit
+        
+        
+        #------------------------------------------------------------------------------
+        # CLIENT CONNECTION DEFAULTS
+        #------------------------------------------------------------------------------
+        
+        # - Statement Behavior -
+        
+        #client_min_messages = notice\t\t# values in order of decreasing detail:
+        \t\t\t\t\t#   debug5
+        \t\t\t\t\t#   debug4
+        \t\t\t\t\t#   debug3
+        \t\t\t\t\t#   debug2
+        \t\t\t\t\t#   debug1
+        \t\t\t\t\t#   log
+        \t\t\t\t\t#   notice
+        \t\t\t\t\t#   warning
+        \t\t\t\t\t#   error
+        #search_path = '\"$user\", public'\t# schema names
+        #row_security = on
+        #default_tablespace = ''\t\t# a tablespace name, '' uses the default
+        #temp_tablespaces = ''\t\t\t# a list of tablespace names, '' uses
+        \t\t\t\t\t# only default tablespace
+        #check_function_bodies = on
+        #default_transaction_isolation = 'read committed'
+        #default_transaction_read_only = off
+        #default_transaction_deferrable = off
+        #session_replication_role = 'origin'
+        #statement_timeout = 0\t\t\t# in milliseconds, 0 is disabled
+        #lock_timeout = 0\t\t\t# in milliseconds, 0 is disabled
+        #idle_in_transaction_session_timeout = 0\t# in milliseconds, 0 is disabled
+        #vacuum_freeze_min_age = 50000000
+        #vacuum_freeze_table_age = 150000000
+        #vacuum_multixact_freeze_min_age = 5000000
+        #vacuum_multixact_freeze_table_age = 150000000
+        #vacuum_cleanup_index_scale_factor = 0.1\t# fraction of total number of tuples
+        \t\t\t\t\t\t# before index cleanup, 0 always performs
+        \t\t\t\t\t\t# index cleanup
+        #bytea_output = 'hex'\t\t\t# hex, escape
+        #xmlbinary = 'base64'
+        #xmloption = 'content'
+        #gin_fuzzy_search_limit = 0
+        #gin_pending_list_limit = 4MB
+        
+        # - Locale and Formatting -
+        
+        datestyle = 'iso, mdy'
+        #intervalstyle = 'postgres'
+        timezone = 'Etc/UTC'
+        #timezone_abbreviations = 'Default'     # Select the set of available time zone
+        \t\t\t\t\t# abbreviations.  Currently, there are
+        \t\t\t\t\t#   Default
+        \t\t\t\t\t#   Australia (historical usage)
+        \t\t\t\t\t#   India
+        \t\t\t\t\t# You can create your own file in
+        \t\t\t\t\t# share/timezonesets/.
+        #extra_float_digits = 0\t\t\t# min -15, max 3
+        #client_encoding = sql_ascii\t\t# actually, defaults to database
+        \t\t\t\t\t# encoding
+        
+        # These settings are initialized by initdb, but they can be changed.
+        lc_messages = 'en_US.utf8'\t\t\t# locale for system error message
+        \t\t\t\t\t# strings
+        lc_monetary = 'en_US.utf8'\t\t\t# locale for monetary formatting
+        lc_numeric = 'en_US.utf8'\t\t\t# locale for number formatting
+        lc_time = 'en_US.utf8'\t\t\t\t# locale for time formatting
+        
+        # default configuration for text search
+        default_text_search_config = 'pg_catalog.english'
+        
+        # - Shared Library Preloading -
+        
+        #shared_preload_libraries = ''\t# (change requires restart)
+        #local_preload_libraries = ''
+        #session_preload_libraries = ''
+        #jit_provider = 'llvmjit'\t\t# JIT library to use
+        
+        # - Other Defaults -
+        
+        #dynamic_library_path = '$libdir'
+        
+        
+        #------------------------------------------------------------------------------
+        # LOCK MANAGEMENT
+        #------------------------------------------------------------------------------
+        
+        #deadlock_timeout = 1s
+        #max_locks_per_transaction = 64\t\t# min 10
+        \t\t\t\t\t# (change requires restart)
+        #max_pred_locks_per_transaction = 64\t# min 10
+        \t\t\t\t\t# (change requires restart)
+        #max_pred_locks_per_relation = -2\t# negative values mean
+        \t\t\t\t\t# (max_pred_locks_per_transaction
+        \t\t\t\t\t#  / -max_pred_locks_per_relation) - 1
+        #max_pred_locks_per_page = 2            # min 0
+        
+        
+        #------------------------------------------------------------------------------
+        # VERSION AND PLATFORM COMPATIBILITY
+        #------------------------------------------------------------------------------
+        
+        # - Previous PostgreSQL Versions -
+        
+        #array_nulls = on
+        #backslash_quote = safe_encoding\t# on, off, or safe_encoding
+        #default_with_oids = off
+        #escape_string_warning = on
+        #lo_compat_privileges = off
+        #operator_precedence_warning = off
+        #quote_all_identifiers = off
+        #standard_conforming_strings = on
+        #synchronize_seqscans = on
+        
+        # - Other Platforms and Clients -
+        
+        #transform_null_equals = off
+        
+        
+        #------------------------------------------------------------------------------
+        # ERROR HANDLING
+        #------------------------------------------------------------------------------
+        
+        #exit_on_error = off\t\t\t# terminate session on any error?
+        #restart_after_crash = on\t\t# reinitialize after backend crash?
+        #data_sync_retry = off\t\t\t# retry or panic on failure to fsync
+        \t\t\t\t\t# data?
+        \t\t\t\t\t# (change requires restart)
+        
+        
+        #------------------------------------------------------------------------------
+        # CONFIG FILE INCLUDES
+        #------------------------------------------------------------------------------
+        
+        # These options allow settings to be loaded from files other than the
+        # default postgresql.conf.
+        
+        #include_dir = ''\t\t\t# include files ending in '.conf' from
+        \t\t\t\t\t# a directory, e.g., 'conf.d'
+        #include_if_exists = ''\t\t\t# include file only if it exists
+        #include = ''\t\t\t\t# include file
+        
+        
+        #------------------------------------------------------------------------------
+        # CUSTOMIZED OPTIONS
+        #------------------------------------------------------------------------------
+        
+        # Add settings for extensions here
+        
+        """
+        }
+    }
+}
+persistentVolumeClaim: {
+    pgsql: {
+        apiVersion: "v1"
+        kind:       "PersistentVolumeClaim"
+        metadata: {
+            name: "pgsql"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            resources: {
+                requests: {
+                    storage: "200Gi"
+                }
+            }
+            accessModes: ["ReadWriteOnce"]
+            storageClassName: "sourcegraph"
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    "precise-code-intel-bundle-manager": {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "precise-code-intel-bundle-manager"
+            annotations: {
+                "prometheus.io/port":            "6060"
+                "sourcegraph.prometheus/scrape": "true"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "precise-code-intel-bundle-manager"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "http"
+                port:       3187
+                targetPort: "http"
+            }, {
+                name:       "debug"
+                port:       6060
+                targetPort: "debug"
+            }]
+            selector: {
+                app: "precise-code-intel-bundle-manager"
+            }
+            type: "ClusterIP"
+        }
+    }
+    "precise-code-intel-worker": {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "precise-code-intel-worker"
+            annotations: {
+                "prometheus.io/port":            "6060"
+                "sourcegraph.prometheus/scrape": "true"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "precise-code-intel-worker"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "http"
+                port:       3188
+                targetPort: "http"
+            }, {
+                name:       "debug"
+                port:       6060
+                targetPort: "debug"
+            }]
+            selector: {
+                app: "precise-code-intel-worker"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+deployment: {
+    "precise-code-intel-bundle-manager": {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "precise-code-intel-bundle-manager"
+            annotations: {
+                description: "Stores and manages precise code intelligence bundles."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "precise-code-intel-bundle-manager"
+                }
+            }
+            minReadySeconds:      10
+            replicas:             1
+            revisionHistoryLimit: 10
+            strategy: {
+                type: "Recreate"
+            }
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "precise-code-intel-bundle-manager"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "precise-code-intel-bundle-manager"
+                        env: [{
+                            name:  "PRECISE_CODE_INTEL_BUNDLE_DIR"
+                            value: "/lsif-storage"
+                        }, {
+                            name: "POD_NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    fieldPath: "metadata.name"
+                                }
+                            }
+                        }]
+                        ports: [{
+                            name:          "http"
+                            containerPort: 3187
+                        }, {
+                            name:          "debug"
+                            containerPort: 6060
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "2"
+                                memory: "2G"
+                            }
+                            requests: {
+                                cpu:    "500m"
+                                memory: "500M"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/precise-code-intel-bundle-manager:3.16.0@sha256:e9d8d328f2bc495ead40a7649432d437e306eee6866f895387b88605525f3702"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        livenessProbe: {
+                            httpGet: {
+                                path:   "/healthz"
+                                port:   "http"
+                                scheme: "HTTP"
+                            }
+                            initialDelaySeconds: 60
+                            timeoutSeconds:      5
+                        }
+                        readinessProbe: {
+                            httpGet: {
+                                path:   "/healthz"
+                                port:   "http"
+                                scheme: "HTTP"
+                            }
+                            timeoutSeconds: 5
+                            periodSeconds:  5
+                        }
+                        volumeMounts: [{
+                            name:      "bundle-manager"
+                            mountPath: "/lsif-storage"
+                        }]
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                    volumes: [{
+                        name: "bundle-manager"
+                        persistentVolumeClaim: {
+                            claimName: "bundle-manager"
+                        }
+                    }]
+                }
+            }
+        }
+    }
+    "precise-code-intel-worker": {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "precise-code-intel-worker"
+            annotations: {
+                description: "Handles conversion of uploaded precise code intelligence bundles."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "precise-code-intel-worker"
+                }
+            }
+            minReadySeconds:      10
+            replicas:             1
+            revisionHistoryLimit: 10
+            strategy: {
+                type: "RollingUpdate"
+                rollingUpdate: {
+                    maxSurge:       1
+                    maxUnavailable: 1
+                }
+            }
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "precise-code-intel-worker"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "precise-code-intel-worker"
+                        env: [{
+                            name:  "NUM_WORKERS"
+                            value: "4"
+                        }, {
+                            name:  "PRECISE_CODE_INTEL_BUNDLE_MANAGER_URL"
+                            value: "http://precise-code-intel-bundle-manager:3187"
+                        }, {
+                            name: "POD_NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    fieldPath: "metadata.name"
+                                }
+                            }
+                        }]
+                        ports: [{
+                            name:          "http"
+                            containerPort: 3188
+                        }, {
+                            name:          "debug"
+                            containerPort: 6060
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "2"
+                                memory: "4G"
+                            }
+                            requests: {
+                                cpu:    "500m"
+                                memory: "2G"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/precise-code-intel-worker:3.16.0@sha256:9e81c02d203c0dd80e7b2b4a9d3a5b4c74aa9f4d1c86b2aba84f712ea870313c"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        livenessProbe: {
+                            httpGet: {
+                                path:   "/healthz"
+                                port:   "http"
+                                scheme: "HTTP"
+                            }
+                            initialDelaySeconds: 60
+                            timeoutSeconds:      5
+                        }
+                        readinessProbe: {
+                            httpGet: {
+                                path:   "/healthz"
+                                port:   "http"
+                                scheme: "HTTP"
+                            }
+                            timeoutSeconds: 5
+                            periodSeconds:  5
+                        }
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                }
+            }
+        }
+    }
+}
+persistentVolumeClaim: {
+    "bundle-manager": {
+        apiVersion: "v1"
+        kind:       "PersistentVolumeClaim"
+        metadata: {
+            name: "bundle-manager"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            resources: {
+                requests: {
+                    storage: "200Gi"
+                }
+            }
+            accessModes: ["ReadWriteOnce"]
+            storageClassName: "sourcegraph"
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    prometheus: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "prometheus"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "prometheus"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "http"
+                port:       30090
+                targetPort: "http"
+            }]
+            selector: {
+                app: "prometheus"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+serviceAccount: {
+    prometheus: {
+        apiVersion: "v1"
+        kind:       "ServiceAccount"
+        metadata: {
+            name: "prometheus"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                category:                        "rbac"
+            }
+        }
+        imagePullSecrets: [{
+            name: "docker-registry"
+        }]
+    }
+}
+deployment: {
+    prometheus: {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "prometheus"
+            annotations: {
+                description: "Collects metrics and aggregates them into graphs."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "prometheus"
+                }
+            }
+            minReadySeconds:      10
+            replicas:             1
+            revisionHistoryLimit: 10
+            strategy: {
+                type: "Recreate"
+            }
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "prometheus"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "prometheus"
+                        ports: [{
+                            name:          "http"
+                            containerPort: 9090
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "2"
+                                memory: "3G"
+                            }
+                            requests: {
+                                cpu:    "500m"
+                                memory: "3G"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/prometheus:3.16.0@sha256:a1c1dd10d3deec10a20fef030c6fe26a7b72ccc93e9584b7b2db7fbf0ec0d311"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        livenessProbe: {
+                            httpGet: {
+                                path: "/-/healthy"
+                                port: 9090
+                            }
+                            initialDelaySeconds: 30
+                            timeoutSeconds:      30
+                        }
+                        readinessProbe: {
+                            httpGet: {
+                                path: "/-/ready"
+                                port: 9090
+                            }
+                            initialDelaySeconds: 30
+                            timeoutSeconds:      30
+                        }
+                        volumeMounts: [{
+                            name:      "data"
+                            mountPath: "/prometheus"
+                        }, {
+                            name:      "config"
+                            mountPath: "/sg_prometheus_add_ons"
+                        }]
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                    serviceAccountName: "prometheus"
+                    volumes: [{
+                        name: "data"
+                        persistentVolumeClaim: {
+                            claimName: "prometheus"
+                        }
+                    }, {
+                        name: "config"
+                        configMap: {
+                            name:        "prometheus"
+                            defaultMode: 511
+                        }
+                    }]
+                }
+            }
+        }
+    }
+}
+configMap: {
+    prometheus: {
+        apiVersion: "v1"
+        kind:       "ConfigMap"
+        metadata: {
+            name: "prometheus"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        data: {
+            "prometheus.yml": """
+        global:
+          scrape_interval: 30s
+          evaluation_interval: 30s
+        alerting:
+          alertmanagers:
+          - kubernetes_sd_configs:
+            - role: endpoints
+            relabel_configs:
+            - source_labels:
+              - __meta_kubernetes_service_name
+              regex: alertmanager
+              action: keep
+        rule_files:
+        - '*_rules.yml'
+        - /sg_config_prometheus/*_rules.yml
+        - /sg_prometheus_add_ons/*_rules.yml
+        scrape_configs:
+        - scheme: https
+          kubernetes_sd_configs:
+          - role: endpoints
+          relabel_configs:
+          - source_labels:
+            - __meta_kubernetes_namespace
+            - __meta_kubernetes_service_name
+            - __meta_kubernetes_endpoint_port_name
+            regex: default;kubernetes;https
+            action: keep
+          job_name: kubernetes-apiservers
+          tls_config:
+            ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        - scheme: https
+          kubernetes_sd_configs:
+          - role: node
+          relabel_configs:
+          - regex: __meta_kubernetes_node_label_(.+)
+            action: labelmap
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels:
+            - __meta_kubernetes_node_name
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/${1}/proxy/metrics
+          job_name: kubernetes-nodes
+          tls_config:
+            ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+            insecure_skip_verify: true
+          bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        - kubernetes_sd_configs:
+          - role: endpoints
+          relabel_configs:
+          - source_labels:
+            - __meta_kubernetes_service_annotation_sourcegraph_prometheus_scrape
+            regex: true
+            action: keep
+          - source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_scheme
+            regex: (https?)
+            action: replace
+            target_label: __scheme__
+          - source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_path
+            regex: (.+)
+            action: replace
+            target_label: __metrics_path__
+          - source_labels:
+            - __address__
+            - __meta_kubernetes_service_annotation_prometheus_io_port
+            regex: (.+)(?::\\d+);(\\d+)
+            action: replace
+            target_label: __address__
+            replacement: $1:$2
+          - regex: __meta_kubernetes_service_label_(.+)
+            action: labelmap
+          - source_labels:
+            - __meta_kubernetes_namespace
+            action: replace
+            target_label: ns
+          - source_labels:
+            - __meta_kubernetes_service_name
+            action: replace
+            target_label: kubernetes_name
+          - source_labels:
+            - app
+            action: replace
+            target_label: job
+          - source_labels:
+            - __meta_kubernetes_pod_name
+            action: replace
+            target_label: instance
+          job_name: kubernetes-service-endpoints
+        - kubernetes_sd_configs:
+          - role: service
+          relabel_configs:
+          - source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_probe
+            regex: true
+            action: keep
+          - source_labels:
+            - __address__
+            target_label: __param_target
+          - target_label: __address__
+            replacement: blackbox
+          - source_labels:
+            - __param_target
+            target_label: instance
+          - regex: __meta_kubernetes_service_label_(.+)
+            action: labelmap
+          - source_labels:
+            - __meta_kubernetes_service_namespace
+            target_label: ns
+          - source_labels:
+            - __meta_kubernetes_service_name
+            target_label: kubernetes_name
+          job_name: kubernetes-services
+          metrics_path: /probe
+          params:
+            module:
+            - http_2xx
+        - kubernetes_sd_configs:
+          - role: pod
+          relabel_configs:
+          - source_labels:
+            - __meta_kubernetes_service_annotation_sourcegraph_prometheus_scrape
+            regex: true
+            action: keep
+          - source_labels:
+            - __meta_kubernetes_pod_annotation_prometheus_io_path
+            regex: (.+)
+            action: replace
+            target_label: __metrics_path__
+          - source_labels:
+            - __address__
+            - __meta_kubernetes_pod_annotation_prometheus_io_port
+            regex: (.+):(?:\\d+);(\\d+)
+            action: replace
+            target_label: __address__
+            replacement: ${1}:${2}
+          - regex: __meta_kubernetes_pod_label_(.+)
+            action: labelmap
+          - source_labels:
+            - __meta_kubernetes_namespace
+            action: replace
+            target_label: ns
+          - source_labels:
+            - __meta_kubernetes_pod_name
+            action: replace
+            target_label: kubernetes_pod_name
+          job_name: kubernetes-pods
+        
+        """
+            "alert_rules.yml": """
+        groups:
+        - name: alert.rules
+          rules:
+          - annotations:
+              description: 'Pods missing from {{`{{`}} $labels.app {{`}}`}}: {{`{{`}} $value
+                {{`}}`}}'
+              help: Alerts when pods are missing.
+              summary: Pods missing from {{`{{`}} $labels.app {{`}}`}}
+            labels:
+              severity: page
+            alert: PodsMissing
+            expr: app:up:ratio{app!=\"\"} < 0.9
+            for: 10m
+          - annotations:
+              description: 'No pods are running for {{`{{`}} $labels.app {{`}}`}}: {{`{{`}}
+                $value {{`}}`}}'
+              help: Alerts when no pods are running for a service.
+              summary: No pods are running for {{`{{`}} $labels.app {{`}}`}}
+            labels:
+              severity: page
+            alert: NoPodsRunning
+            expr: app:up:ratio{app!=\"\"} < 0.1
+            for: 2m
+          - annotations:
+              description: 'Page load latency > 20s (90th percentile over all routes; current
+                value: {{`{{`}}$value{{`}}`}}s)'
+              help: Alerts when the page load latency is too high.
+              summary: High page load latency
+            labels:
+              severity: page
+            alert: ProdPageLoadLatency
+            expr: histogram_quantile(0.9, sum by(le) (rate(src_http_request_duration_seconds_bucket{job=\"sourcegraph-frontend\",route!=\"raw\"}[10m])))
+              > 20
+          - annotations:
+              description: '{{`{{`}} $labels.app {{`}}`}} has more than 10k goroutines. This
+                is probably a regression causing a goroutine leak'
+              help: Alerts when a service has excessive running goroutines.
+              summary: Excessive number of goroutines
+            alert: GoroutineLeak
+            expr: go_goroutines >= 10000
+            for: 10m
+          - annotations:
+              description: '{{`{{`}}$labels.instance{{`}}`}} is using {{`{{`}}humanize $value{{`}}`}}
+                inodes'
+              help: Alerts when a node's remaining FS inodes are low.
+              summary: '{{`{{`}}$labels.instance{{`}}`}} remaining fs inodes is low'
+            labels:
+              severity: page
+            alert: FSINodesRemainingLow
+            expr: sum by(instance) (container_fs_inodes_total{pod_name!=\"\"}) > 3e+06
+          - annotations:
+              help: Alerts when a node has less than 10% available disk space.
+              summary: '{{`{{`}}$labels.exported_name{{`}}`}} has less than 10% available
+                disk space'
+            alert: DiskSpaceLow
+            expr: node:k8snode_filesystem_avail_bytes:ratio < 0.1
+          - annotations:
+              help: Alerts when a node has less than 5% available disk space.
+              summary: Critical! {{`{{`}}$labels.exported_name{{`}}`}} has less than 5% available
+                disk space
+            labels:
+              severity: page
+            alert: DiskSpaceLowCritical
+            expr: node:k8snode_filesystem_avail_bytes:ratio{exported_name=~\".*prod.*\"} < 0.05
+          - annotations:
+              help: Alerts when gitserverdisk space is low.
+              summary: gitserver {{`{{`}}$labels.instance{{`}}`}} disk space is less than
+                10% of available disk space
+            alert: GitserverDiskSpaceLow
+            expr: src_gitserver_disk_space_available / src_gitserver_disk_space_total < 0.1
+          - annotations:
+              help: Alerts when gitserverdisk space is critically low.
+              summary: Critical! gitserver {{`{{`}}$labels.instance{{`}}`}} disk space is
+                less than 5% of available disk space
+            labels:
+              severity: page
+            alert: GitserverDiskSpaceLowCritical
+            expr: src_gitserver_disk_space_available / src_gitserver_disk_space_total < 0.05
+          - annotations:
+              help: Alerts when the search service has more than 10% of requests failing.
+              summary: Error ratio exceeds 10%
+            alert: SearcherErrorRatioTooHigh
+            expr: searcher_errors:ratio10m > 0.1
+            for: 20m
+          - annotations:
+              help: Alerts when a service is probably leaking metrics (unbounded attribute).
+              summary: '{{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.ns{{`}}`}} is probably
+                leaking metrics (unbounded attribute)'
+            alert: PrometheusMetricsBloat
+            expr: http_response_size_bytes{handler=\"prometheus\",job!=\"kubernetes-apiservers\",job!=\"kubernetes-nodes\",quantile=\"0.5\"}
+              > 20000
+        
+        """
+            "extra_rules.yml": ""
+            "node_rules.yml": """
+        groups:
+        - name: nodes.rules
+          rules:
+          - expr: sum by(instance) (rate(container_cpu_usage_seconds_total{kubernetes_pod_name=\"\"}[5m]))
+              / max by(instance) (machine_cpu_cores)
+            record: node:container_cpu_usage_seconds_total:ratio_rate5m
+          - expr: max by(namespace, container_name) (container_memory_usage_bytes{container_name!=\"\"})
+            record: task:container_memory_usage_bytes:max
+          - expr: sum by(id, namespace, container_name) (irate(container_cpu_usage_seconds_total{container_name!=\"\"}[1m]))
+            record: task:container_cpu_usage_seconds_total:sum
+          - expr: min by(exported_name) (k8snode_filesystem_avail_bytes / k8snode_filesystem_size_bytes)
+            record: node:k8snode_filesystem_avail_bytes:ratio
+        
+        """
+            "sourcegraph_rules.yml": """
+        groups:
+        - name: sourcegraph.rules
+          rules:
+          - expr: sum by(app) (up)
+            record: app:up:sum
+          - expr: count by(app) (up)
+            record: app:up:count
+          - expr: app:up:sum / on(app) app:up:count
+            record: app:up:ratio
+        
+        """
+        }
+    }
+}
+persistentVolumeClaim: {
+    prometheus: {
+        apiVersion: "v1"
+        kind:       "PersistentVolumeClaim"
+        metadata: {
+            name: "prometheus"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            resources: {
+                requests: {
+                    storage: "200Gi"
+                }
+            }
+            accessModes: ["ReadWriteOnce"]
+            storageClassName: "sourcegraph"
+        }
+    }
+}
+clusterRole: {
+    prometheus: {
+        apiVersion: "rbac.authorization.k8s.io/v1"
+        kind:       "ClusterRole"
+        metadata: {
+            name: "prometheus"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "cluster-admin"
+                category:                        "rbac"
+            }
+        }
+        rules: [{
+            apiGroups: [""]
+            resources: ["endpoints", "namespaces", "nodes", "nodes/metrics", "nodes/proxy", "pods", "services"]
+            verbs: ["get", "list", "watch"]
+        }, {
+            apiGroups: [""]
+            resources: ["configmaps"]
+            verbs: ["get"]
+        }, {
+            verbs: ["get"]
+            nonResourceURLs: ["/metrics"]
+        }]
+    }
+}
+clusterRoleBinding: {
+    prometheus: {
+        apiVersion: "rbac.authorization.k8s.io/v1"
+        kind:       "ClusterRoleBinding"
+        metadata: {
+            name: "prometheus"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "cluster-admin"
+                category:                        "rbac"
+            }
+        }
+        roleRef: {
+            name:     "prometheus"
+            kind:     "ClusterRole"
+            apiGroup: ""
+        }
+        subjects: [{
+            name:      "prometheus"
+            kind:      "ServiceAccount"
+            namespace: "default"
+        }]
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    "query-runner": {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "query-runner"
+            annotations: {
+                "prometheus.io/port":            "6060"
+                "sourcegraph.prometheus/scrape": "true"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "query-runner"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "http"
+                port:       80
+                targetPort: "http"
+            }]
+            selector: {
+                app: "query-runner"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+deployment: {
+    "query-runner": {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "query-runner"
+            annotations: {
+                description: "Saved search query runner / notification service."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "query-runner"
+                }
+            }
+            minReadySeconds:      10
+            replicas:             1
+            revisionHistoryLimit: 10
+            strategy: {
+                type: "RollingUpdate"
+                rollingUpdate: {
+                    maxSurge:       1
+                    maxUnavailable: 0
+                }
+            }
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "query-runner"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "query-runner"
+                        env:  null
+                        ports: [{
+                            name:          "http"
+                            containerPort: 3183
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "1"
+                                memory: "1G"
+                            }
+                            requests: {
+                                cpu:    "500m"
+                                memory: "1G"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/query-runner:3.16.0@sha256:8db48c533125318a4981ecd1dc8177ba533e2830c79efd50480e301513bb072d"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                    }, {
+                        name: "jaeger-agent"
+                        env: [{
+                            name: "POD_NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    apiVersion: "v1"
+                                    fieldPath:  "metadata.name"
+                                }
+                            }
+                        }]
+                        ports: [{
+                            containerPort: 5775
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 5778
+                            protocol:      "TCP"
+                        }, {
+                            containerPort: 6831
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 6832
+                            protocol:      "UDP"
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "1"
+                                memory: "500M"
+                            }
+                            requests: {
+                                cpu:    "100m"
+                                memory: "100M"
+                            }
+                        }
+                        args: ["--reporter.grpc.host-port=jaeger-collector:14250", "--reporter.type=grpc"]
+                        image: "index.docker.io/sourcegraph/jaeger-agent:3.16.0@sha256:ad1fc2f6b69ba3622f872bb105ef07dec5e5a539d30e733b006e88445dbe61e1"
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                }
+            }
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    "redis-cache": {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "redis-cache"
+            annotations: {
+                "prometheus.io/port":            "9121"
+                "sourcegraph.prometheus/scrape": "true"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "redis-cache"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "redis"
+                port:       6379
+                targetPort: "redis"
+            }]
+            selector: {
+                app: "redis-cache"
+            }
+            type: "ClusterIP"
+        }
+    }
+    "redis-store": {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "redis-store"
+            annotations: {
+                "prometheus.io/port":            "9121"
+                "sourcegraph.prometheus/scrape": "true"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "redis-store"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "redis"
+                port:       6379
+                targetPort: "redis"
+            }]
+            selector: {
+                app: "redis-store"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+deployment: {
+    "redis-cache": {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "redis-cache"
+            annotations: {
+                description: "Redis for storing short-lived caches."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "redis-cache"
+                }
+            }
+            minReadySeconds:      10
+            replicas:             1
+            revisionHistoryLimit: 10
+            strategy: {
+                type: "Recreate"
+            }
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "redis-cache"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "redis-cache"
+                        env:  null
+                        ports: [{
+                            name:          "redis"
+                            containerPort: 6379
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "1"
+                                memory: "6Gi"
+                            }
+                            requests: {
+                                cpu:    "1"
+                                memory: "6Gi"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/redis-cache:3.16.0@sha256:7820219195ab3e8fdae5875cd690fed1b2a01fd1063bd94210c0e9d529c38e56"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        livenessProbe: {
+                            initialDelaySeconds: 30
+                            tcpSocket: {
+                                port: "redis"
+                            }
+                        }
+                        readinessProbe: {
+                            initialDelaySeconds: 5
+                            tcpSocket: {
+                                port: "redis"
+                            }
+                        }
+                        volumeMounts: [{
+                            name:      "redis-data"
+                            mountPath: "/redis-data"
+                        }]
+                    }, {
+                        name: "redis-exporter"
+                        ports: [{
+                            name:          "redisexp"
+                            containerPort: 9121
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "10m"
+                                memory: "100Mi"
+                            }
+                            requests: {
+                                cpu:    "10m"
+                                memory: "100Mi"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/redis_exporter:18-02-07_bb60087_v0.15.0@sha256:282d59b2692cca68da128a4e28d368ced3d17945cd1d273d3ee7ba719d77b753"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                    volumes: [{
+                        name: "redis-data"
+                        persistentVolumeClaim: {
+                            claimName: "redis-cache"
+                        }
+                    }]
+                }
+            }
+        }
+    }
+    "redis-store": {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "redis-store"
+            annotations: {
+                description: "Redis for storing semi-persistent data like user sessions."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "redis-store"
+                }
+            }
+            minReadySeconds:      10
+            replicas:             1
+            revisionHistoryLimit: 10
+            strategy: {
+                type: "Recreate"
+            }
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "redis-store"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "redis-store"
+                        env:  null
+                        ports: [{
+                            name:          "redis"
+                            containerPort: 6379
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "1"
+                                memory: "6Gi"
+                            }
+                            requests: {
+                                cpu:    "1"
+                                memory: "6Gi"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/redis-store:3.16.0@sha256:e8467a8279832207559bdfbc4a89b68916ecd5b44ab5cf7620c995461c005168"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        livenessProbe: {
+                            initialDelaySeconds: 30
+                            tcpSocket: {
+                                port: "redis"
+                            }
+                        }
+                        readinessProbe: {
+                            initialDelaySeconds: 5
+                            tcpSocket: {
+                                port: "redis"
+                            }
+                        }
+                        volumeMounts: [{
+                            name:      "redis-data"
+                            mountPath: "/redis-data"
+                        }]
+                    }, {
+                        name: "redis-exporter"
+                        ports: [{
+                            name:          "redisexp"
+                            containerPort: 9121
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "10m"
+                                memory: "100Mi"
+                            }
+                            requests: {
+                                cpu:    "10m"
+                                memory: "100Mi"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/redis_exporter:18-02-07_bb60087_v0.15.0@sha256:282d59b2692cca68da128a4e28d368ced3d17945cd1d273d3ee7ba719d77b753"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                    volumes: [{
+                        name: "redis-data"
+                        persistentVolumeClaim: {
+                            claimName: "redis-store"
+                        }
+                    }]
+                }
+            }
+        }
+    }
+}
+persistentVolumeClaim: {
+    "redis-cache": {
+        apiVersion: "v1"
+        kind:       "PersistentVolumeClaim"
+        metadata: {
+            name: "redis-cache"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            resources: {
+                requests: {
+                    storage: "100Gi"
+                }
+            }
+            accessModes: ["ReadWriteOnce"]
+            storageClassName: "sourcegraph"
+        }
+    }
+    "redis-store": {
+        apiVersion: "v1"
+        kind:       "PersistentVolumeClaim"
+        metadata: {
+            name: "redis-store"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            resources: {
+                requests: {
+                    storage: "100Gi"
+                }
+            }
+            accessModes: ["ReadWriteOnce"]
+            storageClassName: "sourcegraph"
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    replacer: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "replacer"
+            annotations: {
+                "prometheus.io/port":            "6060"
+                "sourcegraph.prometheus/scrape": "true"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "replacer"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "http"
+                port:       3185
+                targetPort: "http"
+            }, {
+                name:       "debug"
+                port:       6060
+                targetPort: "debug"
+            }]
+            selector: {
+                app: "replacer"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+deployment: {
+    replacer: {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "replacer"
+            annotations: {
+                description: "Backend for replace operations."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "replacer"
+                }
+            }
+            minReadySeconds:      10
+            replicas:             1
+            revisionHistoryLimit: 10
+            strategy: {
+                type: "RollingUpdate"
+                rollingUpdate: {
+                    maxSurge:       1
+                    maxUnavailable: 1
+                }
+            }
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "replacer"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "replacer"
+                        env: [{
+                            name:  "REPLACER_CACHE_SIZE_MB"
+                            value: "100000"
+                        }, {
+                            name: "POD_NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    fieldPath: "metadata.name"
+                                }
+                            }
+                        }, {
+                            name:  "CACHE_DIR"
+                            value: "/mnt/cache/$(POD_NAME)"
+                        }]
+                        ports: [{
+                            name:          "http"
+                            containerPort: 3185
+                        }, {
+                            name:          "debug"
+                            containerPort: 6060
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "4"
+                                memory: "500M"
+                            }
+                            requests: {
+                                cpu:    "500m"
+                                memory: "500M"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/replacer:3.16.0@sha256:837253e0bed4746d9a31e56f27078f88a5567f681c58844916d40841c33a7782"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        readinessProbe: {
+                            httpGet: {
+                                path:   "/healthz"
+                                port:   "http"
+                                scheme: "HTTP"
+                            }
+                            periodSeconds:    1
+                            failureThreshold: 1
+                        }
+                        volumeMounts: [{
+                            name:      "cache-ssd"
+                            mountPath: "/mnt/cache"
+                        }]
+                    }, {
+                        name: "jaeger-agent"
+                        env: [{
+                            name: "POD_NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    apiVersion: "v1"
+                                    fieldPath:  "metadata.name"
+                                }
+                            }
+                        }]
+                        ports: [{
+                            containerPort: 5775
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 5778
+                            protocol:      "TCP"
+                        }, {
+                            containerPort: 6831
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 6832
+                            protocol:      "UDP"
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "1"
+                                memory: "500M"
+                            }
+                            requests: {
+                                cpu:    "100m"
+                                memory: "100M"
+                            }
+                        }
+                        args: ["--reporter.grpc.host-port=jaeger-collector:14250", "--reporter.type=grpc"]
+                        image: "index.docker.io/sourcegraph/jaeger-agent:3.16.0@sha256:ad1fc2f6b69ba3622f872bb105ef07dec5e5a539d30e733b006e88445dbe61e1"
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                    volumes: [{
+                        name: "cache-ssd"
+                        emptyDir: {}
+                    }]
+                }
+            }
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    "repo-updater": {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "repo-updater"
+            annotations: {
+                "prometheus.io/port":            "6060"
+                "sourcegraph.prometheus/scrape": "true"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "repo-updater"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "http"
+                port:       3182
+                targetPort: "http"
+            }]
+            selector: {
+                app: "repo-updater"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+deployment: {
+    "repo-updater": {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "repo-updater"
+            annotations: {
+                description: "Handles repository metadata (not Git data) lookups and updates from external code hosts and other similar services."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "repo-updater"
+                }
+            }
+            minReadySeconds:      10
+            replicas:             1
+            revisionHistoryLimit: 10
+            strategy: {
+                type: "RollingUpdate"
+                rollingUpdate: {
+                    maxSurge:       1
+                    maxUnavailable: 0
+                }
+            }
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "repo-updater"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "repo-updater"
+                        env:  null
+                        ports: [{
+                            name:          "http"
+                            containerPort: 3182
+                        }, {
+                            name:          "debug"
+                            containerPort: 6060
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "100m"
+                                memory: "500Mi"
+                            }
+                            requests: {
+                                cpu:    "100m"
+                                memory: "500Mi"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/repo-updater:3.16.0@sha256:4ed82310dc1d435041748660a377a59c1dc530317d61bc4b080a0c1ef6ce4cb9"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                    }, {
+                        name: "jaeger-agent"
+                        env: [{
+                            name: "POD_NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    apiVersion: "v1"
+                                    fieldPath:  "metadata.name"
+                                }
+                            }
+                        }]
+                        ports: [{
+                            containerPort: 5775
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 5778
+                            protocol:      "TCP"
+                        }, {
+                            containerPort: 6831
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 6832
+                            protocol:      "UDP"
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "1"
+                                memory: "500M"
+                            }
+                            requests: {
+                                cpu:    "100m"
+                                memory: "100M"
+                            }
+                        }
+                        args: ["--reporter.grpc.host-port=jaeger-collector:14250", "--reporter.type=grpc"]
+                        image: "index.docker.io/sourcegraph/jaeger-agent:3.16.0@sha256:ad1fc2f6b69ba3622f872bb105ef07dec5e5a539d30e733b006e88445dbe61e1"
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                }
+            }
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    searcher: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "searcher"
+            annotations: {
+                "prometheus.io/port":            "6060"
+                "sourcegraph.prometheus/scrape": "true"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "searcher"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "http"
+                port:       3181
+                targetPort: "http"
+            }, {
+                name:       "debug"
+                port:       6060
+                targetPort: "debug"
+            }]
+            selector: {
+                app: "searcher"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+deployment: {
+    searcher: {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "searcher"
+            annotations: {
+                description: "Backend for text search operations."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "searcher"
+                }
+            }
+            minReadySeconds:      10
+            replicas:             1
+            revisionHistoryLimit: 10
+            strategy: {
+                type: "RollingUpdate"
+                rollingUpdate: {
+                    maxSurge:       1
+                    maxUnavailable: 1
+                }
+            }
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "searcher"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "searcher"
+                        env: [{
+                            name:  "SEARCHER_CACHE_SIZE_MB"
+                            value: "100000"
+                        }, {
+                            name: "POD_NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    fieldPath: "metadata.name"
+                                }
+                            }
+                        }, {
+                            name:  "CACHE_DIR"
+                            value: "/mnt/cache/$(POD_NAME)"
+                        }]
+                        ports: [{
+                            name:          "http"
+                            containerPort: 3181
+                        }, {
+                            name:          "debug"
+                            containerPort: 6060
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "2"
+                                memory: "2G"
+                            }
+                            requests: {
+                                cpu:    "500m"
+                                memory: "500M"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/searcher:3.16.0@sha256:7dc22bb28e2681d4d0a0f3f3116e62bcde305c6b554db6dce4087fbfc99c5276"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        readinessProbe: {
+                            httpGet: {
+                                path:   "/healthz"
+                                port:   "http"
+                                scheme: "HTTP"
+                            }
+                            periodSeconds:    1
+                            failureThreshold: 1
+                        }
+                        volumeMounts: [{
+                            name:      "cache-ssd"
+                            mountPath: "/mnt/cache"
+                        }]
+                    }, {
+                        name: "jaeger-agent"
+                        env: [{
+                            name: "POD_NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    apiVersion: "v1"
+                                    fieldPath:  "metadata.name"
+                                }
+                            }
+                        }]
+                        ports: [{
+                            containerPort: 5775
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 5778
+                            protocol:      "TCP"
+                        }, {
+                            containerPort: 6831
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 6832
+                            protocol:      "UDP"
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "1"
+                                memory: "500M"
+                            }
+                            requests: {
+                                cpu:    "100m"
+                                memory: "100M"
+                            }
+                        }
+                        args: ["--reporter.grpc.host-port=jaeger-collector:14250", "--reporter.type=grpc"]
+                        image: "index.docker.io/sourcegraph/jaeger-agent:3.16.0@sha256:ad1fc2f6b69ba3622f872bb105ef07dec5e5a539d30e733b006e88445dbe61e1"
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                    volumes: [{
+                        name: "cache-ssd"
+                        emptyDir: {}
+                    }]
+                }
+            }
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    symbols: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "symbols"
+            annotations: {
+                "prometheus.io/port":            "6060"
+                "sourcegraph.prometheus/scrape": "true"
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "symbols"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "http"
+                port:       3184
+                targetPort: "http"
+            }, {
+                name:       "debug"
+                port:       6060
+                targetPort: "debug"
+            }]
+            selector: {
+                app: "symbols"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+deployment: {
+    symbols: {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "symbols"
+            annotations: {
+                description: "Backend for symbols operations."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "symbols"
+                }
+            }
+            minReadySeconds:      10
+            replicas:             1
+            revisionHistoryLimit: 10
+            strategy: {
+                type: "RollingUpdate"
+                rollingUpdate: {
+                    maxSurge:       1
+                    maxUnavailable: 1
+                }
+            }
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "symbols"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "symbols"
+                        env: [{
+                            name:  "SYMBOLS_CACHE_SIZE_MB"
+                            value: "100000"
+                        }, {
+                            name: "POD_NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    fieldPath: "metadata.name"
+                                }
+                            }
+                        }, {
+                            name:  "CACHE_DIR"
+                            value: "/mnt/cache/$(POD_NAME)"
+                        }]
+                        ports: [{
+                            name:          "http"
+                            containerPort: 3184
+                        }, {
+                            name:          "debug"
+                            containerPort: 6060
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "2"
+                                memory: "2G"
+                            }
+                            requests: {
+                                cpu:    "500m"
+                                memory: "500M"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/symbols:3.16.0@sha256:b5da6814c2a03df210e2258365989a5ba0246ca8b1297d65604bcf9e5e8d6788"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        livenessProbe: {
+                            httpGet: {
+                                path:   "/healthz"
+                                port:   "http"
+                                scheme: "HTTP"
+                            }
+                            initialDelaySeconds: 60
+                            timeoutSeconds:      5
+                        }
+                        readinessProbe: {
+                            httpGet: {
+                                path:   "/healthz"
+                                port:   "http"
+                                scheme: "HTTP"
+                            }
+                            timeoutSeconds: 5
+                            periodSeconds:  5
+                        }
+                        volumeMounts: [{
+                            name:      "cache-ssd"
+                            mountPath: "/mnt/cache"
+                        }]
+                    }, {
+                        name: "jaeger-agent"
+                        env: [{
+                            name: "POD_NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    apiVersion: "v1"
+                                    fieldPath:  "metadata.name"
+                                }
+                            }
+                        }]
+                        ports: [{
+                            containerPort: 5775
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 5778
+                            protocol:      "TCP"
+                        }, {
+                            containerPort: 6831
+                            protocol:      "UDP"
+                        }, {
+                            containerPort: 6832
+                            protocol:      "UDP"
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "1"
+                                memory: "500M"
+                            }
+                            requests: {
+                                cpu:    "100m"
+                                memory: "100M"
+                            }
+                        }
+                        args: ["--reporter.grpc.host-port=jaeger-collector:14250", "--reporter.type=grpc"]
+                        image: "index.docker.io/sourcegraph/jaeger-agent:3.16.0@sha256:ad1fc2f6b69ba3622f872bb105ef07dec5e5a539d30e733b006e88445dbe61e1"
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                    volumes: [{
+                        name: "cache-ssd"
+                        emptyDir: {}
+                    }]
+                }
+            }
+        }
+    }
+}
+// ---
+service: {
+    backend: {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "backend"
+            annotations: {
+                description: "Dummy service that prevents backend pods from being scheduled on the same node if possible."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                group:                           "backend"
+            }
+        }
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                name:       "unused"
+                port:       10811
+                targetPort: 10811
+            }]
+            selector: {
+                group: "backend"
+            }
+            type: "ClusterIP"
+        }
+    }
+    "syntect-server": {
+        apiVersion: "v1"
+        kind:       "Service"
+        metadata: {
+            name: "syntect-server"
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+                app:                             "syntect-server"
+            }
+        }
+        spec: {
+            ports: [{
+                name:       "http"
+                port:       9238
+                targetPort: "http"
+            }]
+            selector: {
+                app: "syntect-server"
+            }
+            type: "ClusterIP"
+        }
+    }
+}
+deployment: {
+    "syntect-server": {
+        apiVersion: "apps/v1"
+        kind:       "Deployment"
+        metadata: {
+            name: "syntect-server"
+            annotations: {
+                description: "Backend for syntax highlighting operations."
+            }
+            labels: {
+                deploy:                          "sourcegraph"
+                "sourcegraph-resource-requires": "no-cluster-admin"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "syntect-server"
+                }
+            }
+            minReadySeconds:      10
+            replicas:             1
+            revisionHistoryLimit: 10
+            strategy: {
+                type: "RollingUpdate"
+                rollingUpdate: {
+                    maxSurge:       1
+                    maxUnavailable: 0
+                }
+            }
+            template: {
+                metadata: {
+                    labels: {
+                        deploy: "sourcegraph"
+                        app:    "syntect-server"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "syntect-server"
+                        env:  null
+                        ports: [{
+                            name:          "http"
+                            containerPort: 9238
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "4"
+                                memory: "6G"
+                            }
+                            requests: {
+                                cpu:    "250m"
+                                memory: "2G"
+                            }
+                        }
+                        image:                    "index.docker.io/sourcegraph/syntax-highlighter:3.16.0@sha256:aa93514b7bc3aaf7a4e9c92e5ff52ee5052db6fb101255a69f054e5b8cdb46ff"
+                        terminationMessagePolicy: "FallbackToLogsOnError"
+                        livenessProbe: {
+                            httpGet: {
+                                path:   "/health"
+                                port:   "http"
+                                scheme: "HTTP"
+                            }
+                            initialDelaySeconds: 5
+                            timeoutSeconds:      5
+                        }
+                        readinessProbe: {
+                            tcpSocket: {
+                                port: "http"
+                            }
+                        }
+                    }]
+                    securityContext: {
+                        runAsUser: 0
+                    }
+                }
+            }
+        }
+    }
+}
