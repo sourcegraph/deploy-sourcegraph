@@ -5,6 +5,7 @@ metadata:
     description: Redis for storing short-lived caches.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: redis-cache
 spec:
   minReadySeconds: 10
@@ -14,18 +15,16 @@ spec:
     matchLabels:
       app: redis-cache
   strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
+    type: Recreate
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: redis-cache
     spec:
       containers:
       - env:
-        image: index.docker.io/sourcegraph/redis-cache:3.15.1@sha256:7820219195ab3e8fdae5875cd690fed1b2a01fd1063bd94210c0e9d529c38e56
+        image: index.docker.io/sourcegraph/redis-cache:3.16.1@sha256:7820219195ab3e8fdae5875cd690fed1b2a01fd1063bd94210c0e9d529c38e56
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 30

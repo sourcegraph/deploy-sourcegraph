@@ -87,8 +87,8 @@ const ingressNginx = ingressNginxFiles.then(
 export const ingressIP = ingressNginx.then(ingress =>
     ingress
         .getResource('v1/Service', 'ingress-nginx', 'ingress-nginx')
-        .apply(svc => svc.status)
-        .apply(status => status.loadBalancer.ingress.map(i => i.ip))
+        .apply(svc => svc && svc.status)
+        .apply(status => (status && status.loadBalancer.ingress.map(i => i.ip)) || [])
         .apply(ips => (ips.length === 1 ? ips[0] : undefined))
 )
 

@@ -1,30 +1,29 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   annotations:
     description: Metrics/monitoring dashboards and alerts.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: grafana
 spec:
-  minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: grafana
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
+  serviceName: grafana
+  updateStrategy:
+     type: RollingUpdate
   template:
     metadata:
       labels:
         app: grafana
+        deploy: sourcegraph
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/grafana:3.15.1@sha256:5af40ae6b3a2c4187ad5d57c462684026823231f8efda46fbaa607940d2886ff
+      - image: index.docker.io/sourcegraph/grafana:3.16.1@sha256:eaff3c31ed27a398c07ad7738f46b32b3351a18e4b7db8260559b41d5b45c4b8
         terminationMessagePolicy: FallbackToLogsOnError
         name: grafana
         ports:
@@ -32,7 +31,7 @@ spec:
           name: http
         volumeMounts:
         - mountPath: /var/lib/grafana
-          name: data
+          name: grafana-data
         - mountPath: /sg_config_grafana/provisioning/datasources
           name: config
         # Grafana is relied upon to send alerts to site admins when something is wrong with
@@ -50,10 +49,16 @@ spec:
       securityContext:
         runAsUser: 0
       volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: grafana
-      - configMap:
+      - name: config
+        configMap:
           defaultMode: 0777
           name: grafana
-        name: config
+  volumeClaimTemplates:
+  - metadata:
+      name: grafana-data
+    spec:
+      accessModes: [ "ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi
+      storageClassName: sourcegraph

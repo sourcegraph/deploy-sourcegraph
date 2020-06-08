@@ -5,6 +5,7 @@ metadata:
     description: Backend for symbols operations.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: symbols
 spec:
   minReadySeconds: 10
@@ -21,6 +22,7 @@ spec:
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: symbols
     spec:
       containers:
@@ -33,7 +35,7 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: index.docker.io/sourcegraph/symbols:3.15.1@sha256:8db073ad787c7c509247a6d97e38a733271b118464742037b32d678a27796a52
+        image: index.docker.io/sourcegraph/symbols:3.16.1@sha256:d45c026ca29023e440ba853454af98f7f32ea275a05b95eea37ce645495847cb
         terminationMessagePolicy: FallbackToLogsOnError
         name: symbols
         livenessProbe:
@@ -65,7 +67,7 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: sourcegraph/jaeger-agent:3.15.1@sha256:826c7466a4e00b048d7bb329aacb7f663d4af602c6ad9f8fec4c3d6ed37ce517
+      - image: index.docker.io/sourcegraph/jaeger-agent:3.16.1@sha256:2fc0cdd7db449e411a01a6ba175ad0b33f8515c343edd7c19569e6f87c6f7fe2
         name: jaeger-agent
         env:
           - name: POD_NAME

@@ -6,6 +6,6 @@
 #   * When the cluster is first created
 #   * Whenever the configuration for any resource has been updated
 
-# Apply the base Soucegraph deployment 
+# Apply the base Soucegraph deployment
 kubectl config set-context $(kubectl config current-context) --namespace=sourcegraph
-kubectl apply --prune -l deploy=sourcegraph -f base --recursive
+kubectl apply --prune -l deploy=sourcegraph -f base --recursive $@

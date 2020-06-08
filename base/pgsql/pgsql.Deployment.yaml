@@ -5,6 +5,7 @@ metadata:
     description: Postgres database for various data.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: pgsql
 spec:
   minReadySeconds: 10
@@ -14,13 +15,11 @@ spec:
     matchLabels:
       app: pgsql
   strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
+    type: Recreate
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: pgsql
         group: backend
     spec:
@@ -35,7 +34,7 @@ spec:
           runAsUser: 0
       containers:
       - env:
-        image: index.docker.io/sourcegraph/postgres-11.4:3.15.1@sha256:63090799b34b3115a387d96fe2227a37999d432b774a1d9b7966b8c5d81b56ad
+        image: index.docker.io/sourcegraph/postgres-11.4:3.16.1@sha256:63090799b34b3115a387d96fe2227a37999d432b774a1d9b7966b8c5d81b56ad
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
           exec:
@@ -65,7 +64,7 @@ spec:
       - env:
         - name: DATA_SOURCE_NAME
           value: postgres://sg:@localhost:5432/?sslmode=disable
-        image: wrouesnel/postgres_exporter:v0.5.1@sha256:b9bad0d21bcb73b347ab75add47fd024d5ff82718b9369457591243dff26cc09
+        image: wrouesnel/postgres_exporter:v0.7.0@sha256:785c919627c06f540d515aac88b7966f352403f73e931e70dc2cbf783146a98b
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
         resources:

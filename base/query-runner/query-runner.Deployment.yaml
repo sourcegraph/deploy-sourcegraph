@@ -5,6 +5,7 @@ metadata:
     description: Saved search query runner / notification service.
   labels:
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
   name: query-runner
 spec:
   minReadySeconds: 10
@@ -21,11 +22,12 @@ spec:
   template:
     metadata:
       labels:
+        deploy: sourcegraph
         app: query-runner
     spec:
       containers:
       - env:
-        image: index.docker.io/sourcegraph/query-runner:3.15.1@sha256:02df83ebcb0ee8ecc3728ba3904170755b2561d6402278df78dca122c03c34c3
+        image: index.docker.io/sourcegraph/query-runner:3.16.1@sha256:c69a7a543467ce9f2c8346795542fe9d2818c8fa68c3b1974a54276bc133ae16
         terminationMessagePolicy: FallbackToLogsOnError
         name: query-runner
         ports:
@@ -38,7 +40,7 @@ spec:
           requests:
             cpu: 500m
             memory: 1G
-      - image: sourcegraph/jaeger-agent:3.15.1@sha256:826c7466a4e00b048d7bb329aacb7f663d4af602c6ad9f8fec4c3d6ed37ce517
+      - image: index.docker.io/sourcegraph/jaeger-agent:3.16.1@sha256:2fc0cdd7db449e411a01a6ba175ad0b33f8515c343edd7c19569e6f87c6f7fe2
         name: jaeger-agent
         env:
           - name: POD_NAME
