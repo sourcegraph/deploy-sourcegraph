@@ -17,54 +17,7 @@ let prometheusAnnotations =
       , { mapKey = "prometheus.io/port", mapValue = "6060" }
       ]
 
-let makeDeployment =
-      λ ( args
-        : { name : Text
-          , description : Text
-          , image : Text
-          , resources : kubernetes.ResourceRequirements.Type
-          }
-        ) →
-        kubernetes.Deployment::{
-        , metadata = kubernetes.ObjectMeta::{
-          , annotations = Some
-            [ { mapKey = "description", mapValue = args.description } ]
-          , labels = Some deploySourcegraphLabel
-          , name = Some args.name
-          }
-        , spec = Some kubernetes.DeploymentSpec::{
-          , minReadySeconds = Some 10
-          , replicas = Some 1
-          , revisionHistoryLimit = Some 10
-          , selector = kubernetes.LabelSelector::{
-            , matchLabels = Some [ { mapKey = "app", mapValue = args.name } ]
-            }
-          , strategy = Some kubernetes.DeploymentStrategy::{
-            , rollingUpdate = Some
-              { maxSurge = Some (kubernetes.IntOrString.Int 1)
-              , maxUnavailable = Some (kubernetes.IntOrString.Int 1)
-              }
-            , type = Some "RollingUpdate"
-            }
-          , template = kubernetes.PodTemplateSpec::{
-            , metadata = kubernetes.ObjectMeta::{
-              , labels = Some [ { mapKey = "app", mapValue = args.name } ]
-              }
-            , spec = Some kubernetes.PodSpec::{
-              , containers =
-                [ kubernetes.Container::{
-                  , image = Some args.description
-                  , name = args.name
-                  , terminationMessagePolicy = Some "FallbackToLogsOnError"
-                  }
-                ]
-              , securityContext = Some kubernetes.PodSecurityContext::{
-                , runAsUser = Some 0
-                }
-              }
-            }
-          }
-        }
+let keyValuePair = { mapKey : Text, mapValue : Text } : Type
 
 let jaegerAgent =
       kubernetes.Container::{
@@ -122,11 +75,9 @@ let emptyCacheSSDVolume =
 
 let kubernetesList =
       { Type =
-        { apiVersion = Text, kind = Text, items = List kubernetesTypeUnion }
-      , default =
-        { apiVersion = "v1"
-        , kind = "List"
-        }
+            { apiVersion : Text, kind : Text, items : List kubernetesTypeUnion }
+          : Type
+      , default = { apiVersion = "v1", kind = "List" }
       }
 
 in  { emptyCacheSSDVolume
@@ -139,4 +90,5 @@ in  { emptyCacheSSDVolume
     , kubernetesTypeUnion
     , prelude
     , kubernetesList
+    , keyValuePair
     }

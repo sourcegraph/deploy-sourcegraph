@@ -1,41 +1,72 @@
+let kubernetes = (../../../imports.dhall).Kubernetes
+
+let prelude = (../../../imports.dhall).Prelude
+
+let Optional/default = prelude.Optional.default
+
+let Configuration/global = ../../../config/config.dhall
+
 let util = ../../../util/util.dhall
 
-let kubernetes = util.kubernetes
+let render =
+      λ(c : Configuration/global.Type) →
+        let additionalAnnotations =
+              Optional/default
+                (List util.keyValuePair)
+                ([] : List util.keyValuePair)
+                c.Frontend.Ingress.additionalAnnotations
 
-in  { defaults = kubernetes.Ingress::{
-      , metadata = kubernetes.ObjectMeta::{
-        , annotations = Some
-          [ { mapKey = "kubernetes.io/ingress.class", mapValue = "nginx" }
-          , { mapKey = "nginx.ingress.kubernetes.io/proxy-body-size"
-            , mapValue = "150m"
-            }
-          ]
-        , labels = Some
-          [ { mapKey = "app", mapValue = "sourcegraph-frontend" }
-          , { mapKey = "deploy", mapValue = "sourcegraph" }
-          , { mapKey = "sourcegraph-resource-requires"
-            , mapValue = "no-cluster-admin"
-            }
-          ]
-        , name = Some "sourcegraph-frontend"
-        }
-      , spec = Some kubernetes.IngressSpec::{
-        , rules = Some
-          [ kubernetes.IngressRule::{
-            , http = Some kubernetes.HTTPIngressRuleValue::{
-              , paths =
-                [ kubernetes.HTTPIngressPath::{
-                  , backend =
-                    { serviceName = "sourcegraph-frontend"
-                    , servicePort = kubernetes.IntOrString.Int 30080
+        let additionalLabels =
+              Optional/default
+                (List util.keyValuePair)
+                ([] : List util.keyValuePair)
+                c.Frontend.Ingress.additionalLabels
+
+        let ingress =
+              kubernetes.Ingress::{
+              , metadata = kubernetes.ObjectMeta::{
+                , annotations = Some
+                    (   [ { mapKey = "kubernetes.io/ingress.class"
+                          , mapValue = "nginx"
+                          }
+                        , { mapKey =
+                              "nginx.ingress.kubernetes.io/proxy-body-size"
+                          , mapValue = "150m"
+                          }
+                        ]
+                      # additionalAnnotations
+                    )
+                , labels = Some
+                    (   [ { mapKey = "app", mapValue = "sourcegraph-frontend" }
+                        , { mapKey = "deploy", mapValue = "sourcegraph" }
+                        , { mapKey = "sourcegraph-resource-requires"
+                          , mapValue = "no-cluster-admin"
+                          }
+                        ]
+                      # additionalLabels
+                    )
+                , namespace = c.Frontend.Ingress.namespace
+                , name = Some "sourcegraph-frontend"
+                }
+              , spec = Some kubernetes.IngressSpec::{
+                , rules = Some
+                  [ kubernetes.IngressRule::{
+                    , http = Some kubernetes.HTTPIngressRuleValue::{
+                      , paths =
+                        [ kubernetes.HTTPIngressPath::{
+                          , backend =
+                            { serviceName = "sourcegraph-frontend"
+                            , servicePort = kubernetes.IntOrString.Int 30080
+                            }
+                          , path = Some "/"
+                          }
+                        ]
+                      }
                     }
-                  , path = Some "/"
-                  }
-                ]
+                  ]
+                }
               }
-            }
-          ]
-        }
-      }
-    , Type = kubernetes.Ingress.Type
-    }
+
+        in  ingress
+
+in  render
