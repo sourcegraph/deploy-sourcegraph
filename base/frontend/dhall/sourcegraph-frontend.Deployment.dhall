@@ -4,9 +4,21 @@ let prelude = (../../../imports.dhall).Prelude
 
 let Optional/default = prelude.Optional.default
 
+let Natural/enumerate = prelude.Natural.enumerate
+
+let Text/concatMapSep = prelude.Text.concatMapSep
+
 let Configuration/global = ../../../config/config.dhall
 
 let util = ../../../util/util.dhall
+
+let makeGitserverEnvVar =
+      λ(replicas : Natural) →
+        let indicies = Natural/enumerate replicas
+
+        let makeEndpoint = λ(i : Natural) → "gitserver-${Natural/show i}:3178"
+
+        in  Text/concatMapSep "," Natural makeEndpoint indicies
 
 let render =
       λ(c : Configuration/global.Type) →
@@ -28,6 +40,9 @@ let render =
                 ([] : List kubernetes.EnvVar.Type)
                 c.Frontend.Deployment.additionalEnvironmentVariables
 
+        let gitserverReplicas =
+              Optional/default Natural 1 c.Gitserver.StatefulSet.replicas
+
         let containerEnvironment =
                 [ kubernetes.EnvVar::{ name = "PGDATABASE", value = Some "sg" }
                 , kubernetes.EnvVar::{ name = "PGHOST", value = Some "pgsql" }
@@ -39,7 +54,7 @@ let render =
                 , kubernetes.EnvVar::{ name = "PGUSER", value = Some "sg" }
                 , kubernetes.EnvVar::{
                   , name = "SRC_GIT_SERVERS"
-                  , value = Some "gitserver-0.gitserver:3178"
+                  , value = Some (makeGitserverEnvVar gitserverReplicas)
                   }
                 , kubernetes.EnvVar::{
                   , name = "POD_NAME"
