@@ -10,16 +10,17 @@ let util = ../../../util/util.dhall
 
 let render =
       λ(c : Configuration/global.Type) →
+      let overrides = c.Frontend.Role
         let additionalLabels =
               Optional/default
                 (List util.keyValuePair)
                 ([] : List util.keyValuePair)
-                c.Frontend.Role.additionalLabels
+                overrides.additionalLabels
 
         let role =
               kubernetes.Role::{
               , metadata = kubernetes.ObjectMeta::{
-                , annotations = c.Frontend.RoleBinding.additionalAnnotations
+                , annotations = overrides.additionalAnnotations
                 , labels = Some
                     (   [ { mapKey = "category", mapValue = "rbac" }
                         , { mapKey = "deploy", mapValue = "sourcegraph" }
@@ -29,7 +30,7 @@ let render =
                         ]
                       # additionalLabels
                     )
-                , namespace = c.Frontend.Role.namespace
+                , namespace = overrides.namespace
                 , name = Some "sourcegraph-frontend"
                 }
               , rules = Some

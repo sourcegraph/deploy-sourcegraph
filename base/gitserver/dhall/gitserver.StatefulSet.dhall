@@ -8,25 +8,82 @@ let Configuration/global = ../../../config/config.dhall
 
 let util = ../../../util/util.dhall
 
-let render =
+let gitserverContainer/render =
       λ(c : Configuration/global.Type) →
-        let additionalAnnotations =
-              Optional/default
-                (List util.keyValuePair)
-                ([] : List util.keyValuePair)
-                c.Gitserver.StatefulSet.additionalAnnotations
+        let overrides = c.Gitserver.StatefulSet.Containers.Gitserver
 
-        let additionalLabels =
-              Optional/default
-                (List util.keyValuePair)
-                ([] : List util.keyValuePair)
-                c.Gitserver.StatefulSet.additionalLabels
+        let environment = overrides.additionalEnvironmentVariables
 
         let image =
               Optional/default
                 Text
                 "index.docker.io/sourcegraph/gitserver:3.16.1@sha256:1e81230b978a60d91ba2e557fe2e2cb30518d9d043763312db08e52c814aeb2c"
-                c.Gitserver.StatefulSet.image
+                overrides.image
+
+        let resources =
+              Optional/default
+                kubernetes.ResourceRequirements.Type
+                { limits = Some
+                  [ { mapKey = "cpu", mapValue = "4" }
+                  , { mapKey = "memory", mapValue = "8G" }
+                  ]
+                , requests = Some
+                  [ { mapKey = "cpu", mapValue = "4" }
+                  , { mapKey = "memory", mapValue = "8G" }
+                  ]
+                }
+                overrides.resources
+
+        let container =
+              kubernetes.Container::{
+              , args = Some [ "run" ]
+              , image = Some image
+              , env = environment
+              , livenessProbe = Some kubernetes.Probe::{
+                , initialDelaySeconds = Some 5
+                , tcpSocket = Some kubernetes.TCPSocketAction::{
+                  , port = kubernetes.IntOrString.String "rpc"
+                  }
+                , timeoutSeconds = Some 5
+                }
+              , name = "gitserver"
+              , ports = Some
+                [ kubernetes.ContainerPort::{
+                  , containerPort = 3178
+                  , name = Some "rpc"
+                  }
+                ]
+              , resources = Some resources
+              , terminationMessagePolicy = Some "FallbackToLogsOnError"
+              , volumeMounts = Some
+                [ kubernetes.VolumeMount::{
+                  , mountPath = "/data/repos"
+                  , name = "repos"
+                  }
+                ]
+              }
+
+        in  container
+
+let render =
+      λ(c : Configuration/global.Type) →
+        let overrides = c.Gitserver.StatefulSet
+
+        let additionalAnnotations =
+              Optional/default
+                (List util.keyValuePair)
+                ([] : List util.keyValuePair)
+                overrides.additionalAnnotations
+
+        let additionalLabels =
+              Optional/default
+                (List util.keyValuePair)
+                ([] : List util.keyValuePair)
+                overrides.additionalLabels
+
+        let replicas = Optional/default Natural 1 overrides.replicas
+
+        let gitserverContainer = gitserverContainer/render c
 
         let statefulSet =
               kubernetes.StatefulSet::{
@@ -47,11 +104,11 @@ let render =
                         ]
                       # additionalLabels
                     )
-                , namespace = c.Gitserver.StatefulSet.namespace
+                , namespace = overrides.namespace
                 , name = Some "gitserver"
                 }
               , spec = Some kubernetes.StatefulSetSpec::{
-                , replicas = Some 1
+                , replicas = Some replicas
                 , revisionHistoryLimit = Some 10
                 , selector = kubernetes.LabelSelector::{
                   , matchLabels = Some
@@ -68,45 +125,7 @@ let render =
                       ]
                     }
                   , spec = Some kubernetes.PodSpec::{
-                    , containers =
-                      [ kubernetes.Container::{
-                        , args = Some [ "run" ]
-                        , image = Some image
-                        , livenessProbe = Some kubernetes.Probe::{
-                          , initialDelaySeconds = Some 5
-                          , tcpSocket = Some kubernetes.TCPSocketAction::{
-                            , port = kubernetes.IntOrString.String "rpc"
-                            }
-                          , timeoutSeconds = Some 5
-                          }
-                        , name = "gitserver"
-                        , ports = Some
-                          [ kubernetes.ContainerPort::{
-                            , containerPort = 3178
-                            , name = Some "rpc"
-                            }
-                          ]
-                        , resources = Some
-                          { limits = Some
-                            [ { mapKey = "cpu", mapValue = "4" }
-                            , { mapKey = "memory", mapValue = "8G" }
-                            ]
-                          , requests = Some
-                            [ { mapKey = "cpu", mapValue = "4" }
-                            , { mapKey = "memory", mapValue = "8G" }
-                            ]
-                          }
-                        , terminationMessagePolicy = Some
-                            "FallbackToLogsOnError"
-                        , volumeMounts = Some
-                          [ kubernetes.VolumeMount::{
-                            , mountPath = "/data/repos"
-                            , name = "repos"
-                            }
-                          ]
-                        }
-                      , util.jaegerAgent
-                      ]
+                    , containers = [ gitserverContainer, util.jaegerAgent ]
                     , schedulerName = None Text
                     , securityContext = Some kubernetes.PodSecurityContext::{
                       , runAsUser = Some 0

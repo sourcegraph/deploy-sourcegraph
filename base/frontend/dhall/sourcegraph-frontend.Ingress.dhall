@@ -10,17 +10,19 @@ let util = ../../../util/util.dhall
 
 let render =
       λ(c : Configuration/global.Type) →
+        let overrides = c.Frontend.Ingress
+
         let additionalAnnotations =
               Optional/default
                 (List util.keyValuePair)
                 ([] : List util.keyValuePair)
-                c.Frontend.Ingress.additionalAnnotations
+                overrides.additionalAnnotations
 
         let additionalLabels =
               Optional/default
                 (List util.keyValuePair)
                 ([] : List util.keyValuePair)
-                c.Frontend.Ingress.additionalLabels
+                overrides.additionalLabels
 
         let ingress =
               kubernetes.Ingress::{
@@ -45,7 +47,7 @@ let render =
                         ]
                       # additionalLabels
                     )
-                , namespace = c.Frontend.Ingress.namespace
+                , namespace = overrides.namespace
                 , name = Some "sourcegraph-frontend"
                 }
               , spec = Some kubernetes.IngressSpec::{

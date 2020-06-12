@@ -5,8 +5,16 @@ let Configuration/container = ../../../config/resource/container.dhall
 let util = ../../../util/util.dhall
 
 let containers =
-      { Type = { SourcegraphFrontend : Configuration/container.Type }
-      , default.SourcegraphFrontend = Configuration/container.default
+      { Type =
+          { Postgres : Configuration/container.Type
+          , PostgresExporter : Configuration/container.Type
+          , Init : Configuration/container.Type
+          }
+      , default =
+        { Postgres = Configuration/container.default
+        , PostgresExporter = Configuration/container.default
+        , Init = Configuration/container.default
+        }
       }
 
 let deployment =
@@ -29,21 +37,15 @@ let deployment =
 let configuration =
       { Type =
           { Deployment : deployment.Type
-          , Ingress : Configuration/universal.Type
-          , Role : Configuration/universal.Type
-          , RoleBinding : Configuration/universal.Type
+          , PersistentVolumeClaim : Configuration/universal.Type
+          , ConfigMap : Configuration/universal.Type
           , Service : Configuration/universal.Type
-          , ServiceAccount : Configuration/universal.Type
-          , ServiceInternal : Configuration/universal.Type
           }
       , default =
         { Deployment = deployment.default
-        , Ingress = Configuration/universal.default
-        , Role = Configuration/universal.default
-        , RoleBinding = Configuration/universal.default
+        , PersistentVolumeClaim = Configuration/universal.default
+        , ConfigMap = Configuration/universal.default
         , Service = Configuration/universal.default
-        , ServiceAccount = Configuration/universal.default
-        , ServiceInternal = Configuration/universal.default
         }
       }
 

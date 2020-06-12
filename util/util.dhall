@@ -77,7 +77,11 @@ let kubernetesList =
       { Type =
             { apiVersion : Text, kind : Text, items : List kubernetesTypeUnion }
           : Type
-      , default = { apiVersion = "v1", kind = "List" }
+      , default =
+        { apiVersion = "v1"
+        , kind = "List"
+        , items = [] : List kubernetesTypeUnion
+        }
       }
 
 in  { emptyCacheSSDVolume

@@ -4,23 +4,25 @@ let prelude = (../../../imports.dhall).Prelude
 
 let Optional/default = prelude.Optional.default
 
-let Configuration/global = ../../../config/config.dhall
-
 let util = ../../../util/util.dhall
+
+let Configuration/global = ../../../config/config.dhall
 
 let render =
       λ(c : Configuration/global.Type) →
+        let overrides = c.Frontend.ServiceAccount
+
         let additionalLabels =
               Optional/default
                 (List util.keyValuePair)
                 ([] : List util.keyValuePair)
-                c.Frontend.ServiceAccount.additionalLabels
+                overrides.additionalLabels
 
         let serviceAccount =
               kubernetes.ServiceAccount::{
               , imagePullSecrets = Some [ { name = Some "docker-registry" } ]
               , metadata = kubernetes.ObjectMeta::{
-                , annotations = c.Frontend.ServiceAccount.additionalAnnotations
+                , annotations = overrides.additionalAnnotations
                 , labels = Some
                     (   [ { mapKey = "category", mapValue = "rbac" }
                         , { mapKey = "deploy", mapValue = "sourcegraph" }
@@ -30,7 +32,7 @@ let render =
                         ]
                       # additionalLabels
                     )
-                , namespace = c.Frontend.ServiceAccount.namespace
+                , namespace = overrides.namespace
                 , name = Some "sourcegraph-frontend"
                 }
               }

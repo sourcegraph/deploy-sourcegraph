@@ -18,7 +18,7 @@ let configuration =
         , additionalLabels = None
         , image = None
         , additionalEnvironmentVariables = None
-        , repliacs = None
+        , replicas = None
         }
       }
 

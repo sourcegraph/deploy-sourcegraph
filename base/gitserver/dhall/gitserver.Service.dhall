@@ -10,17 +10,19 @@ let util = ../../../util/util.dhall
 
 let render =
       λ(c : Configuration/global.Type) →
+        let overrides = c.Gitserver.Service
+
         let additionalAnnotations =
               Optional/default
                 (List util.keyValuePair)
                 ([] : List util.keyValuePair)
-                c.Gitserver.Service.additionalAnnotations
+                overrides.additionalAnnotations
 
         let additionalLabels =
               Optional/default
                 (List util.keyValuePair)
                 ([] : List util.keyValuePair)
-                c.Gitserver.Service.additionalLabels
+                overrides.additionalLabels
 
         let service =
               kubernetes.Service::{
@@ -43,7 +45,7 @@ let render =
                           }
                       # additionalLabels
                     )
-                , namespace = c.Gitserver.Service.namespace
+                , namespace = overrides.namespace
                 , name = Some "gitserver"
                 }
               , spec = Some kubernetes.ServiceSpec::{

@@ -10,6 +10,8 @@ let util = ../../../util/util.dhall
 
 let render =
       λ(c : Configuration/global.Type) →
+        let overrides = c.Frontend.ServiceInternal
+
         let additionalLabels =
               Optional/default
                 (List util.keyValuePair)
@@ -19,7 +21,7 @@ let render =
         let serviceInternal =
               kubernetes.Service::{
               , metadata = kubernetes.ObjectMeta::{
-                , annotations = c.Frontend.ServiceInternal.additionalAnnotations
+                , annotations = overrides.additionalAnnotations
                 , labels = Some
                     (   [ { mapKey = "app", mapValue = "sourcegraph-frontend" }
                         , { mapKey = "deploy", mapValue = "sourcegraph" }
@@ -29,7 +31,7 @@ let render =
                         ]
                       # additionalLabels
                     )
-                , namespace = c.Frontend.ServiceInternal.namespace
+                , namespace = overrides.namespace
                 , name = Some "sourcegraph-frontend-internal"
                 }
               , spec = Some kubernetes.ServiceSpec::{

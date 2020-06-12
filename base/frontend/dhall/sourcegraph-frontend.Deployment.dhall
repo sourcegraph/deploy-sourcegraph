@@ -20,30 +20,20 @@ let makeGitserverEnvVar =
 
         in  Text/concatMapSep "," Natural makeEndpoint indicies
 
-let render =
+let frontendContainer/render =
       λ(c : Configuration/global.Type) →
-        let additionalAnnotations =
-              Optional/default
-                (List util.keyValuePair)
-                ([] : List util.keyValuePair)
-                c.Frontend.Deployment.additionalAnnotations
-
-        let additionalLabels =
-              Optional/default
-                (List util.keyValuePair)
-                ([] : List util.keyValuePair)
-                c.Frontend.Deployment.additionalLabels
+        let overrides = c.Frontend.Deployment.Containers.SourcegraphFrontend
 
         let additionalEnvironmentVariables =
               Optional/default
                 (List kubernetes.EnvVar.Type)
                 ([] : List kubernetes.EnvVar.Type)
-                c.Frontend.Deployment.additionalEnvironmentVariables
+                overrides.additionalEnvironmentVariables
 
         let gitserverReplicas =
               Optional/default Natural 1 c.Gitserver.StatefulSet.replicas
 
-        let containerEnvironment =
+        let environment =
                 [ kubernetes.EnvVar::{ name = "PGDATABASE", value = Some "sg" }
                 , kubernetes.EnvVar::{ name = "PGHOST", value = Some "pgsql" }
                 , kubernetes.EnvVar::{ name = "PGPORT", value = Some "5432" }
@@ -86,6 +76,92 @@ let render =
                 ]
               # additionalEnvironmentVariables
 
+        let resources =
+              Optional/default
+                kubernetes.ResourceRequirements.Type
+                { limits = Some
+                  [ { mapKey = "cpu", mapValue = "2" }
+                  , { mapKey = "memory", mapValue = "4G" }
+                  ]
+                , requests = Some
+                  [ { mapKey = "cpu", mapValue = "2" }
+                  , { mapKey = "memory", mapValue = "2G" }
+                  ]
+                }
+                overrides.resources
+
+        let image =
+              Optional/default
+                Text
+                "index.docker.io/sourcegraph/frontend:3.16.1@sha256:8c144508a7f2a662d95c1831ba4b6542942aa25c0eb2f87abe80ff0a9151cf20"
+                overrides.image
+
+        let container =
+              kubernetes.Container::{
+              , args = Some [ "serve" ]
+              , env = Some environment
+              , image = Some image
+              , livenessProbe = Some kubernetes.Probe::{
+                , httpGet = Some kubernetes.HTTPGetAction::{
+                  , path = Some "/healthz"
+                  , port = kubernetes.IntOrString.String "http"
+                  , scheme = Some "HTTP"
+                  }
+                , initialDelaySeconds = Some 300
+                , timeoutSeconds = Some 5
+                }
+              , name = "frontend"
+              , ports = Some
+                [ kubernetes.ContainerPort::{
+                  , containerPort = 3080
+                  , name = Some "http"
+                  }
+                , kubernetes.ContainerPort::{
+                  , containerPort = 3090
+                  , name = Some "http-internal"
+                  }
+                ]
+              , readinessProbe = Some kubernetes.Probe::{
+                , httpGet = Some kubernetes.HTTPGetAction::{
+                  , path = Some "/healthz"
+                  , port = kubernetes.IntOrString.String "http"
+                  , scheme = Some "HTTP"
+                  }
+                , periodSeconds = Some 5
+                , timeoutSeconds = Some 5
+                }
+              , resources = Some resources
+              , terminationMessagePolicy = Some "FallbackToLogsOnError"
+              , volumeMounts = Some
+                [ kubernetes.VolumeMount::{
+                  , mountPath = "/mnt/cache"
+                  , name = "cache-ssd"
+                  }
+                ]
+              }
+
+        in  container
+
+let render =
+      λ(c : Configuration/global.Type) →
+        let overrides = c.Frontend.Deployment
+
+        let additionalAnnotations =
+              Optional/default
+                (List util.keyValuePair)
+                ([] : List util.keyValuePair)
+                overrides.additionalAnnotations
+
+        let additionalLabels =
+              Optional/default
+                (List util.keyValuePair)
+                ([] : List util.keyValuePair)
+                overrides.additionalLabels
+
+        let replicas = Optional/default Natural 1 overrides.replicas
+
+        let frontendContainer = frontendContainer/render c
+
         let deployment =
               kubernetes.Deployment::{
               , metadata = kubernetes.ObjectMeta::{
@@ -105,13 +181,12 @@ let render =
                         ]
                       # additionalLabels
                     )
-                , namespace = c.Frontend.Deployment.namespace
+                , namespace = overrides.namespace
                 , name = Some "sourcegraph-frontend"
                 }
               , spec = Some kubernetes.DeploymentSpec::{
                 , minReadySeconds = Some 10
-                , replicas = Some
-                    (Optional/default Natural 1 c.Frontend.Deployment.replicas)
+                , replicas = Some replicas
                 , revisionHistoryLimit = Some 10
                 , selector = kubernetes.LabelSelector::{
                   , matchLabels = Some
@@ -132,62 +207,7 @@ let render =
                       ]
                     }
                   , spec = Some kubernetes.PodSpec::{
-                    , containers =
-                      [ kubernetes.Container::{
-                        , args = Some [ "serve" ]
-                        , env = Some containerEnvironment
-                        , image = Some
-                            "index.docker.io/sourcegraph/frontend:3.16.1@sha256:8c144508a7f2a662d95c1831ba4b6542942aa25c0eb2f87abe80ff0a9151cf20"
-                        , livenessProbe = Some kubernetes.Probe::{
-                          , httpGet = Some kubernetes.HTTPGetAction::{
-                            , path = Some "/healthz"
-                            , port = kubernetes.IntOrString.String "http"
-                            , scheme = Some "HTTP"
-                            }
-                          , initialDelaySeconds = Some 300
-                          , timeoutSeconds = Some 5
-                          }
-                        , name = "frontend"
-                        , ports = Some
-                          [ kubernetes.ContainerPort::{
-                            , containerPort = 3080
-                            , name = Some "http"
-                            }
-                          , kubernetes.ContainerPort::{
-                            , containerPort = 3090
-                            , name = Some "http-internal"
-                            }
-                          ]
-                        , readinessProbe = Some kubernetes.Probe::{
-                          , httpGet = Some kubernetes.HTTPGetAction::{
-                            , path = Some "/healthz"
-                            , port = kubernetes.IntOrString.String "http"
-                            , scheme = Some "HTTP"
-                            }
-                          , periodSeconds = Some 5
-                          , timeoutSeconds = Some 5
-                          }
-                        , resources = Some
-                          { limits = Some
-                            [ { mapKey = "cpu", mapValue = "2" }
-                            , { mapKey = "memory", mapValue = "4G" }
-                            ]
-                          , requests = Some
-                            [ { mapKey = "cpu", mapValue = "2" }
-                            , { mapKey = "memory", mapValue = "2G" }
-                            ]
-                          }
-                        , terminationMessagePolicy = Some
-                            "FallbackToLogsOnError"
-                        , volumeMounts = Some
-                          [ kubernetes.VolumeMount::{
-                            , mountPath = "/mnt/cache"
-                            , name = "cache-ssd"
-                            }
-                          ]
-                        }
-                      , util.jaegerAgent
-                      ]
+                    , containers = [ frontendContainer, util.jaegerAgent ]
                     , securityContext = Some kubernetes.PodSecurityContext::{
                       , runAsUser = Some 0
                       }
