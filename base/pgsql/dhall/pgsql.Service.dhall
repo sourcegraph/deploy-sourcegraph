@@ -1,91 +1,66 @@
+let kubernetes = (../../../imports.dhall).Kubernetes
+
+let prelude = (../../../imports.dhall).Prelude
+
+let Optional/default = prelude.Optional.default
+
+let Configuration/global = ../../../config/config.dhall
+
 let util = ../../../util/util.dhall
 
-let kubernetes = util.kubernetes
+let render =
+      λ(c : Configuration/global.Type) →
+        let overrides = c.Postgres.Service
 
-in  kubernetes.Service::{
-    , apiVersion = "v1"
-    , kind = "Service"
-    , metadata =
-      { annotations = Some
-          ( toMap
-              { `sourcegraph.prometheus/scrape` = "true"
-              , `prometheus.io/port` = "9187"
+        let additionalAnnotations =
+              Optional/default
+                (List util.keyValuePair)
+                ([] : List util.keyValuePair)
+                overrides.additionalAnnotations
+
+        let additionalLabels =
+              Optional/default
+                (List util.keyValuePair)
+                ([] : List util.keyValuePair)
+                overrides.additionalLabels
+
+        let annotations =
+                toMap
+                  { `sourcegraph.prometheus/scrape` = "true"
+                  , `prometheus.io/port` = "9187"
+                  }
+              # additionalAnnotations
+
+        let labels =
+                toMap
+                  { sourcegraph-resource-requires = "no-cluster-admin"
+                  , deploy = "sourcegraph"
+                  }
+              # additionalLabels
+
+        let service =
+              kubernetes.Service::{
+              , apiVersion = "v1"
+              , kind = "Service"
+              , metadata = kubernetes.ObjectMeta::{
+                , annotations = Some annotations
+                , labels = Some labels
+                , namespace = overrides.namespace
+                , name = Some "pgsql"
+                }
+              , spec = Some kubernetes.ServiceSpec::{
+                , ports = Some
+                  [ kubernetes.ServicePort::{
+                    , name = Some "pgsql"
+                    , port = 5432
+                    , targetPort = Some (kubernetes.IntOrString.String "pgsql")
+                    }
+                  ]
+                , selector = Some (toMap { app = "pgsql" })
+                , type = Some "ClusterIP"
+                }
               }
-          )
-      , clusterName = None Text
-      , creationTimestamp = None Text
-      , deletionGracePeriodSeconds = None Natural
-      , deletionTimestamp = None Text
-      , finalizers = None (List Text)
-      , generateName = None Text
-      , generation = None Natural
-      , labels = Some
-          ( toMap
-              { sourcegraph-resource-requires = "no-cluster-admin"
-              , app = "pgsql"
-              , deploy = "sourcegraph"
-              }
-          )
-      , managedFields =
-          None
-            ( List
-                { apiVersion : Text
-                , fieldsType : Optional Text
-                , fieldsV1 : Optional (List { mapKey : Text, mapValue : Text })
-                , manager : Optional Text
-                , operation : Optional Text
-                , time : Optional Text
-                }
-            )
-      , name = Some "pgsql"
-      , namespace = None Text
-      , ownerReferences =
-          None
-            ( List
-                { apiVersion : Text
-                , blockOwnerDeletion : Optional Bool
-                , controller : Optional Bool
-                , kind : Text
-                , name : Text
-                , uid : Text
-                }
-            )
-      , resourceVersion = None Text
-      , selfLink = None Text
-      , uid = None Text
-      }
-    , spec = Some
-      { clusterIP = None Text
-      , externalIPs = None (List Text)
-      , externalName = None Text
-      , externalTrafficPolicy = None Text
-      , healthCheckNodePort = None Natural
-      , ipFamily = None Text
-      , loadBalancerIP = None Text
-      , loadBalancerSourceRanges = None (List Text)
-      , ports = Some
-        [ { name = Some "pgsql"
-          , nodePort = None Natural
-          , port = 5432
-          , protocol = None Text
-          , targetPort = Some (< Int : Natural | String : Text >.String "pgsql")
-          }
-        ]
-      , publishNotReadyAddresses = None Bool
-      , selector = Some (toMap { app = "pgsql" })
-      , sessionAffinity = None Text
-      , sessionAffinityConfig =
-          None { clientIP : Optional { timeoutSeconds : Optional Natural } }
-      , topologyKeys = None (List Text)
-      , type = Some "ClusterIP"
-      }
-    , status =
-        None
-          { loadBalancer :
-              Optional
-                { ingress :
-                    Optional
-                      (List { hostname : Optional Text, ip : Optional Text })
-                }
-          }
-    }
+
+        in  service
+
+in  render

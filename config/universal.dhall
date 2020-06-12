@@ -7,10 +7,10 @@ let configuration =
           , additionalLabels : Optional (List util.keyValuePair)
           }
       , default =
-        { namespace = None
-        , additionalAnnotations = None
-        , additionalLabels = None
-        }
+        { namespace = None Text
+        , additionalAnnotations = None (List util.keyValuePair)
+        , additionalLabels = None (List util.keyValuePair)
+        } 
       }
 
 in  configuration

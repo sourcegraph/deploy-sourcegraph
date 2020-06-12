@@ -13,12 +13,12 @@ let configuration =
           , replicas : Optional Natural
           }
       , default =
-        { namespace = None
-        , additionalAnnotations = None
-        , additionalLabels = None
-        , image = None
-        , additionalEnvironmentVariables = None
-        , replicas = None
+        { namespace = None Text
+        , additionalAnnotations = None (List util.keyValuePair)
+        , additionalLabels = None (List util.keyValuePair)
+        , image = None Text
+        , additionalEnvironmentVariables = None (List kubernetes.EnvVar.Type)
+        , replicas = None Natural
         }
       }
 

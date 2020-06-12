@@ -8,9 +8,9 @@ let configuration =
               Optional (List kubernetes.EnvVar.Type)
           }
       , default =
-        { image = None
-        , resources = None
-        , additionalEnvironmentVariables = None
+        { image = None Text
+        , resources = None kubernetes.ResourceRequirements.Type
+        , additionalEnvironmentVariables = None (List kubernetes.EnvVar.Type)
         }
       }
 

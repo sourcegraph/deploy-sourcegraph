@@ -18,10 +18,10 @@ let statefulset =
           , Containers : containers.Type
           }
       , default =
-        { namespace = None
-        , additionalAnnotations = None
-        , additionalLabels = None
-        , replicas = None
+        { namespace = None Text
+        , additionalAnnotations = None (List util.keyValuePair)
+        , additionalLabels = None (List util.keyValuePair)
+        , replicas = None Natural
         , Containers = containers.default
         }
       }
