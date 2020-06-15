@@ -24,11 +24,11 @@ patchesJson6902:
       version: v1
     path: gitserver-patch.yaml
   - target:
-      kind: Deployment
+      kind: StatefulSet
       name: grafana
       group: apps
       version: v1
-    path: delete-resources.yaml
+    path: grafana-patch.yaml
   - target:
       kind: StatefulSet
       name: indexed-search
@@ -115,11 +115,6 @@ patchesJson6902:
   - target:
       kind: PersistentVolumeClaim
       name: bundle-manager
-      version: v1
-    path: delete-storageclassname.yaml
-  - target:
-      kind: PersistentVolumeClaim
-      name: grafana
       version: v1
     path: delete-storageclassname.yaml
   - target:
