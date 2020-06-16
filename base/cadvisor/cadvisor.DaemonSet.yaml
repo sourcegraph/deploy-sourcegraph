@@ -27,6 +27,8 @@ spec:
       - name: cadvisor
         image: index.docker.io/sourcegraph/cadvisor:insiders@sha256:d25e28d7af3be79e4c946682c7fdebf8cde1934212e0ab1150b16cea7514a1e9
         args:
+        # Kubernetes-specific flags below (other flags are baked into the Docker image)
+        #
         # disable container labels to allow whitelisting to reduce noise
         - --store_container_labels=false
         - --whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name,io.kubernetes.pod.namespace,io.kubernetes.pod.uid
