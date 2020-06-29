@@ -9,4 +9,4 @@ require (
 	github.com/sethgrid/pester v0.0.0-20190127155807-68a33a018ad0
 )
 
-replace github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.4.3+incompatible
+replace github.com/Azure/go-autorest/v14 => github.com/Azure/go-autorest v14.2.0
