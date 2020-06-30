@@ -52,13 +52,13 @@ spec:
           value: /mnt/cache/$(POD_NAME)
         - name: GRAFANA_SERVER_URL
           value: http://grafana:30070
-          # old value during transition
-        - name: LSIF_API_SERVER_URL
-          value: k8s+http://precise-code-intel-api-server:3186
-          # new value after transition
-        - name: PRECISE_CODE_INTEL_API_SERVER_URL
-          value: k8s+http://precise-code-intel-api-server:3186
-        image: index.docker.io/sourcegraph/frontend:3.15.1@sha256:d6a2253ef0f1b40acb5a6dab7ea785302214c47ae27c4738ad1f9d67f8453ff8
+        - name: JAEGER_SERVER_URL
+          value: http://jaeger-query:16686
+        - name: PRECISE_CODE_INTEL_BUNDLE_MANAGER_URL
+          value: http://precise-code-intel-bundle-manager:3187
+        - name: PROMETHEUS_URL
+          value: http://prometheus:30090
+        image: index.docker.io/sourcegraph/frontend:3.17.2@sha256:2378899365619635ce7acd983582407688d4def72a3fd62ae6fa0c23a0554fde
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -90,7 +90,7 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: index.docker.io/sourcegraph/jaeger-agent:3.15.1@sha256:826c7466a4e00b048d7bb329aacb7f663d4af602c6ad9f8fec4c3d6ed37ce517
+      - image: index.docker.io/sourcegraph/jaeger-agent:3.17.2@sha256:a29258e098c7d23392411abd359563afdd89529e9852ce1ba73f80188a72fd5c
         name: jaeger-agent
         env:
           - name: POD_NAME

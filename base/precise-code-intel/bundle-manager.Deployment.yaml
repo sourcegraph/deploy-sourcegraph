@@ -24,15 +24,13 @@ spec:
     spec:
       containers:
       - env:
-        - name: PRECISE_CODE_INTEL_API_SERVER_URL
-          value: http://precise-code-intel-api-server:3186
         - name: PRECISE_CODE_INTEL_BUNDLE_DIR
           value: /lsif-storage
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/precise-code-intel-bundle-manager:3.15.1@sha256:73ea3f5995e745be2b1918943e02038ca4528feed848b969d1f5f6376417600a
+        image: index.docker.io/sourcegraph/precise-code-intel-bundle-manager:3.17.2@sha256:7dff0e7e8c7a3451ce12cf5eb5e4073bb9502752926acf33f13eb370dc570cc8
         terminationMessagePolicy: FallbackToLogsOnError
         name: precise-code-intel-bundle-manager
         livenessProbe:

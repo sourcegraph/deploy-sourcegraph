@@ -1,0 +1,18 @@
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  labels:
+    app: cadvisor
+    category: rbac
+    deploy: sourcegraph
+    sourcegraph-resource-requires: cluster-admin
+  name: cadvisor
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cadvisor
+subjects:
+- kind: ServiceAccount
+  name: cadvisor
+  # value of namespace needs to match namespace value in base/cadvisor/cadvisor.ServiceAccount.yaml
+  namespace: default
