@@ -9,3 +9,12 @@ if [ ! "$(which src-alpha)" ]; then
   cp src /usr/local/bin/src-alpha
   chmod a+x /usr/local/bin/src-alpha
 fi
+
+if [ ! "$(which jy)" ]; then
+  echo "Installing jy to /usr/local/bin"
+  mkdir -p /tmp/jy
+  cd /tmp/jy
+  wget https://github.com/sourcegraph/jy/releases/download/v1.0.0/jy-1.0.0-linux-amd64
+  cp jy-1.0.0-linux-amd64 /usr/local/bin/jy
+  chmod a+x /usr/local/bin/jy
+fi
