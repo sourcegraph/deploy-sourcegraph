@@ -54,7 +54,12 @@ kubectl create role -n ns-sourcegraph nonroot:unprivileged --verb=use --resource
 
 kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --role=nonroot:unprivileged --serviceaccount=ns-sourcegraph:fake-user
 
-kubectl create secret -n ns-sourcegraph generic gitserver-ssh --from-file id_rsa=/root/.ssh/deploy_sourcegraph_git_ssh_testing
+/bin/cat <<EOM >deploy_sourcegraph_git_ssh_config
+Host *
+    StrictHostKeyChecking no
+EOM
+
+kubectl create secret -n ns-sourcegraph generic gitserver-ssh --from-file id_rsa=/root/.ssh/deploy_sourcegraph_git_ssh_testing --from-file config=deploy_sourcegraph_git_ssh_config
 
 mkdir generated-cluster
 CLEANUP="rm -rf generated-cluster; $CLEANUP"
