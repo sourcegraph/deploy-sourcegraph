@@ -34,8 +34,8 @@ gcloud container clusters create ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --num-n
 
 gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT}
 if [ -z "${NOCLEANUP:-}" ]; then
- CLUSTER_CLEANUP="gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
- CLEANUP="$CLUSTER_CLEANUP; $CLEANUP"
+  CLUSTER_CLEANUP="gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
+  CLEANUP="$CLUSTER_CLEANUP; $CLEANUP"
 fi
 
 kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user ${TEST_GCP_USERNAME}
