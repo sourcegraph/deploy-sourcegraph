@@ -1,6 +1,6 @@
 def validate():
     if cloned:
-       count = src_search_match_count("repo:^github.com/sourcegraph-testing/repo-ssh-keys-test$ gallery-director-drone-vacant-blizzard count:99999")
+       count = src_search_match_count("repo:^github.com/sourcegraph/repo-ssh-keys-test$ gallery-director-drone-vacant-blizzard count:99999")
        return count > 0
     else:
        return False
@@ -12,13 +12,13 @@ svc_config = {
       "token": src_context["github_token"],
       "orgs": [],
       "repos": [
-         "sourcegraph-testing/repo-ssh-keys-test"
+         "sourcegraph/repo-ssh-keys-test"
        ]
 }
 
 svc_id = src_add_external_service("GITHUB", "e2e-test", svc_config)
 
-cloned = src_wait_repo_cloned("github.com/sourcegraph-testing/repo-ssh-keys-test", 5, 2)
+cloned = src_wait_repo_cloned("github.com/sourcegraph/repo-ssh-keys-test", 5, 2)
 
 passed = validate()
 

@@ -33,10 +33,10 @@ DEPLOY_SOURCEGRAPH_ROOT=${CURRENT_DIR}/../../..
 gcloud container clusters create ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --num-nodes 3 --machine-type n1-standard-16 --disk-type pd-ssd --project ${TEST_GCP_PROJECT} --labels="cost-category=build,build-creator=${BUILD_CREATOR},build-branch=${BUILD_BRANCH},integration-test=fresh"
 
 gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT}
-#if [ -z "${NOCLEANUP:-}" ]; then
-# CLUSTER_CLEANUP="gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
-# CLEANUP="$CLUSTER_CLEANUP; $CLEANUP"
-#fi
+if [ -z "${NOCLEANUP:-}" ]; then
+ CLUSTER_CLEANUP="gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
+ CLEANUP="$CLUSTER_CLEANUP; $CLEANUP"
+fi
 
 kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user ${TEST_GCP_USERNAME}
 
