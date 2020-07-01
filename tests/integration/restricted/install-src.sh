@@ -18,3 +18,12 @@ if [ ! "$(which jy)" ]; then
   cp jy-1.0.0-linux-amd64 /usr/local/bin/jy
   chmod a+x /usr/local/bin/jy
 fi
+
+if [ ! "$(which yj)" ]; then
+  echo "Installing yj to /usr/local/bin"
+  mkdir -p /tmp/yj
+  cd /tmp/yj
+  wget https://github.com/sourcegraph/yj/releases/download/v1.0.0/yj-1.0.0-linux-amd64
+  cp yj-1.0.0-linux-amd64 /usr/local/bin/yj
+  chmod a+x /usr/local/bin/yj
+fi
