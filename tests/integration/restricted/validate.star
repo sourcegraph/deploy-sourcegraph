@@ -6,6 +6,7 @@ def validate():
        return False
 
 src_create_first_admin("e2e@sourcegrah.com", "e2e-test-user", "123123123-e2e-test")
+src_log("created first admin")
 
 svc_config = {
       "url": "https://github.com",
@@ -17,11 +18,15 @@ svc_config = {
 }
 
 svc_id = src_add_external_service("GITHUB", "e2e-test", svc_config)
+src_log("added service")
 
 cloned = src_wait_repo_cloned("github.com/sourcegraph-testing/repo-ssh-keys-test", 5, 2)
+src_log("cloned repo")
 
 passed = validate()
+src_log("searched")
 
 src_delete_external_service(svc_id)
+src_log("deleted service")
 
 src_log("done")
