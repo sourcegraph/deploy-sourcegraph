@@ -244,6 +244,7 @@ data:
             for: 10m
             labels:
               level: critical
+              severity: page
             annotations:
               description: 'Pods missing from {{`{{`}} $labels.app {{`}}`}}: {{`{{`}} $value
             {{`}}`}}'
@@ -254,6 +255,7 @@ data:
             for: 2m
             labels:
               level: critical
+              severity: page
             annotations:
               description: 'No pods are running for {{`{{`}} $labels.app {{`}}`}}: {{`{{`}}
             $value {{`}}`}}'
@@ -264,6 +266,7 @@ data:
               > 20
             labels:
               level: critical
+              severity: page
             annotations:
               description: 'Page load latency > 20s (90th percentile over all routes; current
             value: {{`{{`}}$value{{`}}`}}s)'
@@ -283,6 +286,7 @@ data:
             expr: sum by(instance) (container_fs_inodes_total{pod_name!=""}) > 3e+06
             labels:
               level: critical
+              severity: page
             annotations:
               description: '{{`{{`}}$labels.instance{{`}}`}} is using {{`{{`}}humanize $value{{`}}`}}
             inodes'
@@ -300,6 +304,7 @@ data:
             expr: node:k8snode_filesystem_avail_bytes:ratio{exported_name=~".*prod.*"} < 0.05
             labels:
               level: critical
+              severity: page
             annotations:
               help: Alerts when a node has less than 5% available disk space.
               summary: Critical! {{`{{`}}$labels.exported_name{{`}}`}} has less than 5% available
@@ -313,6 +318,7 @@ data:
             expr: src_gitserver_disk_space_available / src_gitserver_disk_space_total < 0.05
             labels:
               level: critical
+              severity: page
             annotations:
               help: Alerts when gitserverdisk space is critically low.
               summary: Critical! gitserver {{`{{`}}$labels.instance{{`}}`}} disk space is less than 5% of available disk space
