@@ -235,6 +235,7 @@ data:
       metrics_path: /alertmanager/metrics
       static_configs:
         - targets: ['127.0.0.1:9093']
+  # TODO: migrate these rules to the generator - https://github.com/sourcegraph/sourcegraph/issues/12117
   alert_rules.yml: |
     groups:
       - name: alert.rules
@@ -245,9 +246,10 @@ data:
             labels:
               level: critical
               severity: page
+              service_name: "{{ $labels.app }}"
+              name: "{{ $labels.alertname }}"
+              description: "Pods missing from {{ $labels.app }}: {{ $value }}"
             annotations:
-              description: 'Pods missing from {{`{{`}} $labels.app {{`}}`}}: {{`{{`}} $value
-            {{`}}`}}'
               help: Alerts when pods are missing.
               summary: Pods missing from {{`{{`}} $labels.app {{`}}`}}
           - alert: NoPodsRunning
@@ -256,9 +258,10 @@ data:
             labels:
               level: critical
               severity: page
+              service_name: "{{ $labels.app }}"
+              name: "{{ $labels.alertname }}"
+              description: "No pods are running for {{ $labels.app }}: {{ $value }}"
             annotations:
-              description: 'No pods are running for {{`{{`}} $labels.app {{`}}`}}: {{`{{`}}
-            $value {{`}}`}}'
               help: Alerts when no pods are running for a service.
               summary: No pods are running for {{`{{`}} $labels.app {{`}}`}}
           - alert: ProdPageLoadLatency
@@ -267,9 +270,10 @@ data:
             labels:
               level: critical
               severity: page
+              service_name: "{{ $labels.app }}"
+              name: "{{ $labels.alertname }}"
+              description: "Page load latency > 20s (90th percentile over all routes; current value: {{ $value }}s)"
             annotations:
-              description: 'Page load latency > 20s (90th percentile over all routes; current
-            value: {{`{{`}}$value{{`}}`}}s)'
               help: Alerts when the page load latency is too high.
               summary: High page load latency
           - alert: GoroutineLeak
@@ -277,9 +281,10 @@ data:
             for: 10m
             labels:
               level: warn
+              service_name: "{{ $labels.app }}"
+              name: "{{ $labels.alertname }}"
+              description: "{{ $labels.app }} has more than 10k goroutines. This is probably a regression causing a goroutine leak"
             annotations:
-              description: '{{`{{`}} $labels.app {{`}}`}} has more than 10k goroutines. This
-            is probably a regression causing a goroutine leak'
               help: Alerts when a service has excessive running goroutines.
               summary: Excessive number of goroutines
           - alert: FSINodesRemainingLow
@@ -287,15 +292,19 @@ data:
             labels:
               level: critical
               severity: page
+              service_name: "{{ $labels.app }}"
+              name: "{{ $labels.alertname }}"
+              description: "{{ $labels.instance }} is using {{ $value | humanize }} inodes"
             annotations:
-              description: '{{`{{`}}$labels.instance{{`}}`}} is using {{`{{`}}humanize $value{{`}}`}}
-            inodes'
               help: Alerts when a node's remaining FS inodes are low.
               summary: '{{`{{`}}$labels.instance{{`}}`}} remaining fs inodes is low'
           - alert: DiskSpaceLow
             expr: node:k8snode_filesystem_avail_bytes:ratio < 0.1
             labels:
               level: warn
+              service_name: "{{ $labels.app }}"
+              name: "{{ $labels.alertname }}"
+              description: "{{ $labels.exported_name }} has less than 10% available disk space"
             annotations:
               help: Alerts when a node has less than 10% available disk space.
               summary: '{{`{{`}}$labels.exported_name{{`}}`}} has less than 10% available
@@ -305,12 +314,20 @@ data:
             labels:
               level: critical
               severity: page
+              service_name: "{{ $labels.app }}"
+              name: "{{ $labels.alertname }}"
+              description: "{{ $labels.exported_name }} has less than 5% available disk space"
             annotations:
               help: Alerts when a node has less than 5% available disk space.
               summary: Critical! {{`{{`}}$labels.exported_name{{`}}`}} has less than 5% available
                 disk space
           - alert: GitserverDiskSpaceLow
             expr: src_gitserver_disk_space_available / src_gitserver_disk_space_total < 0.1
+            labels:
+              level: warning
+              service_name: "{{ $labels.app }}"
+              name: "{{ $labels.alertname }}"
+              description: "gitserver {{ $labels.instance }} disk space is less than 10% of available disk space"
             annotations:
               help: Alerts when gitserverdisk space is low.
               summary: gitserver {{`{{`}}$labels.instance{{`}}`}} disk space is less than 10% of available disk space
@@ -319,6 +336,9 @@ data:
             labels:
               level: critical
               severity: page
+              service_name: "{{ $labels.app }}"
+              name: "{{ $labels.alertname }}"
+              description: "gitserver {{ $labels.instance }} disk space is less than 5% of available disk space"
             annotations:
               help: Alerts when gitserverdisk space is critically low.
               summary: Critical! gitserver {{`{{`}}$labels.instance{{`}}`}} disk space is less than 5% of available disk space
@@ -327,6 +347,9 @@ data:
             for: 20m
             labels:
               level: warn
+              service_name: "{{ $labels.app }}"
+              name: "{{ $labels.alertname }}"
+              description: Error ratio exceeds 10%
             annotations:
               help: Alerts when the search service has more than 10% of requests failing.
               summary: Error ratio exceeds 10%
@@ -335,6 +358,9 @@ data:
               > 20000
             labels:
               level: warn
+              service_name: "{{ $labels.app }}"
+              name: "{{ $labels.alertname }}"
+              description: "{{ $labels.job }} in {{ $labels.ns }} is probably leaking metrics (unbounded attribute)"
             annotations:
               help: Alerts when a service is probably leaking metrics (unbounded attribute).
               summary: '{{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.ns{{`}}`}} is probably
