@@ -25,8 +25,6 @@ A Prometheus instance is part of the default Sourcegraph cluster installation.
    myCustomMetric2 = sum by (route, ns, le)(task:src_http_request_duration_seconds_bucket:rate5m)
    ```
 
-1. [Enable Alertmanager](../../config/prometheus/alertmanager/README.md).
-
 1. Apply your changes to Prometheus to the cluster.
 
    ```bash
