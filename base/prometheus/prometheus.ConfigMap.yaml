@@ -234,14 +234,18 @@ data:
         action: replace
         target_label: kubernetes_pod_name
 
-    - job_name: 'builtin-alertmanager'
-      metrics_path: /alertmanager/metrics
-      static_configs:
-        - targets: ['127.0.0.1:9093']
     # Scrape prometheus itself for metrics.
     - job_name: 'builtin-prometheus'
       static_configs:
         - targets: ['127.0.0.1:9092']
+          labels:
+            app: prometheus
+    - job_name: 'builtin-alertmanager'
+      metrics_path: /alertmanager/metrics
+      static_configs:
+        - targets: ['127.0.0.1:9093']
+          labels:
+            app: alertmanager
   extra_rules.yml: ""
 kind: ConfigMap
 metadata:
