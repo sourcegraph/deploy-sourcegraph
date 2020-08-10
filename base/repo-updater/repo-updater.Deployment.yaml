@@ -36,6 +36,14 @@ spec:
           name: http
         - containerPort: 6060
           name: debug
+        readinessProbe:
+          failureThreshold: 1
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 1
+          timeoutSeconds: 5
         resources:
           limits:
             cpu: "1"
