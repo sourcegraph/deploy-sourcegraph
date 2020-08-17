@@ -131,6 +131,9 @@ data:
       - source_labels: [__meta_kubernetes_service_annotation_sourcegraph_prometheus_scrape]
         action: keep
         regex: true
+      - source_labels: [__meta_kubernetes_pod_container_name]
+        action: drop
+        regex: jaeger-agent
       - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
         action: replace
         target_label: __scheme__
