@@ -27,7 +27,7 @@ jobs:
       # Set up and commit cherry-pick
       - name: Set up cherry-pick of ${{ github.event.client_payload.sha }}
         run: |
-          git cherry-pick -x --strategy=recursive --no-commit ${{ github.event.client_payload.sha }}
+          git cherry-pick -x --strategy=recursive --no-commit ${{ github.event.client_payload.sha }} || true # ignore conflicts
       - name: Unstage irrelevant cherry-picked changes
         run: |
           git reset -- .github
