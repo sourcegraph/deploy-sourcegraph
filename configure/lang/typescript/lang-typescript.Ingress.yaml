@@ -20,6 +20,8 @@ metadata:
         # See
         # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/
         # for more nginx annotations.
+        certmanager.k8s.io/issuer: "letsencrypt-prod"
+        certmanager.k8s.io/acme-challenge-type: http01
 spec:
     tls:
     - hosts:
@@ -29,10 +31,10 @@ spec:
       # 
       # Make sure to replace 'typescript.sourcegraph.example.com' with the real domain that you are
       # using for the Javascript/Typescript language server.
-      - typescript.sourcegraph.example.com
-      secretName: typescript-tls
+      - typescript-k8s.sgdev.org
+      secretName: lang-typescript-tls
     rules:
-    - host: typescript.sourcegraph.example.com
+    - host: typescript-k8s.sgdev.org
       http:
         paths:
         - path: /

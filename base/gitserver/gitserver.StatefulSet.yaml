@@ -8,7 +8,7 @@ metadata:
     sourcegraph-resource-requires: no-cluster-admin
   name: gitserver
 spec:
-  replicas: 1
+  replicas: 4
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -51,6 +51,8 @@ spec:
         # about configuring gitserver to use an SSH key
         # - mountPath: /root/.ssh
         #   name: ssh
+        - name: ssh
+          mountPath: /root/.ssh
       - image: index.docker.io/sourcegraph/jaeger-agent:3.19.1@sha256:cb75526fb4baa89fca5ed4566abf2104478f7e2e498139e72ed4d52a00ea1ff0
         name: jaeger-agent
         env:
@@ -88,6 +90,10 @@ spec:
       #   secret:
       #     defaultMode: 384
       #     secretName: gitserver-ssh
+      - name: ssh
+        secret:
+          defaultMode: 384
+          secretName: gitserver-ssh
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
@@ -100,5 +106,5 @@ spec:
         requests:
           # The size of disk used to mirror your git repositories.
           # If you change this, also change indexed-search's disk size.
-          storage: 200Gi
+          storage: 1Ti
       storageClassName: sourcegraph

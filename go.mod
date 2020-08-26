@@ -1,4 +1,4 @@
-module github.com/sourcegraph/deploy-sourcegraph
+module github.com/sourcegraph/deploy-sourcegraph-dogfood-k8s
 
 go 1.14
 

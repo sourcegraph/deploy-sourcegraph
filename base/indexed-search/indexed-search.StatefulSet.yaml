@@ -8,7 +8,7 @@ metadata:
     sourcegraph-resource-requires: no-cluster-admin
   name: indexed-search
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -38,11 +38,11 @@ spec:
           timeoutSeconds: 5
         resources:
           limits:
-            cpu: "2"
-            memory: 4G
+            cpu: 12
+            memory: 120Gi
           requests:
-            cpu: 500m
-            memory: 2G
+            cpu: 12
+            memory: 120Gi
         volumeMounts:
         - mountPath: /data
           name: data
@@ -83,5 +83,5 @@ spec:
         requests:
           # The size of disk to used for search indexes.
           # This should typically be gitserver disk size multipled by the number of gitserver shards.
-          storage: 200Gi
+          storage: 4Ti
       storageClassName: sourcegraph
