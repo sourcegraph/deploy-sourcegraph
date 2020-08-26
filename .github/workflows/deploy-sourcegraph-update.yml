@@ -32,10 +32,14 @@ jobs:
       - name: Unstage irrelevant cherry-picked changes
         run: |
           git reset -- .github
-          git reset -- *.md
       - name: Commit update - if this step fails, there are no relevant changes
+        id: commit
         run: |
+          trap 'EXIT_CODE=$?' ERR
           git commit --no-edit
+          echo ::set-output name=status::$EXIT_CODE
+          exit $EXIT_CODE
+        continue-on-error: true
 
       # Get short hash for ease of use
       - name: Generate git short hash
@@ -69,8 +73,9 @@ jobs:
             * {{ steps.strings.outputs.change_entry }}
 
       # Report back to originating PR that something went wrong
+      # Don't report commit errors, since that is likely caused by lack of relevant changes
       - name: Report failure
-        if: ${{ failure() }}
+        if: ${{ failure() && steps.commit.outputs.status == "0" }}
         uses: peter-evans/create-or-update-comment@v1
         with:
           repository: sourcegraph/deploy-sourcegraph
