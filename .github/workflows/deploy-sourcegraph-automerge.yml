@@ -1,0 +1,32 @@
+name: automerge
+
+on:
+  pull_request:
+
+jobs:
+  automerge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Check for unresolved conflicts
+        run: |
+          ! grep -R "<<<<<<<\|=======" --exclude-dir=.github .
+
+      - name: Automerge
+        if: ${{ success() }}
+        uses: pascalgn/automerge-action@v0.9.0
+        env:
+          MERGE_LABELS: automerge
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Report failure
+        if: ${{ failure() }}
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.number }}
+          body: |
+            :warning: [Failed to automerge this pull request](https://github.com/sourcegraph/deploy-sourcegraph-dogfood-k8s-2/actions/runs/${{ github.run_id }}).
+
+            /cc @sourcegraph/distribution, @${{ github.event.client_payload.actor }}
+          token: ${{ secrets.COMMENT_PERSONAL_ACCESS_TOKEN }}
