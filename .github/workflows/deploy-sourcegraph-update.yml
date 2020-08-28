@@ -16,6 +16,8 @@ jobs:
       # Set up this repository and the upstream repository
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          fetch-depth: '0'
       - name: Set up git
         run: |
           git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
@@ -23,31 +25,33 @@ jobs:
       - name: Fetch upstream
         run: |
           git remote add upstream https://github.com/sourcegraph/deploy-sourcegraph.git
-          git fetch upstream ${{ github.event.client_payload.sha }}
+          git fetch upstream
 
       # Set up and commit merge
       - name: Set up merge of ${{ github.event.client_payload.sha }}
         run: |
           git merge --strategy=recursive --no-commit ${{ github.event.client_payload.sha }} || true # ignore conflicts
-      - name: Unstage irrelevant cherry-picked changes
-        run: |
-          git reset -- .github
-      - name: Commit update - if this step fails, there are no relevant changes
+      - name: Commit update
         id: commit
         run: |
-          trap 'EXIT_CODE=$?' ERR
-          git commit --no-edit
-          echo ::set-output name=status::$EXIT_CODE
-          exit $EXIT_CODE
-        continue-on-error: true
+          git reset -- .github # Unstage irrelevant cherry-picked changes
+          if git commit --no-edit ; then
+            echo ::set-output name=status::0
+            exit 0
+          else
+            echo ::set-output name=status::1
+            exit 1
+          fi
+      - name: Clean working space
+        run: |
+          git add .
+          git reset HEAD --hard
 
       # Get short hash for ease of use
       - name: Generate git short hash
-        id: strings
+        id: parse_rev
         run: |
           echo "::set-output name=short_hash::$(git rev-parse --short ${{ github.event.client_payload.sha }})"
-          CHANGE_ENTRY="https://github.com/sourcegraph/deploy-sourcegraph/commit/${{ github.event.client_payload.sha }} (https://github.com/sourcegraph/deploy-sourcegraph/pull/${{ github.event.client_payload.pull_request }}) by [${{ github.event.client_payload.actor }}](https://github.com/${{ github.event.client_payload.actor }}) ([logs](https://github.com/sourcegraph/deploy-sourcegraph-dogfood-k8s-2/actions/runs/${{ github.run_id }}))"
-          echo "::set-output name=change_entry::$CHANGE_ENTRY"
       
       # Get existing pull request body if existing
       - name: Get pull request
@@ -63,19 +67,19 @@ jobs:
       - name: Open pull request
         uses: peter-evans/create-pull-request@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.COMMENT_PERSONAL_ACCESS_TOKEN }}
           base: release
           branch: deploy-sourcegraph-changes
           labels: automerge,deploy-sourcegraph
-          title: 'deploy-sourcegraph@${{ steps.strings.outputs.short_hash }}'
+          title: 'deploy-sourcegraph@${{ steps.parse_rev.outputs.short_hash }}'
           body: |
             ${{ steps.pull_request.body }}
-            * {{ steps.strings.outputs.change_entry }}
+            * https://github.com/sourcegraph/deploy-sourcegraph/commit/${{ github.event.client_payload.sha }} (https://github.com/sourcegraph/deploy-sourcegraph/pull/${{ github.event.client_payload.pull_request }}) by [${{ github.event.client_payload.actor }}](https://github.com/${{ github.event.client_payload.actor }}) ([logs](https://github.com/sourcegraph/deploy-sourcegraph-dogfood-k8s-2/actions/runs/${{ github.run_id }}))
 
       # Report back to originating PR that something went wrong
       # Don't report commit errors, since that is likely caused by lack of relevant changes
       - name: Report failure
-        if: ${{ failure() && steps.commit.outputs.status == "0" }}
+        if: ${{ failure() && steps.commit.outputs.status == '0' }}
         uses: peter-evans/create-or-update-comment@v1
         with:
           repository: sourcegraph/deploy-sourcegraph
