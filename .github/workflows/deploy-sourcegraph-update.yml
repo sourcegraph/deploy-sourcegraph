@@ -35,6 +35,7 @@ jobs:
         id: commit
         run: |
           git reset -- .github # Unstage irrelevant cherry-picked changes
+          git add --update .
           if git commit --no-edit ; then
             echo ::set-output name=status::0
             exit 0
