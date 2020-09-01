@@ -60,7 +60,8 @@ jobs:
           BODY=$(curl \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
             -H "Accept: application/vnd.github.groot-preview+json" \
-            "https://api.github.com/repos/sourcegraph/deploy-sourcegraph-dogfood-k8s-2/pulls?head=deploy-sourcegraph-changes" | jq --raw-output 'if (type=="array" and (. | length) > 0) then .[0].body else empty end' | cat)
+            "https://api.github.com/repos/sourcegraph/deploy-sourcegraph-dogfood-k8s-2/pulls?head=sourcegraph:deploy-sourcegraph-changes&state=open" | jq --raw-output 'if (type=="array" and (. | length) > 0) then .[0].body else empty end' | cat)
+          echo $BODY
           echo "::set-output name=body::$BODY"
 
       # Create pull request, configured to automatically merge
