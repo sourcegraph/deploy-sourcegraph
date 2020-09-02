@@ -7,11 +7,18 @@
   "prHourlyLimit": 0,
   "packageRules": [
     {
-      "groupName": "Sourcegraph Docker images",
+      "groupName": "Sourcegraph Docker insiders images",
       "packagePatterns": ["^index.docker.io/sourcegraph/"],
-      "ignoreUnstable": false,
       "followTag": "insiders",
-      "extends": ["default:automergeAll"]
+      "ignoreUnstable": false,
+      "automerge": false
+    },
+    {
+      "groupName": "Sourcegraph Docker release images",
+      "packagePatterns": ["^index.docker.io/sourcegraph/"],
+      "versionScheme": "semver",
+      "ignoreUnstable": false,
+      "automerge": false
     },
     {
       "groupName": "Pulumi NPM packages",
