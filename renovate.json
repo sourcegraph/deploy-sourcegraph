@@ -7,22 +7,11 @@
   "prHourlyLimit": 0,
   "packageRules": [
     {
-      "packagePatterns": ["^index.docker.io/sourcegraph/"],
-      "excludePackageNames": ["index.docker.io/sourcegraph/grafana", "index.docker.io/sourcegraph/prometheus"],
       "groupName": "Sourcegraph Docker images",
-      "versionScheme": "semver",
+      "packagePatterns": ["^index.docker.io/sourcegraph/"],
       "ignoreUnstable": false,
-      "semanticCommits": false,
-      "automerge": true
-    },
-    {
-      "packageNames": ["index.docker.io/sourcegraph/grafana", "index.docker.io/sourcegraph/prometheus"],
-      "groupName": "Sourcegraph Prometheus / Grafana Docker images",
-      "allowedVersions": "<10.0",
-      "versionScheme": "semver",
-      "ignoreUnstable": false,
-      "semanticCommits": false,
-      "automerge": true
+      "followTag": "insiders",
+      "extends": ["default:automergeAll"]
     },
     {
       "groupName": "Pulumi NPM packages",
@@ -34,5 +23,5 @@
   ],
   "masterIssue": true,
   "pinDigests": true,
-  "baseBranches": ["master", "3.14"]
+  "baseBranches": ["master"]
 }
