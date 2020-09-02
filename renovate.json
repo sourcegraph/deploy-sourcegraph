@@ -1,10 +1,13 @@
 {
   "$schema": "http://json.schemastore.org/renovate",
   "extends": ["config:base"],
+  "prHourlyLimit": 0,
+  "masterIssue": true,
+  "pinDigests": true,
+  "baseBranches": ["master"],
   "kubernetes": {
     "fileMatch": ["(^|/)[^/]*\\.yaml$"]
   },
-  "prHourlyLimit": 0,
   "packageRules": [
     {
       "groupName": "Sourcegraph Docker insiders images",
@@ -27,8 +30,5 @@
       "packagePatterns": ["@pulumi/"],
       "followTag": "latest"
     }
-  ],
-  "masterIssue": true,
-  "pinDigests": true,
-  "baseBranches": ["master"]
+  ]
 }
