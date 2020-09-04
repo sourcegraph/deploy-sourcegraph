@@ -23,9 +23,8 @@ Kubernetes is easy later.
 - [Updating](https://docs.sourcegraph.com/admin/updates/kubernetes)
 - [Scaling](https://docs.sourcegraph.com/admin/install/kubernetes/scale)
 - [Troubleshooting](https://docs.sourcegraph.com/admin/install/kubernetes/troubleshoot)
-- [Admin guide](docs/admin-guide.md) - useful guide for Sourcegraph admins
-  - [Prometheus metrics](docs/admin-guide.md#prometheus) - list of all Prometheus metrics that can be used for
-    application performance monitoring
+- [Admin guide](https://docs.sourcegraph.com/admin) - useful guide for Sourcegraph admins
+  - [Metrics](https://docs.sourcegraph.com/admin/observability/metrics) - guidance of metrics that can be used for monitoring Sourcegraph
 
 ## Kubernetes alternatives
 
