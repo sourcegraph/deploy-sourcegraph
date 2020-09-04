@@ -1,10 +1,11 @@
-> 🚨  IMPORTANT: When upgrading Sourcegraph, please check [upgrading docs](https://docs.sourcegraph.com/admin/updates/kubernetes) to check if any manual migrations are necessary.
-
-> `master` branch tracks development. Use the revision of this repository corresponding to the
-> version of Sourcegraph you wish to deploy. E.g., `git checkout v3.10.4`.
-
 # Sourcegraph on Kubernetes
+
 [![sourcegraph: search](https://img.shields.io/badge/sourcegraph-search-brightgreen.svg)](https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph)
+
+> 🚨 IMPORTANT: When upgrading Sourcegraph, please check [upgrading docs](https://docs.sourcegraph.com/admin/updates/kubernetes) to check if any manual migrations are necessary.
+>
+> The `master` branch tracks development. Use the branch of this repository corresponding to the
+> version of Sourcegraph you wish to deploy, e.g. `git checkout 3.19`.
 
 Deploying Sourcegraph into a Kubernetes cluster is for organizations that need highly scalable and
 available code search and code intelligence. This repository contains documentation for creating,
