@@ -1,10 +1,11 @@
-> 🚨  IMPORTANT: When upgrading Sourcegraph, please check [upgrading docs](https://docs.sourcegraph.com/admin/updates/kubernetes) to check if any manual migrations are necessary.
-
-> `master` branch tracks development. Use the revision of this repository corresponding to the
-> version of Sourcegraph you wish to deploy. E.g., `git checkout v3.10.4`.
-
 # Sourcegraph on Kubernetes
-[![sourcegraph: search](https://img.shields.io/badge/sourcegraph-search-brightgreen.svg)](https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph)
+
+[![sourcegraph: search](https://img.shields.io/badge/sourcegraph-search-brightgreen.svg)](https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph) [![master build status](https://badge.buildkite.com/018ed23ed79d7297e7dd109b745597c58d875323fb06e81786.svg?branch=master)](https://buildkite.com/sourcegraph/deploy-sourcegraph)
+
+> 🚨 IMPORTANT: When upgrading Sourcegraph, please check [upgrading docs](https://docs.sourcegraph.com/admin/updates/kubernetes) to check if any manual migrations are necessary.
+>
+> The `master` branch tracks development. Use the branch of this repository corresponding to the
+> version of Sourcegraph you wish to deploy, e.g. `git checkout 3.19`.
 
 Deploying Sourcegraph into a Kubernetes cluster is for organizations that need highly scalable and
 available code search and code intelligence. This repository contains documentation for creating,
@@ -23,9 +24,8 @@ Kubernetes is easy later.
 - [Updating](https://docs.sourcegraph.com/admin/updates/kubernetes)
 - [Scaling](https://docs.sourcegraph.com/admin/install/kubernetes/scale)
 - [Troubleshooting](https://docs.sourcegraph.com/admin/install/kubernetes/troubleshoot)
-- [Admin guide](docs/admin-guide.md) - useful guide for Sourcegraph admins
-  - [Prometheus metrics](docs/admin-guide.md#prometheus) - list of all Prometheus metrics that can be used for
-    application performance monitoring
+- [Admin guide](https://docs.sourcegraph.com/admin) - useful guide for Sourcegraph admins
+  - [Metrics](https://docs.sourcegraph.com/admin/observability/metrics) - guidance of metrics that can be used for monitoring Sourcegraph
 
 ## Kubernetes alternatives
 
