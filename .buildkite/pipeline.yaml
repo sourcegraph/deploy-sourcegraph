@@ -1,10 +1,4 @@
 steps:
-  - label: ":k8s:"
-    command: .buildkite/verify-yaml.sh
-  - label: ":k8s:"
-    command: .buildkite/verify-label.sh
-  - label: ":k8s:"
-    command: .buildkite/verify-rbac-labels.sh
   - label: ':lipstick:'
     command: .buildkite/prettier-check.sh
   - label: ':lipstick:'
@@ -12,22 +6,10 @@ steps:
 
   - wait
 
-  - label: ":pulumi: :k8s:"
-    concurrency: 3
-    concurrency_group: deploy-sourcegraph/integration
-    command: .buildkite/integration-test.sh
-    env:
-      VERBOSE: "true"
-
-  - label: ":k8s:"
-    concurrency: 3
-    concurrency_group: deploy-sourcegraph/integration-restricted
-    command: .buildkite/integration-restricted-test.sh
-
-  - wait: ~
-    continue_on_failure: true
-  
-  - label: ":gcompute: :floppy_disk: 🧹"
+  - label: ':rocket: :k8s:'
+    branches: 'release'
     concurrency: 1
-    concurrency_group: deploy-sourcegraph/clean-unused-disks
-    command: .buildkite/cleanup-unused-disks.sh
+    concurrency_group: dogfood/deploy
+    commands:
+      - gcloud container clusters get-credentials dogfood --zone us-central1-f --project sourcegraph-dogfood
+      - ./kubectl-apply-all.sh --context="gke_sourcegraph-dogfood_us-central1-f_dogfood"
