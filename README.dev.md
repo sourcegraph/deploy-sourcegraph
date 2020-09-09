@@ -19,9 +19,9 @@
 
 Refer to [deployment basics](https://about.sourcegraph.com/handbook/engineering/deployments#deployment-basics) to learn about Sourcegraph Docker images and [Renovate](https://renovatebot.com/docs/docker/), which performs most image updates.
 
-The `master` branch of this repository is configured to track the latest builds from `sourcegraph/sourgraph@main`, tagged as `BUILD_YYYY_MM_DD_HASH`. Renovate performs upgrades for Sourcegraph Docker images based on a psuedo-versioning scheme that interprets this tag as `v0.YYYY.BUILD`.
+The `master` branch of this repository is configured to track the latest builds from `sourcegraph/sourgraph@main`, tagged as `insiders`. Renovate automatically performs updates for these images.
 
-Release branches (`3.19`, etc) track specific versions instead.
+Release branches (`3.19`, etc) track specific versions instead, and updates are triggered manually for specific branches - see [cutting a release](#cutting-a-release).
 
 ### Cutting a release
 
