@@ -27,7 +27,7 @@ spec:
       - args:
         - run
         env:
-        image: index.docker.io/sourcegraph/gitserver:3.19.2@sha256:51b827ff2bf3f9df740cd8538840ef7fd7cb245c7b93063ef829f67ca71ea23e
+        image: index.docker.io/sourcegraph/gitserver:insiders@sha256:7d5777089e5dae0abfa1cef2f5242cd3f1b197b01bbce4e8e897977468cf1404
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 5
@@ -52,9 +52,13 @@ spec:
         # about configuring gitserver to use an SSH key
         # - mountPath: /root/.ssh
         #   name: ssh
+<<<<<<< HEAD
         - name: ssh
           mountPath: /root/.ssh
       - image: index.docker.io/sourcegraph/jaeger-agent:3.19.2@sha256:e757094c04559780dba1ded3475ee5f0e4e5330aa6bbc8a7398e7277b0e450fe
+=======
+      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:65d5cab29b7d92ce42e44c29af09890cf3499304951e21c067ff8e0b57872feb
+>>>>>>> 6951de7e7ce45df7ec8eba3f2ae7da178bddf041
         name: jaeger-agent
         env:
           - name: POD_NAME
