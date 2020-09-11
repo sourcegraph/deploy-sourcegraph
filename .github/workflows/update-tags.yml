@@ -13,8 +13,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.14'
+
+      # uses version pinned in go.mod
       - name: Install update-docker-tags
-        run: go get -u github.com/slimsag/update-docker-tags
+        run: go install github.com/slimsag/update-docker-tags
+
+      # generate update
       - name: Pin tags to ${{ github.event.inputs.semver }}
         run: .github/workflows/scripts/update-docker-tags.sh "${{ github.event.inputs.semver }}"
       - name: Open pull request
