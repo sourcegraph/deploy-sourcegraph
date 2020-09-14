@@ -39,11 +39,11 @@ spec:
           timeoutSeconds: 5
         resources:
           limits:
-            cpu: 12
-            memory: 120Gi
+            cpu: "5"
+            memory: 80Gi
           requests:
-            cpu: 12
-            memory: 120Gi
+            cpu: "5"
+            memory: 64Gi
         volumeMounts:
         - mountPath: /data
           name: data
@@ -58,11 +58,11 @@ spec:
           # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
           # lower lag between a new commit and it being indexed for search.
           limits:
-            cpu: "8"
-            memory: 8G
+            cpu: "5"
+            memory: 31Gi
           requests:
             cpu: "4"
-            memory: 4G
+            memory: 24Gi
         volumeMounts:
         - mountPath: /data
           name: data
