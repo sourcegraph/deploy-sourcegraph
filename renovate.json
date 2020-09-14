@@ -9,16 +9,16 @@
   "kubernetes": {
     "fileMatch": ["(^|/)[^/]*\\.yaml$"]
   },
-  "schedule": [
-    "before 3am on Monday"
-  ],
   "packageRules": [
     {
       "groupName": "Sourcegraph Docker insiders images",
       "packagePatterns": ["^index.docker.io/sourcegraph/"],
       "ignoreUnstable": false,
       "semanticCommits": false,
-      "automerge": true
+      "automerge": true,
+      "schedule": [
+        "before 3am on Monday"
+      ]
     },
     {
       "groupName": "Pulumi NPM packages",
