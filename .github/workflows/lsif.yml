@@ -1,6 +1,9 @@
 name: LSIF
 on:
-  - push
+  push:
+    branches-ignore:
+      - 'renovate/docker-sourcegraph-docker-insiders-images'
+
 jobs:
   lsif-go:
     if: github.repository == 'sourcegraph/deploy-sourcegraph'
