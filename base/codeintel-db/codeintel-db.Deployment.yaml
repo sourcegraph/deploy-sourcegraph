@@ -6,21 +6,21 @@ metadata:
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-  name: db-codeintel
+  name: codeintel-db
 spec:
   minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: db-codeintel
+      app: codeintel-db
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         deploy: sourcegraph
-        app: db-codeintel
+        app: codeintel-db
         group: backend
     spec:
       initContainers:
@@ -79,8 +79,8 @@ spec:
       volumes:
       - name: disk
         persistentVolumeClaim:
-          claimName: db-codeintel
+          claimName: codeintel-db
       - name: pgsql-conf
         configMap:
           defaultMode: 0777
-          name: db-codeintel-conf
+          name: codeintel-db-conf

@@ -5,15 +5,15 @@ metadata:
     prometheus.io/port: "9187"
     sourcegraph.prometheus/scrape: "true"
   labels:
-    app: db-codeintel
+    app: codeintel-db
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-  name: db-codeintel
+  name: codeintel-db
 spec:
   ports:
   - name: pgsql
     port: 5432
     targetPort: pgsql
   selector:
-    app: db-codeintel
+    app: codeintel-db
   type: ClusterIP
