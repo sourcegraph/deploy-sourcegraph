@@ -250,6 +250,105 @@ data:
           labels:
             app: alertmanager
   extra_rules.yml: ""
+  node_rules.yml: |
+    groups:
+      - name: nodes.rules
+        rules:
+          - record: node:container_cpu_usage_seconds_total:ratio_rate5m
+            expr: sum by(instance) (rate(container_cpu_usage_seconds_total{kubernetes_pod_name=""}[5m]))
+              / max by(instance) (machine_cpu_cores)
+          - record: task:container_memory_usage_bytes:max
+            expr: max by(namespace, container_name) (container_memory_usage_bytes{container_name!=""})
+          - record: task:container_cpu_usage_seconds_total:sum
+            expr: sum by(id, namespace, container_name) (irate(container_cpu_usage_seconds_total{container_name!=""}[1m]))
+          - record: node:k8snode_filesystem_avail_bytes:ratio
+            expr: min by(exported_name) (k8snode_filesystem_avail_bytes / k8snode_filesystem_size_bytes)
+  sourcegraph_rules.yml: |
+    groups:
+      - name: sourcegraph.rules
+        rules:
+          - record: app:up:sum
+            expr: sum by(app) (up)
+          - record: app:up:count
+            expr: count by(app) (up)
+          - record: app:up:ratio
+            expr: app:up:sum / on(app) app:up:count
+  sourcegraph_blackbox_rules.yml: |
+    groups:
+      - name: ssl_expiry.rules
+        rules:
+          - alert: SSLCertExpiringSoon
+            expr: probe_ssl_earliest_cert_expiry{job="http_200"} - time() < 86400 * 30
+            for: 10m
+            labels:
+              level: critical
+      - name: http_probe.rules
+        rules:
+          - alert: http probe
+            expr: probe_http_status_code{instance="http://sourcegraph-frontend:30080",job="http_200"} != 200
+            for: 5m
+            labels:
+              level: critical
+          - alert: http probe
+            expr: probe_http_status_code{instance="http://k8s.sgdev.org",job="http_200"} == 200
+            for: 5m
+            labels:
+              level: critical
+          - alert: http probe
+            expr: probe_http_status_code{instance="https://k8s.sgdev.org",job="http_200"} != 200
+            for: 5m
+            labels:
+              level: critical
+          - alert: http probe
+            expr: probe_http_status_code{instance="https://k8s.sgdev.org/-/godoc/refs?def=Route&pkg=github.com%2Fgorilla%2Fmux&repo=github.com%2Fgorilla%2Fmux",job="http_200"} != 200
+            for: 5m
+            labels:
+              level: critical
+          - alert: http probe
+            expr: probe_http_status_code{instance="https://k8s.sgdev.org/favicon.ico",job="http_200"} != 200
+            for: 5m
+            labels:
+              level: critical
+          - alert: http probe
+            expr: probe_http_status_code{instance="https://k8s.sgdev.org/github.com/golang/go/-/info/GoPackage/fmt/-/Printf",job="http_200"} != 200
+            for: 5m
+            labels:
+              level: critical
+          - alert: http probe
+            expr: probe_http_status_code{instance="https://k8s.sgdev.org/login",job="http_200"} != 200
+            for: 5m
+            labels:
+              level: critical
+  blackbox.yml: |
+    modules:
+      http_2xx:
+        prober: http
+        timeout: 5s
+        http:
+          valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+          valid_status_codes: []  # Defaults to 2xx
+          method: GET
+          no_follow_redirects: false
+          fail_if_not_ssl: true
+          tls_config:
+            insecure_skip_verify: true
+          preferred_ip_protocol: "ip4" # defaults to "ip6"
+          ip_protocol_fallback: false  # no fallback to "ip6"
+      http_2xx_custom_headers:
+        prober: http
+        timeout: 5s
+        http:
+          valid_http_versions: ["HTTP/1.1", "HTTP/2.0"]
+          valid_status_codes: []  # Defaults to 2xx
+          method: GET
+          headers:
+            Accept: "application/vnd.sourcegraph.api+json;version=20180621"
+          no_follow_redirects: false
+          fail_if_not_ssl: true
+          tls_config:
+            insecure_skip_verify: false
+          preferred_ip_protocol: "ip4" # defaults to "ip6"
+          ip_protocol_fallback: false  # no fallback to "ip6"
 kind: ConfigMap
 metadata:
   labels:
