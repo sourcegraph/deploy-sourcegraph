@@ -7,16 +7,19 @@ data:
 
     alerting:
       alertmanagers:
-        - kubernetes_sd_configs:
-          - role: endpoints
-          relabel_configs:
-            - source_labels: [__meta_kubernetes_service_name]
-              regex: alertmanager
-              action: keep
-        # bundled alertmanager, started by prom-wrapper
+        # Bundled Alertmanager, started by prom-wrapper
         - static_configs:
             - targets: ['127.0.0.1:9093']
           path_prefix: /alertmanager
+        # Uncomment the following to have alerts delivered to additional Alertmanagers discovered
+        # in the cluster. This configuration is not required if you use Sourcegraph's built-in alerting:
+        # https://docs.sourcegraph.com/admin/observability/alerting
+        # - kubernetes_sd_configs:
+        #  - role: endpoints
+        #  relabel_configs:
+        #    - source_labels: [__meta_kubernetes_service_name]
+        #      regex: alertmanager
+        #      action: keep
 
     rule_files:
       - '*_rules.yml'
@@ -128,6 +131,9 @@ data:
       - source_labels: [__meta_kubernetes_service_annotation_sourcegraph_prometheus_scrape]
         action: keep
         regex: true
+      - source_labels: [__meta_kubernetes_pod_container_name]
+        action: drop
+        regex: jaeger-agent
       - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
         action: replace
         target_label: __scheme__
@@ -231,164 +237,19 @@ data:
         action: replace
         target_label: kubernetes_pod_name
 
+    # Scrape prometheus itself for metrics.
+    - job_name: 'builtin-prometheus'
+      static_configs:
+        - targets: ['127.0.0.1:9092']
+          labels:
+            app: prometheus
     - job_name: 'builtin-alertmanager'
       metrics_path: /alertmanager/metrics
       static_configs:
         - targets: ['127.0.0.1:9093']
-  # TODO: migrate these rules to the generator - https://github.com/sourcegraph/sourcegraph/issues/12117
-  alert_rules.yml: |
-    groups:
-      - name: alert.rules
-        rules:
-          - alert: PodsMissing
-            expr: app:up:ratio{app!=""} < 0.9
-            for: 10m
-            labels:
-              level: critical
-              severity: page
-              service_name: "{{ $labels.app }}"
-              name: "{{ $labels.alertname }}"
-              description: "Pods missing from {{ $labels.app }}: {{ $value }}"
-            annotations:
-              help: Alerts when pods are missing.
-              summary: Pods missing from {{`{{`}} $labels.app {{`}}`}}
-          - alert: NoPodsRunning
-            expr: app:up:ratio{app!=""} < 0.1
-            for: 2m
-            labels:
-              level: critical
-              severity: page
-              service_name: "{{ $labels.app }}"
-              name: "{{ $labels.alertname }}"
-              description: "No pods are running for {{ $labels.app }}: {{ $value }}"
-            annotations:
-              help: Alerts when no pods are running for a service.
-              summary: No pods are running for {{`{{`}} $labels.app {{`}}`}}
-          - alert: ProdPageLoadLatency
-            expr: histogram_quantile(0.9, sum by(le) (rate(src_http_request_duration_seconds_bucket{job="sourcegraph-frontend",route!="raw"}[10m])))
-              > 20
-            labels:
-              level: critical
-              severity: page
-              service_name: "{{ $labels.app }}"
-              name: "{{ $labels.alertname }}"
-              description: "Page load latency > 20s (90th percentile over all routes; current value: {{ $value }}s)"
-            annotations:
-              help: Alerts when the page load latency is too high.
-              summary: High page load latency
-          - alert: GoroutineLeak
-            expr: go_goroutines >= 10000
-            for: 10m
-            labels:
-              level: warn
-              service_name: "{{ $labels.app }}"
-              name: "{{ $labels.alertname }}"
-              description: "{{ $labels.app }} has more than 10k goroutines. This is probably a regression causing a goroutine leak"
-            annotations:
-              help: Alerts when a service has excessive running goroutines.
-              summary: Excessive number of goroutines
-          - alert: FSINodesRemainingLow
-            expr: sum by(instance) (container_fs_inodes_total{pod_name!=""}) > 3e+06
-            labels:
-              level: critical
-              severity: page
-              service_name: "{{ $labels.app }}"
-              name: "{{ $labels.alertname }}"
-              description: "{{ $labels.instance }} is using {{ $value | humanize }} inodes"
-            annotations:
-              help: Alerts when a node's remaining FS inodes are low.
-              summary: '{{`{{`}}$labels.instance{{`}}`}} remaining fs inodes is low'
-          - alert: DiskSpaceLow
-            expr: node:k8snode_filesystem_avail_bytes:ratio < 0.1
-            labels:
-              level: warn
-              service_name: "{{ $labels.app }}"
-              name: "{{ $labels.alertname }}"
-              description: "{{ $labels.exported_name }} has less than 10% available disk space"
-            annotations:
-              help: Alerts when a node has less than 10% available disk space.
-              summary: '{{`{{`}}$labels.exported_name{{`}}`}} has less than 10% available
-            disk space'
-          - alert: DiskSpaceLowCritical
-            expr: node:k8snode_filesystem_avail_bytes:ratio{exported_name=~".*prod.*"} < 0.05
-            labels:
-              level: critical
-              severity: page
-              service_name: "{{ $labels.app }}"
-              name: "{{ $labels.alertname }}"
-              description: "{{ $labels.exported_name }} has less than 5% available disk space"
-            annotations:
-              help: Alerts when a node has less than 5% available disk space.
-              summary: Critical! {{`{{`}}$labels.exported_name{{`}}`}} has less than 5% available
-                disk space
-          - alert: GitserverDiskSpaceLow
-            expr: src_gitserver_disk_space_available / src_gitserver_disk_space_total < 0.1
-            labels:
-              level: warning
-              service_name: "{{ $labels.app }}"
-              name: "{{ $labels.alertname }}"
-              description: "gitserver {{ $labels.instance }} disk space is less than 10% of available disk space"
-            annotations:
-              help: Alerts when gitserverdisk space is low.
-              summary: gitserver {{`{{`}}$labels.instance{{`}}`}} disk space is less than 10% of available disk space
-          - alert: GitserverDiskSpaceLowCritical
-            expr: src_gitserver_disk_space_available / src_gitserver_disk_space_total < 0.05
-            labels:
-              level: critical
-              severity: page
-              service_name: "{{ $labels.app }}"
-              name: "{{ $labels.alertname }}"
-              description: "gitserver {{ $labels.instance }} disk space is less than 5% of available disk space"
-            annotations:
-              help: Alerts when gitserverdisk space is critically low.
-              summary: Critical! gitserver {{`{{`}}$labels.instance{{`}}`}} disk space is less than 5% of available disk space
-          - alert: SearcherErrorRatioTooHigh
-            expr: searcher_errors:ratio10m > 0.1
-            for: 20m
-            labels:
-              level: warn
-              service_name: "{{ $labels.app }}"
-              name: "{{ $labels.alertname }}"
-              description: Error ratio exceeds 10%
-            annotations:
-              help: Alerts when the search service has more than 10% of requests failing.
-              summary: Error ratio exceeds 10%
-          - alert: PrometheusMetricsBloat
-            expr: http_response_size_bytes{handler="prometheus",job!="kubernetes-apiservers",job!="kubernetes-nodes",quantile="0.5"}
-              > 20000
-            labels:
-              level: warn
-              service_name: "{{ $labels.app }}"
-              name: "{{ $labels.alertname }}"
-              description: "{{ $labels.job }} in {{ $labels.ns }} is probably leaking metrics (unbounded attribute)"
-            annotations:
-              help: Alerts when a service is probably leaking metrics (unbounded attribute).
-              summary: '{{`{{`}}$labels.job{{`}}`}} in {{`{{`}}$labels.ns{{`}}`}} is probably
-            leaking metrics (unbounded attribute)'
+          labels:
+            app: alertmanager
   extra_rules.yml: ""
-  node_rules.yml: |
-    groups:
-      - name: nodes.rules
-        rules:
-          - record: node:container_cpu_usage_seconds_total:ratio_rate5m
-            expr: sum by(instance) (rate(container_cpu_usage_seconds_total{kubernetes_pod_name=""}[5m]))
-              / max by(instance) (machine_cpu_cores)
-          - record: task:container_memory_usage_bytes:max
-            expr: max by(namespace, container_name) (container_memory_usage_bytes{container_name!=""})
-          - record: task:container_cpu_usage_seconds_total:sum
-            expr: sum by(id, namespace, container_name) (irate(container_cpu_usage_seconds_total{container_name!=""}[1m]))
-          - record: node:k8snode_filesystem_avail_bytes:ratio
-            expr: min by(exported_name) (k8snode_filesystem_avail_bytes / k8snode_filesystem_size_bytes)
-  sourcegraph_rules.yml: |
-    groups:
-      - name: sourcegraph.rules
-        rules:
-          - record: app:up:sum
-            expr: sum by(app) (up)
-          - record: app:up:count
-            expr: count by(app) (up)
-          - record: app:up:ratio
-            expr: app:up:sum / on(app) app:up:count
 kind: ConfigMap
 metadata:
   labels:
