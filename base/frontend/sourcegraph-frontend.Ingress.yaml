@@ -5,12 +5,9 @@ metadata:
     kubernetes.io/ingress.class: "nginx"
     # We can upload large files (extensions)
     nginx.ingress.kubernetes.io/proxy-body-size: "150m"
-    # See
-    # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/
+    # See https://cert-manager.io/docs/usage/ingress/#supported-annotations
     # for more nginx annotations.
-
-    certmanager.k8s.io/acme-challenge-type: http01
-    certmanager.k8s.io/issuer: letsencrypt-prod
+    cert-manager.io/issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-read-timeout: 1d
   labels:
     app: sourcegraph-frontend

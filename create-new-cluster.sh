@@ -14,4 +14,19 @@
 # a YAML file that can be `kubectl apply`d to the cluster, version that file in this repository, and add
 # the relevant `kubectl apply` command to ./kubectl-apply-all.sh
 
+### BEGIN CUSTOMIZATIONS
+
+# shellcheck disable=SC2068
+
+# dogfood-k8s namespaces
+kubectl apply --prune -l deploy=namespace -f namespaces --recursive $@
+
+# dogfood-k8s ingress
+./configure/ingress-nginx/install.sh
+
+# *.sgdev.org certificate, find in 1password and save to the defined files
+kubectl create secret tls sourcegraph-tls --key ./sgdev-tls-key --cert ./sgdev-tls-cert $@
+
+### END CUSTOMIZATIONS
+
 ./kubectl-apply-all.sh $@

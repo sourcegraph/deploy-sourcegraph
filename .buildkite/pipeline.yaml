@@ -12,6 +12,7 @@ steps:
     concurrency_group: dogfood/deploy
     commands:
       - gcloud container clusters get-credentials dogfood --zone us-central1-f --project sourcegraph-dogfood
-      - kubectl apply --prune -l deploy=namespace -f namespaces --recursive --context="gke_sourcegraph-dogfood_us-central1-f_dogfood"
+      # Set up the namespace
       - kubectl config set-context --current --namespace=dogfood-k8s
+      # Deploy relevant Kubernetes bits
       - ./kubectl-apply-all.sh --context="gke_sourcegraph-dogfood_us-central1-f_dogfood"
