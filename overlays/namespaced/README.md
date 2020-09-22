@@ -1,3 +1,5 @@
+# Namesapced
+
 This is a convenient kustomization that adds the specified namespace to all objects.
 
 If you replace `ns-sourcegraph` with your namespace value, make sure to do it in all the places in this directory tree.
