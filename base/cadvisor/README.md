@@ -5,3 +5,8 @@
 cAdvisor is part of the default Sourcegraph cluster installation, and deployed as a [Kubernetes DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/). This setup is based on the [official cAdvisor Kubernetes Daemonset configuration](https://github.com/google/cadvisor/tree/master/deploy/kubernetes). We use our own cAdvisor deployment over the built-in metrics exported by Kubernetes because the latter is often outdated and needs to be kept in sync with our [Docker-Compose deployments](https://docs.sourcegraph.com/admin/install/docker-compose). This setup allows us to have standard dashboards across all Sourcegraph deployments.
 
 Note that the `sourcegraph/cadvisor` Docker images come with a set of default flags to help reduce memory usage and load on Prometheus - see [our Dockerfile](https://github.com/sourcegraph/sourcegraph/blob/master/docker-images/cadvisor/Dockerfile) for more details.
+
+## Namespaces
+
+If you are deploying Sourcegraph to a non-default namespace, you'll have to change the namespace specified in
+[cadvisor.ClusterRoleBinding.yaml](cadvisor.ClusterRoleBinding.yaml) to the one that you created. You can do this by editing the namespace directly, or by using the [namespaced overlay](../../configure/../overlays/namespaced/README.md).
