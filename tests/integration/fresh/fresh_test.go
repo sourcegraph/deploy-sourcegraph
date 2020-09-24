@@ -49,7 +49,6 @@ func commonConfig() (map[string]string, error) {
 	for env, key := range map[string]string{
 		"TEST_GCP_PROJECT":        "gcp:project",
 		"TEST_GCP_ZONE":           "gcp:zone",
-		"TEST_GCP_USERNAME":       "gcpUsername",
 		"DEPLOY_SOURCEGRAPH_ROOT": "deploySourcegraphRoot",
 		"BUILD_CREATOR":           "buildCreator",
 		"GENERATED_BASE":          "generatedBase",
