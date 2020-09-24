@@ -3,7 +3,7 @@
 
 set -euxo pipefail
 
-SOURCEGRAPH_AUXILIARY_PROJECT=sourcegraph-server
+SOURCEGRAPH_AUXILIARY_PROJECT=sourcegraph-ci
 
 gcloud_command() {
   gcloud --quiet --project="$SOURCEGRAPH_AUXILIARY_PROJECT" "$@"

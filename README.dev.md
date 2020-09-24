@@ -60,7 +60,7 @@ Clone [`sourcegraph/deploy-k8s-helper`](https://github.com/sourcegraph/deploy-k8
 1. Ensure that the `deploySourcegraphRoot` value in your stack configuration (see https://github.com/sourcegraph/deploy-k8s-helper/blob/master/README.md) is pointing to your deploy-sourcegraph checkout (ex: `pulumi config set deploySourcegraphRoot /Users/ggilmore/dev/go/src/github.com/sourcegraph/deploy-sourcegraph`)
 1. In your deploy-sourcegraph checkout, make sure that you're on the latest `master`
 1. Run `yarn up` in your https://github.com/sourcegraph/deploy-k8s-helper checkout
-1. It'll take a few minutes for the cluster to be provisioned and for sourcegraph to be installed. Pulumi will show you the progresss that it's making, and will tell you when it's done. 
+1. It'll take a few minutes for the cluster to be provisioned and for sourcegraph to be installed. Pulumi will show you the progresss that it's making, and will tell you when it's done.
 1. Use the instructions in [configure.md](docs/configure.md) to:
    1. Add a repository (e.g. [sourcegraph/sourcegraph](https://github.com/sourcegraph/sourcegraph))
    1. Enable a language extension (e.g. [Go](https://sourcegraph.com/extensions/sourcegraph/lang-go)), and test that code intelligence is working on the above repository
@@ -93,7 +93,7 @@ Refer to [how to deploy a test cluster](https://about.sourcegraph.com/handbook/e
 
 ##### Check the upgrade path from the previous release to `master`
 
-1. Tear down the cluster that you created above by deleting it through from the [Sourcegraph Auxiliary GCP Project](https://console.cloud.google.com/kubernetes/list?project=sourcegraph-server&organizationId=1006954638239).
+1. Tear down the cluster that you created above by deleting it through from the [Sourcegraph CI GCP Project](https://console.cloud.google.com/kubernetes/list?project=sourcegraph-ci&organizationId=1006954638239).
 1. Checkout the commit that contains the configuration for the previous release (e.g. the commit has `2.11.x` images if you're currently trying to release `2.12.x`, etc.)
 1. [Use the "Provision a new cluster" instructions above](#Provision-a-new-cluster) to create a new cluster.
 1. Deploy the older commit to the new cluster, and do [the same smoke tests](#Do-smoke-tests-for-master-branch) with the older version.
