@@ -5,10 +5,12 @@ metadata:
     description: Headless service that provides a stable network identity for the
       indexed-search stateful set.
     sourcegraph.prometheus/scrape: "true"
+    prometheus.io/port: "6070"
   labels:
     app: indexed-search
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: indexed-search
   name: indexed-search
 spec:
   clusterIP: None

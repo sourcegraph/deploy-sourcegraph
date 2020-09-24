@@ -6,6 +6,7 @@ metadata:
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: frontend
   name: sourcegraph-frontend
 spec:
   minReadySeconds: 10
@@ -62,11 +63,13 @@ spec:
           value: /mnt/cache/$(POD_NAME)
         - name: GRAFANA_SERVER_URL
           value: http://grafana:30070
+        - name: JAEGER_SERVER_URL
+          value: http://jaeger-query:16686
         - name: PRECISE_CODE_INTEL_BUNDLE_MANAGER_URL
           value: http://precise-code-intel-bundle-manager:3187
         - name: PROMETHEUS_URL
           value: http://prometheus:30090
-        image: index.docker.io/sourcegraph/frontend:3.16.0@sha256:055560401f9c06f0d56fdad9b9233a99770c573a48bd84d27b16609ac1c9658d
+        image: index.docker.io/sourcegraph/frontend:insiders@sha256:ae4a1f2fc621a6480cd3f456e5c9ebd0c148ae361bfcd820fb25bd32f243b8f4
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -98,7 +101,7 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: index.docker.io/sourcegraph/jaeger-agent:3.16.0@sha256:ad1fc2f6b69ba3622f872bb105ef07dec5e5a539d30e733b006e88445dbe61e1
+      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:73ae9593b543e9b958e1a49c1fdc37478f4e7c72ac60785d0d1532845e9f43d5
         name: jaeger-agent
         env:
           - name: POD_NAME

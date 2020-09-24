@@ -6,6 +6,7 @@ metadata:
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: grafana
   name: grafana
 spec:
   replicas: 1
@@ -23,7 +24,7 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/grafana:3.16.0@sha256:771dd20ea85af7ba188022078f6937f035cab48f312929b8056831b0418b8cfe
+      - image: index.docker.io/sourcegraph/grafana:insiders@sha256:7ed43ceb3189504fb6a3d8f4d0239c458d340587f110f96820a5dd30d2a83cc3
         terminationMessagePolicy: FallbackToLogsOnError
         name: grafana
         ports:
@@ -40,7 +41,7 @@ spec:
         # host node.
         resources:
           limits:
-            cpu: 1
+            cpu: "1"
             memory: 512Mi
           requests:
             cpu: 100m
