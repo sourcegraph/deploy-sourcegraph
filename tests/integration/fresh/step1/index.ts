@@ -58,7 +58,7 @@ const ingressNginx = ingressNginxFiles.then(
             {
                 files,
             },
-            { providers: { kubernetes: k8sProvider }}
+            { providers: { kubernetes: k8sProvider } }
         )
 )
 
