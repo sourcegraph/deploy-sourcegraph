@@ -12,7 +12,6 @@ BUILD_BRANCH="${BUILD_BRANCH:-dev}"
 BUILD_UUID="${BUILD_UUID:-dev}"
 [ ! -z "$TEST_GCP_ZONE" ]
 [ ! -z "$TEST_GCP_PROJECT" ]
-[ ! -z "$TEST_GCP_USERNAME" ]
 
 CLEANUP=""
 trap 'bash -c "$CLEANUP"' EXIT
@@ -35,8 +34,6 @@ if [ -z "${NOCLEANUP:-}" ]; then
   CLUSTER_CLEANUP="gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
   CLEANUP="$CLUSTER_CLEANUP; $CLEANUP"
 fi
-
-kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user ${TEST_GCP_USERNAME}
 
 kubectl apply -f sourcegraph.StorageClass.yaml
 

@@ -7,28 +7,6 @@ import * as k8s from '@pulumi/kubernetes'
 import { k8sProvider } from './cluster'
 import { deploySourcegraphRoot, gcpUsername, generatedBase } from './config'
 
-const clusterAdmin = new k8s.rbac.v1.ClusterRoleBinding(
-    'cluster-admin-role-binding',
-    {
-        metadata: { name: `${os.userInfo().username}-cluster-admin-role-binding` },
-
-        roleRef: {
-            apiGroup: 'rbac.authorization.k8s.io',
-            kind: 'ClusterRole',
-            name: 'cluster-admin',
-        },
-
-        subjects: [
-            {
-                apiGroup: 'rbac.authorization.k8s.io',
-                kind: 'User',
-                name: gcpUsername,
-            },
-        ],
-    },
-    { provider: k8sProvider }
-)
-
 const storageClass = new k8s.storage.v1.StorageClass(
     'sourcegraph-storage-class',
     {
