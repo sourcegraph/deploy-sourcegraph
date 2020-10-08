@@ -6,6 +6,7 @@ metadata:
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: prometheus
   name: prometheus
 spec:
   minReadySeconds: 10
@@ -23,7 +24,7 @@ spec:
         app: prometheus
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/prometheus:3.19.2@sha256:be6b68a89bdf4b4b60ed61a1545179b20f91db8ba11e60869aaa00720b7c0e7b
+      - image: index.docker.io/sourcegraph/prometheus:3.20.1@sha256:df6d0c5fd05886ab945342c88621de49fee1f679ea43af7aeb74b0c7b480a422
         terminationMessagePolicy: FallbackToLogsOnError
         name: prometheus
         readinessProbe:

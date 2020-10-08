@@ -7,6 +7,7 @@ metadata:
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: repo-updater
   name: repo-updater
 spec:
   minReadySeconds: 10
@@ -27,7 +28,7 @@ spec:
         app: repo-updater
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/repo-updater:3.19.2@sha256:c135cd1efd3731c3cc0cc03f205147917110240650888e538fdbe325a552caff
+      - image: index.docker.io/sourcegraph/repo-updater:3.20.1@sha256:02d74899241a9c1522c0a2e469a127b69b9398381a97237dd4c3b71cba1b40e7
         env:
         terminationMessagePolicy: FallbackToLogsOnError
         name: repo-updater
@@ -36,6 +37,14 @@ spec:
           name: http
         - containerPort: 6060
           name: debug
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 1
+          timeoutSeconds: 5
         resources:
           limits:
             cpu: "1"
@@ -43,7 +52,7 @@ spec:
           requests:
             cpu: "1"
             memory: 500Mi
-      - image: index.docker.io/sourcegraph/jaeger-agent:3.19.2@sha256:e757094c04559780dba1ded3475ee5f0e4e5330aa6bbc8a7398e7277b0e450fe
+      - image: index.docker.io/sourcegraph/jaeger-agent:3.20.1@sha256:128bd4231dff8c0e67bb6d48e64317ad14bea91b7129b28758de61708979b4e0
         name: jaeger-agent
         env:
           - name: POD_NAME

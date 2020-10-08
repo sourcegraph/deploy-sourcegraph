@@ -6,6 +6,7 @@ metadata:
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: indexed-search
   name: indexed-search
 spec:
   replicas: 1
@@ -22,7 +23,7 @@ spec:
     spec:
       containers:
       - env:
-        image: index.docker.io/sourcegraph/indexed-searcher:3.19.2@sha256:d2e87635cf48c4c5d744962540751022013359bc00a9fb8e1ec2464cc6a0a2b8
+        image: index.docker.io/sourcegraph/indexed-searcher:3.20.1@sha256:a2c815da8c414fc18fc3565314cc7eb65ff78015229f736d54a06d9c63750393
         terminationMessagePolicy: FallbackToLogsOnError
         name: zoekt-webserver
         ports:
@@ -47,7 +48,7 @@ spec:
         - mountPath: /data
           name: data
       - env:
-        image: index.docker.io/sourcegraph/search-indexer:3.19.2@sha256:7ddeb4d06a89e086506f08d9a114186260c7fa6c242e59be8c28b505d506047a
+        image: index.docker.io/sourcegraph/search-indexer:3.20.1@sha256:b1bcedb46745b0de72ec42efe99305106064365b503f09b8e54dfe8d09b4677b
         terminationMessagePolicy: FallbackToLogsOnError
         name: zoekt-indexserver
         ports:

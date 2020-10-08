@@ -6,6 +6,7 @@ metadata:
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: syntect-server
   name: syntect-server
 spec:
   minReadySeconds: 10
@@ -27,7 +28,7 @@ spec:
     spec:
       containers:
       - env:
-        image: index.docker.io/sourcegraph/syntax-highlighter:3.19.2@sha256:625c556f5cf456144e51e3fe55e6312398b7714994165b4f605711e6f7d862a0
+        image: index.docker.io/sourcegraph/syntax-highlighter:insiders@sha256:07b9f1ff4bd2c60299f9404144cd72897fa4de2308d1be65c35bcdcd10e5410d
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:

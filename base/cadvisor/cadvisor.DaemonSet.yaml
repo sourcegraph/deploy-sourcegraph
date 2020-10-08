@@ -7,6 +7,7 @@ metadata:
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: cluster-admin
+    app.kubernetes.io/component: cadvisor
   name: cadvisor
 spec:
   selector:
@@ -25,7 +26,7 @@ spec:
       serviceAccountName: cadvisor
       containers:
       - name: cadvisor
-        image: index.docker.io/sourcegraph/cadvisor:3.19.2@sha256:76276b4b464154d0329c7d960fdfcb2c627784a0e809243cc53d3e5dea6f19c8
+        image: index.docker.io/sourcegraph/cadvisor:3.20.1@sha256:940dc4661adf1c1acc8d9f41a727905d5727dddacbb426ab7368d270c6d769c6
         args:
         # Kubernetes-specific flags below (other flags are baked into the Docker image)
         #

@@ -6,6 +6,7 @@ metadata:
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: query-runner
   name: query-runner
 spec:
   minReadySeconds: 10
@@ -27,7 +28,7 @@ spec:
     spec:
       containers:
       - env:
-        image: index.docker.io/sourcegraph/query-runner:3.19.2@sha256:bdf87a86c751774dc7940ed3f4bd0a508e24e06630b1b8874d1dc43b1263969f
+        image: index.docker.io/sourcegraph/query-runner:3.20.1@sha256:2afd4c28829d6d3647396e46aa5795fe792e7da26ace2c9ec27f8cbc55bc8958
         terminationMessagePolicy: FallbackToLogsOnError
         name: query-runner
         ports:
@@ -40,7 +41,7 @@ spec:
           requests:
             cpu: 500m
             memory: 1G
-      - image: index.docker.io/sourcegraph/jaeger-agent:3.19.2@sha256:e757094c04559780dba1ded3475ee5f0e4e5330aa6bbc8a7398e7277b0e450fe
+      - image: index.docker.io/sourcegraph/jaeger-agent:3.20.1@sha256:128bd4231dff8c0e67bb6d48e64317ad14bea91b7129b28758de61708979b4e0
         name: jaeger-agent
         env:
           - name: POD_NAME
