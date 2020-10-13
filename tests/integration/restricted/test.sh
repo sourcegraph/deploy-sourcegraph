@@ -45,7 +45,7 @@ kubectl create serviceaccount -n ns-sourcegraph fake-user
 
 kubectl create rolebinding -n ns-sourcegraph fake-admin --clusterrole=admin --serviceaccount=ns-sourcegraph:fake-user
 
-kubectl create role -n ns-sourcegraph nonroot:unprivileged --verb=use --resource=podsecuritypolicy --resource-name=nonroot-policy
+kubectl create role -n ns-sourcegraph nonroot:unprivileged --verb=use --resource=podsecuritypolicies.extension --resource-name=nonroot-policy
 
 kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --role=nonroot:unprivileged --serviceaccount=ns-sourcegraph:fake-user
 
