@@ -17,8 +17,8 @@ CLEANUP=""
 trap 'bash -c "$CLEANUP"' EXIT
 
 CLUSTER_NAME_SUFFIX=$(echo ${BUILD_UUID} | head -c 8)
-
 CLUSTER_NAME="ds-test-restricted-${CLUSTER_NAME_SUFFIX}"
+CLUSTER_VERSION="1.15.12-gke.20"
 
 cd $(dirname "${BASH_SOURCE[0]}")
 
@@ -27,7 +27,7 @@ DEPLOY_SOURCEGRAPH_ROOT=${CURRENT_DIR}/../../..
 
 # set up the cluster, set up the fake user and restricted policy and then deploy the non-privileged overlay as that user
 
-gcloud container clusters create ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --num-nodes 3 --machine-type n1-standard-16 --disk-type pd-ssd --project ${TEST_GCP_PROJECT} --labels="cost-category=build,build-creator=${BUILD_CREATOR},build-branch=${BUILD_BRANCH},integration-test=fresh"
+gcloud container clusters create ${CLUSTER_NAME} --cluster-version=${CLUSTER_VERSION} --zone ${TEST_GCP_ZONE} --num-nodes 3 --machine-type n1-standard-16 --disk-type pd-ssd --project ${TEST_GCP_PROJECT} --labels="cost-category=build,build-creator=${BUILD_CREATOR},build-branch=${BUILD_BRANCH},integration-test=fresh"
 
 gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT}
 if [ -z "${NOCLEANUP:-}" ]; then
@@ -45,7 +45,7 @@ kubectl create serviceaccount -n ns-sourcegraph fake-user
 
 kubectl create rolebinding -n ns-sourcegraph fake-admin --clusterrole=admin --serviceaccount=ns-sourcegraph:fake-user
 
-kubectl create role -n ns-sourcegraph nonroot:unprivileged --verb=use --resource=podsecuritypolicy --resource-name=nonroot-policy
+kubectl create role -n ns-sourcegraph nonroot:unprivileged --verb=use --resource=podsecuritypolicies.extension --resource-name=nonroot-policy
 
 kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --role=nonroot:unprivileged --serviceaccount=ns-sourcegraph:fake-user
 
