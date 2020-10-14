@@ -45,8 +45,6 @@ kubectl create serviceaccount -n ns-sourcegraph fake-user
 
 kubectl create rolebinding -n ns-sourcegraph fake-admin --clusterrole=admin --serviceaccount=ns-sourcegraph:fake-user
 
-gcloud info | grep Account
-kubectl create clusterrolebinding -n ns-sourcegraph ns-sourcegraph-admin-binding --clusterrole=cluster-admin --user=buildkite@sourcegraph-ci.iam.gserviceaccount.com
 kubectl create role -n ns-sourcegraph nonroot:unprivileged --verb=use --resource=podsecuritypolicies.extension --resource-name=nonroot-policy
 
 kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --role=nonroot:unprivileged --serviceaccount=ns-sourcegraph:fake-user
