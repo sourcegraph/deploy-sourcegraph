@@ -52,16 +52,15 @@ spec:
         # guarantee it has enough memory to perform its job reliably and prevent conflicts with
         # other pods on the same host node.
         #
-        # Its average memory usage may be much lower than 3G if Sourcegraph itself does not have
-        # much traffic, the 3G number chosen here is what works reliably on Sourcegraph.com with
-        # lots of traffic.
+        # The limit chosen here is based on what works reliably on Sourcegraph.com with lots
+        # of traffic.
         resources:
           limits:
             cpu: "2"
-            memory: 3G
+            memory: 6G
           requests:
             cpu: 500m
-            memory: 3G
+            memory: 6G
       securityContext:
         runAsUser: 0
       serviceAccountName: prometheus
