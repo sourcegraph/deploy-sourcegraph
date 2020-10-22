@@ -2,7 +2,8 @@
 
 CONSTRAINT=$1
 
-update-docker-tags \
+# Using `go run` ensures we are using the version of `update-docker-tags` pinned in `go.mod`
+go run github.com/slimsag/update-docker-tags \
   -enforce="sourcegraph/cadvisor=$CONSTRAINT" \
   -enforce="sourcegraph/frontend=$CONSTRAINT" \
   -enforce="sourcegraph/jaeger-agent=$CONSTRAINT" \
