@@ -24,9 +24,15 @@ steps:
     concurrency_group: deploy-sourcegraph/integration-restricted
     command: .buildkite/integration-restricted-test.sh
 
+    # eventually pull into seperate pipeline
+  - label: "e2e cluster test"
+    concurrency: 3
+    concurrency_group: deploy-sourcegraph/e2e-tests
+    command: ./buildkite/e2e-test.sh
+
   - wait: ~
     continue_on_failure: true
-  
+
   - label: ":gcompute: :floppy_disk: 🧹"
     concurrency: 1
     concurrency_group: deploy-sourcegraph/clean-unused-disks
