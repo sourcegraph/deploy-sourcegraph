@@ -69,6 +69,24 @@ spec:
           value: http://precise-code-intel-bundle-manager:3187
         - name: PROMETHEUS_URL
           value: http://prometheus:30090
+        # If these variables are updated, they must also be updated in the
+        # precise-code-intel-worker deployment as well.
+        - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
+          value: S3
+        - name: PRECISE_CODE_INTEL_UPLOAD_BUCKET
+          value: lsif-uploads
+        - name: PRECISE_CODE_INTEL_UPLOAD_MANAGE_BUCKET
+          value: 'true'
+        - name: AWS_ACCESS_KEY_ID
+          value: 'AKIAIOSFODNN7EXAMPLE'
+        - name: AWS_SECRET_ACCESS_KEY
+          value: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'
+        - name: AWS_ENDPOINT
+          value: http://minio:9000
+        - name: AWS_REGION
+          value: us-east-1
+        - name: AWS_S3_FORCE_PATH_STYLE
+          value: 'true'
         image: index.docker.io/sourcegraph/frontend:insiders@sha256:77e6c79ed5d58ef9f1f8e651e3b05acc8f764c10dad26c9182cb55cbc633569f
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
