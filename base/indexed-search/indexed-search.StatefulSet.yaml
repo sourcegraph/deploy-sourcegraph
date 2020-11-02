@@ -23,7 +23,16 @@ spec:
     spec:
       containers:
       - env:
-        image: index.docker.io/sourcegraph/indexed-searcher:3.21.2@sha256:fcf03182a79aaf48252f74e47204088a2db4f11620c97dfbca0721f61521fe3c
+        # By default zoekt's watchdog tries 3 times before panicing. This ups
+        # the threshold to 10. If you want to disable the watchdog, set this
+        # value to "0".
+        - name: ZOEKT_WATCHDOG_ERRORS
+          value: "10"
+        # This insiders image is 3.21.2 with 4 extra backwards compatible
+        # commits. Importantly it includes tunables and instrumentation for
+        # the watchdog. See
+        # https://github.com/sourcegraph/sourcegraph/pull/15148
+        image: index.docker.io/sourcegraph/indexed-searcher:insiders@sha256:cdf94f70e787859459b401437e07d587d9a3692059ed6f6e5956d50ca1617e20
         terminationMessagePolicy: FallbackToLogsOnError
         name: zoekt-webserver
         ports:
