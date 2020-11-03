@@ -9,7 +9,6 @@ on:
 
 jobs:
   dispatch:
-    if: ${{ github.repository == 'sourcegraph/deploy-sourcegraph' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -19,14 +18,13 @@ jobs:
 
       # generate update
       - name: Pin tags to ${{ github.event.inputs.semver }}
-        run: .github/workflows/scripts/update-docker-tags.sh "${{ github.event.inputs.semver }}"
+        run: tools/update-docker-tags.sh "${{ github.event.inputs.semver }}"
       - name: Open pull request
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           base: ${{ github.event.inputs.branch }}
           branch: upgrade-${{ github.event.inputs.branch }}
-          labels: release
           title: 'Upgrade ${{ github.event.inputs.branch }} to ${{ github.event.inputs.semver }}'
           body: |
             Upgrade the `${{ github.event.inputs.branch }}` branch's Sourcegraph Docker images to enforce constraints `${{ github.event.inputs.semver }}`.
