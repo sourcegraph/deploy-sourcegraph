@@ -25,7 +25,7 @@ jobs:
       - name: Pin tags to ${{ github.event.inputs.semver }}
         run: .github/workflows/scripts/update-docker-tags.sh "${{ github.event.inputs.semver }}"
       - name: Open pull request
-        uses: peter-evans/create-pull-request@v2
+        uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           base: ${{ github.event.inputs.branch }}
@@ -36,3 +36,4 @@ jobs:
             Upgrade the `${{ github.event.inputs.branch }}` branch's Sourcegraph Docker images to enforce constraints `${{ github.event.inputs.semver }}`.
 
             This pull request was generate by [this run](https://github.com/sourcegraph/deploy-sourcegraph/actions/runs/${{ github.run_id }})
+          commit-message: 'Upgrade to Sourcegraph ${{ github.event.inputs.semver }}'

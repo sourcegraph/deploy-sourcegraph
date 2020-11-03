@@ -6,22 +6,21 @@ metadata:
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: pgsql
-  name: pgsql
+  name: codeintel-db
 spec:
   minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: pgsql
+      app: codeintel-db
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         deploy: sourcegraph
-        app: pgsql
+        app: codeintel-db
         group: backend
     spec:
       initContainers:
@@ -35,7 +34,7 @@ spec:
           runAsUser: 0
       containers:
       - env:
-        image: index.docker.io/sourcegraph/postgres-11.4:3.21.2@sha256:a55fea6638d478c2368c227d06a1a2b7a2056b693967628427d41c92d9209e97
+        image: index.docker.io/sourcegraph/codeintel-db@sha256:63090799b34b3115a387d96fe2227a37999d432b774a1d9b7966b8c5d81b56ad
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
           exec:
@@ -80,8 +79,8 @@ spec:
       volumes:
       - name: disk
         persistentVolumeClaim:
-          claimName: pgsql
+          claimName: codeintel-db
       - name: pgsql-conf
         configMap:
           defaultMode: 0777
-          name: pgsql-conf
+          name: codeintel-db-conf
