@@ -1,13 +1,13 @@
 #!/bin/bash
 
-if [ ! "$(which src-alpha)" ]; then
-  echo "Installing pre-release src to /usr/local/bin"
-  mkdir -p /tmp/src-alpha
-  cd /tmp/src-alpha
-  wget https://github.com/sourcegraph/src-cli/releases/download/3.18.0-alpha/src-cli_3.18.0-alpha-SNAPSHOT-3b23f74_linux_amd64.tar.gz
-  tar xvzf src-cli_3.18.0-alpha-SNAPSHOT-3b23f74_linux_amd64.tar.gz
-  cp src /usr/local/bin/src-alpha
-  chmod a+x /usr/local/bin/src-alpha
+if [ ! "$(which src)" ]; then
+  echo "Installing src to /usr/local/bin"
+  mkdir -p /tmp/src
+  cd /tmp/src
+  wget https://github.com/sourcegraph/src-cli/releases/download/3.21.7/src-cli_3.21.7_linux_amd64.tar.gz
+  tar xvzf src-cli_3.21.7_linux_amd64.tar.gz
+  cp src /usr/local/bin/src
+  chmod a+x /usr/local/bin/src
 fi
 
 if [ ! "$(which jy)" ]; then

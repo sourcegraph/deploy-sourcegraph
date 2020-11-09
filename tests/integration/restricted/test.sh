@@ -87,4 +87,4 @@ sleep 2 # (initial delay in port-forward activating)
 curl --retry-connrefused --retry 2 --retry-delay 10 -m 30 http://localhost:30080
 
 # run a validation script against it
-src-alpha -endpoint http://localhost:30080 validate -context github_token=$DEPLOY_SOURCEGRAPH_TESTING_GITHUB_TOKEN validate.json
+src -endpoint http://localhost:30080 validate -context github_token=$DEPLOY_SOURCEGRAPH_TESTING_GITHUB_TOKEN validate.json
