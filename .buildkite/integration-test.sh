@@ -7,9 +7,8 @@ cd "$(dirname "${BASH_SOURCE[0]}")"/..
 DEPLOY_SOURCEGRAPH_ROOT=$(pwd)
 export DEPLOY_SOURCEGRAPH_ROOT
 
-export TEST_GCP_PROJECT=sourcegraph-server
+export TEST_GCP_PROJECT=sourcegraph-ci
 export TEST_GCP_ZONE=us-central1-a
-export TEST_GCP_USERNAME=buildkite@sourcegraph-dev.iam.gserviceaccount.com
 
 BUILD_CREATOR="$(echo "${BUILDKITE_BUILD_CREATOR}" | tr ' /@.' '_' | tr '[:upper:]' '[:lower:]')"
 export BUILD_CREATOR

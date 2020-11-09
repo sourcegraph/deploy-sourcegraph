@@ -2,6 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 bases:
   - ../bases/deployments
+  - ../bases/pvcs
 patchesStrategicMerge:
   - frontend/sourcegraph-frontend.Deployment.yaml
   - github-proxy/github-proxy.Deployment.yaml
@@ -10,13 +11,11 @@ patchesStrategicMerge:
   - indexed-search/indexed-search.StatefulSet.yaml
   - jaeger/jaeger.Deployment.yaml
   - pgsql/pgsql.Deployment.yaml
-  - precise-code-intel/bundle-manager.Deployment.yaml
   - precise-code-intel/worker.Deployment.yaml
   - prometheus/prometheus.Deployment.yaml
   - query-runner/query-runner.Deployment.yaml
   - redis/redis-cache.Deployment.yaml
   - redis/redis-store.Deployment.yaml
-  - replacer/replacer.Deployment.yaml
   - repo-updater/repo-updater.Deployment.yaml
   - searcher/searcher.Deployment.yaml
   - symbols/symbols.Deployment.yaml

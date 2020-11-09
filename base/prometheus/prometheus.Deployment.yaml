@@ -6,6 +6,7 @@ metadata:
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: prometheus
   name: prometheus
 spec:
   minReadySeconds: 10
@@ -23,7 +24,7 @@ spec:
         app: prometheus
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/prometheus:3.17.2@sha256:a725419a532fb17f6955e80f8a2f35efe15287c0a556e4fe7168d5fc6ff730d8
+      - image: index.docker.io/sourcegraph/prometheus:insiders@sha256:a5cdd71bb704a4cebab51c14d45cb748cb99faaa0de485010f0820e5b842be2b
         terminationMessagePolicy: FallbackToLogsOnError
         name: prometheus
         readinessProbe:
@@ -51,16 +52,15 @@ spec:
         # guarantee it has enough memory to perform its job reliably and prevent conflicts with
         # other pods on the same host node.
         #
-        # Its average memory usage may be much lower than 3G if Sourcegraph itself does not have
-        # much traffic, the 3G number chosen here is what works reliably on Sourcegraph.com with
-        # lots of traffic.
+        # The limit chosen here is based on what works reliably on Sourcegraph.com with lots
+        # of traffic.
         resources:
           limits:
             cpu: "2"
-            memory: 3G
+            memory: 6G
           requests:
             cpu: 500m
-            memory: 3G
+            memory: 6G
       securityContext:
         runAsUser: 0
       serviceAccountName: prometheus

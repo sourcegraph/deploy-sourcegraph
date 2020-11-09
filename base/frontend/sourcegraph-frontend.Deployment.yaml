@@ -6,6 +6,7 @@ metadata:
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: frontend
   name: sourcegraph-frontend
 spec:
   minReadySeconds: 10
@@ -39,6 +40,16 @@ spec:
           value: disable
         - name: PGUSER
           value: sg
+        - name: CODEINTEL_PGDATABASE
+          value: sg
+        - name: CODEINTEL_PGHOST
+          value: codeintel-db
+        - name: CODEINTEL_PGPORT
+          value: "5432"
+        - name: CODEINTEL_PGSSLMODE
+          value: disable
+        - name: CODEINTEL_PGUSER
+          value: sg
         - name: SRC_GIT_SERVERS
           value: gitserver-0.gitserver:3178
         # POD_NAME is used by CACHE_DIR
@@ -54,11 +65,9 @@ spec:
           value: http://grafana:30070
         - name: JAEGER_SERVER_URL
           value: http://jaeger-query:16686
-        - name: PRECISE_CODE_INTEL_BUNDLE_MANAGER_URL
-          value: http://precise-code-intel-bundle-manager:3187
         - name: PROMETHEUS_URL
           value: http://prometheus:30090
-        image: index.docker.io/sourcegraph/frontend:3.17.2@sha256:2378899365619635ce7acd983582407688d4def72a3fd62ae6fa0c23a0554fde
+        image: index.docker.io/sourcegraph/frontend:insiders@sha256:04c20d587c8c5f00c2f49cdf98e491ec0a545813aeb4d9fc34f8d445f351642e
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -90,7 +99,7 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: index.docker.io/sourcegraph/jaeger-agent:3.17.2@sha256:a29258e098c7d23392411abd359563afdd89529e9852ce1ba73f80188a72fd5c
+      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:2e2d5c46c56aff4edf96838fa7392505ec60707b3813068a0a617148a305af85
         name: jaeger-agent
         env:
           - name: POD_NAME

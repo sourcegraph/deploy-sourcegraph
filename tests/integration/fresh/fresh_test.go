@@ -18,7 +18,7 @@ func TestFreshDeployment(t *testing.T) {
 		t.Skip("skipping fresh cluster integration test in short mode")
 	}
 
-	for _, k8sVersion := range []string{"1.14", "1.15", "1.17"} {
+	for _, k8sVersion := range []string{"1.15", "1.16", "1.17"} {
 		k8sVersion := k8sVersion
 
 		t.Run(fmt.Sprintf("GKE version %q", k8sVersion), func(t *testing.T) {
@@ -49,7 +49,6 @@ func commonConfig() (map[string]string, error) {
 	for env, key := range map[string]string{
 		"TEST_GCP_PROJECT":        "gcp:project",
 		"TEST_GCP_ZONE":           "gcp:zone",
-		"TEST_GCP_USERNAME":       "gcpUsername",
 		"DEPLOY_SOURCEGRAPH_ROOT": "deploySourcegraphRoot",
 		"BUILD_CREATOR":           "buildCreator",
 		"GENERATED_BASE":          "generatedBase",

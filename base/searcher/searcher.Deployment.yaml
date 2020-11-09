@@ -6,6 +6,7 @@ metadata:
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: searcher
   name: searcher
 spec:
   minReadySeconds: 10
@@ -35,7 +36,7 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: index.docker.io/sourcegraph/searcher:3.17.2@sha256:7813d44b378e6ce9f85bbe8a378a6b671f525545369fc4d8b22984cd9bffe4b1
+        image: index.docker.io/sourcegraph/searcher:insiders@sha256:054203f2a338b320577eb72d177a588d624a20b6bb7125876bc430bdde067f54
         terminationMessagePolicy: FallbackToLogsOnError
         name: searcher
         ports:
@@ -44,12 +45,13 @@ spec:
         - containerPort: 6060
           name: debug
         readinessProbe:
-          failureThreshold: 1
+          failureThreshold: 3
           httpGet:
             path: /healthz
             port: http
             scheme: HTTP
-          periodSeconds: 1
+          periodSeconds: 5
+          timeoutSeconds: 5
         resources:
           limits:
             cpu: "2"
@@ -60,7 +62,7 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: index.docker.io/sourcegraph/jaeger-agent:3.17.2@sha256:a29258e098c7d23392411abd359563afdd89529e9852ce1ba73f80188a72fd5c
+      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:2e2d5c46c56aff4edf96838fa7392505ec60707b3813068a0a617148a305af85
         name: jaeger-agent
         env:
           - name: POD_NAME
