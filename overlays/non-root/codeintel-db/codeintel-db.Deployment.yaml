@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codeintel-db
+spec:
+  template:
+    spec:
+      initContainers:
+        - name: correct-data-dir-permissions
+          securityContext:
+            # Required to prevent escalations to root.
+            allowPrivilegeEscalation: false
+            runAsUser: 999
+            runAsGroup: 999
+      containers:
+        - name: pgsql
+          securityContext:
+            # Required to prevent escalations to root.
+            allowPrivilegeEscalation: false
+            runAsUser: 999
+            runAsGroup: 999
+      securityContext:
+        # Required to prevent escalations to root.
+        runAsUser: 999
