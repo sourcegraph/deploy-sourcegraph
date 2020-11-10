@@ -25,6 +25,8 @@ cd $(dirname "${BASH_SOURCE[0]}")
 CURRENT_DIR=$(pwd)
 DEPLOY_SOURCEGRAPH_ROOT=${CURRENT_DIR}/../../..
 
+./install-src.sh
+
 # set up the cluster, set up the fake user and restricted policy and then deploy the non-privileged overlay as that user
 
 gcloud container clusters create ${CLUSTER_NAME} --cluster-version=${CLUSTER_VERSION} --zone ${TEST_GCP_ZONE} --num-nodes 3 --machine-type n1-standard-16 --disk-type pd-ssd --project ${TEST_GCP_PROJECT} --labels="cost-category=build,build-creator=${BUILD_CREATOR},build-branch=${BUILD_BRANCH},integration-test=fresh"
@@ -49,9 +51,20 @@ kubectl create role -n ns-sourcegraph nonroot:unprivileged --verb=use --resource
 
 kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --role=nonroot:unprivileged --serviceaccount=ns-sourcegraph:fake-user
 
+/bin/cat <<EOM >deploy_sourcegraph_git_ssh_config
+Host *
+    StrictHostKeyChecking no
+EOM
+
+kubectl create secret -n ns-sourcegraph generic gitserver-ssh --from-file id_rsa=/root/.ssh/deploy_sourcegraph_git_ssh_testing --from-file config=deploy_sourcegraph_git_ssh_config
+
 mkdir generated-cluster
 CLEANUP="rm -rf generated-cluster; $CLEANUP"
 "${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh non-privileged-create-cluster ${CURRENT_DIR}/generated-cluster
+
+GS=${CURRENT_DIR}/generated-cluster/apps_v1_statefulset_gitserver.yaml
+cat $GS | yj | jq '.spec.template.spec.containers[].volumeMounts += [{mountPath: "/home/sourcegraph/.ssh", name: "ssh"}]' | jy -o $GS
+cat $GS | yj | jq '.spec.template.spec.volumes += [{name: "ssh", secret: {defaultMode: 384, secretName:"gitserver-ssh"}}]' | jy -o $GS
 
 kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph apply -f ${CURRENT_DIR}/generated-cluster --recursive
 
@@ -72,3 +85,8 @@ kubectl -n ns-sourcegraph port-forward svc/sourcegraph-frontend 30080 &
 CLEANUP="kill $!; $CLEANUP"
 sleep 2 # (initial delay in port-forward activating)
 curl --retry-connrefused --retry 2 --retry-delay 10 -m 30 http://localhost:30080
+
+/usr/local/bin/src version
+
+# run a validation script against it
+/usr/local/bin/src -endpoint http://localhost:30080 validate -context github_token=$DEPLOY_SOURCEGRAPH_TESTING_GITHUB_TOKEN validate.json
