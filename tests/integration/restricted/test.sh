@@ -16,8 +16,6 @@ BUILD_UUID="${BUILD_UUID:-dev}"
 CLEANUP=""
 trap 'bash -c "$CLEANUP"' EXIT
 
-NOCLEANUP=true
-
 CLUSTER_NAME_SUFFIX=$(echo ${BUILD_UUID} | head -c 8)
 CLUSTER_NAME="ds-test-restricted-${CLUSTER_NAME_SUFFIX}"
 CLUSTER_VERSION="1.15.12-gke.20"
