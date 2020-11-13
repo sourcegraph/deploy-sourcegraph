@@ -1,4 +1,3 @@
-import * as os from 'os'
 import * as path from 'path'
 
 import * as fg from 'fast-glob'
@@ -43,7 +42,7 @@ baseFiles.then(
                 dependsOn: [storageClass],
             }
         )
-);
+)
 const ingressNginxFiles = fg(
     `${path.posix.join(deploySourcegraphRoot, 'configure', 'ingress-nginx')}/**/*.yaml`,
     globOptions
