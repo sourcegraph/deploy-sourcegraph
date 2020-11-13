@@ -31,8 +31,7 @@ const globOptions = {
 }
 
 const baseFiles = fg(`${generatedBase}/**/*.yaml`, globOptions)
-
-const baseDeployment = baseFiles.then(
+baseFiles.then(
     files =>
         new k8s.yaml.ConfigGroup(
             'base',
@@ -44,8 +43,7 @@ const baseDeployment = baseFiles.then(
                 dependsOn: [storageClass],
             }
         )
-)
-
+);
 const ingressNginxFiles = fg(
     `${path.posix.join(deploySourcegraphRoot, 'configure', 'ingress-nginx')}/**/*.yaml`,
     globOptions
