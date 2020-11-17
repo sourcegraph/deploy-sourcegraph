@@ -25,6 +25,8 @@ Release branches (`3.19`, etc) track specific versions instead, and updates are 
 
 ### Cutting a release
 
+> ⚠️ If you are using the Sourcegraph release tooling, this step will be done for you in the PR it creates. Learn more about the release process in [the handbook](https://about.sourcegraph.com/handbook/engineering/releases).
+
 The [GitHub Action "Update tags"](https://github.com/sourcegraph/deploy-sourcegraph/actions?query=workflow%3A%22Dispatch+update%22) is used to enforce semver constraints for Sourcegraph Docker images for appropriate release branches (`3.19`, etc). Click "Run workflow" and provide the necessary parameters to open a pull request. You can run the workflow locally as well:
 
 ```sh
