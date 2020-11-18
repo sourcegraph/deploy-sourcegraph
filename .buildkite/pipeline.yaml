@@ -23,6 +23,8 @@ steps:
     concurrency: 3
     concurrency_group: deploy-sourcegraph/integration-restricted
     command: .buildkite/integration-restricted-test.sh
+    env:
+      NOCLEANUP: "true"
 
   - wait: ~
     continue_on_failure: true
