@@ -13,32 +13,36 @@ import (
 )
 
 func TestFreshDeployment(t *testing.T) {
-
 	if testing.Short() {
 		t.Skip("skipping fresh cluster integration test in short mode")
 	}
 
-	for _, k8sVersion := range []string{"1.15", "1.16", "1.17","1.18"} {
+	nocleanup := os.Getenv("NOCLEANUP") == "true"
+	for _, k8sVersion := range []string{"1.15", "1.16", "1.17", "1.18"} {
 		k8sVersion := k8sVersion
-
 		t.Run(fmt.Sprintf("GKE version %q", k8sVersion), func(t *testing.T) {
-
 			config, err := commonConfig()
 			if err != nil {
-				t.Fatalf("unable to generate pulumi configuration, err: %s", err)
+				t.Errorf("failed to generate Pulumi test configuration: %s", err)
+				t.FailNow()
 			}
-
 			config["kubernetesVersionPrefix"] = k8sVersion
-			integration.ProgramTest(t, &integration.ProgramTestOptions{
+
+			tester := integration.ProgramTestManualLifeCycle(t, &integration.ProgramTestOptions{
 				Dir: "step1",
 
 				Config:               config,
 				ExpectRefreshChanges: true,
 				Quick:                false,
 				Verbose:              testing.Verbose(),
+				SkipStackRemoval:     nocleanup,
 
 				ExtraRuntimeValidation: ValidateFrontendIsReachable,
 			})
+			if err := testLifecycle(t, tester, nocleanup); err != nil {
+				t.Errorf("failed to run test: %s", err)
+				t.FailNow()
+			}
 		})
 	}
 }
@@ -126,4 +130,38 @@ func ingressIP(outputs map[string]interface{}) (net.IP, error) {
 	}
 
 	return net.ParseIP(ipStr), nil
+}
+
+// testLifecyle mirrors `pt.TestLifeCycleInitAndDestroy`, but makes the destroy step optional
+func testLifecycle(t *testing.T, pt *integration.ProgramTester, nocleanup bool) error {
+	err := pt.TestLifeCyclePrepare()
+	if err != nil {
+		return fmt.Errorf("copying test to temp dir: %w", err)
+	}
+
+	pt.TestFinished = false
+	defer pt.TestCleanUp()
+
+	err = pt.TestLifeCycleInitialize()
+	if err != nil {
+		return fmt.Errorf("initializing test project: %w", err)
+	}
+
+	if !nocleanup {
+		// Ensure that before we exit, we attempt to destroy and remove the stack.
+		defer func() {
+			destroyErr := pt.TestLifeCycleDestroy()
+			if err != nil {
+				t.Errorf("failed to clean up: %s", destroyErr)
+				t.Fail()
+			}
+		}()
+	}
+
+	if err = pt.TestPreviewUpdateAndEdits(); err != nil {
+		return fmt.Errorf("running test preview, update, and edits: %w", err)
+	}
+
+	pt.TestFinished = true
+	return nil
 }
