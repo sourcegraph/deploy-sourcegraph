@@ -1,4 +1,3 @@
-import * as os from 'os'
 import * as path from 'path'
 
 import * as fg from 'fast-glob'
@@ -31,8 +30,7 @@ const globOptions = {
 }
 
 const baseFiles = fg(`${generatedBase}/**/*.yaml`, globOptions)
-
-const baseDeployment = baseFiles.then(
+baseFiles.then(
     files =>
         new k8s.yaml.ConfigGroup(
             'base',
@@ -45,7 +43,6 @@ const baseDeployment = baseFiles.then(
             }
         )
 )
-
 const ingressNginxFiles = fg(
     `${path.posix.join(deploySourcegraphRoot, 'configure', 'ingress-nginx')}/**/*.yaml`,
     globOptions
