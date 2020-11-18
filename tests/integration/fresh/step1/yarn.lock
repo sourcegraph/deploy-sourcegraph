@@ -18,6 +18,13 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
+"@grpc/grpc-js@^0.6.15":
+  version "0.6.18"
+  resolved "https://registry.yarnpkg.com/@grpc/grpc-js/-/grpc-js-0.6.18.tgz#ba3b3dfef869533161d192a385412a4abd0db127"
+  integrity sha512-uAzv/tM8qpbf1vpx1xPMfcUMzbfdqJtdCYAqY/LsLeQQlnTb4vApylojr+wlCyr7bZeg3AFfHvtihnNOQQt/nA==
+  dependencies:
+    semver "^6.2.0"
+
 "@nodelib/fs.scandir@2.1.3":
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.3.tgz#3a582bdb53804c6ba6d146579c46e52130cf4a3b"
@@ -92,35 +99,33 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@pulumi/gcp@1.3.0":
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/@pulumi/gcp/-/gcp-1.3.0.tgz#6bc66055ccf5099d2016db4f0b70d05956460110"
-  integrity sha512-uRsGCmM/f0s72sVPHywCgQkL2zmm5MDFZGp69HQFPB7Y1KiH9t/7+KW0vIUSUVUblbVMecWDcV4KWJ208MnD/A==
+"@pulumi/gcp@1.9.0":
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/@pulumi/gcp/-/gcp-1.9.0.tgz#0cb6da759a388d80edddf4edaa71f2166456ef93"
+  integrity sha512-F8F4gw63QyfMe7Vql6LkJfjLWQ+ToyB2ouFeY/POuNaXH5g/4P9fKjxRN+TbbV7qSQrXqoj4qzLN/sPcfW30Pg==
   dependencies:
     "@pulumi/pulumi" "^1.0.0"
     "@types/express" "^4.16.0"
     read-package-json "^2.0.13"
 
-"@pulumi/kubernetes@1.2.2":
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/@pulumi/kubernetes/-/kubernetes-1.2.2.tgz#ee12122798ebdd75cabfac734191c085b6d683a6"
-  integrity sha512-xz9/E0X0tlxl4nvFTA1OlbskaKWSSZy+hjIZdH+uOvsq5bDT0twM/0OG512PUk7RhHKBWpyJEVxngDKucpxuJg==
+"@pulumi/kubernetes@2.7.0":
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@pulumi/kubernetes/-/kubernetes-2.7.0.tgz#30658d3c805d819b5a0c1fc6e712fe6e90be0573"
+  integrity sha512-ECUegttwkwxaqmmgzNK/p3tWHE2OKD1I98Xh7eQ2WqUqMF28qS6wUQitUaLUIFhuW0vZ+NYFSNz0fytDuuiCbQ==
   dependencies:
-    "@pulumi/pulumi" "^1.0.0"
+    "@pulumi/pulumi" "^2.0.0"
     "@types/glob" "^5.0.35"
-    "@types/js-yaml" "^3.11.2"
     "@types/node-fetch" "^2.1.4"
     "@types/tmp" "^0.0.33"
     glob "^7.1.2"
-    js-yaml "^3.12.0"
     node-fetch "^2.3.0"
     shell-quote "^1.6.1"
     tmp "^0.0.33"
 
-"@pulumi/pulumi@1.12.0":
-  version "1.12.0"
-  resolved "https://registry.yarnpkg.com/@pulumi/pulumi/-/pulumi-1.12.0.tgz#7dff6771192cf20e8b282c0c23a649eb5e659632"
-  integrity sha512-EW/UNLFEVXspzDQnxPMCrXNaZ0gb2eHtYekSlBosXLJdWAGKPAy/a7IvVEA3E91f01Chi1JnUjGV8+cBDuxefw==
+"@pulumi/pulumi@1.14.1":
+  version "1.14.1"
+  resolved "https://registry.yarnpkg.com/@pulumi/pulumi/-/pulumi-1.14.1.tgz#f6ae3f658a89a967306a99309da5c9ba4f288efe"
+  integrity sha512-5Cw7llLGI9PhFj5zhPMYI5WH2+cqMnlFUqIQwBRNJt72ZBGuaPj8g7CE0sHZWbypQoXPkW4PGBMFKTllbd5WJA==
   dependencies:
     "@pulumi/query" "^0.3.0"
     deasync "^0.1.15"
@@ -155,6 +160,26 @@
     source-map-support "^0.4.16"
     ts-node "^7.0.0"
     typescript "^3.0.0"
+    upath "^1.1.0"
+
+"@pulumi/pulumi@^2.0.0":
+  version "2.13.2"
+  resolved "https://registry.yarnpkg.com/@pulumi/pulumi/-/pulumi-2.13.2.tgz#19b1089edb810c7b2b146750725423dde87b1f85"
+  integrity sha512-KpjwNm7nyzCyQrPDtx1YTLfDuhKPRDBfowgUNlSUDpDr6fFTr8dMYKpj4Dp8ukRgNhDMSQrVGIiw0Bvkiu2uqA==
+  dependencies:
+    "@grpc/grpc-js" "^0.6.15"
+    "@pulumi/query" "^0.3.0"
+    google-protobuf "^3.5.0"
+    js-yaml "^3.14.0"
+    minimist "^1.2.0"
+    normalize-package-data "^2.4.0"
+    protobufjs "^6.8.6"
+    read-package-tree "^5.3.1"
+    require-from-string "^2.0.1"
+    semver "^6.1.0"
+    source-map-support "^0.4.16"
+    ts-node "^7.0.1"
+    typescript "~3.7.3"
     upath "^1.1.0"
 
 "@pulumi/query@^0.3.0":
@@ -220,11 +245,6 @@
     "@types/events" "*"
     "@types/minimatch" "*"
     "@types/node" "*"
-
-"@types/js-yaml@^3.11.2":
-  version "3.12.1"
-  resolved "https://registry.yarnpkg.com/@types/js-yaml/-/js-yaml-3.12.1.tgz#5c6f4a1eabca84792fbd916f0cb40847f123c656"
-  integrity sha512-SGGAhXLHDx+PK4YLNcNGa6goPf9XRWQNAUUbffkwVGGXIxmDKWyGGL4inzq2sPmExu431Ekb9aEMn9BkPqEYFA==
 
 "@types/long@*":
   version "4.0.1"
@@ -854,10 +874,18 @@ js-tokens@^4.0.0:
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-4.0.0.tgz#19203fb59991df98e3a287050d4647cdeaf32499"
   integrity sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==
 
-js-yaml@^3.12.0, js-yaml@^3.13.1:
+js-yaml@^3.13.1:
   version "3.13.1"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.13.1.tgz#aff151b30bfdfa8e49e05da22e7415e9dfa37847"
   integrity sha512-YfbcO7jXDdyj0DGxYVSlSeQNHbD7XPWvrVWeVUujrQEoZzWJIRrCPoyk6kL6IAjAG2IolMK4T0hNUe0HOUs5Jw==
+  dependencies:
+    argparse "^1.0.7"
+    esprima "^4.0.0"
+
+js-yaml@^3.14.0:
+  version "3.14.0"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-3.14.0.tgz#a7a34170f26a21bb162424d8adacb4113a69e482"
+  integrity sha512-/4IbIeHcD9VMHFqDR/gQ7EdZdLimOvW2DdcxFjdyyZ9NsbS+ccrXqVWDtab/lRl5AlUqmpBx8EhPaWR+OtY17A==
   dependencies:
     argparse "^1.0.7"
     esprima "^4.0.0"
@@ -1324,7 +1352,7 @@ sax@^1.2.4:
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.1.tgz#a954f931aeba508d307bbf069eff0c01c96116f7"
   integrity sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==
 
-semver@^6.1.0:
+semver@^6.1.0, semver@^6.2.0:
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
   integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
