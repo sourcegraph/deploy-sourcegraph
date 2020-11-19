@@ -18,11 +18,11 @@ func TestFreshDeployment(t *testing.T) {
 		t.Skip("skipping fresh cluster integration test in short mode")
 	}
 
-	for _, k8sVersion := range []string{"1.15", "1.16", "1.17","1.18"} {
+	for _, k8sVersion := range []string{"1.15", "1.16", "1.17", "1.18"} {
 		k8sVersion := k8sVersion
 
 		t.Run(fmt.Sprintf("GKE version %q", k8sVersion), func(t *testing.T) {
-
+			t.Parallel()
 			config, err := commonConfig()
 			if err != nil {
 				t.Fatalf("unable to generate pulumi configuration, err: %s", err)
