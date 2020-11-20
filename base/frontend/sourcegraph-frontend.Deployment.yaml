@@ -67,7 +67,7 @@ spec:
           value: http://jaeger-query:16686
         - name: PROMETHEUS_URL
           value: http://prometheus:30090
-        image: index.docker.io/sourcegraph/frontend:insiders@sha256:d1371796099dd3ad69b56b4b621b30d7791db25badbe766a4df2337e63a4b169
+        image: index.docker.io/sourcegraph/frontend:insiders@sha256:4e03da8cfc293ce17fd6f9edba6ab4894652df7cf56ec4f07488046b012b6ffe
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -99,7 +99,7 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:677ca72187079ccc7aac5635efc8fdf8b8dba5fd241026b51288ce07524b2a3c
+      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:f2e092eaa0e9591b860b830a77c6c91a44623f26c49036f61725277f503a6a65
         name: jaeger-agent
         env:
           - name: POD_NAME
