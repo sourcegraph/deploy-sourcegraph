@@ -17,7 +17,10 @@ func TestFreshDeployment(t *testing.T) {
 		t.Skip("skipping fresh cluster integration test in short mode")
 	}
 
-	nocleanup := os.Getenv("NOCLEANUP") == "true"
+	// Configure if the test should clean up after itself - useful for debugging
+	noCleanup := os.Getenv("NOCLEANUP") == "true"
+
+	// Validate on various kubernetes versions
 	for _, k8sVersion := range []string{"1.15", "1.16", "1.17", "1.18"} {
 		k8sVersion := k8sVersion
 		t.Run(fmt.Sprintf("GKE version %q", k8sVersion), func(t *testing.T) {
@@ -35,11 +38,11 @@ func TestFreshDeployment(t *testing.T) {
 				ExpectRefreshChanges: true,
 				Quick:                false,
 				Verbose:              testing.Verbose(),
-				SkipStackRemoval:     nocleanup,
+				SkipStackRemoval:     noCleanup,
 
 				ExtraRuntimeValidation: ValidateFrontendIsReachable,
 			})
-			if err := testLifecycle(t, tester, nocleanup); err != nil {
+			if err := testLifecycle(t, tester, noCleanup); err != nil {
 				t.Errorf("failed to run test: %s", err)
 				t.FailNow()
 			}
@@ -132,8 +135,12 @@ func ingressIP(outputs map[string]interface{}) (net.IP, error) {
 	return net.ParseIP(ipStr), nil
 }
 
-// testLifecyle mirrors `pt.TestLifeCycleInitAndDestroy`, but makes the destroy step optional
-func testLifecycle(t *testing.T, pt *integration.ProgramTester, nocleanup bool) error {
+// testLifecyle mirrors `pt.TestLifeCycleInitAndDestroy`, but makes the destroy step
+// optional, as configured by the `noCleanup` parameter.
+//
+// This variation is hand-rolled because there does not seem to be a direct equivalent for
+// this in the Pulumi v1.x library.
+func testLifecycle(t *testing.T, pt *integration.ProgramTester, noCleanup bool) error {
 	err := pt.TestLifeCyclePrepare()
 	if err != nil {
 		return fmt.Errorf("copying test to temp dir: %w", err)
@@ -147,7 +154,7 @@ func testLifecycle(t *testing.T, pt *integration.ProgramTester, nocleanup bool) 
 		return fmt.Errorf("initializing test project: %w", err)
 	}
 
-	if !nocleanup {
+	if !noCleanup {
 		// Ensure that before we exit, we attempt to destroy and remove the stack.
 		defer func() {
 			destroyErr := pt.TestLifeCycleDestroy()

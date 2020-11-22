@@ -18,12 +18,18 @@ steps:
     command: .buildkite/integration-test.sh
     env:
       VERBOSE: "true"
-      NOCLEANUP: "true"
+      # Can be set to true to help debug test results, but ensure that created resources
+      # are removed manually
+      NOCLEANUP: "false"
 
   - label: ":k8s:"
     concurrency: 3
     concurrency_group: deploy-sourcegraph/integration-restricted
     command: .buildkite/integration-restricted-test.sh
+    env:
+      # Can be set to true to help debug test results, but ensure that created resources
+      # are removed manually
+      NOCLEANUP: "false"
 
   - wait: ~
     continue_on_failure: true
