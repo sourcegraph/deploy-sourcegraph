@@ -34,7 +34,7 @@ gcloud container clusters create ${CLUSTER_NAME} --cluster-version=${CLUSTER_VER
 gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT}
 
 # Configure if the test should clean up after itself - useful for debugging
-if [ "${NOCLEANUP:-}" == "true" ]; then
+if [ "${NOCLEANUP:-}" != "true" ]; then
   CLUSTER_CLEANUP="gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
   CLEANUP="$CLUSTER_CLEANUP; $CLEANUP"
 fi
