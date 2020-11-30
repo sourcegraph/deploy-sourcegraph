@@ -32,7 +32,9 @@ DEPLOY_SOURCEGRAPH_ROOT=${CURRENT_DIR}/../../..
 gcloud container clusters create ${CLUSTER_NAME} --cluster-version=${CLUSTER_VERSION} --zone ${TEST_GCP_ZONE} --num-nodes 3 --machine-type n1-standard-16 --disk-type pd-ssd --project ${TEST_GCP_PROJECT} --labels="cost-category=build,build-creator=${BUILD_CREATOR},build-branch=${BUILD_BRANCH},integration-test=fresh"
 
 gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT}
-if [ -z "${NOCLEANUP:-}" ]; then
+
+# Configure if the test should clean up after itself - useful for debugging
+if [ "${NOCLEANUP:-}" != "true" ]; then
   CLUSTER_CLEANUP="gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
   CLEANUP="$CLUSTER_CLEANUP; $CLEANUP"
 fi
@@ -72,12 +74,12 @@ kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph ap
 
 # wait for it all to finish (we list out the ones with persistent volume claim because they take longer)
 
-timeout 5m kubectl -n ns-sourcegraph rollout status -w statefulset/indexed-search
-timeout 5m kubectl -n ns-sourcegraph rollout status -w deployment/prometheus
-timeout 5m kubectl -n ns-sourcegraph rollout status -w deployment/redis-cache
-timeout 5m kubectl -n ns-sourcegraph rollout status -w deployment/redis-store
-timeout 5m kubectl -n ns-sourcegraph rollout status -w statefulset/gitserver
-timeout 5m kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
+timeout 10m kubectl -n ns-sourcegraph rollout status -w statefulset/indexed-search
+timeout 10m kubectl -n ns-sourcegraph rollout status -w deployment/prometheus
+timeout 10m kubectl -n ns-sourcegraph rollout status -w deployment/redis-cache
+timeout 10m kubectl -n ns-sourcegraph rollout status -w deployment/redis-store
+timeout 10m kubectl -n ns-sourcegraph rollout status -w statefulset/gitserver
+timeout 10m kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
 
 # hit it with one request
 
