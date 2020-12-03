@@ -65,6 +65,8 @@ spec:
       - env:
         - name: DATA_SOURCE_NAME
           value: postgres://sg:@localhost:5432/?sslmode=disable
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /queries.yaml
         image: wrouesnel/postgres_exporter:v0.7.0@sha256:785c919627c06f540d515aac88b7966f352403f73e931e70dc2cbf783146a98b
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
@@ -75,6 +77,9 @@ spec:
           requests:
             cpu: 10m
             memory: 50Mi
+        volumeMounts:
+          - mountPath: /
+            name: pg_exporter-conf
       securityContext:
         runAsUser: 0
       volumes:
@@ -85,3 +90,9 @@ spec:
         configMap:
           defaultMode: 0777
           name: pgsql-conf
+      - name: pg_exporter-conf
+        configMap:
+          defaultMode: 0777
+          name: pg_exporter-conf
+
+
