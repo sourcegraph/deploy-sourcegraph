@@ -36,7 +36,7 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: index.docker.io/sourcegraph/searcher:insiders@sha256:d11d5bece239695aa08b1a71d3a859d8de73f1b4172ef844f771587180b94dc7
+        image: index.docker.io/sourcegraph/searcher:insiders@sha256:56dc548ce6e4031ef5724595c434f49d4d36ebd38a51590f7fe0b9818b0f4936
         terminationMessagePolicy: FallbackToLogsOnError
         name: searcher
         ports:
@@ -62,7 +62,7 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:02c090db12834330d6731c50f3b95eb8d87e2502f9850d8de6d9f272a2226e14
+      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:91f8437c888d11310f331cb1d28f239bbcd4251c32d3f99e18e9c4957c1370fb
         name: jaeger-agent
         env:
           - name: POD_NAME
