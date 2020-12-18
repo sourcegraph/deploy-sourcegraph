@@ -30,13 +30,11 @@ spec:
       - env:
         - name: NUM_WORKERS
           value: '4'
-        - name: PRECISE_CODE_INTEL_BUNDLE_MANAGER_URL
-          value: http://precise-code-intel-bundle-manager:3187
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/precise-code-intel-worker:3.21.2@sha256:77973d2d7b07702c2d9e456098b71c430b6c08966b3b028409d68c7837e5a950
+        image: index.docker.io/sourcegraph/precise-code-intel-worker:3.22.1@sha256:029d2433effa48301c9870fe68e957f060e696a8230357504782eef20536bcba
         terminationMessagePolicy: FallbackToLogsOnError
         name: precise-code-intel-worker
         livenessProbe:

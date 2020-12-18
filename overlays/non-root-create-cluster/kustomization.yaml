@@ -3,11 +3,12 @@ kind: Kustomization
 bases:
   - ../non-root
 patchesStrategicMerge:
+  - codeintel-db/codeintel-db.Deployment.yaml
   - gitserver/gitserver.StatefulSet.yaml
   - grafana/grafana.StatefulSet.yaml
   - indexed-search/indexed-search.StatefulSet.yaml
+  - minio/minio.Deployment.yaml
   - pgsql/pgsql.Deployment.yaml
-  - precise-code-intel/bundle-manager.Deployment.yaml
   - prometheus/prometheus.Deployment.yaml
   - redis/redis-cache.Deployment.yaml
   - redis/redis-store.Deployment.yaml
