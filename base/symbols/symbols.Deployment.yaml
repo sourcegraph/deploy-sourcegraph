@@ -36,7 +36,7 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: index.docker.io/sourcegraph/symbols:insiders@sha256:0c4bfe5d2612278bf615fe27335d1b160a9b3706c611f6c96b8e720be886f6a7
+        image: index.docker.io/sourcegraph/symbols:insiders@sha256:423844d4680a2274aa6beddc2aa4b52e6404d088061d55c29fb8b5fcd2ca21d7
         terminationMessagePolicy: FallbackToLogsOnError
         name: symbols
         livenessProbe:
@@ -68,7 +68,7 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:763feb47c0a323554cbf1e15c2ef44df7365810ebe8a4adf85af01bda4c47ee1
+      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:d387dedbcc60774f3dba1e4ee86dd4eef3a577bf60cc337dbba6a646c21c4fdc
         name: jaeger-agent
         env:
           - name: POD_NAME
