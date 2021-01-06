@@ -236,11 +236,13 @@ data:
       - source_labels: [__meta_kubernetes_namespace]
         action: replace
         target_label: ns
+
+      metric_relabel_configs:
       # cAdvisor-specific customization. We want container metrics to be named after their container name label.
       # Note that 'io.kubernetes.container.name' must be provided in cAdvisor '--whitelisted_container_labels'
       # (see cadvisor.DaemonSet.yaml)
       - source_labels: [container_label_io_kubernetes_container_name]
-        regex: '.+'
+        regex: (.+)
         action: replace
         target_label: name
 
