@@ -228,14 +228,24 @@ data:
         target_label: __address__
       - action: labelmap
         regex: __meta_kubernetes_pod_label_(.+)
-      - source_labels: [__meta_kubernetes_namespace]
-        action: replace
-        # Sourcegraph specific customization. We want a more convenient to type label.
-        # target_label: kubernetes_namespace
-        target_label: ns
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: kubernetes_pod_name
+      # Sourcegraph specific customization. We want a more convenient to type label.
+      # target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: ns
+
+      metric_relabel_configs:
+      # cAdvisor-specific customization. We want container metrics to be named after their container name label.
+      # Note that 'io.kubernetes.container.name' and 'io.kubernetes.pod.name' must be provided in cAdvisor
+      # '--whitelisted_container_labels' (see cadvisor.DaemonSet.yaml)
+      - source_labels: [container_label_io_kubernetes_container_name, container_label_io_kubernetes_pod_name]
+        regex: (.+)
+        action: replace
+        target_label: name
+        separator: '-'
 
     # Scrape prometheus itself for metrics.
     - job_name: 'builtin-prometheus'
