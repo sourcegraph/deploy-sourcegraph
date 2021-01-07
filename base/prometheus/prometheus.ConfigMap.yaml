@@ -242,7 +242,7 @@ data:
       # not in the same namespace as cAdvisor itself. Regex checks that the two labels are
       # the same.
       - source_labels: [container_label_io_kubernetes_pod_namespace, ns]
-        regex: $2;$2
+        regex: $1;$1
         action: keep
       # cAdvisor-specific customization. We want container metrics to be named after their container name label.
       # Note that 'io.kubernetes.container.name' and 'io.kubernetes.pod.name' must be provided in cAdvisor
