@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1 # k8s 1.14+
 kind: Ingress
 metadata:
   annotations:
@@ -26,8 +26,10 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: sourcegraph-frontend
-          servicePort: 30080
+          service:
+            name: sourcegraph-frontend
+            port:
+              number: 30080
     # If you're using TLS/SSL, uncomment the following line and replace 'sourcegraph.example.com' with the real
     # domain that you want to use for your Sourcegraph instance.
     # host: sourcegraph.example.com
