@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: A singleton service that coordinates external executors. This is required to enable auto-indexing for the cluster (which exists only here and in the Cloud environment).
+  labels:
+    deploy: sourcegraph
+  name: executor-queue
+  namespace: prod
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: executor-queue
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: executor-queue
+    spec:
+      containers:
+      - env:
+        - name: EXECUTOR_FRONTEND_URL
+          value: https://sourcegraph.com
+        - name: EXECUTOR_FRONTEND_USERNAME
+          value: executor
+        - name: EXECUTOR_FRONTEND_PASSWORD
+          value: jWcIgGi36gTolzUPHPbMmG92hqafpSsr0K9ku66DcrTWBvUeskjiSwjyBUVHxfIRhlE0v2UgthRr2/NJftez+TbXLwPnuCYJQNPExjuKiROX+1YsnQYUqggzlca8tJhUg5E1+mLMIEC56NTnMu9Yt2Un14dRy/jGjjZtNzYON2o=
+        - name: SRC_FRONTEND_INTERNAL
+          value: sourcegraph-frontend-internal
+        - name: SRC_LOG_FORMAT
+          value: json
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        # NOTE: This service is nto in deploy-sourcegraph (but it IS in deploy-sourcegraph-dot-com). This has the consequence of this
+        # tag not auto-updating, as it pulls the tag versions from the former repository. This is alright as the executor-queue service
+        # is not under heavy development and updating by hand when necessary seems low-effort for the near future.
+        image: sourcegraph/executor-queue:84019_2021-01-11_cc8e4f1@sha256:5e382deb6beb2584f5719fe60cb46ee6e55a41481efd502961db748d4759e894
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: executor-queue
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 3191
+          name: http
+        - containerPort: 6060
+          name: debug
+        resources:
+          limits:
+            cpu: "2"
+            memory: 12Gi
+          requests:
+            cpu: 500m
+            memory: 4Gi
+        securityContext:
+          runAsUser: 0
+      - name: cloud-sql-proxy
+        # Please update regularly
+        image: gcr.io/cloudsql-docker/gce-proxy:1.17
+        command:
+         - "/cloud_sql_proxy"
+          # Utilize VPC-native cluster to connect via private ip
+         - "-ip_address_types=PRIVATE"
+         - "-instances=sourcegraph-dev:us-central1:sg-cloud-732a936743=tcp:5432,sourcegraph-dev:us-central1:sg-cloud-code-intel-9fc67e507c=tcp:5433"
+         # This flag specifies where the service account key can be found
+         - "-credential_file=/secrets/service_account.json"
+        securityContext:
+           # The default Cloud SQL proxy image runs as the
+           # "nonroot" user and group (uid: 65532) by default.
+          runAsNonRoot: true
+        volumeMounts:
+         - name: sql-sa
+           mountPath: /secrets/
+           readOnly: true
+      volumes:
+        - name: sql-sa
+          secret:
+            secretName: cloud-proxy-sa
