@@ -71,25 +71,3 @@ spec:
             memory: 4Gi
         securityContext:
           runAsUser: 0
-      - name: cloud-sql-proxy
-        # Please update regularly
-        image: gcr.io/cloudsql-docker/gce-proxy:1.17
-        command:
-         - "/cloud_sql_proxy"
-          # Utilize VPC-native cluster to connect via private ip
-         - "-ip_address_types=PRIVATE"
-         - "-instances=sourcegraph-dev:us-central1:sg-cloud-732a936743=tcp:5432,sourcegraph-dev:us-central1:sg-cloud-code-intel-9fc67e507c=tcp:5433"
-         # This flag specifies where the service account key can be found
-         - "-credential_file=/secrets/service_account.json"
-        securityContext:
-           # The default Cloud SQL proxy image runs as the
-           # "nonroot" user and group (uid: 65532) by default.
-          runAsNonRoot: true
-        volumeMounts:
-         - name: sql-sa
-           mountPath: /secrets/
-           readOnly: true
-      volumes:
-        - name: sql-sa
-          secret:
-            secretName: cloud-proxy-sa
