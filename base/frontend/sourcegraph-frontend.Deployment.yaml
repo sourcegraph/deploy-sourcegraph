@@ -27,7 +27,9 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-      - args:
+      - name: frontend
+        image: index.docker.io/sourcegraph/frontend:insiders@sha256:b69a210ec21ca10028937dd404467bc84b8da18b31772705199666bc70bc2647
+        args:
         - serve
         env:
         - name: PGDATABASE
@@ -75,7 +77,6 @@ spec:
           value: executor
         - name: EXECUTOR_FRONTEND_PASSWORD
           value: jWcIgGi36gTolzUPHPbMmG92hqafpSsr0K9ku66DcrTWBvUeskjiSwjyBUVHxfIRhlE0v2UgthRr2/NJftez+TbXLwPnuCYJQNPExjuKiROX+1YsnQYUqggzlca8tJhUg5E1+mLMIEC56NTnMu9Yt2Un14dRy/jGjjZtNzYON2o=
-        image: index.docker.io/sourcegraph/frontend:insiders@sha256:3dc1b7ae3e1ee823699b302bce1cb65fe404b9f8bc43dc6058aa58d439719bb6
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -91,7 +92,6 @@ spec:
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
-        name: frontend
         ports:
         - containerPort: 3080
           name: http
@@ -107,8 +107,8 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:25c2c72fdd81d3f1f2e882865d79e42217f5c368774de2ac5c753d2e471428a4
-        name: jaeger-agent
+      - name: jaeger-agent
+        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:b1397c275f9dabe6c073121125fd52e1a5989e3ae4897a0ffca86a4c2e36dc35
         env:
           - name: POD_NAME
             valueFrom:
