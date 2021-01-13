@@ -27,7 +27,9 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-      - args:
+      - name: frontend
+        image: index.docker.io/sourcegraph/frontend:insiders@sha256:7cf91a61da67ab6619990ad7cad43565c8808f564a298b4e1e88bf7ad142a49f
+        args:
         - serve
         env:
         - name: PGDATABASE
@@ -67,7 +69,6 @@ spec:
           value: http://jaeger-query:16686
         - name: PROMETHEUS_URL
           value: http://prometheus:30090
-        image: index.docker.io/sourcegraph/frontend:insiders@sha256:04c55196d1a7d04e39d78f0a1fccf6ac8cdaa98c9b577f9bb2db6d6774190bc9
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -83,7 +84,6 @@ spec:
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
-        name: frontend
         ports:
         - containerPort: 3080
           name: http
@@ -99,8 +99,8 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:ee58c6189ed7b5f8861e89839c2b5452f45c98f1204a6b86b3ecf64fc3a3ad9e
-        name: jaeger-agent
+      - name: jaeger-agent
+        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:6a2439c585a15b2d69494f9183e0c7bd5d59af4c57f8bdea7024c9751f007c4d
         env:
           - name: POD_NAME
             valueFrom:
