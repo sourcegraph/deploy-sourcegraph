@@ -117,35 +117,9 @@ is reachable under the path `/api/v1`.
 
 ## Defining alerts
 
-The following alerts are recommended and included by default when Prometheus is enabled:
+Sourcegraph ships with a default set of alerts - see [alerting](https://docs.sourcegraph.com/admin/observability/alerting).
 
-- `PodsMissing`: Alerts when pods are missing.
-- `NoPodsRunning`: Alerts when no pods are running for a service.
-- `ProdPageLoadLatency`: Alerts when the page load latency is too high.
-- `GoroutineLeak`: Alerts when a service has excessive running goroutines.
-- `FSINodesRemainingLow`: Alerts when a node's remaining FS inodes are low.
-- `DiskSpaceLow`: Alerts when a node has less than 10% available disk space.
-- `DiskSpaceLowCritical`: Alerts when a node has less than 5% available disk space.
-- `SearcherErrorRatioTooHigh`: Alerts when the search service has more than 10% of requests failing.
-
-You can view these alerts and their definitions in the Prometheus UI under the "Alerts" tab
-(http://localhost:9090/alerts if you're using `kubectl port-forward` to expose the Prometheus UI).
-
-Refer to the [Prometheus alerting rules docs](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/) for the alert definition syntax. To see the definition of the default alerts, open the Prometheus "Alerts" tab and click on the rule of interest. These can be useful starting points for defining new alerting rules.
-
-Here is an example alerting rule that fires on high page load latency (specifically when the p90 latency exceeds 20
-seconds):
-
-```
-ALERT ProdPageLoadLatency
-  IF histogram_quantile(0.9, sum(rate(src_http_request_duration_seconds_bucket{job="sourcegraph-frontend"}[10m])) by (le)) > 20
-  LABELS { severity="page" }
-  ANNOTATIONS {
-    summary = "High page load latency",
-    description = "Page load latency > 20s (90th percentile over all routes; current value: {{$value}}s)",
-    help = "Alerts when the page load latency is too high.",
-  }
-```
+Additional rules and alerts can be defined in `extra_rules.yml` - see [Prometheus configuration](https://docs.sourcegraph.com/admin/observability/metrics#prometheus-configuration).
 
 ## Metrics
 
