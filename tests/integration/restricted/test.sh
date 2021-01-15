@@ -18,7 +18,8 @@ trap 'bash -c "$CLEANUP"' EXIT
 
 CLUSTER_NAME_SUFFIX=$(echo ${BUILD_UUID} | head -c 8)
 CLUSTER_NAME="ds-test-restricted-${CLUSTER_NAME_SUFFIX}"
-CLUSTER_VERSION="1.15.12-gke.20"
+# get the STABLE channel version from GKE
+CLUSTER_VERSION=$(gcloud container get-server-config --zone us-central1-a -q 2>&1  | grep "defaultClusterVersion" | awk '{ print $2}')
 
 cd $(dirname "${BASH_SOURCE[0]}")
 
