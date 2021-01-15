@@ -40,14 +40,7 @@ If you are deploying Sourcegraph to a non-default namespace, you'll have to chan
 
 ### Port-forwarding
 
-Use `kubectl port-forward` to grant direct access to the Prometheus UI. This is the simplest way to
-access Prometheus data, but requires access to the cluster via `kubectl`.
-
-1.  Forward port 9090:
-    ```bash
-    kubectl port-forward $(kubectl get pods -l app=prometheus -o jsonpath="{.items[0].metadata.name}") 9090
-    ```
-1.  Navigate to `http://localhost:9090`.
+See [accessing Prometheus directly](https://docs.sourcegraph.com/admin/observability/metrics#accessing-prometheus-directly).
 
 ### Kubernetes service
 
