@@ -124,15 +124,3 @@ Additional rules and alerts can be defined in `extra_rules.yml` - see [Prometheu
 ## Metrics
 
 See [metrics and dashboards](https://docs.sourcegraph.com/admin/observability/metrics).
-
-## Sample queries
-
-Sourcegraph's Prometheus includes by default many useful metrics for tracking
-application performance. The following are some commonly used queries that you can try out in the
-UI:
-
-- Average (5-minute) HTTP requests per second: `job:src_http_request_count:rate5m`
-- Average (5-minute) HTTP requests per second, bucketed by request duration:
-  `route:src_http_request_duration_seconds_bucket:rate5m`
-- CPU usage by container: `max by (container_name)(task:container_cpu_usage_seconds_total:sum{container_name=~"$name"})`
-- Memory usage by container: `max by (container_name)(container_memory_usage_bytes{container_name=~"$name"}) / 1024 / 1024 / 1024`
