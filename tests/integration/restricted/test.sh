@@ -18,7 +18,7 @@ trap 'bash -c "$CLEANUP"' EXIT
 
 CLUSTER_NAME_SUFFIX=$(echo ${BUILD_UUID} | head -c 8)
 CLUSTER_NAME="ds-test-restricted-${CLUSTER_NAME_SUFFIX}"
-CLUSTER_VERSION="1.15.12-gke.20"
+CLUSTER_VERSION="1.15.12-gke.6002"
 
 cd $(dirname "${BASH_SOURCE[0]}")
 
