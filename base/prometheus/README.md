@@ -149,8 +149,7 @@ ALERT ProdPageLoadLatency
 
 ## Metrics
 
-See the [Prometheus metrics page](prom-metrics.md) for a full list of available
-Prometheus metrics.
+See [metrics and dashboards](https://docs.sourcegraph.com/admin/observability/metrics).
 
 ## Sample queries
 
