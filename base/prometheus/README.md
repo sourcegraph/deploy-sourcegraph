@@ -65,7 +65,6 @@ metadata:
   labels:
     app: prometheus
   name: prometheus-node-port
-  namespace: ns-sourcegraph
 spec:
   externalTrafficPolicy: Cluster
   ports:
