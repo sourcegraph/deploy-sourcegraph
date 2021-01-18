@@ -58,7 +58,6 @@ metadata:
   labels:
     app: prometheus
   name: prometheus-node-port
-  namespace: default
 spec:
   externalTrafficPolicy: Cluster
   ports:
