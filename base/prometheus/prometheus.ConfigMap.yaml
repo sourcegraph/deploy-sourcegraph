@@ -238,24 +238,14 @@ data:
         target_label: ns
 
       metric_relabel_configs:
-      # cAdvisor-specific customization. Drop container metrics exported by cAdvisor
-      # not in the same namespace as Sourcegraph.
-<<<<<<< HEAD
-      # The regex must keep matches on '^$' (empty string) to ensure other metrics do not
-      # get dropped.
-      - source_labels: [container_label_io_kubernetes_pod_namespace]
-        regex: ^$|dogfood-k8s # ensure this matches with namespace declarations
-        action: keep
-=======
       # Uncomment this if you have problems with certain dashboards or cAdvisor itself
       # picking up non-Sourcegraph services. Ensure all Sourcegraph services are running
       # within the Sourcegraph namespace you have defined.
       # The regex must keep matches on '^$' (empty string) to ensure other metrics do not
       # get dropped.
-      # - source_labels: [container_label_io_kubernetes_pod_namespace]
-      #   regex: ^$|ns-sourcegraph # ensure this matches with namespace declarations
-      #   action: keep
->>>>>>> 5cfb2c079a3693a6879c26d9f49f9167670ceeef
+      - source_labels: [container_label_io_kubernetes_pod_namespace]
+        regex: ^$|dogfood-k8s # ensure this matches with namespace declarations
+        action: keep
       # cAdvisor-specific customization. We want container metrics to be named after their container name label.
       # Note that 'io.kubernetes.container.name' and 'io.kubernetes.pod.name' must be provided in cAdvisor
       # '--whitelisted_container_labels' (see cadvisor.DaemonSet.yaml)
