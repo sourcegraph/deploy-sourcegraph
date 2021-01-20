@@ -238,8 +238,9 @@ data:
         target_label: ns
 
       metric_relabel_configs:
-      # cAdvisor-specific customization. Drop container metrics exported by cAdvisor
-      # not in the same namespace as Sourcegraph.
+      # Uncomment this if you have problems with certain dashboards or cAdvisor itself
+      # picking up non-Sourcegraph services. Ensure all Sourcegraph services are running
+      # within the Sourcegraph namespace you have defined.
       # The regex must keep matches on '^$' (empty string) to ensure other metrics do not
       # get dropped.
       - source_labels: [container_label_io_kubernetes_pod_namespace]
