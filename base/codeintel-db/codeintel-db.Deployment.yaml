@@ -33,7 +33,7 @@ spec:
         securityContext:
           runAsUser: 0
       containers:
-      - env:
+      - name: pgsql
         image: index.docker.io/sourcegraph/codeintel-db:insiders@sha256:a55fea6638d478c2368c227d06a1a2b7a2056b693967628427d41c92d9209e97
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
@@ -45,7 +45,6 @@ spec:
           exec:
             command:
               - /liveness.sh
-        name: pgsql
         ports:
         - containerPort: 5432
           name: pgsql

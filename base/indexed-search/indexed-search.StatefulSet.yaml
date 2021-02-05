@@ -22,10 +22,9 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-      - env:
+      - name: zoekt-webserver
         image: index.docker.io/sourcegraph/indexed-searcher:insiders@sha256:76d7e8a7453caed03412064d2f8e40dd49b9df958edd846e5a91c514b840803e
         terminationMessagePolicy: FallbackToLogsOnError
-        name: zoekt-webserver
         ports:
         - containerPort: 6070
           name: http
@@ -47,10 +46,9 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: data
-      - env:
+      - name: zoekt-indexserver
         image: index.docker.io/sourcegraph/search-indexer:insiders@sha256:89fa7d5eac6f9f3e8893a482650dffcea4d22be993328427679af7e3ddd08e10
         terminationMessagePolicy: FallbackToLogsOnError
-        name: zoekt-indexserver
         ports:
         - containerPort: 6072
           name: index-http

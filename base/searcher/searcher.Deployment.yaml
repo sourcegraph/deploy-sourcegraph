@@ -27,7 +27,8 @@ spec:
         app: searcher
     spec:
       containers:
-      - env:
+      - name: searcher
+        env:
         - name: SEARCHER_CACHE_SIZE_MB
           value: "100000"
         - name: POD_NAME
@@ -38,7 +39,6 @@ spec:
           value: /mnt/cache/$(POD_NAME)
         image: index.docker.io/sourcegraph/searcher:insiders@sha256:e74d4f9cfd5711a29e1b8e83c714bff436ab7a06f3721aa4286baeb8eae7bdc4
         terminationMessagePolicy: FallbackToLogsOnError
-        name: searcher
         ports:
         - containerPort: 3181
           name: http
@@ -62,8 +62,8 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:60c9a814b1f4a6547b45550ee4ba58c0e097802e5b8fb8b0f1f7d5f51dd74851
-        name: jaeger-agent
+      - name: jaeger-agent
+        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:60c9a814b1f4a6547b45550ee4ba58c0e097802e5b8fb8b0f1f7d5f51dd74851
         env:
           - name: POD_NAME
             valueFrom:
