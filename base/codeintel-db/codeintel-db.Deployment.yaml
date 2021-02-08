@@ -19,68 +19,70 @@ spec:
   template:
     metadata:
       labels:
-        deploy: sourcegraph
         app: codeintel-db
+        deploy: sourcegraph
         group: backend
     spec:
-      initContainers:
-      - name: correct-data-dir-permissions
-        image: sourcegraph/alpine:3.10@sha256:4d05cd5669726fc38823e92320659a6d1ef7879e62268adec5df658a0bacf65c
-        command: ["sh", "-c", "if [ -d /data/pgdata-11 ]; then chmod 750 /data/pgdata-11; fi"]
-        volumeMounts:
-        - mountPath: /data
-          name: disk
-        securityContext:
-          runAsUser: 0
       containers:
-      - name: pgsql
-        image: index.docker.io/sourcegraph/codeintel-db:insiders@sha256:a55fea6638d478c2368c227d06a1a2b7a2056b693967628427d41c92d9209e97
-        terminationMessagePolicy: FallbackToLogsOnError
-        readinessProbe:
-          exec:
-            command:
-              - /ready.sh
-        livenessProbe:
-          initialDelaySeconds: 15
-          exec:
-            command:
-              - /liveness.sh
-        ports:
-        - containerPort: 5432
+        - image: "index.docker.io/sourcegraph/codeintel-db:insiders@sha256:a55fea6638d478c2368c227d06a1a2b7a2056b693967628427d41c92d9209e97"
+          livenessProbe:
+            exec:
+              command:
+                - /liveness.sh
+            initialDelaySeconds: 15
           name: pgsql
-        resources:
-          limits:
-            cpu: "4"
-            memory: 2Gi
-          requests:
-            cpu: "4"
-            memory: 2Gi
-        volumeMounts:
-        - mountPath: /data
-          name: disk
-        - mountPath: /conf
-          name: pgsql-conf
-      - env:
-        - name: DATA_SOURCE_NAME
-          value: postgres://sg:@localhost:5432/?sslmode=disable
-        # Dax: Temporarily switch back to upstream postgres exporter        
-        image: wrouesnel/postgres_exporter:v0.7.0@sha256:785c919627c06f540d515aac88b7966f352403f73e931e70dc2cbf783146a98b
-        terminationMessagePolicy: FallbackToLogsOnError
-        name: pgsql-exporter
-        resources:
-          limits:
-            cpu: 10m
-            memory: 50Mi
-          requests:
-            cpu: 10m
-            memory: 50Mi
+          ports:
+            - containerPort: 5432
+              name: pgsql
+          readinessProbe:
+            exec:
+              command:
+                - /ready.sh
+          resources:
+            limits:
+              cpu: '4'
+              memory: "2Gi"
+            requests:
+              cpu: '4'
+              memory: "2Gi"
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /data
+              name: disk
+            - mountPath: /conf
+              name: pgsql-conf
+        - env:
+            - name: DATA_SOURCE_NAME
+              value: "postgres://sg:@localhost:5432/?sslmode=disable"
+          image: "wrouesnel/postgres_exporter:v0.7.0@sha256:785c919627c06f540d515aac88b7966f352403f73e931e70dc2cbf783146a98b"
+          name: pgsql-exporter
+          resources:
+            limits:
+              cpu: "10m"
+              memory: "50Mi"
+            requests:
+              cpu: "10m"
+              memory: "50Mi"
+          terminationMessagePolicy: FallbackToLogsOnError
+      initContainers:
+        - command:
+            - sh
+            - "-c"
+            - "if [ -d /data/pgdata-11 ]; then chmod 750 /data/pgdata-11; fi"
+          image: "sourcegraph/alpine:3.10@sha256:4d05cd5669726fc38823e92320659a6d1ef7879e62268adec5df658a0bacf65c"
+          name: correct-data-dir-permissions
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /data
+              name: disk
       securityContext:
         runAsUser: 0
       volumes:
-      - name: disk
-        persistentVolumeClaim:
-          claimName: codeintel-db
-      - name: pgsql-conf
-        configMap:
-          defaultMode: 0777
-          name: codeintel-db-conf
+        - name: disk
+          persistentVolumeClaim:
+            claimName: codeintel-db
+        - configMap:
+            defaultMode: 511
+            name: codeintel-db-conf
+          name: pgsql-conf

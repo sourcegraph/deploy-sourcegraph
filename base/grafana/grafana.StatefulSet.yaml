@@ -4,9 +4,9 @@ metadata:
   annotations:
     description: Metrics/monitoring dashboards and alerts.
   labels:
+    app.kubernetes.io/component: grafana
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: grafana
   name: grafana
 spec:
   replicas: 1
@@ -15,8 +15,6 @@ spec:
     matchLabels:
       app: grafana
   serviceName: grafana
-  updateStrategy:
-     type: RollingUpdate
   template:
     metadata:
       labels:
@@ -24,42 +22,43 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-      - name: grafana
-        image: index.docker.io/sourcegraph/grafana:insiders@sha256:9e7fae7daf20e83246f24becc07ab98267819f59579465eae0a003dd3fcff84f
-        terminationMessagePolicy: FallbackToLogsOnError
-        ports:
-        - containerPort: 3370
-          name: http
-        volumeMounts:
-        - mountPath: /var/lib/grafana
-          name: grafana-data
-        - mountPath: /sg_config_grafana/provisioning/datasources
-          name: config
-        # Grafana is relied upon to send alerts to site admins when something is wrong with
-        # Sourcegraph, thus its memory requests and limits are the same to guarantee it has enough
-        # memory to perform its job reliably and prevent conflicts with other pods on the same
-        # host node.
-        resources:
-          limits:
-            cpu: "1"
-            memory: 512Mi
-          requests:
-            cpu: 100m
-            memory: 512Mi
-      serviceAccountName: grafana
+        - image: "index.docker.io/sourcegraph/grafana:insiders@sha256:9e7fae7daf20e83246f24becc07ab98267819f59579465eae0a003dd3fcff84f"
+          name: grafana
+          ports:
+            - containerPort: 3370
+              name: http
+          resources:
+            limits:
+              cpu: '1'
+              memory: "512Mi"
+            requests:
+              cpu: "100m"
+              memory: "512Mi"
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /var/lib/grafana
+              name: grafana-data
+            - mountPath: /sg_config_grafana/provisioning/datasources
+              name: config
       securityContext:
         runAsUser: 0
+      serviceAccountName: grafana
       volumes:
-      - name: config
-        configMap:
-          defaultMode: 0777
-          name: grafana
+        - configMap:
+            defaultMode: 511
+            name: grafana
+          name: config
+  updateStrategy:
+    type: RollingUpdate
   volumeClaimTemplates:
-  - metadata:
-      name: grafana-data
-    spec:
-      accessModes: [ "ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 2Gi
-      storageClassName: sourcegraph
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: grafana-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: "2Gi"
+        storageClassName: sourcegraph
