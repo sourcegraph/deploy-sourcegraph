@@ -3,11 +3,11 @@ kind: DaemonSet
 metadata:
   annotations:
     description: DaemonSet to ensure all nodes run a cAdvisor pod.
-    seccomp.security.alpha.kubernetes.io/pod: docker/default
+    seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
   labels:
-    app.kubernetes.io/component: cadvisor
     deploy: sourcegraph
     sourcegraph-resource-requires: cluster-admin
+    app.kubernetes.io/component: cadvisor
   name: cadvisor
 spec:
   selector:
@@ -17,61 +17,66 @@ spec:
     metadata:
       annotations:
         description: Collects and exports container metrics.
-        prometheus.io/port: '48080'
-        sourcegraph.prometheus/scrape: 'true'
+        prometheus.io/port: "48080"
+        sourcegraph.prometheus/scrape: "true"
       labels:
-        app: cadvisor
         deploy: sourcegraph
+        app: cadvisor
     spec:
-      automountServiceAccountToken: false
-      containers:
-        - args:
-            - "--store_container_labels=false"
-            - "--whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name,io.kubernetes.pod.namespace,io.kubernetes.pod.uid"
-          image: "index.docker.io/sourcegraph/cadvisor:insiders@sha256:3546a650742b69755a3073cfcbc51a02587a3c61e03df45a106a2d093292255f"
-          name: cadvisor
-          ports:
-            - containerPort: 48080
-              name: http
-              protocol: TCP
-          resources:
-            limits:
-              cpu: "300m"
-              memory: "2000Mi"
-            requests:
-              cpu: "150m"
-              memory: "200Mi"
-          volumeMounts:
-            - mountPath: /rootfs
-              name: rootfs
-              readOnly: true
-            - mountPath: /var/run
-              name: var-run
-              readOnly: true
-            - mountPath: /sys
-              name: sys
-              readOnly: true
-            - mountPath: /var/lib/docker
-              name: docker
-              readOnly: true
-            - mountPath: /dev/disk
-              name: disk
-              readOnly: true
       serviceAccountName: cadvisor
+      containers:
+      - name: cadvisor
+        image: index.docker.io/sourcegraph/cadvisor:insiders@sha256:3546a650742b69755a3073cfcbc51a02587a3c61e03df45a106a2d093292255f
+        args:
+        # Kubernetes-specific flags below (other flags are baked into the Docker image)
+        #
+        # disable container labels to allow whitelisting to reduce noise
+        - --store_container_labels=false
+        - --whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name,io.kubernetes.pod.namespace,io.kubernetes.pod.uid
+        # it is safe to uncomment this option if you use docker as your container runtime to reduce noise
+        # - --docker_only
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 150m
+          limits:
+            memory: 2000Mi
+            cpu: 300m
+        volumeMounts:
+        - name: rootfs
+          mountPath: /rootfs
+          readOnly: true
+        - name: var-run
+          mountPath: /var/run
+          readOnly: true
+        - name: sys
+          mountPath: /sys
+          readOnly: true
+        - name: docker
+          mountPath: /var/lib/docker
+          readOnly: true
+        - name: disk
+          mountPath: /dev/disk
+          readOnly: true
+        ports:
+        - name: http
+          containerPort: 48080
+          protocol: TCP
+      automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30
       volumes:
-        - hostPath:
-            path: /
-          name: rootfs
-        - hostPath:
-            path: /var/run
-          name: var-run
-        - hostPath:
-            path: /sys
-          name: sys
-        - hostPath:
-            path: /var/lib/docker
-          name: docker
-        - hostPath:
-            path: /dev/disk
-          name: disk
+      - name: rootfs
+        hostPath:
+          path: /
+      - name: var-run
+        hostPath:
+          path: /var/run
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: docker
+        hostPath:
+          path: /var/lib/docker
+      - name: disk
+        hostPath:
+          path: /dev/disk

@@ -4,9 +4,9 @@ metadata:
   annotations:
     description: Collects metrics and aggregates them into graphs.
   labels:
-    app.kubernetes.io/component: prometheus
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: prometheus
   name: prometheus
 spec:
   minReadySeconds: 10
@@ -20,48 +20,55 @@ spec:
   template:
     metadata:
       labels:
-        app: prometheus
         deploy: sourcegraph
+        app: prometheus
     spec:
       containers:
-        - image: "index.docker.io/sourcegraph/prometheus:insiders@sha256:ff010583e8b9f6afc4991037c07e7987b57041bb000c23747b72deefee3ca39f"
-          livenessProbe:
-            httpGet:
-              path: /-/healthy
-              port: 9090
-            initialDelaySeconds: 30
-            timeoutSeconds: 30
-          name: prometheus
-          ports:
-            - containerPort: 9090
-              name: http
-          readinessProbe:
-            httpGet:
-              path: /-/ready
-              port: 9090
-            initialDelaySeconds: 30
-            timeoutSeconds: 30
-          resources:
-            limits:
-              cpu: '2'
-              memory: "6G"
-            requests:
-              cpu: "500m"
-              memory: "6G"
-          terminationMessagePolicy: FallbackToLogsOnError
-          volumeMounts:
-            - mountPath: /prometheus
-              name: data
-            - mountPath: /sg_prometheus_add_ons
-              name: config
+      - name: prometheus
+        image: index.docker.io/sourcegraph/prometheus:insiders@sha256:ff010583e8b9f6afc4991037c07e7987b57041bb000c23747b72deefee3ca39f
+        terminationMessagePolicy: FallbackToLogsOnError
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        ports:
+        - containerPort: 9090
+          name: http
+        volumeMounts:
+        - mountPath: /prometheus
+          name: data
+        - mountPath: /sg_prometheus_add_ons
+          name: config
+        # Prometheus is relied upon to monitor services for sending alerts to site admins when
+        # something is wrong with Sourcegraph, thus its memory requests and limits are the same to
+        # guarantee it has enough memory to perform its job reliably and prevent conflicts with
+        # other pods on the same host node.
+        #
+        # The limit chosen here is based on what works reliably on Sourcegraph.com with lots
+        # of traffic.
+        resources:
+          limits:
+            cpu: "2"
+            memory: 6G
+          requests:
+            cpu: 500m
+            memory: 6G
       securityContext:
         runAsUser: 0
       serviceAccountName: prometheus
       volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: prometheus
-        - configMap:
-            defaultMode: 511
-            name: prometheus
-          name: config
+      - name: data
+        persistentVolumeClaim:
+          claimName: prometheus
+      - configMap:
+          defaultMode: 0777
+          name: prometheus
+        name: config

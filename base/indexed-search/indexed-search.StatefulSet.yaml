@@ -4,9 +4,9 @@ metadata:
   annotations:
     description: Backend for indexed text search operations.
   labels:
-    app.kubernetes.io/component: indexed-search
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: indexed-search
   name: indexed-search
 spec:
   replicas: 1
@@ -22,63 +22,65 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-        - image: "index.docker.io/sourcegraph/indexed-searcher:insiders@sha256:76d7e8a7453caed03412064d2f8e40dd49b9df958edd846e5a91c514b840803e"
-          name: zoekt-webserver
-          ports:
-            - containerPort: 6070
-              name: http
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /healthz
-              port: http
-              scheme: HTTP
-            periodSeconds: 5
-            timeoutSeconds: 5
-          resources:
-            limits:
-              cpu: '2'
-              memory: "4G"
-            requests:
-              cpu: "500m"
-              memory: "2G"
-          terminationMessagePolicy: FallbackToLogsOnError
-          volumeMounts:
-            - mountPath: /data
-              name: data
-        - image: "index.docker.io/sourcegraph/search-indexer:insiders@sha256:89fa7d5eac6f9f3e8893a482650dffcea4d22be993328427679af7e3ddd08e10"
-          name: zoekt-indexserver
-          ports:
-            - containerPort: 6072
-              name: index-http
-          resources:
-            limits:
-              cpu: '8'
-              memory: "8G"
-            requests:
-              cpu: '4'
-              memory: "4G"
-          terminationMessagePolicy: FallbackToLogsOnError
-          volumeMounts:
-            - mountPath: /data
-              name: data
+      - name: zoekt-webserver
+        image: index.docker.io/sourcegraph/indexed-searcher:insiders@sha256:76d7e8a7453caed03412064d2f8e40dd49b9df958edd846e5a91c514b840803e
+        terminationMessagePolicy: FallbackToLogsOnError
+        ports:
+        - containerPort: 6070
+          name: http
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4G
+          requests:
+            cpu: 500m
+            memory: 2G
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      - name: zoekt-indexserver
+        image: index.docker.io/sourcegraph/search-indexer:insiders@sha256:89fa7d5eac6f9f3e8893a482650dffcea4d22be993328427679af7e3ddd08e10
+        terminationMessagePolicy: FallbackToLogsOnError
+        ports:
+        - containerPort: 6072
+          name: index-http
+        resources:
+          # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
+          # lower lag between a new commit and it being indexed for search.
+          limits:
+            cpu: "8"
+            memory: 8G
+          requests:
+            cpu: "4"
+            memory: 4G
+        volumeMounts:
+        - mountPath: /data
+          name: data
       securityContext:
         runAsUser: 0
       volumes:
-        - name: data
+      - name: data
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
-    - apiVersion: v1
-      kind: PersistentVolumeClaim
-      metadata:
-        labels:
-          deploy: sourcegraph
-        name: data
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: "200Gi"
-        storageClassName: sourcegraph
+  - metadata:
+      labels:
+        deploy: sourcegraph
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          # The size of disk to used for search indexes.
+          # This should typically be gitserver disk size multipled by the number of gitserver shards.
+          storage: 200Gi
+      storageClassName: sourcegraph

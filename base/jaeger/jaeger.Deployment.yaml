@@ -1,38 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: jaeger
   labels:
-    app: jaeger
-    app.kubernetes.io/component: jaeger
-    app.kubernetes.io/name: jaeger
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-  name: jaeger
+    app.kubernetes.io/component: jaeger
+    app: jaeger
+    app.kubernetes.io/name: jaeger
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: jaeger
-      app.kubernetes.io/component: all-in-one
       app.kubernetes.io/name: jaeger
+      app.kubernetes.io/component: all-in-one
   strategy:
     type: Recreate
   template:
     metadata:
-      annotations:
-        prometheus.io/port: '16686'
-        prometheus.io/scrape: 'true'
       labels:
         app: jaeger
-        app.kubernetes.io/component: all-in-one
-        app.kubernetes.io/name: jaeger
         deploy: sourcegraph
+        app.kubernetes.io/name: jaeger
+        app.kubernetes.io/component: all-in-one
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "16686"
     spec:
-      containers:
-        - args:
-            - "--memory.max-traces=20000"
-          image: "index.docker.io/sourcegraph/jaeger-all-in-one:insiders@sha256:c40fc00b886da07c76c7d838dc62b599f29acfe253086593dfccb9840f0c8acb"
-          name: jaeger
+        containers:
+        - name: jaeger
+          image: index.docker.io/sourcegraph/jaeger-all-in-one:insiders@sha256:c40fc00b886da07c76c7d838dc62b599f29acfe253086593dfccb9840f0c8acb
+          args: ["--memory.max-traces=20000"]
           ports:
             - containerPort: 5775
               protocol: UDP
@@ -48,15 +47,15 @@ spec:
               protocol: TCP
           readinessProbe:
             httpGet:
-              path: /
+              path: "/"
               port: 14269
             initialDelaySeconds: 5
           resources:
             limits:
-              cpu: '1'
-              memory: "1G"
+              cpu: "1"
+              memory: 1G
             requests:
-              cpu: "500m"
-              memory: "500M"
-      securityContext:
-        runAsUser: 0
+              cpu: 500m
+              memory: 500M
+        securityContext:
+          runAsUser: 0
