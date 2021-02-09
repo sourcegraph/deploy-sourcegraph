@@ -24,7 +24,8 @@ spec:
         app: minio
     spec:
       containers:
-      - env:
+      - name: minio
+        env:
         - name: MINIO_ACCESS_KEY
           value: AKIAIOSFODNN7EXAMPLE
         - name: MINIO_SECRET_KEY
@@ -32,7 +33,6 @@ spec:
         image: index.docker.io/sourcegraph/minio:insiders@sha256:3d7a0147396ea799284ba707765d477797518425682c9aa65faa5883a63fac4f
         args: ['minio', 'server', '/data']
         terminationMessagePolicy: FallbackToLogsOnError
-        name: minio
         ports:
         - containerPort: 9000
           name: minio
