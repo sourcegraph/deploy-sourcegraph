@@ -24,9 +24,8 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-      - args:
-        - run
-        env:
+      - name: gitserver
+        args: ["run"]
         image: index.docker.io/sourcegraph/gitserver:insiders@sha256:5dffb09ec347d06786982eacc5e8e2e53931266000e9cc8d43c570a72b8665f8
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
@@ -34,7 +33,6 @@ spec:
           tcpSocket:
             port: rpc
           timeoutSeconds: 5
-        name: gitserver
         ports:
         - containerPort: 3178
           name: rpc

@@ -27,7 +27,8 @@ spec:
         app: precise-code-intel-worker
     spec:
       containers:
-      - env:
+      - name: precise-code-intel-worker
+        env:
         - name: NUM_WORKERS
           value: '4'
         - name: POD_NAME
@@ -36,7 +37,6 @@ spec:
               fieldPath: metadata.name
         image: index.docker.io/sourcegraph/precise-code-intel-worker:insiders@sha256:c5047ae9c865942d1b416a5628fc16e3ad2f5c4901132f59a674d71868b81017
         terminationMessagePolicy: FallbackToLogsOnError
-        name: precise-code-intel-worker
         livenessProbe:
           httpGet:
             path: /healthz
