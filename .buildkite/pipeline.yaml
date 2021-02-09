@@ -30,11 +30,3 @@ steps:
       # Can be set to true to help debug test results, but ensure that created resources
       # are removed manually
       NOCLEANUP: "false"
-
-  - wait: ~
-    continue_on_failure: true
-  
-  - label: ":gcompute: :floppy_disk: 🧹"
-    concurrency: 1
-    concurrency_group: deploy-sourcegraph/clean-unused-disks
-    command: .buildkite/cleanup-unused-disks.sh
