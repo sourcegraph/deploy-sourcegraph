@@ -6,6 +6,7 @@ steps:
 
   - wait
 
+<<<<<<< HEAD
   - label: ':rocket: :k8s:'
     branches: 'release'
     concurrency: 1
@@ -16,3 +17,23 @@ steps:
       - kubectl config set-context --current --namespace=dogfood-k8s
       # Deploy relevant Kubernetes bits
       - ./kubectl-apply-all.sh --context="gke_sourcegraph-dogfood_us-central1-f_dogfood"
+=======
+  - label: ":pulumi: :k8s:"
+    concurrency: 3
+    concurrency_group: deploy-sourcegraph/integration
+    command: .buildkite/integration-test.sh
+    env:
+      VERBOSE: "true"
+      # Can be set to true to help debug test results, but ensure that created resources
+      # are removed manually
+      NOCLEANUP: "false"
+
+  - label: ":k8s:"
+    concurrency: 3
+    concurrency_group: deploy-sourcegraph/integration-restricted
+    command: .buildkite/integration-restricted-test.sh
+    env:
+      # Can be set to true to help debug test results, but ensure that created resources
+      # are removed manually
+      NOCLEANUP: "false"
+>>>>>>> 847fa3be5d3ad5e28f5256a23ab8dd536782c302
