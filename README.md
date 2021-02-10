@@ -27,9 +27,9 @@ Kubernetes is easy later.
 - [Admin guide](https://docs.sourcegraph.com/admin) - useful guide for Sourcegraph admins
   - [Metrics](https://docs.sourcegraph.com/admin/observability/metrics) - guidance of metrics that can be used for monitoring Sourcegraph
 
-## Kubernetes alternatives
+## Is Kubernetes the right deployment type for me?
 
-We recommend using Kubernetes for deploying Sourcegraph (see above for installation instructions). However, we understand not everyone can use Kubernetes or may prefer their own container infrastructure. If this is the case, check out our [pure-Docker deployment reference](https://github.com/sourcegraph/deploy-sourcegraph-docker).
+Please see [our docs](https://docs.sourcegraph.com/admin/install) for comparisons of deployment types and our resource estimator.
 
 ## Contributing
 
