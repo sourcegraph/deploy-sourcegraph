@@ -26,7 +26,7 @@ spec:
       containers:
       - name: gitserver
         args: ["run"]
-        image: index.docker.io/sourcegraph/gitserver:insiders@sha256:10e354825f1b3e99bdad7b2107b877cc4ada86bf9c4947ff9fc58a8fdc912453
+        image: index.docker.io/sourcegraph/gitserver:insiders@sha256:a0d058b2ebb9321118f98c826d3b227a54b2f64001de875094728a3869c9f940
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 5
@@ -51,7 +51,7 @@ spec:
         - mountPath: /root/.ssh
           name: ssh
       - name: jaeger-agent
-        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:db5b4636805866c49119b6a6f8e3d8d7d520261dc1c8c88273b48c77c5fb559e
+        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:92745b9cc9fdd0e070ad32be2dbb392e0e30376841322505001de9b9d4fe1c42
         env:
           - name: POD_NAME
             valueFrom:
