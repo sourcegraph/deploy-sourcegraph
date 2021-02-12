@@ -18,7 +18,8 @@ trap 'bash -c "$CLEANUP"' EXIT
 
 CLUSTER_NAME_SUFFIX=$(echo ${BUILD_UUID} | head -c 8)
 CLUSTER_NAME="ds-test-restricted-${CLUSTER_NAME_SUFFIX}"
-CLUSTER_VERSION="1.15.12-gke.20"
+# get the STABLE channel version from GKE
+CLUSTER_VERSION=$(gcloud container get-server-config --zone us-central1-a -q 2>&1 | grep "defaultClusterVersion" | awk '{ print $2}')
 
 cd $(dirname "${BASH_SOURCE[0]}")
 
@@ -49,7 +50,8 @@ kubectl create serviceaccount -n ns-sourcegraph fake-user
 
 kubectl create rolebinding -n ns-sourcegraph fake-admin --clusterrole=admin --serviceaccount=ns-sourcegraph:fake-user
 
-kubectl create role -n ns-sourcegraph nonroot:unprivileged --verb=use --resource=podsecuritypolicies.extension --resource-name=nonroot-policy
+# Kubernetes < 1.16 change to '--resource=podsecuritypolicies.extensions'
+kubectl create role -n ns-sourcegraph nonroot:unprivileged --verb=use --resource=podsecuritypolicies.extensions --resource-name=nonroot-policy
 
 kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --role=nonroot:unprivileged --serviceaccount=ns-sourcegraph:fake-user
 
