@@ -55,17 +55,18 @@ spec:
       - env:
         - name: DATA_SOURCE_NAME
           value: postgres://sg:@localhost:5432/?sslmode=disable
-        # Dax: Temporarily switch back to upstream postgres exporter        
-        image: wrouesnel/postgres_exporter:v0.7.0@sha256:785c919627c06f540d515aac88b7966f352403f73e931e70dc2cbf783146a98b
-        terminationMessagePolicy: FallbackToLogsOnError
-        name: pgsql-exporter
-        resources:
-          limits:
-            cpu: 10m
-            memory: 50Mi
-          requests:
-            cpu: 10m
-            memory: 50Mi
+        # Dax: Temporarily switch back to upstream postgres exporter
+        # https://github.com/sourcegraph/sourcegraph/issues/18225
+        # image: wrouesnel/postgres_exporter:v0.7.0@sha256:785c919627c06f540d515aac88b7966f352403f73e931e70dc2cbf783146a98b
+        # terminationMessagePolicy: FallbackToLogsOnError
+        # name: pgsql-exporter
+        # resources:
+        #   limits:
+        #     cpu: 10m
+        #     memory: 50Mi
+        #   requests:
+        #     cpu: 10m
+        #     memory: 50Mi
       securityContext:
         runAsUser: 0
       volumes:
