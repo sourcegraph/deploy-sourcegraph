@@ -31,15 +31,6 @@ spec:
         - name: POSTGRES_PASSWORD # Accessible by Sourcegraph applications on the network only, so password auth is not used.
           value: password
         terminationMessagePolicy: FallbackToLogsOnError
-        readinessProbe:
-          exec:
-            command:
-              - /ready.sh
-        livenessProbe:
-          initialDelaySeconds: 15
-          exec:
-            command:
-              - /liveness.sh
         ports:
         - containerPort: 5432
           name: timescaledb
