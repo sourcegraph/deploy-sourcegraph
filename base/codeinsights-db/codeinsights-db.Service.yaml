@@ -5,16 +5,16 @@ metadata:
     prometheus.io/port: "9187"
     sourcegraph.prometheus/scrape: "true"
   labels:
-    app.kubernetes.io/component: codeintel-db
-    app: codeintel-db
+    app.kubernetes.io/component: codeinsights-db
+    app: codeinsights-db
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-  name: codeintel-db
+  name: codeinsights-db
 spec:
   ports:
-  - name: pgsql
+  - name: timescaledb
     port: 5432
-    targetPort: pgsql
+    targetPort: timescaledb
   selector:
-    app: codeintel-db
+    app: codeinsights-db
   type: ClusterIP

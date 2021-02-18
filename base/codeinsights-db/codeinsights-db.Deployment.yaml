@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Code Insights TimescaleDB instance.
+  labels:
+    app.kubernetes.io/component: codeinsights-db
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: codeinsights-db
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: codeinsights-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        deploy: sourcegraph
+        app: codeinsights-db
+        group: backend
+    spec:
+      containers:
+      - name: timescaledb
+        image: index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:f985af2fef860cc48be40ded864df025b8794b02b86e66cbc6c55bfe3c418831
+        env:
+        - name: POSTGRES_PASSWORD # Accessible by Sourcegraph applications on the network only, so password auth is not used.
+          value: password
+        terminationMessagePolicy: FallbackToLogsOnError
+        ports:
+        - containerPort: 5432
+          name: timescaledb
+        resources:
+          limits:
+            cpu: "4"
+            memory: 2Gi
+          requests:
+            cpu: "4"
+            memory: 2Gi
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+        - mountPath: /conf
+          name: timescaledb-conf
+      # - env:
+      #   - name: DATA_SOURCE_NAME
+      #     value: postgres://sg:@localhost:5432/?sslmode=disable
+      #   # Dax: Temporarily switch back to upstream postgres exporter
+      #   # https://github.com/sourcegraph/sourcegraph/issues/18225
+      #   image: wrouesnel/postgres_exporter:v0.7.0@sha256:785c919627c06f540d515aac88b7966f352403f73e931e70dc2cbf783146a98b
+      #   terminationMessagePolicy: FallbackToLogsOnError
+      #   name: pgsql-exporter
+      #   resources:
+      #     limits:
+      #       cpu: 10m
+      #       memory: 50Mi
+      #     requests:
+      #       cpu: 10m
+      #       memory: 50Mi
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: disk
+        persistentVolumeClaim:
+          claimName: codeinsights-db
+      - name: timescaledb-conf
+        configMap:
+          defaultMode: 0777
+          name: codeinsights-db-conf
