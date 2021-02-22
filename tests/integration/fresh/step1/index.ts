@@ -26,7 +26,7 @@ const storageClass = new k8s.storage.v1.StorageClass(
 )
 
 const globOptions = {
-    ignore: ['**/kustomization.yaml'],
+    ignore: ['**/kustomization.yaml', 'overlays/**/*.yaml'],
 }
 
 const baseFiles = fg(`${generatedBase}/**/*.yaml`, globOptions)
