@@ -30,6 +30,8 @@ spec:
         env:
         - name: POSTGRES_PASSWORD # Accessible by Sourcegraph applications on the network only, so password auth is not used.
           value: password
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 5432
@@ -42,7 +44,7 @@ spec:
             cpu: "4"
             memory: 2Gi
         volumeMounts:
-        - mountPath: /data
+        - mountPath: /var/lib/postgresql/data/
           name: disk
         - mountPath: /conf
           name: timescaledb-conf
