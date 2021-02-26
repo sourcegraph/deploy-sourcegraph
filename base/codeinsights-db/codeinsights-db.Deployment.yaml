@@ -30,6 +30,8 @@ spec:
         env:
         - name: POSTGRES_PASSWORD # Accessible by Sourcegraph applications on the network only, so password auth is not used.
           value: password
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 5432
