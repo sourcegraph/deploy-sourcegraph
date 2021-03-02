@@ -27,9 +27,15 @@ spec:
       - name: minio
         env:
         - name: MINIO_ACCESS_KEY
-          value: AKIAIOSFODNN7EXAMPLE
+          valueFrom:
+            secretKeyRef:
+              name: minio-secrets
+              key: MINIO_ACCESS_KEY
         - name: MINIO_SECRET_KEY
-          value: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-secrets
+              key: MINIO_ACCESS_KEY
         image: index.docker.io/sourcegraph/minio:insiders@sha256:3d7a0147396ea799284ba707765d477797518425682c9aa65faa5883a63fac4f
         args: ['minio', 'server', '/data']
         terminationMessagePolicy: FallbackToLogsOnError
