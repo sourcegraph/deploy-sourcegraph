@@ -72,13 +72,19 @@ spec:
         - name: PROMETHEUS_URL
           value: http://prometheus:30090
         - name: PRECISE_CODE_INTEL_INTERNAL_PROXY_AUTH_TOKEN
-          value: jWcIgGi36gTolzUPHPbMmG92hqafpSsr0K9ku66DcrTWBvUeskjiSwjyBUVHxfIRhlE0v2UgthRr2/NJftez+TbXLwPnuCYJQNPExjuKiROX+1YsnQYUqggzlca8tJhUg5E1+mLMIEC56NTnMu9Yt2Un14dRy/jGjjZtNzYON2o=
+          valueFrom:
+            secretKeyRef:
+              name: code-intel-secrets
+              key: PRECISE_CODE_INTEL_INTERNAL_PROXY_AUTH_TOKEN
         - name: EXECUTOR_QUEUE_URL
           value: http://executor-queue:3191
         - name: EXECUTOR_FRONTEND_USERNAME
           value: executor
         - name: EXECUTOR_FRONTEND_PASSWORD
-          value: jWcIgGi36gTolzUPHPbMmG92hqafpSsr0K9ku66DcrTWBvUeskjiSwjyBUVHxfIRhlE0v2UgthRr2/NJftez+TbXLwPnuCYJQNPExjuKiROX+1YsnQYUqggzlca8tJhUg5E1+mLMIEC56NTnMu9Yt2Un14dRy/jGjjZtNzYON2o=
+          valueFrom:
+            secretKeyRef:
+              name: code-intel-secrets
+              key: EXECUTOR_FRONTEND_PASSWORD
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:

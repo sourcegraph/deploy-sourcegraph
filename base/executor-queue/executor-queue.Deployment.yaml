@@ -28,7 +28,10 @@ spec:
         - name: EXECUTOR_FRONTEND_USERNAME
           value: executor
         - name: EXECUTOR_FRONTEND_PASSWORD
-          value: jWcIgGi36gTolzUPHPbMmG92hqafpSsr0K9ku66DcrTWBvUeskjiSwjyBUVHxfIRhlE0v2UgthRr2/NJftez+TbXLwPnuCYJQNPExjuKiROX+1YsnQYUqggzlca8tJhUg5E1+mLMIEC56NTnMu9Yt2Un14dRy/jGjjZtNzYON2o=
+          valueFrom:
+            secretKeyRef:
+              name: code-intel-secrets
+              key: EXECUTOR_FRONTEND_PASSWORD
         - name: SRC_FRONTEND_INTERNAL
           value: sourcegraph-frontend-internal
         - name: SRC_LOG_FORMAT
