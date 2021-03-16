@@ -10,4 +10,4 @@ require (
 	github.com/sourcegraph/sourcegraph/enterprise/dev/ci/images v0.0.0-20201215004529-23092738fe86
 )
 
-replace github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.4.3+incompatible
+replace github.com/Azure/go-autorest/v14 => github.com/Azure/go-autorest v14.2.0+incompatible
