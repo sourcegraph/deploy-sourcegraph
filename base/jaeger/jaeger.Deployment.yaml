@@ -29,33 +29,33 @@ spec:
         prometheus.io/port: "16686"
     spec:
         containers:
-          - image: index.docker.io/sourcegraph/jaeger-all-in-one:3.24.1@sha256:7015e25e08cbb169828c8e1bc995d967e81d3706eea79f0fc43280e126a6e576
-            name: jaeger
-            args: ["--memory.max-traces=20000"]
-            ports:
-              - containerPort: 5775
-                protocol: UDP
-              - containerPort: 6831
-                protocol: UDP
-              - containerPort: 6832
-                protocol: UDP
-              - containerPort: 5778
-                protocol: TCP
-              - containerPort: 16686
-                protocol: TCP
-              - containerPort: 14250
-                protocol: TCP
-            readinessProbe:
-              httpGet:
-                path: "/"
-                port: 14269
-              initialDelaySeconds: 5
-            resources:
-              limits:
-                cpu: "1"
-                memory: 1G
-              requests:
-                cpu: 500m
-                memory: 500M
+        - name: jaeger
+          image: index.docker.io/sourcegraph/jaeger-all-in-one:3.25.2@sha256:7509cdb033e7fef27fc590bd4aca45bdbb9ddce6f1b96ccef3e0e8a8a12c863d
+          args: ["--memory.max-traces=20000"]
+          ports:
+            - containerPort: 5775
+              protocol: UDP
+            - containerPort: 6831
+              protocol: UDP
+            - containerPort: 6832
+              protocol: UDP
+            - containerPort: 5778
+              protocol: TCP
+            - containerPort: 16686
+              protocol: TCP
+            - containerPort: 14250
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: "/"
+              port: 14269
+            initialDelaySeconds: 5
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1G
+            requests:
+              cpu: 500m
+              memory: 500M
         securityContext:
           runAsUser: 0

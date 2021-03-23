@@ -4,6 +4,7 @@ metadata:
   annotations:
     description: Postgres database for various data.
   labels:
+    app.kubernetes.io/component: codeintel-db
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
   name: codeintel-db
@@ -33,8 +34,8 @@ spec:
         securityContext:
           runAsUser: 0
       containers:
-      - env:
-        image: index.docker.io/sourcegraph/codeintel-db:3.24.1@sha256:a55fea6638d478c2368c227d06a1a2b7a2056b693967628427d41c92d9209e97
+      - name: pgsql
+        image: index.docker.io/sourcegraph/codeintel-db:3.25.2@sha256:a55fea6638d478c2368c227d06a1a2b7a2056b693967628427d41c92d9209e97
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
           exec:
@@ -45,7 +46,6 @@ spec:
           exec:
             command:
               - /liveness.sh
-        name: pgsql
         ports:
         - containerPort: 5432
           name: pgsql

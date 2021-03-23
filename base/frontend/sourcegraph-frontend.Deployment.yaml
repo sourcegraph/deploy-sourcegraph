@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: index.docker.io/sourcegraph/frontend:3.24.1@sha256:34a642351c054502a1e60c053ffaa7951c199bfb0fe6b1ff276b0b25588685e2
+        image: index.docker.io/sourcegraph/frontend:3.25.2@sha256:d22244aad7dda2328d2f18980bc925b7f4763d198a3fa584766ab00c11082b8a
         args:
         - serve
         env:
@@ -42,6 +42,8 @@ spec:
           value: disable
         - name: PGUSER
           value: sg
+        - name: CODEINSIGHTS_PGDATASOURCE
+          value: postgres://postgres:password@codeinsights-db:5432/postgres
         - name: CODEINTEL_PGDATABASE
           value: sg
         - name: CODEINTEL_PGHOST
@@ -92,15 +94,17 @@ spec:
         resources:
           limits:
             cpu: "2"
-            memory: 2G
+            ephemeral-storage: "8Gi"
+            memory: 4G
           requests:
             cpu: "2"
+            ephemeral-storage: "4Gi"
             memory: 2G
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
       - name: jaeger-agent
-        image: index.docker.io/sourcegraph/jaeger-agent:3.24.1@sha256:eb3ecda1149ab8ff6142e53f825f7bca4cfd2102ee850bc79e6f95ca96187a7d
+        image: index.docker.io/sourcegraph/jaeger-agent:3.25.2@sha256:48711e706cfdb85f99be639e7d8c09bca80d7c5d970a5f951b505ae21312f449
         env:
           - name: POD_NAME
             valueFrom:

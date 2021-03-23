@@ -27,7 +27,8 @@ spec:
         app: symbols
     spec:
       containers:
-      - env:
+      - name: symbols
+        env:
         - name: SYMBOLS_CACHE_SIZE_MB
           value: "100000"
         - name: POD_NAME
@@ -36,9 +37,8 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: index.docker.io/sourcegraph/symbols:3.24.1@sha256:59ea001223edff4a2f85f44116c6bc236fdbd1db3d3b73553ea04eb5b9bd4db0
+        image: index.docker.io/sourcegraph/symbols:3.25.2@sha256:617ea086b9d19564d24b0ac599290c12a2b74702d9f9df3ac45f4baf97eef6b3
         terminationMessagePolicy: FallbackToLogsOnError
-        name: symbols
         livenessProbe:
           httpGet:
             path: /healthz
@@ -60,16 +60,18 @@ spec:
           name: debug
         resources:
           limits:
-            cpu: "1"
-            memory: 1G
+            cpu: "2"
+            ephemeral-storage: "8Gi"
+            memory: 2G
           requests:
             cpu: 500m
+            ephemeral-storage: "4Gi"
             memory: 500M
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: index.docker.io/sourcegraph/jaeger-agent:3.24.1@sha256:eb3ecda1149ab8ff6142e53f825f7bca4cfd2102ee850bc79e6f95ca96187a7d
-        name: jaeger-agent
+      - name: jaeger-agent
+        image: index.docker.io/sourcegraph/jaeger-agent:3.25.2@sha256:48711e706cfdb85f99be639e7d8c09bca80d7c5d970a5f951b505ae21312f449
         env:
           - name: POD_NAME
             valueFrom:
