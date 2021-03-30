@@ -27,7 +27,7 @@ spec:
       initContainers:
       - name: correct-data-dir-permissions
         image: sourcegraph/alpine:3.12@sha256:133a0a767b836cf86a011101995641cf1b5cbefb3dd212d78d7be145adde636d
-        command: ["sh", "-c", "if [ -d /data/pgdata-11 ]; then chmod 750 /data/pgdata-11; fi"]
+        command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
         volumeMounts:
         - mountPath: /data
           name: disk
@@ -35,7 +35,7 @@ spec:
           runAsUser: 0
       containers:
       - env:
-        image: index.docker.io/sourcegraph/postgres-11.4:insiders@sha256:a55fea6638d478c2368c227d06a1a2b7a2056b693967628427d41c92d9209e97
+        image: index.docker.io/sourcegraph/postgres-12.6:91468_2021-03-30_b77d2e6@sha256:aa937c1c8ab20f3c809f04480d5a73791b05be59d3183726fd499ae0a123e982
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
           exec:
