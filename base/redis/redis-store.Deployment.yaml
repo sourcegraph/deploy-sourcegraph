@@ -24,46 +24,46 @@ spec:
         app: redis-store
     spec:
       containers:
-      - name: redis-store
-        image: index.docker.io/sourcegraph/redis-store:insiders@sha256:e8467a8279832207559bdfbc4a89b68916ecd5b44ab5cf7620c995461c005168
-        terminationMessagePolicy: FallbackToLogsOnError
-        livenessProbe:
-          initialDelaySeconds: 30
-          tcpSocket:
-            port: redis
-        ports:
-        - containerPort: 6379
-          name: redis
-        readinessProbe:
-          initialDelaySeconds: 5
-          tcpSocket:
-            port: redis
-        resources:
-          limits:
-            cpu: "1"
-            memory: 6Gi
-          requests:
-            cpu: "1"
-            memory: 6Gi
-        volumeMounts:
-        - mountPath: /redis-data
-          name: redis-data
-      - name: redis-exporter    
-        image: index.docker.io/sourcegraph/redis_exporter:84464_2021-01-15_c2e4c28@sha256:f3f51453e4261734f08579fe9c812c66ee443626690091401674be4fb724da70
-        terminationMessagePolicy: FallbackToLogsOnError
-        ports:
-        - containerPort: 9121
-          name: redisexp
-        resources:
-          limits:
-            cpu: 10m
-            memory: 100Mi
-          requests:
-            cpu: 10m
-            memory: 100Mi
+        - name: redis-store
+          image: us.gcr.io/sourcegraph-dev/redis-store:8f69c11e20e32618ead6a83c83796224b33aa013@sha256:e8467a8279832207559bdfbc4a89b68916ecd5b44ab5cf7620c995461c005168
+          terminationMessagePolicy: FallbackToLogsOnError
+          livenessProbe:
+            initialDelaySeconds: 30
+            tcpSocket:
+              port: redis
+          ports:
+            - containerPort: 6379
+              name: redis
+          readinessProbe:
+            initialDelaySeconds: 5
+            tcpSocket:
+              port: redis
+          resources:
+            limits:
+              cpu: "1"
+              memory: 6Gi
+            requests:
+              cpu: "1"
+              memory: 6Gi
+          volumeMounts:
+            - mountPath: /redis-data
+              name: redis-data
+        - name: redis-exporter
+          image: us.gcr.io/sourcegraph-dev/redis_exporter:8f69c11e20e32618ead6a83c83796224b33aa013@sha256:f3f51453e4261734f08579fe9c812c66ee443626690091401674be4fb724da70
+          terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - containerPort: 9121
+              name: redisexp
+          resources:
+            limits:
+              cpu: 10m
+              memory: 100Mi
+            requests:
+              cpu: 10m
+              memory: 100Mi
       securityContext:
         runAsUser: 0
       volumes:
-      - name: redis-data
-        persistentVolumeClaim:
-          claimName: redis-store
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: redis-store

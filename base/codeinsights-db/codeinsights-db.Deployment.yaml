@@ -25,29 +25,29 @@ spec:
         group: backend
     spec:
       containers:
-      - name: timescaledb
-        image: index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:f985af2fef860cc48be40ded864df025b8794b02b86e66cbc6c55bfe3c418831
-        env:
-        - name: POSTGRES_PASSWORD # Accessible by Sourcegraph applications on the network only, so password auth is not used.
-          value: password
-        - name: PGDATA
-          value: /var/lib/postgresql/data/pgdata
-        terminationMessagePolicy: FallbackToLogsOnError
-        ports:
-        - containerPort: 5432
-          name: timescaledb
-        resources:
-          limits:
-            cpu: "4"
-            memory: 2Gi
-          requests:
-            cpu: "4"
-            memory: 2Gi
-        volumeMounts:
-        - mountPath: /var/lib/postgresql/data/
-          name: disk
-        - mountPath: /conf
-          name: timescaledb-conf
+        - name: timescaledb
+          image: us.gcr.io/sourcegraph-dev/codeinsights-db:8f69c11e20e32618ead6a83c83796224b33aa013@sha256:f985af2fef860cc48be40ded864df025b8794b02b86e66cbc6c55bfe3c418831
+          env:
+            - name: POSTGRES_PASSWORD # Accessible by Sourcegraph applications on the network only, so password auth is not used.
+              value: password
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - containerPort: 5432
+              name: timescaledb
+          resources:
+            limits:
+              cpu: "4"
+              memory: 2Gi
+            requests:
+              cpu: "4"
+              memory: 2Gi
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data/
+              name: disk
+            - mountPath: /conf
+              name: timescaledb-conf
       # - env:
       #   - name: DATA_SOURCE_NAME
       #     value: postgres://sg:@localhost:5432/?sslmode=disable
@@ -66,10 +66,10 @@ spec:
       securityContext:
         runAsUser: 0
       volumes:
-      - name: disk
-        persistentVolumeClaim:
-          claimName: codeinsights-db
-      - name: timescaledb-conf
-        configMap:
-          defaultMode: 0777
-          name: codeinsights-db-conf
+        - name: disk
+          persistentVolumeClaim:
+            claimName: codeinsights-db
+        - name: timescaledb-conf
+          configMap:
+            defaultMode: 0777
+            name: codeinsights-db-conf

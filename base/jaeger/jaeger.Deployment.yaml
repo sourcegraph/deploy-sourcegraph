@@ -28,9 +28,9 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "16686"
     spec:
-        containers:
+      containers:
         - name: jaeger
-          image: index.docker.io/sourcegraph/jaeger-all-in-one:insiders@sha256:986cee25cf992a33b59ead99d88defff3d168370f7e8944d0288846f989a7cb3
+          image: us.gcr.io/sourcegraph-dev/jaeger-all-in-one:8f69c11e20e32618ead6a83c83796224b33aa013@sha256:986cee25cf992a33b59ead99d88defff3d168370f7e8944d0288846f989a7cb3
           args: ["--memory.max-traces=20000"]
           ports:
             - containerPort: 5775
@@ -57,5 +57,5 @@ spec:
             requests:
               cpu: 500m
               memory: 500M
-        securityContext:
-          runAsUser: 0
+      securityContext:
+        runAsUser: 0
