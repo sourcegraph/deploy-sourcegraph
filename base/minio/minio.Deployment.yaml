@@ -24,51 +24,51 @@ spec:
         app: minio
     spec:
       containers:
-      - name: minio
-        env:
-        - name: MINIO_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: minio-secrets
-              key: MINIO_ACCESS_KEY
-        - name: MINIO_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: minio-secrets
-              key: MINIO_SECRET_KEY
-        image: index.docker.io/sourcegraph/minio:insiders@sha256:3d7a0147396ea799284ba707765d477797518425682c9aa65faa5883a63fac4f
-        args: ['minio', 'server', '/data']
-        terminationMessagePolicy: FallbackToLogsOnError
-        ports:
-        - containerPort: 9000
-          name: minio
-        livenessProbe:
-          httpGet:
-            path: /minio/health/live
-            port: minio
-            scheme: HTTP
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /minio/health/live
-            port: minio
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
-        resources:
-          limits:
-            cpu: "1"
-            memory: 500M
-          requests:
-            cpu: "1"
-            memory: 500M
-        volumeMounts:
-        - mountPath: /data
-          name: minio-data
+        - name: minio
+          env:
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secrets
+                  key: MINIO_ACCESS_KEY
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secrets
+                  key: MINIO_SECRET_KEY
+          image: us.gcr.io/sourcegraph-dev/minio:8f69c11e20e32618ead6a83c83796224b33aa013@sha256:3d7a0147396ea799284ba707765d477797518425682c9aa65faa5883a63fac4f
+          args: ['minio', 'server', '/data']
+          terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - containerPort: 9000
+              name: minio
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: minio
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: minio
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: "1"
+              memory: 500M
+          volumeMounts:
+            - mountPath: /data
+              name: minio-data
       securityContext:
         runAsUser: 0
       volumes:
-      - name: minio-data
-        persistentVolumeClaim:
-          claimName: minio
+        - name: minio-data
+          persistentVolumeClaim:
+            claimName: minio

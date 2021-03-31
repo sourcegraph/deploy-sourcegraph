@@ -22,65 +22,65 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-      - name: zoekt-webserver
-        image: index.docker.io/sourcegraph/indexed-searcher:insiders@sha256:2a9ea16a036175df18219a4ba2850512c75887705295d48eabff4f3b805caf84
-        terminationMessagePolicy: FallbackToLogsOnError
-        ports:
-        - containerPort: 6070
-          name: http
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /healthz
-            port: http
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
-        resources:
-          limits:
-            cpu: "5"
-            memory: 96Gi
-          requests:
-            cpu: "2"
-            memory: 64Gi
-        volumeMounts:
-        - mountPath: /data
-          name: data
-      - name: zoekt-indexserver
-        image: index.docker.io/sourcegraph/search-indexer:insiders@sha256:89a2a4f3df0d493a98b5e8c8c9f952a03768b80632ff3af550b02c6c802ebe7e
-        terminationMessagePolicy: FallbackToLogsOnError
-        ports:
-        - containerPort: 6072
-          name: index-http
-        resources:
-          # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
-          # lower lag between a new commit and it being indexed for search.
-          limits:
-            cpu: "8"
-            memory: 16Gi
-          requests:
-            cpu: "4"
-            memory: 8Gi
-        volumeMounts:
-        - mountPath: /data
-          name: data
+        - name: zoekt-webserver
+          image: us.gcr.io/sourcegraph-dev/indexed-searcher:8f69c11e20e32618ead6a83c83796224b33aa013@sha256:2a9ea16a036175df18219a4ba2850512c75887705295d48eabff4f3b805caf84
+          terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - containerPort: 6070
+              name: http
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "5"
+              memory: 96Gi
+            requests:
+              cpu: "2"
+              memory: 64Gi
+          volumeMounts:
+            - mountPath: /data
+              name: data
+        - name: zoekt-indexserver
+          image: us.gcr.io/sourcegraph-dev/search-indexer:8f69c11e20e32618ead6a83c83796224b33aa013@sha256:89a2a4f3df0d493a98b5e8c8c9f952a03768b80632ff3af550b02c6c802ebe7e
+          terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - containerPort: 6072
+              name: index-http
+          resources:
+            # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
+            # lower lag between a new commit and it being indexed for search.
+            limits:
+              cpu: "8"
+              memory: 16Gi
+            requests:
+              cpu: "4"
+              memory: 8Gi
+          volumeMounts:
+            - mountPath: /data
+              name: data
       securityContext:
         runAsUser: 0
       volumes:
-      - name: data
+        - name: data
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
-  - metadata:
-      labels:
-        deploy: sourcegraph
-      name: data
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          # The size of disk to used for search indexes.
-          # This should typically be gitserver disk size multipled by the number of gitserver shards.
-          storage: 4Ti
-      storageClassName: sourcegraph
+    - metadata:
+        labels:
+          deploy: sourcegraph
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            # The size of disk to used for search indexes.
+            # This should typically be gitserver disk size multipled by the number of gitserver shards.
+            storage: 4Ti
+        storageClassName: sourcegraph

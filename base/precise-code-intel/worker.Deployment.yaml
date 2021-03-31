@@ -27,41 +27,41 @@ spec:
         app: precise-code-intel-worker
     spec:
       containers:
-      - name: precise-code-intel-worker
-        env:
-        - name: NUM_WORKERS
-          value: '4'
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/precise-code-intel-worker:insiders@sha256:485cf5037269cada397badb321dad5de2e19c9eec86c37d508380a97f4e4507c
-        terminationMessagePolicy: FallbackToLogsOnError
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: http
-            scheme: HTTP
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /healthz
-            port: http
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
-        ports:
-        - containerPort: 3188
-          name: http
-        - containerPort: 6060
-          name: debug
-        resources:
-          limits:
-            cpu: "2"
-            memory: 4G
-          requests:
-            cpu: 500m
-            memory: 2G
+        - name: precise-code-intel-worker
+          env:
+            - name: NUM_WORKERS
+              value: '4'
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          image: us.gcr.io/sourcegraph-dev/precise-code-intel-worker:8f69c11e20e32618ead6a83c83796224b33aa013@sha256:485cf5037269cada397badb321dad5de2e19c9eec86c37d508380a97f4e4507c
+          terminationMessagePolicy: FallbackToLogsOnError
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 3188
+              name: http
+            - containerPort: 6060
+              name: debug
+          resources:
+            limits:
+              cpu: "2"
+              memory: 4G
+            requests:
+              cpu: 500m
+              memory: 2G
       securityContext:
         runAsUser: 0
