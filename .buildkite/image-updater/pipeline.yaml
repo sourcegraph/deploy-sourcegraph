@@ -27,7 +27,7 @@ steps:
           add: '.'
           branch: update-docker-images/images
           create-branch: 'true'
-          message: Update Docker images for sourcegraph/deploy-sourcegraph-dogfood-k8s-2
+          message: "Update Docker images to \"${TARGET_COMMIT?is not set. Please specify the sourcegraph/sourcegraph commit that you would like to be deployed.}\""
           remote: origin
     retry:
       manual:
@@ -42,9 +42,9 @@ steps:
     depends_on:
       - stage-srcimg
     env:
-      BODY: Update Docker images for sourcegraph/deploy-sourcegraph-dogfood-k8s-2
+      BODY: "Update Docker images to \"${TARGET_COMMIT?is not set. Please specify the sourcegraph/sourcegraph commit that you would like to be deployed.}\""
       HEAD: update-docker-images/images
-      TITLE: Update Docker images for sourcegraph/deploy-sourcegraph-dogfood-k8s-2
+      TITLE: "Update Docker images to \"${TARGET_COMMIT?is not set. Please specify the sourcegraph/sourcegraph commit that you would like to be deployed.}\""
     key: stage-create-pr
     label: ":github: Open Pull Request"
     retry:
