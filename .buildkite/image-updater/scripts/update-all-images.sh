@@ -21,7 +21,7 @@ IMAGES=(
   indexed-searcher
   jaeger-agent
   jaeger-all-in-one minio
-  postgres-11.4
+  postgres-12.6
   postgres_exporter
   precise-code-intel-worker
   prometheus
