@@ -8,4 +8,4 @@ See [ingress controller documentation](../../docs/configure.md#ingress-controlle
 
 # ArgoCD requirements
 
-ArgoCD requires `--enable-ssl-passthrough` to be enabled on the nginx controller pod
+ArgoCD requires `--enable-ssl-passthrough` to be enabled on the nginx controller pod. This is due to fact that uses both gRPC (for the CLI) and https for the UI. Nginx doesn't support both these protocols within a single ingress resource. 
