@@ -15,5 +15,17 @@ PIPELINE_FILE="./ci/pipeline.dhall"
 echo "(${PIPELINE_FILE}).Scripts" | dhall to-directory-tree --output "${SCRIPTS_DIR}"
 fd --extension "sh" . "${SCRIPTS_DIR}" --exec chmod +x '{}'
 
-# write buildkite pipeline
-echo "(${PIPELINE_FILE}).Pipeline" | dhall-to-yaml --generated-comment --output="${OUTPUT_DIR}/pipeline.yaml"
+PIPELINES="(${PIPELINE_FILE}).Pipelines"
+
+# write image-updater pipeline
+echo "${PIPELINES}.ImageUpdater" | dhall-to-yaml --generated-comment --output="${OUTPUT_DIR}/pipeline.yaml"
+
+CRON_IMAGES=(
+  "gitserver"
+  "indexed-search"
+)
+
+# write all cron-tag pipelines
+for IMAGE in "${CRON_IMAGES[@]}"; do
+  echo "${PIPELINES}.CronTagGenerator \"${IMAGE}\"" | dhall-to-yaml --generated-comment --output="${OUTPUT_DIR}/cron-tag-${IMAGE}.pipeline.yaml"
+done

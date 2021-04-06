@@ -1,5 +1,5 @@
 let ImageUpdater =
-      https://raw.githubusercontent.com/sourcegraph/image-updater-pipeline/89981c7e5a76402060bc40ffe43a03723d7b5706/package.dhall sha256:11052fdfd7cfe82ae9267b66d148a1112b5666c5452513c3a9b04b03107fe6ca
+      https://raw.githubusercontent.com/sourcegraph/image-updater-pipeline/c57505015e2d2054446b70e49a96cee66f6e0b61/package.dhall sha256:22614ee59a29fb03efe74662c186ecb7bbc9b9c8236ecb7a5725c8d27046b1cb
 
 let Config = ImageUpdater.Config
 
@@ -9,6 +9,6 @@ let c =
       , scriptsFolder = env:SCRIPTS_DIR as Text ? ".buildkite/image-updater"
       }
 
-let Pipeline = ImageUpdater.MakePipeline c
+let Pipelines = ImageUpdater.MakePipeline c
 
-in  { Pipeline, Scripts = ImageUpdater.Scripts }
+in  { Pipelines, Scripts = ImageUpdater.Scripts }

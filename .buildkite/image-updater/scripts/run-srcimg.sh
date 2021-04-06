@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+SCRIPTS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+
 cd "$(git rev-parse --show-toplevel)"
 set -euo pipefail
 
@@ -21,7 +23,7 @@ function file_contains_image() {
   local image="$1"
   local file="$2"
 
-  yq eval --exit-status ".spec.template.spec.containers.[] | select(.image == \"*/${image}*\")" "${file}"
+  flock --shared "${file}" --command "${SCRIPTS_DIR}/file-contains-image.sh ${image} ${file}"
 }
 export -f file_contains_image
 
@@ -38,7 +40,7 @@ function substitute_image() {
   local new_image="$2"
   local file="$3"
 
-  yq eval -i "(.spec.template.spec.containers.[]|select(.image == \"*/${old_image}*\").image)|=\"${new_image}\"" "${file}"
+  flock --exclusive "${file}" --command "${SCRIPTS_DIR}/substitute-image.sh ${old_image} ${new_image} ${file}"
 }
 export -f substitute_image
 
