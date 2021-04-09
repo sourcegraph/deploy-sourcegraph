@@ -41,7 +41,15 @@ spec:
           failureThreshold: 3
           httpGet:
             path: /healthz
-            port: http
+            port: debug
+            scheme: HTTP
+          periodSeconds: 1
+          timeoutSeconds: 5
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ready
+            port: debug
             scheme: HTTP
           periodSeconds: 1
           timeoutSeconds: 5
