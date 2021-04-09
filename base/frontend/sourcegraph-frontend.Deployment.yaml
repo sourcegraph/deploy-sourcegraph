@@ -75,14 +75,14 @@ spec:
         livenessProbe:
           httpGet:
             path: /healthz
-            port: health-check
+            port: debug
             scheme: HTTP
           initialDelaySeconds: 300
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /ready
-            port: health-check
+            port: debug
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
@@ -92,7 +92,7 @@ spec:
         - containerPort: 3090
           name: http-internal
         - containerPort: 6060
-          name: health-check
+          name: debug
         resources:
           limits:
             cpu: "2"
