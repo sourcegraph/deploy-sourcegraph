@@ -51,6 +51,10 @@ spec:
             requests:
               cpu: "1"
               memory: 500Mi
+          volumeMounts:
+            - mountPath: /secrets/kms/
+              name: kms-service-account
+              readOnly: true
         - name: jaeger-agent
           image: us.gcr.io/sourcegraph-dev/jaeger-agent:24f469353b4855defcb117ab6fd267cd095062f8@sha256:965deeb6d9ab97f6115eb10775f746922170c016d385d6ce603951edabb16f48
           env:
@@ -80,3 +84,7 @@ spec:
             - --reporter.type=grpc
       securityContext:
         runAsUser: 0
+      volumes:
+        - name: kms-service-account
+          secret:
+            secretName: kms-service-account-key
