@@ -63,5 +63,13 @@ spec:
             requests:
               cpu: 500m
               memory: 2G
+          volumeMounts:
+            - mountPath: /secrets/kms/
+              name: kms-service-account
+              readOnly: true
       securityContext:
         runAsUser: 0
+      volumes:
+        - name: kms-service-account
+          secret:
+            secretName: kms-service-account-key
