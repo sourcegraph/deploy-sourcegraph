@@ -22,55 +22,55 @@ spec:
         app: executor-queue
     spec:
       containers:
-      - env:
-        - name: EXECUTOR_FRONTEND_URL
-          value: https://sourcegraph.com
-        - name: EXECUTOR_FRONTEND_USERNAME
-          value: executor
-        - name: EXECUTOR_FRONTEND_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: code-intel-secrets
-              key: EXECUTOR_FRONTEND_PASSWORD
-        - name: SRC_FRONTEND_INTERNAL
-          value: sourcegraph-frontend-internal
-        - name: SRC_LOG_FORMAT
-          value: json
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        # NOTE: This service is nto in deploy-sourcegraph (but it IS in deploy-sourcegraph-dot-com). This has the consequence of this
-        # tag not auto-updating, as it pulls the tag versions from the former repository. This is alright as the executor-queue service
-        # is not under heavy development and updating by hand when necessary seems low-effort for the near future.
-        image: sourcegraph/executor-queue:93035_2021-04-14_8e50916@sha256:6422f75d66300930ee5c677afcb29b9c6134179e709573de07ea3d10d438399a
-        terminationMessagePolicy: FallbackToLogsOnError
-        name: executor-queue
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: debug
-            scheme: HTTP
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: debug
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
-        ports:
-        - containerPort: 3191
-          name: http
-        - containerPort: 6060
-          name: debug
-        resources:
-          limits:
-            cpu: "2"
-            memory: 12Gi
-          requests:
-            cpu: 500m
-            memory: 4Gi
-        securityContext:
-          runAsUser: 0
+        - env:
+            - name: EXECUTOR_FRONTEND_URL
+              value: https://sourcegraph.com
+            - name: EXECUTOR_FRONTEND_USERNAME
+              value: executor
+            - name: EXECUTOR_FRONTEND_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: code-intel-secrets
+                  key: EXECUTOR_FRONTEND_PASSWORD
+            - name: SRC_FRONTEND_INTERNAL
+              value: sourcegraph-frontend-internal
+            - name: SRC_LOG_FORMAT
+              value: json
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          # NOTE: This service is nto in deploy-sourcegraph (but it IS in deploy-sourcegraph-dot-com). This has the consequence of this
+          # tag not auto-updating, as it pulls the tag versions from the former repository. This is alright as the executor-queue service
+          # is not under heavy development and updating by hand when necessary seems low-effort for the near future.
+          image: us.gcr.io/sourcegraph-dev/executor-queue:ef08c52176b949c4c0025bd2f2db4dd899c3491b@sha256:0736399c131b6fe6d707c0b2debc932ce017ed1cea6e7224e68235de156fc7bf
+          terminationMessagePolicy: FallbackToLogsOnError
+          name: executor-queue
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: debug
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: debug
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 3191
+              name: http
+            - containerPort: 6060
+              name: debug
+          resources:
+            limits:
+              cpu: "2"
+              memory: 12Gi
+            requests:
+              cpu: 500m
+              memory: 4Gi
+          securityContext:
+            runAsUser: 0
