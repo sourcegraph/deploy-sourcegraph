@@ -43,20 +43,20 @@ spec:
         # NOTE: This service is nto in deploy-sourcegraph (but it IS in deploy-sourcegraph-dot-com). This has the consequence of this
         # tag not auto-updating, as it pulls the tag versions from the former repository. This is alright as the executor-queue service
         # is not under heavy development and updating by hand when necessary seems low-effort for the near future.
-        image: sourcegraph/executor-queue:84019_2021-01-11_cc8e4f1@sha256:5e382deb6beb2584f5719fe60cb46ee6e55a41481efd502961db748d4759e894
+        image: sourcegraph/executor-queue:93035_2021-04-14_8e50916@sha256:6422f75d66300930ee5c677afcb29b9c6134179e709573de07ea3d10d438399a
         terminationMessagePolicy: FallbackToLogsOnError
         name: executor-queue
         livenessProbe:
           httpGet:
             path: /healthz
-            port: http
+            port: debug
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
-            path: /healthz
-            port: http
+            path: /ready
+            port: debug
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
