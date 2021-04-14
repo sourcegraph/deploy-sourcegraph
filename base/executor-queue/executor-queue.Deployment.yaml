@@ -49,14 +49,14 @@ spec:
         livenessProbe:
           httpGet:
             path: /healthz
-            port: debug
+            port: http
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
-            path: /ready
-            port: debug
+            path: /healthz
+            port: http
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
