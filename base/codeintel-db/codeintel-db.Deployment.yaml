@@ -35,7 +35,7 @@ spec:
             runAsUser: 0
       containers:
         - name: pgsql
-          image: us.gcr.io/sourcegraph-dev/codeintel-db:5202a40cebcb4e5d01cfc0c891af2ca1ea863dcf@sha256:aa937c1c8ab20f3c809f04480d5a73791b05be59d3183726fd499ae0a123e982
+          image: us.gcr.io/sourcegraph-dev/codeintel-db:6bec8c3c132040547408d5755dd11a5e73689848@sha256:aa937c1c8ab20f3c809f04480d5a73791b05be59d3183726fd499ae0a123e982
           terminationMessagePolicy: FallbackToLogsOnError
           readinessProbe:
             exec:
@@ -65,7 +65,7 @@ spec:
             - name: DATA_SOURCE_NAME
               value: postgres://sg:@localhost:5432/?sslmode=disable
           # Dax: Temporarily switch back to upstream postgres exporter        
-          image: us.gcr.io/sourcegraph-dev/postgres_exporter:5202a40cebcb4e5d01cfc0c891af2ca1ea863dcf@sha256:4f7b9b5ac76c3d8959836cb1280d48d99fb74d21d1762782cb3bdbe0fdcb9396
+          image: us.gcr.io/sourcegraph-dev/postgres_exporter:6bec8c3c132040547408d5755dd11a5e73689848@sha256:6eaf952105b5f4bab759880302565c0c8a5c551720c279ad5eae845c3cb931fa
           terminationMessagePolicy: FallbackToLogsOnError
           name: pgsql-exporter
           resources:
