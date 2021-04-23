@@ -102,10 +102,14 @@ func (e *validationError) Error() string {
 }
 
 func isReleaseBranch(branch string) bool {
+	if verbose {
+		log.Printf("branch = %q", branch)
+	}
+
 	version := strings.TrimPrefix(branch, "publish-")
 
 	if !strings.HasPrefix(version, "v") {
-		version = fmt.Sprintf("v:%s", version)
+		version = fmt.Sprintf("v%s", version)
 	}
 
 	return semver.IsValid(version)
