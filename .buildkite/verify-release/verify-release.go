@@ -67,21 +67,14 @@ func validate(paths []string) error {
 			defer f.Close()
 
 			refs := Parse(f)
-			log.Println(path)
-			log.Printf("%v", refs)
-
-			b, err := os.ReadFile(path)
-			if err != nil {
-				return fmt.Errorf("when reading %q: %w", path, err)
-			}
-
-			contents := string(b)
-
-			for _, tag := range []string{"insiders", "latest"} {
-				if strings.Contains(contents, fmt.Sprintf(":%s", tag)) {
-					validationErrors = append(validationErrors, validationError{path, tag})
+			for _, r := range refs {
+				for _, tag := range []string{"insiders", "latest"} {
+					if r.Version == tag {
+						validationErrors = append(validationErrors, validationError{path, tag})
+					}
 				}
 			}
+
 			return nil
 		})
 

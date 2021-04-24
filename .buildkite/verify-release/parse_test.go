@@ -122,8 +122,10 @@ func TestParseLine(t *testing.T) {
 		{
 			line: "image: index.docker.io/sourcegraph/syntax-highlighter:insiders@sha256:a5f9b8d8a78107310d17bd2041102a89324ff35ccf6769807084747912ea7eda",
 			expected: &ImageReference{
-				Name:    "sourcegraph",
-				Version: "3.20",
+				Name:     "sourcegraph/syntax-highlighter",
+				Version:  "insiders",
+				Digest:   "a5f9b8d8a78107310d17bd2041102a89324ff35ccf6769807084747912ea7eda",
+				Registry: "index.docker.io",
 			},
 		},
 

@@ -30,9 +30,9 @@ func (ir *ImageReference) probablyValid() bool {
 		return false
 	}
 
-	noVersion := ir.Version == ""
-	noDigest := ir.Digest == ""
+	hasVersion := ir.Version != ""
+	hasDigest := ir.Digest != ""
 
 	// You can be missing a version or a digest, but not both.
-	return noVersion != noDigest
+	return hasVersion || hasDigest
 }

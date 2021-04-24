@@ -4,7 +4,6 @@ import (
 	"bufio"
 	_ "crypto/sha256"
 	"io"
-	"log"
 
 	"fmt"
 	"strings"
@@ -29,11 +28,9 @@ func Parse(r io.Reader) []*ImageReference {
 }
 
 func ParseLine(line string) *ImageReference {
-	log.Println(line)
 	line = trimComment(line)
 
 	segments := strings.Fields(line)
-	log.Printf("segments: %v", segments)
 	for _, s := range segments {
 		s = trimQuotes(s)
 		imgRef := parseSegment(s)
