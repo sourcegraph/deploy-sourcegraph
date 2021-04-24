@@ -7,7 +7,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestParse(t *testing.T) {
+func TestParseLine(t *testing.T) {
 	for _, test := range []struct {
 		line     string
 		expected *ImageReference
@@ -107,6 +107,27 @@ func TestParse(t *testing.T) {
 		},
 
 		{
+			line: "'sourcegraph:3.20'#",
+			expected: &ImageReference{
+				Name:    "sourcegraph",
+				Version: "3.20",
+			},
+		},
+
+		{
+			line:     "#'sourcegraph:3.20'",
+			expected: nil,
+		},
+
+		{
+			line: "image: index.docker.io/sourcegraph/syntax-highlighter:insiders@sha256:a5f9b8d8a78107310d17bd2041102a89324ff35ccf6769807084747912ea7eda",
+			expected: &ImageReference{
+				Name:    "sourcegraph",
+				Version: "3.20",
+			},
+		},
+
+		{
 			line:     "\\#sourcegraph:3.20 \\# a comment...",
 			expected: nil,
 		},
@@ -122,12 +143,17 @@ func TestParse(t *testing.T) {
 		},
 
 		{
+			line:     "#",
+			expected: nil,
+		},
+
+		{
 			line:     "",
 			expected: nil,
 		},
 	} {
 		t.Run(test.line, func(t *testing.T) {
-			image := Parse(test.line)
+			image := ParseLine(test.line)
 			equalReference(t, test.expected, image)
 		})
 	}

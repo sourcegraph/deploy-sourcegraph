@@ -60,6 +60,16 @@ func validate(paths []string) error {
 				log.Println(path)
 			}
 
+			f, err := os.Open(path)
+			if err != nil {
+				return fmt.Errorf("when opening %q: %w", path, err)
+			}
+			defer f.Close()
+
+			refs := Parse(f)
+			log.Println(path)
+			log.Printf("%v", refs)
+
 			b, err := os.ReadFile(path)
 			if err != nil {
 				return fmt.Errorf("when reading %q: %w", path, err)

@@ -1,7 +1,10 @@
 package main
 
 import (
+	"bufio"
 	_ "crypto/sha256"
+	"io"
+	"log"
 
 	"fmt"
 	"strings"
@@ -9,21 +12,48 @@ import (
 	"verify-release/reference"
 )
 
-func Parse(line string) *ImageReference {
-	segments := strings.Fields(line)
-	for _, s := range segments {
-		if probablyComment(s) {
-			return nil
-		}
+func Parse(r io.Reader) []*ImageReference {
+	var out []*ImageReference
 
+	scanner := bufio.NewScanner(r)
+	scanner.Split(bufio.ScanLines)
+
+	for scanner.Scan() {
+		imgRef := ParseLine(scanner.Text())
+		if imgRef != nil {
+			out = append(out, imgRef)
+		}
+	}
+
+	return out
+}
+
+func ParseLine(line string) *ImageReference {
+	log.Println(line)
+	line = trimComment(line)
+
+	segments := strings.Fields(line)
+	log.Printf("segments: %v", segments)
+	for _, s := range segments {
 		s = trimQuotes(s)
 		imgRef := parseSegment(s)
+
 		if imgRef != nil && imgRef.probablyValid() {
 			return imgRef
 		}
 	}
 
 	return nil
+}
+
+func trimComment(line string) string {
+	// assume any appearance of "#" is a comment
+	i := strings.LastIndex(line, "#")
+	if i >= 0 {
+		line = line[:i]
+	}
+
+	return line
 }
 
 func parseSegment(s string) *ImageReference {
@@ -59,10 +89,6 @@ func parseSegment(s string) *ImageReference {
 	}
 
 	return imgRef
-}
-
-func probablyComment(s string) bool {
-	return strings.HasPrefix(s, "#")
 }
 
 // trimQuotes removes surrounding single or double

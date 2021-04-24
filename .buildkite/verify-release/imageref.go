@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type ImageReference struct {
 	Name     string
 	Version  string
@@ -7,16 +9,20 @@ type ImageReference struct {
 	Digest   string
 }
 
+func (ir *ImageReference) String() string {
+	return fmt.Sprintf("%s: version=%q digest=%q registry=%q", ir.Name, ir.Version, ir.Digest, ir.Registry)
+}
+
 func (ir *ImageReference) probablyValid() bool {
-	// This function isn't perfect, this is a
+	// This function isn't perfect. This is a
 	// rough heuristic to probably find
-	// docker images references
-	// that are actually the one that we care about.
+	// Docker image references that are actually
+	// the ones that we care about.
 	//
 	// I wanted to avoid using a specific file schema
 	// e.g. parsing a file as K8s or docker-compose, etc.
 	//
-	// Strings like "a" are considered to be valid docker
+	// Strings like just "a" are considered to be valid Docker
 	// images. I wanted to skip over those for our purposes.
 	//
 
