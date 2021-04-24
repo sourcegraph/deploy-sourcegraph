@@ -1,6 +1,8 @@
 package main
 
 import (
+	_ "crypto/sha256"
+
 	"flag"
 	"fmt"
 	"io/fs"
