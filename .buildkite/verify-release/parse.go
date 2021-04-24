@@ -45,7 +45,7 @@ func ParseLine(line string) *ImageReference {
 
 func trimComment(line string) string {
 	// assume any appearance of "#" is a comment
-	i := strings.LastIndex(line, "#")
+	i := strings.Index(line, "#")
 	if i >= 0 {
 		line = line[:i]
 	}
