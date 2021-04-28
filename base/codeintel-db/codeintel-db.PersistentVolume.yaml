@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    deploy: sourcegraph
+    disk: codeintel-db
+  name: codeintel-db
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 2Ti
+  claimRef:
+    namespace: dogfood-k8s
+    name: codeintel-db
+  gcePersistentDisk:
+    fsType: ext4
+    pdName: gke-dogfood-f91db20b-d-pvc-968c8688-c24e-4a9f-99fc-56cede1387e7
+  storageClassName: sourcegraph
