@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    deploy: sourcegraph
+    disk: repos-gitserver
+  name: repos-gitserver-3
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 1Ti
+  claimRef:
+    namespace: dogfood-k8s
+    name: repos-gitserver-3
+  gcePersistentDisk:
+    fsType: ext4
+    pdName: gke-dogfood-f91db20b-d-pvc-46d2b75b-0121-44df-9577-c22ab33b7251
+  storageClassName: sourcegraph
