@@ -12,4 +12,4 @@
 #
 # Apply the base Soucegraph deployment
 # shellcheck disable=SC2068
-kubectl apply --prune -l deploy=sourcegraph -f base --recursive $@
+echo "Our deployments are managed via https://argocd.sgdev.org"
