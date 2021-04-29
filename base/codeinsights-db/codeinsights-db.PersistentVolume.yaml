@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    deploy: sourcegraph
+    disk: codeinsights-db
+  name: codeinsights-db
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 200Gi
+  claimRef:
+    namespace: dogfood-k8s
+    name: codeinsights-db
+  gcePersistentDisk:
+    fsType: ext4
+    pdName: gke-dogfood-952a5131-d-pvc-9f3cb8b3-f831-4183-8253-3bf2270f89c1
+  storageClassName: sourcegraph
