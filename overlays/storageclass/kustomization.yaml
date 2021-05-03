@@ -1,0 +1,60 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+bases:
+  - ../bases/deployments
+  - ../bases/pvcs
+patchesJson6902:
+  - target:
+      kind: StatefulSet
+      name: gitserver
+      group: apps
+      version: v1
+    path: replace-storageclass-name-sts.yaml
+  - target:
+      kind: StatefulSet
+      name: grafana
+      group: apps
+      version: v1
+    path: replace-storageclass-name-sts.yaml
+  - target:
+      kind: StatefulSet
+      name: indexed-search
+      group: apps
+      version: v1
+    path: replace-storageclass-name-sts.yaml
+  - target:
+      kind: PersistentVolumeClaim
+      name: prometheus
+      version: v1
+    path: replace-storageclass-name-pvc.yaml
+  - target:
+      kind: PersistentVolumeClaim
+      name: pgsql
+      version: v1
+    path: replace-storageclass-name-pvc.yaml
+  - target:
+      kind: PersistentVolumeClaim
+      name: redis-cache
+      version: v1
+    path: replace-storageclass-name-pvc.yaml
+  - target:
+      kind: PersistentVolumeClaim
+      name: redis-store
+      version: v1
+    path: replace-storageclass-name-pvc.yaml
+  - target:
+      kind: PersistentVolumeClaim
+      name: codeintel-db
+      version: v1
+    path: replace-storageclass-name-pvc.yaml
+  - target:
+      kind: PersistentVolumeClaim
+      name: minio
+      version: v1
+    path: replace-storageclass-name-pvc.yaml
+  - target:
+      kind: PersistentVolumeClaim
+      name: codeinsights-db
+      version: v1
+    path: replace-storageclass-name-pvc.yaml    
+

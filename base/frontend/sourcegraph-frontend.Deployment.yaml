@@ -10,7 +10,7 @@ metadata:
   name: sourcegraph-frontend
 spec:
   minReadySeconds: 10
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: index.docker.io/sourcegraph/frontend:insiders@sha256:21d08d3f1e5aefbe5b1d6ccd1f6b4203cd016dfb89a413ee95aa8cb67b688365
+        image: index.docker.io/sourcegraph/frontend:insiders@sha256:53c8a0233ed9f3aff61f98fc51e15c2aedf51060591422cb53fc65b37bb64dc4
         args:
         - serve
         env:
@@ -75,14 +75,14 @@ spec:
         livenessProbe:
           httpGet:
             path: /healthz
-            port: http
+            port: debug
             scheme: HTTP
           initialDelaySeconds: 300
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
-            path: /healthz
-            port: http
+            path: /ready
+            port: debug
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
@@ -91,6 +91,8 @@ spec:
           name: http
         - containerPort: 3090
           name: http-internal
+        - containerPort: 6060
+          name: debug
         resources:
           limits:
             cpu: "2"
@@ -104,7 +106,7 @@ spec:
         - mountPath: /mnt/cache
           name: cache-ssd
       - name: jaeger-agent
-        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:14ce47128e899d01cc9874b91d46ee46d7da6bde8162925ad4614c3efbe9bf96
+        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:22ecc0f4c041fb22b1b8c5a7c6f0f5233c80b147e26604ebe310a05860089dca
         env:
           - name: POD_NAME
             valueFrom:
