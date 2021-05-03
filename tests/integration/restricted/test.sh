@@ -60,7 +60,7 @@ Host *
     StrictHostKeyChecking no
 EOM
 
-kubectl create secret -n ns-sourcegraph generic gitserver-ssh --from-file id_rsa=/root/.ssh/deploy_sourcegraph_git_ssh_testing --from-file config=deploy_sourcegraph_git_ssh_config
+kubectl create secret -n ns-sourcegraph generic gitserver-ssh --from-literal=rsa=supersecret --from-literal=config=topsecret
 
 mkdir generated-cluster
 CLEANUP="rm -rf generated-cluster; $CLEANUP"
