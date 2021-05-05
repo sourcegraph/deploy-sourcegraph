@@ -60,7 +60,7 @@ Host *
     StrictHostKeyChecking no
 EOM
 
-kubectl create secret -n ns-sourcegraph generic gitserver-ssh --from-file id_rsa=/root/.ssh/deploy_sourcegraph_git_ssh_testing --from-file config=deploy_sourcegraph_git_ssh_config
+kubectl create secret -n ns-sourcegraph generic gitserver-ssh --from-literal=rsa=supersecret --from-literal=config=topsecret
 
 mkdir generated-cluster
 CLEANUP="rm -rf generated-cluster; $CLEANUP"
@@ -93,4 +93,4 @@ curl --retry-connrefused --retry 2 --retry-delay 10 -m 30 http://localhost:30080
 /usr/local/bin/src version
 
 # run a validation script against it
-/usr/local/bin/src -endpoint http://localhost:30080 validate -context github_token=$DEPLOY_SOURCEGRAPH_TESTING_GITHUB_TOKEN validate.json
+/usr/local/bin/src -endpoint http://localhost:30080 validate -context github_token=$GH_TOKEN validate.json
