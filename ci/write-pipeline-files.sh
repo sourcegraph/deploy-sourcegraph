@@ -23,6 +23,8 @@ echo "${PIPELINES}.ImageUpdater" | dhall-to-yaml --generated-comment --output="$
 CRON_IMAGES=(
   "gitserver"
   "indexed-search"
+  "redis-cache"
+  "redis-store"
 )
 
 # write all cron-tag pipelines
