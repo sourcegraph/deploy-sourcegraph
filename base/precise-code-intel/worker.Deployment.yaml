@@ -10,7 +10,7 @@ metadata:
   name: precise-code-intel-worker
 spec:
   minReadySeconds: 10
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -35,19 +35,19 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/precise-code-intel-worker:3.26.3@sha256:c210c850d9960b8509792627bc19ea4256e6108f7cc8a283c952cfbaf83d06bc
+        image: index.docker.io/sourcegraph/precise-code-intel-worker:3.27.4@sha256:455b3be9455fe1ae43828859beb0ed3ffce9a07c431bd2fce713eb60731d0aeb
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
             path: /healthz
-            port: http
+            port: debug
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
-            path: /healthz
-            port: http
+            path: /ready
+            port: debug
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
