@@ -25,14 +25,14 @@ spec:
         group: backend
     spec:
       initContainers:
-        - name: correct-data-dir-permissions
-          image: sourcegraph/alpine:3.12@sha256:ce099fbcd3cf70b338fc4cb2a4e1fa9ae847de21afdb0a849a393b87d94fb174
-          command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
-          volumeMounts:
-            - mountPath: /data
-              name: disk
-          securityContext:
-            runAsUser: 0
+      - name: correct-data-dir-permissions
+        image: index.docker.io/sourcegraph/alpine:3.12@sha256:ce099fbcd3cf70b338fc4cb2a4e1fa9ae847de21afdb0a849a393b87d94fb174
+        command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+        securityContext:
+          runAsUser: 0
       containers:
         - env:
           image: us.gcr.io/sourcegraph-dev/postgres-12.6:a50fd10eeb50e4a21ac231f218309abd57bc91e7@sha256:068548b16ca201e41a4710b4b0eda43cd09f3a78a81f74c2021e4fe937076d60
