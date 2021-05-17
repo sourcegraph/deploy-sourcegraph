@@ -38,7 +38,9 @@ spec:
               path: /-/healthy
               port: 9090
             initialDelaySeconds: 30
-            timeoutSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 120
+            periodSeconds: 3
           ports:
             - containerPort: 9090
               name: http
