@@ -26,6 +26,9 @@ spec:
       containers:
         - name: gitserver
           args: ["run"]
+          env:
+          - name: SRC_LOG_LEVEL
+            value: dbug
           image: us.gcr.io/sourcegraph-dev/gitserver:6463fdfd082874dc44c77fbf4f199653e3f43936@sha256:2ec904e61640842587d16b202bd0fd04ff6bedc023869881cadf911f345c5202
           terminationMessagePolicy: FallbackToLogsOnError
           livenessProbe:

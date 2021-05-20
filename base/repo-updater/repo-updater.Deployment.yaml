@@ -30,6 +30,8 @@ spec:
         - name: repo-updater
           image: us.gcr.io/sourcegraph-dev/repo-updater:6463fdfd082874dc44c77fbf4f199653e3f43936@sha256:2760ef35fe0d6c11572d7deb9247123f0752e37f1d76e887ff68418e06e3dc16
           env:
+          - name: SRC_LOG_LEVEL
+            value: info
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
             - containerPort: 3182
