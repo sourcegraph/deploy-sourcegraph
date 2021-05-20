@@ -28,10 +28,10 @@ spec:
     spec:
       containers:
         - name: repo-updater
-          image: us.gcr.io/sourcegraph-dev/repo-updater:6463fdfd082874dc44c77fbf4f199653e3f43936@sha256:2760ef35fe0d6c11572d7deb9247123f0752e37f1d76e887ff68418e06e3dc16
+          image: us.gcr.io/sourcegraph-dev/repo-updater:234b0adea89e1c48a1158fe5c1d46df9c8ffd355@sha256:eb9a261658dfa96b9c86d1a9aaea1025f352f34c9d7bb03bcd99bfcbe0517c3b
           env:
-          - name: SRC_LOG_LEVEL
-            value: info
+            - name: SRC_LOG_LEVEL
+              value: info
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
             - containerPort: 3182
@@ -58,7 +58,7 @@ spec:
               name: kms-service-account
               readOnly: true
         - name: jaeger-agent
-          image: us.gcr.io/sourcegraph-dev/jaeger-agent:6463fdfd082874dc44c77fbf4f199653e3f43936@sha256:d3ee867f116ab5b839d17f72dc57d2dd95e6b86bc86a1dbcbcc097f83e4e1cfd
+          image: us.gcr.io/sourcegraph-dev/jaeger-agent:234b0adea89e1c48a1158fe5c1d46df9c8ffd355@sha256:bbe7039bf8a2fa90618d8b1d910b06d04a674e7bad9f23b84f35f073581138c7
           env:
             - name: POD_NAME
               valueFrom:
