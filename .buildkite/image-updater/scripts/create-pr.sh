@@ -20,4 +20,4 @@ set_pull_request_automerge() {
 }
 
 url=$(create_pull_request)
-set_pull_request_automerge "$url"
+set_pull_request_automerge "$url" || true
