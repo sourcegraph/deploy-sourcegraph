@@ -145,7 +145,7 @@ import * as mkdirp from 'mkdirp' // TODO: START HERE
             ...c.StatefulSets,    
         )
         fileContents.forEach(c => {
-
+            // NEXT 2
             fs.writeFileSync(path.join(outDir, c[0] + '.yaml'), YAML.stringify(c))
         })
     }
