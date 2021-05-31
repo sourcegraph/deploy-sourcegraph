@@ -4,26 +4,27 @@ import * as fs from "fs";
 import * as YAML from 'yaml';
 import * as path from "path";
 import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
+import * as mkdirp from 'mkdirp' // TODO: START HERE
 
 (function() {
     const sourceDir = '../base'
     const outDir = 'rendered'
     
     interface Cluster {
-        Deployments: k8s.V1Deployment[]
-        PersistentVolumeClaims: k8s.V1PersistentVolumeClaim[]
-        PersistentVolumes: k8s.V1PersistentVolume[]
-        Services: k8s.V1Service[]
-        ClusterRoles: k8s.V1ClusterRole[]
-        ClusterRoleBindings: k8s.V1ClusterRoleBinding[]
-        ConfigMaps: k8s.V1ConfigMap[]
-        DaemonSets: k8s.V1DaemonSet[]
-        Ingresss: k8s.V1Ingress[]
-        PodSecurityPolicys: k8s.V1beta1PodSecurityPolicy[],
-        Roles: k8s.V1Role[]
-        RoleBindings: k8s.V1RoleBinding[]
-        ServiceAccounts: k8s.V1ServiceAccount[]
-        StatefulSets: k8s.V1StatefulSet[]
+        Deployments: [string, k8s.V1Deployment][]
+        PersistentVolumeClaims: [string, k8s.V1PersistentVolumeClaim][]
+        PersistentVolumes: [string, k8s.V1PersistentVolume][]
+        Services: [string, k8s.V1Service][]
+        ClusterRoles: [string, k8s.V1ClusterRole][]
+        ClusterRoleBindings: [string, k8s.V1ClusterRoleBinding][]
+        ConfigMaps: [string, k8s.V1ConfigMap][]
+        DaemonSets: [string, k8s.V1DaemonSet][]
+        Ingresss: [string, k8s.V1Ingress][]
+        PodSecurityPolicys: [string, k8s.V1beta1PodSecurityPolicy][],
+        Roles: [string, k8s.V1Role][]
+        RoleBindings: [string, k8s.V1RoleBinding][]
+        ServiceAccounts: [string, k8s.V1ServiceAccount][]
+        StatefulSets: [string, k8s.V1StatefulSet][]
         Unrecognized: string[]
     }
     
@@ -53,47 +54,47 @@ import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
                     const k8sType = path.extname(entry.name.substring(0, entry.name.length - '.yaml'.length))
                     switch (k8sType) {
                         case '.Deployment':
-                            cluster.Deployments.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
+                            cluster.Deployments.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
                             break
                         case '.PersistentVolumeClaim':
-                            cluster.PersistentVolumeClaims.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
+                            cluster.PersistentVolumeClaims.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
                             break
                         case '.PersistentVolume':
-                            cluster.PersistentVolumes.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
+                            cluster.PersistentVolumes.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
                             break
                         case '.Service':
                         case '.IndexerService':
-                            cluster.Services.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
+                            cluster.Services.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
                             break
                         case '.ClusterRole':
-                            cluster.ClusterRoles.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
+                            cluster.ClusterRoles.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
                             break
                         case '.ClusterRoleBinding':
-                            cluster.ClusterRoleBindings.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
+                            cluster.ClusterRoleBindings.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
                             break
                         case '.ConfigMap':
-                            cluster.ConfigMaps.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
+                            cluster.ConfigMaps.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
                             break
                         case '.DaemonSet':
-                            cluster.DaemonSets.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
+                            cluster.DaemonSets.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
                             break
                         case '.Ingress':
-                            cluster.Ingresss.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
+                            cluster.Ingresss.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
                             break
                         case '.PodSecurityPolicy':
-                            cluster.PodSecurityPolicys.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
+                            cluster.PodSecurityPolicys.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
                             break
                         case '.Role':
-                            cluster.Roles.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
+                            cluster.Roles.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
                             break
                         case '.RoleBinding':
-                            cluster.RoleBindings.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
+                            cluster.RoleBindings.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
                             break
                         case '.ServiceAccount':
-                            cluster.ServiceAccounts.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
+                            cluster.ServiceAccounts.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
                             break
                         case '.StatefulSet':
-                            cluster.StatefulSets.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
+                            cluster.StatefulSets.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
                             break
                         default:
                             cluster.Unrecognized.push(entry.name)
@@ -109,9 +110,10 @@ import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
     
     readCluster(sourceDir)
 
+    // Returns a thing that transforms all deployments that match a particular criteria
     const transformDeployments = (selector: (d: k8s.V1Deployment) => boolean, transform: (d: k8s.V1Deployment) => void): ((c: Cluster) => void) => {
         return ((c: Cluster) => {
-            c.Deployments.filter(d => selector(d)).forEach(d => transform(d))
+            c.Deployments.filter(([, d]) => selector(d)).forEach(([, d]) => transform(d))
         })
     }
     
@@ -143,11 +145,8 @@ import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
             ...c.StatefulSets,    
         )
         fileContents.forEach(c => {
-            if (!c.metadata?.name) {
-                console.error('missing name from', c)
-                return
-            }
-            fs.writeFileSync(path.join(outDir, c.metadata.name + '.yaml'), YAML.stringify(c))
+
+            fs.writeFileSync(path.join(outDir, c[0] + '.yaml'), YAML.stringify(c))
         })
     }
 
