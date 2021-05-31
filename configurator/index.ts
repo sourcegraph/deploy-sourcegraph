@@ -51,7 +51,6 @@ import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
             if (entry.isFile()) {
                 if (entry.name.endsWith('.yaml')) {
                     const k8sType = path.extname(entry.name.substring(0, entry.name.length - '.yaml'.length))
-                    console.log(k8sType)
                     switch (k8sType) {
                         case '.Deployment':
                             cluster.Deployments.push(YAML.parse(readFileSync(path.join(root, entry.name)).toString()))
@@ -148,8 +147,10 @@ import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
                 console.error('missing name from', c)
                 return
             }
-            fs.writeFileSync(path.join(outDir, c.metadata.name + '.yaml'), c)
+            fs.writeFileSync(path.join(outDir, c.metadata.name + '.yaml'), YAML.stringify(c))
         })
     }
+
+    writeCluster(cluster)
     
 })()
