@@ -6,7 +6,7 @@ import * as path from "path";
 import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
 import * as mkdirp from 'mkdirp'
 
-(function() {
+(async function() {
     const sourceDir = '../base'
     const outDir = 'rendered'
     
@@ -126,7 +126,7 @@ import * as mkdirp from 'mkdirp'
     transformations.forEach(t => t(cluster))
     
 
-    function writeCluster(c: Cluster) {
+    async function writeCluster(c: Cluster) {
         const fileContents = []
         fileContents.push(
             ...c.Deployments,
@@ -144,13 +144,15 @@ import * as mkdirp from 'mkdirp'
             ...c.ServiceAccounts,
             ...c.StatefulSets,    
         )
-        fileContents.forEach(c => {
-            const filename = c[0]
-            mkdirp(path.dirname(path.join(outDir, filename)))
-            fs.writeFileSync(path.join(outDir, filename), YAML.stringify(c))
+        await fileContents.forEach(async c => {
+            const filename = path.relative(sourceDir, c[0])
+            await mkdirp(path.dirname(path.join(outDir, filename)))
+            fs.writeFileSync(path.join(outDir, filename), YAML.stringify(c[1]))
         })
     }
 
-    writeCluster(cluster)
+    await writeCluster(cluster)
     
-})()
+})().then(() => {
+    console.log("Done")
+})
