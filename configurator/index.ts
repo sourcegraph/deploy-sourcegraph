@@ -4,7 +4,7 @@ import * as fs from "fs";
 import * as YAML from 'yaml';
 import * as path from "path";
 import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
-import * as mkdirp from 'mkdirp' // TODO: START HERE
+import * as mkdirp from 'mkdirp'
 
 (function() {
     const sourceDir = '../base'
@@ -145,8 +145,9 @@ import * as mkdirp from 'mkdirp' // TODO: START HERE
             ...c.StatefulSets,    
         )
         fileContents.forEach(c => {
-            // NEXT 2
-            fs.writeFileSync(path.join(outDir, c[0] + '.yaml'), YAML.stringify(c))
+            const filename = c[0]
+            mkdirp(path.dirname(path.join(outDir, filename)))
+            fs.writeFileSync(path.join(outDir, filename), YAML.stringify(c))
         })
     }
 
