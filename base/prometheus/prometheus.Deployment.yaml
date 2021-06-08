@@ -24,53 +24,52 @@ spec:
         app: prometheus
     spec:
       containers:
-        - name: prometheus
-          image: us.gcr.io/sourcegraph-dev/prometheus:f3874b8479d7bb37459f20162beb49da47a87624@sha256:59b95cbc9d0ec82b8f3bca845082a098839b6dce79b7bba1639a49323fe75b61
-          terminationMessagePolicy: FallbackToLogsOnError
-          readinessProbe:
-            httpGet:
-              path: /-/ready
-              port: 9090
-            initialDelaySeconds: 30
-            timeoutSeconds: 30
-          livenessProbe:
-            httpGet:
-              path: /-/healthy
-              port: 9090
-            initialDelaySeconds: 30
-            timeoutSeconds: 5
-            failureThreshold: 120
-            periodSeconds: 3
-          ports:
-            - containerPort: 9090
-              name: http
-          volumeMounts:
-            - mountPath: /prometheus
-              name: data
-            - mountPath: /sg_prometheus_add_ons
-              name: config
-          # Prometheus is relied upon to monitor services for sending alerts to site admins when
-          # something is wrong with Sourcegraph, thus its memory requests and limits are the same to
-          # guarantee it has enough memory to perform its job reliably and prevent conflicts with
-          # other pods on the same host node.
-          #
-          # The limit chosen here is based on what works reliably on Sourcegraph.com with lots
-          # of traffic.
-          resources:
-            limits:
-              cpu: "2"
-              memory: 8G
-            requests:
-              cpu: 500m
-              memory: 6G
+      - name: prometheus
+        image: us.gcr.io/sourcegraph-dev/prometheus:e0ad894d122fb4ec3182b2faed19a2ae4bdccf6f@sha256:9da37cd77f4c386eb3a482d107e2f8454ba6c52c897d8248f985a86d9e855cd8
+        terminationMessagePolicy: FallbackToLogsOnError
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9090
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9090
+          # TODO(Dax)
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        ports:
+        - containerPort: 9090
+          name: http
+        volumeMounts:
+        - mountPath: /prometheus
+          name: data
+        - mountPath: /sg_prometheus_add_ons
+          name: config
+        # Prometheus is relied upon to monitor services for sending alerts to site admins when
+        # something is wrong with Sourcegraph, thus its memory requests and limits are the same to
+        # guarantee it has enough memory to perform its job reliably and prevent conflicts with
+        # other pods on the same host node.
+        #
+        # The limit chosen here is based on what works reliably on Sourcegraph.com with lots
+        # of traffic.
+        resources:
+          limits:
+            cpu: "2"
+            memory: 8G
+          requests:
+            cpu: 500m
+            memory: 6G
       securityContext:
         runAsUser: 0
       serviceAccountName: prometheus
       volumes:
-        - name: data
-          persistentVolumeClaim:
-            claimName: prometheus
-        - configMap:
-            defaultMode: 0777
-            name: prometheus
-          name: config
+      - name: data
+        persistentVolumeClaim:
+          claimName: prometheus
+      - configMap:
+          defaultMode: 0777
+          name: prometheus
+        name: config

@@ -25,65 +25,72 @@ spec:
         group: backend
     spec:
       initContainers:
-        - name: correct-data-dir-permissions
-          image: index.docker.io/sourcegraph/alpine:3.12@sha256:ce099fbcd3cf70b338fc4cb2a4e1fa9ae847de21afdb0a849a393b87d94fb174
-          command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
-          volumeMounts:
-            - mountPath: /data
-              name: disk
-          securityContext:
-            runAsUser: 0
+      - name: correct-data-dir-permissions
+        image: index.docker.io/sourcegraph/alpine:3.12@sha256:ce099fbcd3cf70b338fc4cb2a4e1fa9ae847de21afdb0a849a393b87d94fb174
+        command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+        securityContext:
+          runAsUser: 0
+        resources:
+          limits:
+            cpu: "10m"
+            memory: "50Mi"
+          requests:
+            cpu: "10m"
+            memory: "50Mi"
       containers:
-        - env:
-          image: us.gcr.io/sourcegraph-dev/postgres-12.6:f3874b8479d7bb37459f20162beb49da47a87624@sha256:42ebe9a02c09b91e6fe7289fbaf94bc4f0d1e0868e407a1c3988a528f53a266a
-          terminationMessagePolicy: FallbackToLogsOnError
-          readinessProbe:
-            exec:
-              command:
-                - /ready.sh
-          livenessProbe:
-            initialDelaySeconds: 15
-            exec:
-              command:
-                - /liveness.sh
+      - env:
+        image: us.gcr.io/sourcegraph-dev/postgres-12.6:e0ad894d122fb4ec3182b2faed19a2ae4bdccf6f@sha256:9437c71a98bfb92cdb16f534975e60db31084e8cb239310ec31325f370a5ba44
+        terminationMessagePolicy: FallbackToLogsOnError
+        readinessProbe:
+          exec:
+            command:
+              - /ready.sh
+        livenessProbe:
+          initialDelaySeconds: 15
+          exec:
+            command:
+              - /liveness.sh
+        name: pgsql
+        ports:
+        - containerPort: 5432
           name: pgsql
-          ports:
-            - containerPort: 5432
-              name: pgsql
-          resources:
-            limits:
-              cpu: "7"
-              memory: 32Gi
-            requests:
-              cpu: "7"
-              memory: 32Gi
-          volumeMounts:
-            - mountPath: /data
-              name: disk
-            - mountPath: /conf
-              name: pgsql-conf
-        - env:
-            - name: DATA_SOURCE_NAME
-              value: postgres://sg:@localhost:5432/?sslmode=disable
-            - name: PG_EXPORTER_EXTEND_QUERY_PATH
-              value: /config/queries.yaml
-          image: us.gcr.io/sourcegraph-dev/postgres_exporter:f3874b8479d7bb37459f20162beb49da47a87624@sha256:cde4c86b4a7f7824b4025feb39240c210af6ce39bf8193dac928930a43e65f62
-          terminationMessagePolicy: FallbackToLogsOnError
-          name: pgsql-exporter
-          resources:
-            limits:
-              cpu: 10m
-              memory: 50Mi
-            requests:
-              cpu: 10m
-              memory: 50Mi
+        resources:
+          limits:
+            cpu: "7"
+            memory: 32Gi
+          requests:
+            cpu: "7"
+            memory: 32Gi
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+        - mountPath: /conf
+          name: pgsql-conf
+      - env:
+        - name: DATA_SOURCE_NAME
+          value: postgres://sg:@localhost:5432/?sslmode=disable
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/queries.yaml
+        image: us.gcr.io/sourcegraph-dev/postgres_exporter:e0ad894d122fb4ec3182b2faed19a2ae4bdccf6f@sha256:5fea9370acb97ee8e36fbebeef29b800dac243093a8ea4d62ac83ab22407d525
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: pgsql-exporter
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
       securityContext:
         runAsUser: 0
       volumes:
-        - name: disk
-          persistentVolumeClaim:
-            claimName: pgsql
-        - name: pgsql-conf
-          configMap:
-            defaultMode: 0777
-            name: pgsql-conf
+      - name: disk
+        persistentVolumeClaim:
+          claimName: pgsql
+      - name: pgsql-conf
+        configMap:
+          defaultMode: 0777
+          name: pgsql-conf

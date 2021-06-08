@@ -2,7 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: Handles repository metadata (not Git data) lookups and updates from external code hosts and other similar services.
+    description: Handles repository metadata (not Git data) lookups and updates from
+      external code hosts and other similar services.
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
@@ -27,63 +28,63 @@ spec:
         app: repo-updater
     spec:
       containers:
-        - name: repo-updater
-          image: us.gcr.io/sourcegraph-dev/repo-updater:f3874b8479d7bb37459f20162beb49da47a87624@sha256:0d76fabe2418f32347387e485cb304419dde1e65ad2500e7de79588cd6acbf24
-          env:
+      - name: repo-updater
+        image: us.gcr.io/sourcegraph-dev/repo-updater:e0ad894d122fb4ec3182b2faed19a2ae4bdccf6f@sha256:10aae8a3cc7074849724669d47a1ce6a7702027488e3d56df18953159df1edae
+        env:
             - name: SRC_LOG_LEVEL
               value: info
-          terminationMessagePolicy: FallbackToLogsOnError
-          ports:
-            - containerPort: 3182
-              name: http
-            - containerPort: 6060
-              name: debug
-          readinessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /healthz
-              port: http
-              scheme: HTTP
-            periodSeconds: 1
-            timeoutSeconds: 5
-          resources:
-            limits:
-              cpu: "1"
-              memory: 2Gi
-            requests:
-              cpu: "1"
-              memory: 500Mi
-          volumeMounts:
-            - mountPath: /secrets/kms/
-              name: kms-service-account
-              readOnly: true
-        - name: jaeger-agent
-          image: us.gcr.io/sourcegraph-dev/jaeger-agent:f3874b8479d7bb37459f20162beb49da47a87624@sha256:83d1ad7b7f6aa40e962bf24584fd03e5248d5618afb99073ada16340dab34b5e
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  apiVersion: v1
-                  fieldPath: metadata.name
-          ports:
-            - containerPort: 5775
-              protocol: UDP
-            - containerPort: 5778
-              protocol: TCP
-            - containerPort: 6831
-              protocol: UDP
-            - containerPort: 6832
-              protocol: UDP
-          resources:
-            limits:
-              cpu: "1"
-              memory: 500M
-            requests:
-              cpu: 100m
-              memory: 100M
-          args:
-            - --reporter.grpc.host-port=jaeger-collector:14250
-            - --reporter.type=grpc
+        terminationMessagePolicy: FallbackToLogsOnError
+        ports:
+        - containerPort: 3182
+          name: http
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 1
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: "1"
+            memory: 500Mi
+        volumeMounts:
+          - mountPath: /secrets/kms/
+            name: kms-service-account
+            readOnly: true
+      - name: jaeger-agent
+        image: us.gcr.io/sourcegraph-dev/jaeger-agent:e0ad894d122fb4ec3182b2faed19a2ae4bdccf6f@sha256:32bbeff6139e63230b93074639eceb8a80b63271caede32447c5ddd01c5e2c57
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+        ports:
+        - containerPort: 5775
+          protocol: UDP
+        - containerPort: 5778
+          protocol: TCP
+        - containerPort: 6831
+          protocol: UDP
+        - containerPort: 6832
+          protocol: UDP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 500M
+          requests:
+            cpu: 100m
+            memory: 100M
+        args:
+          - --reporter.grpc.host-port=jaeger-collector:14250
+          - --reporter.type=grpc
       securityContext:
         runAsUser: 0
       volumes:

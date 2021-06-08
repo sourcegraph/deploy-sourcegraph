@@ -27,46 +27,46 @@ spec:
         app: precise-code-intel-worker
     spec:
       containers:
-        - name: precise-code-intel-worker
-          env:
-            - name: NUM_WORKERS
-              value: '4'
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-          image: us.gcr.io/sourcegraph-dev/precise-code-intel-worker:f3874b8479d7bb37459f20162beb49da47a87624@sha256:6da2e2cb3b8956f3d93dc65dca7cba1f4c127b0018c16db756a41d559a9c1149
-          terminationMessagePolicy: FallbackToLogsOnError
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: http
-              scheme: HTTP
-            initialDelaySeconds: 60
-            timeoutSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /healthz
-              port: http
-              scheme: HTTP
-            periodSeconds: 5
-            timeoutSeconds: 5
-          ports:
-            - containerPort: 3188
-              name: http
-            - containerPort: 6060
-              name: debug
-          resources:
-            limits:
-              cpu: "2"
-              memory: 4G
-            requests:
-              cpu: 500m
-              memory: 2G
-          volumeMounts:
-            - mountPath: /secrets/kms/
-              name: kms-service-account
-              readOnly: true
+      - name: precise-code-intel-worker
+        env:
+        - name: NUM_WORKERS
+          value: '4'
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        image: us.gcr.io/sourcegraph-dev/precise-code-intel-worker:e0ad894d122fb4ec3182b2faed19a2ae4bdccf6f@sha256:034c93955a5b13d763b828c181794a6973a7ffc06e9730339626ef6ab0e17749
+        terminationMessagePolicy: FallbackToLogsOnError
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: debug
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 3188
+          name: http
+        - containerPort: 6060
+          name: debug
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4G
+          requests:
+            cpu: 500m
+            memory: 2G
+        volumeMounts:
+          - mountPath: /secrets/kms/
+            name: kms-service-account
+            readOnly: true
       securityContext:
         runAsUser: 0
       volumes:
