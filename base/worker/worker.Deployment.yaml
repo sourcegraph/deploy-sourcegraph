@@ -61,15 +61,12 @@ spec:
           requests:
             cpu: 500m
             memory: 2G
-        securityContext:
-          runAsUser: 0
         volumeMounts:
-          - mountPath: /secrets/
-            name: codeintel-bucket-service-account
-            readOnly: true
           - mountPath: /secrets/kms/
             name: kms-service-account
             readOnly: true
+      securityContext:
+        runAsUser: 0
       volumes:
         - name: kms-service-account
           secret:
