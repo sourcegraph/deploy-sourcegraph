@@ -25,58 +25,58 @@ spec:
     spec:
       serviceAccountName: cadvisor
       containers:
-      - name: cadvisor
-        image: us.gcr.io/sourcegraph-dev/cadvisor:e0ad894d122fb4ec3182b2faed19a2ae4bdccf6f@sha256:6a90049180eb0db1a172f21336dd4aa65748eb57fb94bfafc82603158c5abaf7
-        args:
-        # Kubernetes-specific flags below (other flags are baked into the Docker image)
-        #
-        # disable container labels to allow whitelisting to reduce noise
-        - --store_container_labels=false
-        - --whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name,io.kubernetes.pod.namespace,io.kubernetes.pod.uid
-        # it is safe to uncomment this option if you use docker as your container runtime to reduce noise
-        # - --docker_only
-        resources:
-          requests:
-            memory: 200Mi
-            cpu: 150m
-          limits:
-            memory: 2000Mi
-            cpu: 300m
-        volumeMounts:
-        - name: rootfs
-          mountPath: /rootfs
-          readOnly: true
-        - name: var-run
-          mountPath: /var/run
-          readOnly: true
-        - name: sys
-          mountPath: /sys
-          readOnly: true
-        - name: docker
-          mountPath: /var/lib/docker
-          readOnly: true
-        - name: disk
-          mountPath: /dev/disk
-          readOnly: true
-        ports:
-        - name: http
-          containerPort: 48080
-          protocol: TCP
+        - name: cadvisor
+          image: us.gcr.io/sourcegraph-dev/cadvisor:f3874b8479d7bb37459f20162beb49da47a87624@sha256:95baf448a0a641c65d39c5f3ee1e3de569153df53129d8d477d209130e62e562
+          args:
+            # Kubernetes-specific flags below (other flags are baked into the Docker image)
+            #
+            # disable container labels to allow whitelisting to reduce noise
+            - --store_container_labels=false
+            - --whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name,io.kubernetes.pod.namespace,io.kubernetes.pod.uid
+          # it is safe to uncomment this option if you use docker as your container runtime to reduce noise
+          # - --docker_only
+          resources:
+            requests:
+              memory: 200Mi
+              cpu: 150m
+            limits:
+              memory: 2000Mi
+              cpu: 300m
+          volumeMounts:
+            - name: rootfs
+              mountPath: /rootfs
+              readOnly: true
+            - name: var-run
+              mountPath: /var/run
+              readOnly: true
+            - name: sys
+              mountPath: /sys
+              readOnly: true
+            - name: docker
+              mountPath: /var/lib/docker
+              readOnly: true
+            - name: disk
+              mountPath: /dev/disk
+              readOnly: true
+          ports:
+            - name: http
+              containerPort: 48080
+              protocol: TCP
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30
       volumes:
-      - name: rootfs
-        hostPath:
-          path: /
-      - name: var-run
-        hostPath:
-          path: /var/run
-      - name: sys
-        hostPath:
-          path: /sys
-      - name: docker
-        hostPath:
-          path: /var/lib/docker
-      - name: disk
-        hostPath:
-          path: /dev/disk
+        - name: rootfs
+          hostPath:
+            path: /
+        - name: var-run
+          hostPath:
+            path: /var/run
+        - name: sys
+          hostPath:
+            path: /sys
+        - name: docker
+          hostPath:
+            path: /var/lib/docker
+        - name: disk
+          hostPath:
+            path: /dev/disk

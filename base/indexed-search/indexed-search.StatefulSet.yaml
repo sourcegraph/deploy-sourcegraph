@@ -22,65 +22,65 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-      - name: zoekt-webserver
-        image: us.gcr.io/sourcegraph-dev/indexed-searcher:e0ad894d122fb4ec3182b2faed19a2ae4bdccf6f@sha256:446ee0e9e1c8cb97d07913a1c286f0126d960ed2646c32e05afd75143d1032b7
-        terminationMessagePolicy: FallbackToLogsOnError
-        ports:
-        - containerPort: 6070
-          name: http
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /healthz
-            port: http
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
-        resources:
-          limits:
-            cpu: "5"
-            memory: 96Gi
-          requests:
-            cpu: "2"
-            memory: 64Gi
-        volumeMounts:
-        - mountPath: /data
-          name: data
-      - name: zoekt-indexserver
-        image: us.gcr.io/sourcegraph-dev/search-indexer:e0ad894d122fb4ec3182b2faed19a2ae4bdccf6f@sha256:248d5431f16316cc25ad168e6470e4ca8575bff279b98b1b8fc31ef5abf28c58
-        terminationMessagePolicy: FallbackToLogsOnError
-        ports:
-        - containerPort: 6072
-          name: index-http
-        resources:
-          # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
-          # lower lag between a new commit and it being indexed for search.
-          limits:
-            cpu: "8"
-            memory: 16Gi
-          requests:
-            cpu: "4"
-            memory: 8Gi
-        volumeMounts:
-        - mountPath: /data
-          name: data
+        - name: zoekt-webserver
+          image: us.gcr.io/sourcegraph-dev/indexed-searcher:f3874b8479d7bb37459f20162beb49da47a87624@sha256:446ee0e9e1c8cb97d07913a1c286f0126d960ed2646c32e05afd75143d1032b7
+          terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - containerPort: 6070
+              name: http
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "5"
+              memory: 96Gi
+            requests:
+              cpu: "2"
+              memory: 64Gi
+          volumeMounts:
+            - mountPath: /data
+              name: data
+        - name: zoekt-indexserver
+          image: us.gcr.io/sourcegraph-dev/search-indexer:f3874b8479d7bb37459f20162beb49da47a87624@sha256:248d5431f16316cc25ad168e6470e4ca8575bff279b98b1b8fc31ef5abf28c58
+          terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - containerPort: 6072
+              name: index-http
+          resources:
+            # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
+            # lower lag between a new commit and it being indexed for search.
+            limits:
+              cpu: "8"
+              memory: 16Gi
+            requests:
+              cpu: "4"
+              memory: 8Gi
+          volumeMounts:
+            - mountPath: /data
+              name: data
       securityContext:
         runAsUser: 0
       volumes:
-      - name: data
+        - name: data
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
-  - metadata:
-      labels:
-        deploy: sourcegraph
-      name: data
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          # The size of disk to used for search indexes.
-          # This should typically be gitserver disk size multipled by the number of gitserver shards.
-          storage: 4Ti
-      storageClassName: sourcegraph
+    - metadata:
+        labels:
+          deploy: sourcegraph
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            # The size of disk to used for search indexes.
+            # This should typically be gitserver disk size multipled by the number of gitserver shards.
+            storage: 4Ti
+        storageClassName: sourcegraph
