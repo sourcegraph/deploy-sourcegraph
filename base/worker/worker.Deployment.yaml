@@ -27,44 +27,44 @@ spec:
         app: worker
     spec:
       containers:
-      - name: worker
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/worker:insiders@sha256:c724fc8d29c30135d30e41a798b6a7688b5eda0a3b9a7b74753faf7028c02b41
-        terminationMessagePolicy: FallbackToLogsOnError
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: debug
-            scheme: HTTP
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: debug
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
-        ports:
-        - containerPort: 3189
-          name: http
-        - containerPort: 6060
-          name: debug
-        resources:
-          limits:
-            cpu: "2"
-            memory: 4G
-          requests:
-            cpu: 500m
-            memory: 2G
-        volumeMounts:
-          - mountPath: /secrets/kms/
-            name: kms-service-account
-            readOnly: true
+        - name: worker
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          image: us.gcr.io/sourcegraph-dev/worker:c473ed09b35849cb14e8e69a82fcd3707b8fb50e@sha256:18209afea6442f42590ce3eb31d80feacd61c7a97c86cf426ce3c672484b673b
+          terminationMessagePolicy: FallbackToLogsOnError
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: debug
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: debug
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 3189
+              name: http
+            - containerPort: 6060
+              name: debug
+          resources:
+            limits:
+              cpu: "2"
+              memory: 4G
+            requests:
+              cpu: 500m
+              memory: 2G
+          volumeMounts:
+            - mountPath: /secrets/kms/
+              name: kms-service-account
+              readOnly: true
       securityContext:
         runAsUser: 0
       volumes:
