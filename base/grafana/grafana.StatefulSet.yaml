@@ -16,7 +16,7 @@ spec:
       app: grafana
   serviceName: grafana
   updateStrategy:
-     type: RollingUpdate
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -24,45 +24,45 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-      - name: grafana
-        image: us.gcr.io/sourcegraph-dev/grafana:e0ad894d122fb4ec3182b2faed19a2ae4bdccf6f@sha256:dc88ab5fffdb90592dd34e26472688c118791c1cef1ce9d322d66983bb275697
-        terminationMessagePolicy: FallbackToLogsOnError
-        ports:
-        - containerPort: 3370
-          name: http
-        volumeMounts:
-        - mountPath: /var/lib/grafana
-          name: grafana-data
-        - mountPath: /sg_config_grafana/provisioning/datasources
-          name: config
-        # Grafana is relied upon to send alerts to site admins when something is wrong with
-        # Sourcegraph, thus its memory requests and limits are the same to guarantee it has enough
-        # memory to perform its job reliably and prevent conflicts with other pods on the same
-        # host node.
-        resources:
-          limits:
-            cpu: "1"
-            memory: 512Mi
-          requests:
-            cpu: 100m
-            memory: 512Mi
-        env:
-          - name: GF_SERVER_ROOT_URL
-            value: https://k8s.sgdev.org/-/debug/grafana
+        - name: grafana
+          image: us.gcr.io/sourcegraph-dev/grafana:f3874b8479d7bb37459f20162beb49da47a87624@sha256:69f5e9abbc983a05009d2f8ee8b83b5ae19dd71e10a090a4bacd7d06c2e6ea3b
+          terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - containerPort: 3370
+              name: http
+          volumeMounts:
+            - mountPath: /var/lib/grafana
+              name: grafana-data
+            - mountPath: /sg_config_grafana/provisioning/datasources
+              name: config
+          # Grafana is relied upon to send alerts to site admins when something is wrong with
+          # Sourcegraph, thus its memory requests and limits are the same to guarantee it has enough
+          # memory to perform its job reliably and prevent conflicts with other pods on the same
+          # host node.
+          resources:
+            limits:
+              cpu: "1"
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 512Mi
+          env:
+            - name: GF_SERVER_ROOT_URL
+              value: https://k8s.sgdev.org/-/debug/grafana
       serviceAccountName: grafana
       securityContext:
         runAsUser: 0
       volumes:
-      - name: config
-        configMap:
-          defaultMode: 0777
-          name: grafana
+        - name: config
+          configMap:
+            defaultMode: 0777
+            name: grafana
   volumeClaimTemplates:
-  - metadata:
-      name: grafana-data
-    spec:
-      accessModes: [ "ReadWriteOnce"]
-      resources:
-        requests:
-          storage: 2Gi
-      storageClassName: sourcegraph
+    - metadata:
+        name: grafana-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 2Gi
+        storageClassName: sourcegraph
