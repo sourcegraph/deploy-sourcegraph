@@ -36,6 +36,7 @@ IMAGES=(
   searcher
   symbols
   syntax-highlighter
+  worker
 )
 
 ROOT="$(git rev-parse --show-toplevel)"

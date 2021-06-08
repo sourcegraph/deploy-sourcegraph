@@ -1,5 +1,5 @@
 let ImageUpdater =
-      https://raw.githubusercontent.com/sourcegraph/image-updater-pipeline/b99441a4372d2daf203560c394ff7ff27b9dc49d/package.dhall sha256:1a24c012d53e8df12543e8f0e59e7c10b23f7cff71a4c442848d6d254a211f16
+      https://raw.githubusercontent.com/sourcegraph/image-updater-pipeline/eec274d84996ee9fc05b4bced9591de792aed41b/package.dhall sha256:98ed8de0599828c7e1badb9d0f772c36edf6b231d02c5a3188313b81c11b75f6
 
 let Config = ImageUpdater.Config
 
