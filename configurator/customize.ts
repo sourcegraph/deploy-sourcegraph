@@ -1,11 +1,13 @@
-import { transformDeployments, setResources, Cluster } from './common'
+import { transformDeployments, setResources, Cluster, storageClass } from './common'
 
 export const transformations: ((c: Cluster) => void)[] = [    
     // transformDeployments(d => d.metadata?.name === 'sourcegraph-frontend', d => {
     //     d.metadata!.name += '-foobar2'
     // })
 
-    setResources(['zoekt-webserver'], { limits: { cpu: '1' }})
+    setResources(['zoekt-webserver'], { limits: { cpu: '1' }}),
+
+    storageClass('gcp'),
 
     // TODO
     // - Network Ingress

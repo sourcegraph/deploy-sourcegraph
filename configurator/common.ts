@@ -17,11 +17,12 @@ export interface Cluster {
     ConfigMaps: [string, k8s.V1ConfigMap][]
     DaemonSets: [string, k8s.V1DaemonSet][]
     Ingresss: [string, k8s.V1Ingress][]
-    PodSecurityPolicys: [string, k8s.V1beta1PodSecurityPolicy][],
+    PodSecurityPolicys: [string, k8s.V1beta1PodSecurityPolicy][]
     Roles: [string, k8s.V1Role][]
     RoleBindings: [string, k8s.V1RoleBinding][]
     ServiceAccounts: [string, k8s.V1ServiceAccount][]
     StatefulSets: [string, k8s.V1StatefulSet][]
+    StorageClasses: [string, k8s.V1StorageClass][]
     Unrecognized: string[]
 }
 
@@ -47,3 +48,21 @@ export const setResources = (containerNames: string[], resources: k8s.V1Resource
         .filter((c?: k8s.V1Container) => c && _.includes(containerNames, c.name))
         .forEach(c => c && updateContainer(c))
 }
+
+export const storageClass = (base: 'gcp' | 'aws' | 'azure' | 'generic'): Transform => (c: Cluster) => {
+    switch (base) {
+        case 'gcp':
+            const obj = YAML.parse(readFileSync(path.join('custom', 'gcp.StorageClass.yaml')).toString())
+            c.StorageClasses.push(['sourcegraph.StorageClass.yaml', obj])
+            break
+        case 'aws':
+            break
+        case 'azure':
+            break
+        case 'generic':
+            break
+    }
+}
+
+// export const ingressController = () => (c: Cluster) => {
+// }

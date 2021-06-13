@@ -27,9 +27,10 @@ import { transformations } from './customize'
         RoleBindings: [],
         ServiceAccounts: [],
         StatefulSets: [],
+        StorageClasses: [],
         Unrecognized: [],
     }
-    
+
     function readCluster(root: string) {
         const contents = readdirSync(root, {withFileTypes: true})
         for (const entry of contents) {
