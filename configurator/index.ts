@@ -37,49 +37,51 @@ import { transformations } from './customize'
             if (entry.isFile()) {
                 if (entry.name.endsWith('.yaml')) {
                     const k8sType = path.extname(entry.name.substring(0, entry.name.length - '.yaml'.length))
+                    const filename = path.join(root, entry.name)
+                    const relativeFilename = path.relative(sourceDir, filename)
                     switch (k8sType) {
                         case '.Deployment':
-                            cluster.Deployments.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
+                            cluster.Deployments.push([relativeFilename, YAML.parse(readFileSync(filename).toString())])
                             break
                         case '.PersistentVolumeClaim':
-                            cluster.PersistentVolumeClaims.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
+                            cluster.PersistentVolumeClaims.push([relativeFilename, YAML.parse(readFileSync(filename).toString())])
                             break
                         case '.PersistentVolume':
-                            cluster.PersistentVolumes.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
+                            cluster.PersistentVolumes.push([relativeFilename, YAML.parse(readFileSync(filename).toString())])
                             break
                         case '.Service':
                         case '.IndexerService':
-                            cluster.Services.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
+                            cluster.Services.push([relativeFilename, YAML.parse(readFileSync(filename).toString())])
                             break
                         case '.ClusterRole':
-                            cluster.ClusterRoles.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
+                            cluster.ClusterRoles.push([relativeFilename, YAML.parse(readFileSync(filename).toString())])
                             break
                         case '.ClusterRoleBinding':
-                            cluster.ClusterRoleBindings.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
+                            cluster.ClusterRoleBindings.push([relativeFilename, YAML.parse(readFileSync(filename).toString())])
                             break
                         case '.ConfigMap':
-                            cluster.ConfigMaps.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
+                            cluster.ConfigMaps.push([relativeFilename, YAML.parse(readFileSync(filename).toString())])
                             break
                         case '.DaemonSet':
-                            cluster.DaemonSets.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
+                            cluster.DaemonSets.push([relativeFilename, YAML.parse(readFileSync(filename).toString())])
                             break
                         case '.Ingress':
-                            cluster.Ingresss.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
+                            cluster.Ingresss.push([relativeFilename, YAML.parse(readFileSync(filename).toString())])
                             break
                         case '.PodSecurityPolicy':
-                            cluster.PodSecurityPolicys.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
+                            cluster.PodSecurityPolicys.push([relativeFilename, YAML.parse(readFileSync(filename).toString())])
                             break
                         case '.Role':
-                            cluster.Roles.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
+                            cluster.Roles.push([relativeFilename, YAML.parse(readFileSync(filename).toString())])
                             break
                         case '.RoleBinding':
-                            cluster.RoleBindings.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
+                            cluster.RoleBindings.push([relativeFilename, YAML.parse(readFileSync(filename).toString())])
                             break
                         case '.ServiceAccount':
-                            cluster.ServiceAccounts.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
+                            cluster.ServiceAccounts.push([relativeFilename, YAML.parse(readFileSync(filename).toString())])
                             break
                         case '.StatefulSet':
-                            cluster.StatefulSets.push([path.join(root, entry.name), YAML.parse(readFileSync(path.join(root, entry.name)).toString())])
+                            cluster.StatefulSets.push([relativeFilename, YAML.parse(readFileSync(filename).toString())])
                             break
                         default:
                             cluster.Unrecognized.push(entry.name)
@@ -112,12 +114,12 @@ import { transformations } from './customize'
             ...c.Roles,
             ...c.RoleBindings,
             ...c.ServiceAccounts,
-            ...c.StatefulSets,    
+            ...c.StatefulSets,
+            ...c.StorageClasses,
         )
         await fileContents.forEach(async c => {
-            const filename = path.relative(sourceDir, c[0])
-            await mkdirp(path.dirname(path.join(outDir, filename)))
-            fs.writeFileSync(path.join(outDir, filename), YAML.stringify(c[1]))
+            await mkdirp(path.dirname(path.join(outDir, c[0])))
+            fs.writeFileSync(path.join(outDir, c[0]), YAML.stringify(c[1]))
         })
     }
 

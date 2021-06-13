@@ -49,19 +49,12 @@ export const setResources = (containerNames: string[], resources: k8s.V1Resource
         .forEach(c => c && updateContainer(c))
 }
 
-export const storageClass = (base: 'gcp' | 'aws' | 'azure' | 'generic'): Transform => (c: Cluster) => {
-    switch (base) {
-        case 'gcp':
-            const obj = YAML.parse(readFileSync(path.join('custom', 'gcp.StorageClass.yaml')).toString())
-            c.StorageClasses.push(['sourcegraph.StorageClass.yaml', obj])
-            break
-        case 'aws':
-            break
-        case 'azure':
-            break
-        case 'generic':
-            break
+export const storageClass = (base: 'gcp' | 'aws' | 'azure' | 'generic', customizeStorageClass?: (sc: k8s.V1StorageClass) => void): Transform => (c: Cluster) => {
+    const obj = YAML.parse(readFileSync(path.join('custom', `${base}.StorageClass.yaml`)).toString())
+    if (customizeStorageClass) {
+        customizeStorageClass(obj)
     }
+    c.StorageClasses.push(['sourcegraph.StorageClass.yaml', obj])
 }
 
 // export const ingressController = () => (c: Cluster) => {

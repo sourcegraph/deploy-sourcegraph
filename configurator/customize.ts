@@ -1,3 +1,4 @@
+import * as k8s from "@kubernetes/client-node";
 import { transformDeployments, setResources, Cluster, storageClass } from './common'
 
 export const transformations: ((c: Cluster) => void)[] = [    
@@ -7,7 +8,9 @@ export const transformations: ((c: Cluster) => void)[] = [
 
     setResources(['zoekt-webserver'], { limits: { cpu: '1' }}),
 
-    storageClass('gcp'),
+    storageClass('gcp', (sc: k8s.V1StorageClass) => {
+        // possible customizations here
+    }),
 
     // TODO
     // - Network Ingress
