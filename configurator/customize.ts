@@ -1,5 +1,5 @@
 import * as k8s from "@kubernetes/client-node";
-import { transformDeployments, setResources, Cluster, storageClass } from './common'
+import { transformDeployments, setResources, Cluster, storageClass, ingressNginx } from './common'
 
 export const transformations: ((c: Cluster) => void)[] = [    
     // transformDeployments(d => d.metadata?.name === 'sourcegraph-frontend', d => {
@@ -11,6 +11,8 @@ export const transformations: ((c: Cluster) => void)[] = [
     storageClass('gcp', (sc: k8s.V1StorageClass) => {
         // possible customizations here
     }),
+
+    ingressNginx(),
 
     // TODO
     // - Network Ingress

@@ -28,6 +28,7 @@ import { transformations } from './customize'
         ServiceAccounts: [],
         StatefulSets: [],
         StorageClasses: [],
+        RawFiles: [],
         Unrecognized: [],
     }
 
@@ -96,7 +97,9 @@ import { transformations } from './customize'
     }    
     readCluster(sourceDir)
     
-    transformations.forEach(t => t(cluster))
+    for (const t of transformations) {
+        await t(cluster)
+    }
     
     async function writeCluster(c: Cluster) {
         const fileContents = []
@@ -121,6 +124,9 @@ import { transformations } from './customize'
             await mkdirp(path.dirname(path.join(outDir, c[0])))
             fs.writeFileSync(path.join(outDir, c[0]), YAML.stringify(c[1]))
         })
+        for (const [name, contents] of c.RawFiles) {
+            fs.writeFileSync(path.join(outDir, name), contents)
+        }
     }
 
     await writeCluster(cluster)

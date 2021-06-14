@@ -6,6 +6,7 @@ import * as YAML from 'yaml';
 import * as path from "path";
 import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
 import * as mkdirp from 'mkdirp'
+import * as request from 'request'
 
 export interface Cluster {
     Deployments: [string, k8s.V1Deployment][]
@@ -23,15 +24,17 @@ export interface Cluster {
     ServiceAccounts: [string, k8s.V1ServiceAccount][]
     StatefulSets: [string, k8s.V1StatefulSet][]
     StorageClasses: [string, k8s.V1StorageClass][]
+    RawFiles: [string, string][]
     Unrecognized: string[]
 }
 
-type Transform = (c: Cluster) => void
+type Transform = (c: Cluster) => Promise<void>
 
 // Returns a thing that transforms all deployments that match a particular criteria
 export const transformDeployments = (selector: (d: k8s.V1Deployment) => boolean, transform: (d: k8s.V1Deployment) => void): Transform => {
     return ((c: Cluster) => {
         c.Deployments.filter(([, d]) => selector(d)).forEach(([, d]) => transform(d))
+        return Promise.resolve()
     })
 }
 
@@ -47,6 +50,7 @@ export const setResources = (containerNames: string[], resources: k8s.V1Resource
     containers
         .filter((c?: k8s.V1Container) => c && _.includes(containerNames, c.name))
         .forEach(c => c && updateContainer(c))
+    return Promise.resolve()
 }
 
 export const storageClass = (base: 'gcp' | 'aws' | 'azure' | 'generic', customizeStorageClass?: (sc: k8s.V1StorageClass) => void): Transform => (c: Cluster) => {
@@ -55,7 +59,29 @@ export const storageClass = (base: 'gcp' | 'aws' | 'azure' | 'generic', customiz
         customizeStorageClass(obj)
     }
     c.StorageClasses.push(['sourcegraph.StorageClass.yaml', obj])
+    return Promise.resolve()
 }
 
-// export const ingressController = () => (c: Cluster) => {
-// }
+export const ingressNginx = (): Transform => async (c: Cluster) => {
+    const body = await new Promise<any>(resolve => request('https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/cloud/deploy.yaml', (err, res, body) => {
+        resolve(body)
+    }))
+
+
+    const docs = YAML.parseAllDocuments(body)
+    for (const doc of docs) {
+        doc.setIn(['metadata', 'labels', 'deploy'], 'sourcegraph')
+    }
+
+    
+
+    // // console.log('#########', obj)
+    // for (const obj of objs) {
+    //     // console.log("#########", obj.toString())
+    //     console.log("#####", YAML.parse(obj.toString()))
+    // }
+    // // c.Others.push(['ingress.yaml', obj])    
+
+
+    c.RawFiles.push(['ingress-nginx.yaml', docs.map(doc => doc.toString()).join('\n')])
+}
