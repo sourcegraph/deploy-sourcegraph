@@ -67,21 +67,11 @@ export const ingressNginx = (): Transform => async (c: Cluster) => {
         resolve(body)
     }))
 
-
+    // Add `deploy: sourcegraph` label
     const docs = YAML.parseAllDocuments(body)
     for (const doc of docs) {
         doc.setIn(['metadata', 'labels', 'deploy'], 'sourcegraph')
     }
-
-    
-
-    // // console.log('#########', obj)
-    // for (const obj of objs) {
-    //     // console.log("#########", obj.toString())
-    //     console.log("#####", YAML.parse(obj.toString()))
-    // }
-    // // c.Others.push(['ingress.yaml', obj])    
-
 
     c.RawFiles.push(['ingress-nginx.yaml', docs.map(doc => doc.toString()).join('\n')])
 }
