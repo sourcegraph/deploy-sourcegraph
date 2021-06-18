@@ -42,7 +42,7 @@ spec:
               memory: "50Mi"
       containers:
         - env:
-          image: us.gcr.io/sourcegraph-dev/postgres-12.6:462b482a885f707578f4dce2604cf229f5cd894d@sha256:61eef26855e56c966d7cbfc1ab8ea432eebd3d1a7b4a480f427ad3bc13bae809
+          image: us.gcr.io/sourcegraph-dev/postgres-12.6:587fe31801d50c8ac56a8a239ae92390d933bed5@sha256:c7513f58d111c82aa849c27aa5c3ded97d421f2fc1e043dd3a57a4414266ad5b
           terminationMessagePolicy: FallbackToLogsOnError
           readinessProbe:
             exec:
@@ -74,7 +74,7 @@ spec:
               value: postgres://sg:@localhost:5432/?sslmode=disable
             - name: PG_EXPORTER_EXTEND_QUERY_PATH
               value: /config/queries.yaml
-          image: us.gcr.io/sourcegraph-dev/postgres_exporter:462b482a885f707578f4dce2604cf229f5cd894d@sha256:8b9f12b1bf0157727921522723896c4da28d3cad5cf255b394a519dc2c762d8f
+          image: us.gcr.io/sourcegraph-dev/postgres_exporter:587fe31801d50c8ac56a8a239ae92390d933bed5@sha256:3a0ff64a02cb5c6244d558f64483688eaeab364fa71adc2ab55955823113b141
           terminationMessagePolicy: FallbackToLogsOnError
           name: pgsql-exporter
           resources:
