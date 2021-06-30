@@ -37,7 +37,7 @@ spec:
                   fieldPath: metadata.name
             - name: CACHE_DIR
               value: /mnt/cache/$(POD_NAME)
-          image: us.gcr.io/sourcegraph-dev/symbols:acc7a8397c1050202851c4dc8e3a47264dcc7464@sha256:3055f1d867ec49609e9fef13543a231af0a521fd233a683429940ba5323b1549
+          image: us.gcr.io/sourcegraph-dev/symbols:867df51fe47e790ac14aa394e00ea7f22570ebd9@sha256:ad5e171d0be849733f6633af4b6b40177f58a793223b5315d25471d0c1fd24b9
           terminationMessagePolicy: FallbackToLogsOnError
           livenessProbe:
             httpGet:
@@ -71,7 +71,7 @@ spec:
             - mountPath: /mnt/cache
               name: cache-ssd
         - name: jaeger-agent
-          image: us.gcr.io/sourcegraph-dev/jaeger-agent:acc7a8397c1050202851c4dc8e3a47264dcc7464@sha256:2bc3890c1e5f2e2d9a465f08308e63a88820654a090d12b20905ff624563cd75
+          image: us.gcr.io/sourcegraph-dev/jaeger-agent:867df51fe47e790ac14aa394e00ea7f22570ebd9@sha256:c92411fc38deb15f75d8cde8ef030f5b52fab35573a8e9e43633bf63c3b2e854
           env:
             - name: POD_NAME
               valueFrom:
