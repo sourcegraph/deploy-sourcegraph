@@ -120,10 +120,13 @@ import { transformations } from './customize'
             ...c.StatefulSets,
             ...c.StorageClasses,
         )
-        await fileContents.forEach(async c => {
-            await mkdirp(path.dirname(path.join(outDir, c[0])))
-            fs.writeFileSync(path.join(outDir, c[0]), YAML.stringify(c[1]))
-        })
+        await Promise.all(fileContents.map(async c => {
+            const filename = path.join(outDir, c[0])
+            const directory = path.dirname(filename)
+            await mkdirp(directory)
+            // await new Promise(resolve => fs.writeFile(filename, YAML.stringify(c[1]), { flag: 'w'}, resolve))
+            fs.writeFileSync(filename, YAML.stringify(c[1]))
+        }))
         for (const [name, contents] of c.RawFiles) {
             fs.writeFileSync(path.join(outDir, name), contents)
         }
