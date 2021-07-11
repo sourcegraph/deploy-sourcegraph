@@ -1,7 +1,7 @@
 import * as k8s from "@kubernetes/client-node";
-import { transformDeployments, setResources, Cluster, storageClass, ingressNginx } from './common'
+import { Transform, transformDeployments, setResources, Cluster, storageClass, ingressNginx, serviceNginx } from './common'
 
-export const transformations: ((c: Cluster) => void)[] = [    
+export const transformations: Transform[] = [    
     // transformDeployments(d => d.metadata?.name === 'sourcegraph-frontend', d => {
     //     d.metadata!.name += '-foobar2'
     // })
@@ -13,6 +13,7 @@ export const transformations: ((c: Cluster) => void)[] = [
     }),
 
     ingressNginx(),
+    // serviceNginx('path/to/certificate.crt', 'path/to/private/key.key'),
 
     // TODO
     // - Network Ingress

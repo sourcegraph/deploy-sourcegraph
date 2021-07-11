@@ -7,6 +7,8 @@ import * as path from "path";
 import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
 import * as mkdirp from 'mkdirp'
 import * as request from 'request'
+import { reject } from "lodash";
+import { resolve } from "dns";
 
 export interface Cluster {
     Deployments: [string, k8s.V1Deployment][]
@@ -28,7 +30,7 @@ export interface Cluster {
     Unrecognized: string[]
 }
 
-type Transform = (c: Cluster) => Promise<void>
+export type Transform = (c: Cluster) => Promise<void>
 
 // Returns a thing that transforms all deployments that match a particular criteria
 export const transformDeployments = (selector: (d: k8s.V1Deployment) => boolean, transform: (d: k8s.V1Deployment) => void): Transform => {
@@ -74,4 +76,22 @@ export const ingressNginx = (): Transform => async (c: Cluster) => {
     }
 
     c.RawFiles.push(['ingress-nginx.yaml', docs.map(doc => doc.toString()).join('\n')])
+}
+
+export const serviceNginx = (tlsCertFile: string, tlsKeyFile: string): Transform => async (c: Cluster) => {
+    const s = readFileSync(path.join('custom', 'nginx-svc', 'nginx.ConfigMap.yaml')).toString()
+    const y = YAML.parse(s) as k8s.V1ConfigMap
+    const tlsCert = readFileSync(tlsCertFile).toString()
+    const tlsKey = readFileSync(tlsKeyFile).toString()
+    y.data!['tls.crt'] =  tlsCert
+    y.data!['tls.key'] = tlsKey
+    c.ConfigMaps.push(['nginx.ConfigMap.yaml', y])
+    c.Deployments.push([
+        'nginx.Deployment.yaml',
+        YAML.parse(readFileSync(path.join('custom', 'nginx-svc', 'nginx.Deployment.yaml')).toString())
+    ])
+    c.Services.push([
+        'nginx.Service.yaml',
+        YAML.parse(readFileSync(path.join('custom', 'nginx-svc', 'nginx.Service.yaml')).toString())
+    ])
 }

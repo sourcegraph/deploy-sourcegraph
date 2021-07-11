@@ -124,7 +124,6 @@ import { transformations } from './customize'
             const filename = path.join(outDir, c[0])
             const directory = path.dirname(filename)
             await mkdirp(directory)
-            // await new Promise(resolve => fs.writeFile(filename, YAML.stringify(c[1]), { flag: 'w'}, resolve))
             fs.writeFileSync(filename, YAML.stringify(c[1]))
         }))
         for (const [name, contents] of c.RawFiles) {
