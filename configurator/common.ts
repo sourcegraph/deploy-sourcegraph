@@ -182,3 +182,33 @@ Other cloud providers
 Follow your cloud provider documentation to expose the NodePort port on the cluster VMs to the Internet.
 `)
 }
+
+export const sshCloning = (sshKeyFile: string, knownHostsFile: string, root: boolean = true): Transform => async (c: Cluster) => {
+    const sshKey = readFileSync(sshKeyFile).toString('base64')
+    const knownHosts = readFileSync(knownHostsFile).toString('base64')
+    const sshDir = root ? '/root' : '/home/sourcegraph'
+    c.Secrets.push(['gitserver-ssh.Secret.yaml', {
+        apiVersion: 'v1',
+        kind: 'Secret',
+        metadata: { name: 'gitserver-ssh' },
+        type: 'Opaque',
+        data: {
+            id_rsa: sshKey,
+            known_hosts: knownHosts,
+        }
+    }])
+    c.StatefulSets.filter(([filename, ]) => filename.endsWith('gitserver.StatefulSet.yaml')).forEach(([filename, data]) => {
+        data.spec!.template.spec!.containers.forEach(container => {
+            if (container.name === 'gitserver') {
+                if (!container.volumeMounts) {
+                    container.volumeMounts = []
+                }
+                container.volumeMounts.push({mountPath: `${sshDir}/.ssh`, name: 'ssh'})
+            }
+        })
+        if (!data.spec!.template.spec!.volumes) {
+            data.spec!.template.spec!.volumes = []
+        }
+        !data.spec!.template.spec!.volumes!.push({ name: 'ssh', secret: {defaultMode: 0o644, secretName: 'gitserver-ssh'}})
+    })
+}

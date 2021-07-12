@@ -24,8 +24,7 @@ export const transformations: Transform[] = [
 
     // TODO
     // - NetworkPolicy and NetworkPolicy with Namespaced Overlay Example
-    // - TLS
-    // - Customize site configuration
+    // - [x] TLS
     // - Repository cloning
     // - Replica count
     // - Storage class (GCP, AWS, Azure, other)
