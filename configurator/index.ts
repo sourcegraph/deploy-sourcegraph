@@ -25,6 +25,7 @@ import { transformations } from './customize'
         PodSecurityPolicys: [],
         Roles: [],
         RoleBindings: [],
+        Secrets: [],
         ServiceAccounts: [],
         StatefulSets: [],
         StorageClasses: [],
@@ -120,6 +121,7 @@ import { transformations } from './customize'
             ...c.ServiceAccounts,
             ...c.StatefulSets,
             ...c.StorageClasses,
+            ...c.Secrets,
         )
         await Promise.all(fileContents.map(async c => {
             const filename = path.join(outDir, c[0])

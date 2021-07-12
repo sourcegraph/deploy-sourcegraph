@@ -24,6 +24,7 @@ export interface Cluster {
     Roles: [string, k8s.V1Role][]
     RoleBindings: [string, k8s.V1RoleBinding][]
     ServiceAccounts: [string, k8s.V1ServiceAccount][]
+    Secrets: [string, k8s.V1Secret][]
     StatefulSets: [string, k8s.V1StatefulSet][]
     StorageClasses: [string, k8s.V1StorageClass][]
     RawFiles: [string, string][]
@@ -65,7 +66,7 @@ export const storageClass = (base: 'gcp' | 'aws' | 'azure' | 'generic', customiz
     return Promise.resolve()
 }
 
-export const ingressNginx = (): Transform => async (c: Cluster) => {
+export const ingressNginx = (tls?: {certFile: string, keyFile: string, hostname: string}): Transform => async (c: Cluster) => {
     const body = await new Promise<any>(resolve => request('https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/cloud/deploy.yaml', (err, res, body) => {
         resolve(body)
     }))
@@ -74,6 +75,46 @@ export const ingressNginx = (): Transform => async (c: Cluster) => {
     const docs = YAML.parseAllDocuments(body)
     for (const doc of docs) {
         doc.setIn(['metadata', 'labels', 'deploy'], 'sourcegraph')
+    }
+
+    if (tls) {
+        c.Ingresss.forEach(([filepath, data]) => {
+            data.spec!.tls = [{
+                hosts: [tls.hostname],
+                secretName: 'sourcegraph-tls',
+            }]
+            data.spec!.rules = [{
+                http: {
+                    paths: [{
+                        path: '/',
+                        backend: {
+                            service: {
+                                name: 'sourcegraph-frontend',
+                                port: {
+                                    number: 300080    
+                                }
+                            }
+                        }
+                    }],
+                },
+                host: tls.hostname,
+            }]
+        })
+
+        const cert = readFileSync(tls.certFile).toString('base64')
+        const key = readFileSync(tls.keyFile).toString('base64')
+        c.Secrets.push(['sourcegraph-tls.Secret.yaml', {
+            apiVersion: 'v1',
+            kind: 'Secret',
+            metadata: { name: 'sourcegraph-tls' },
+            type: 'kubernetes.io/tls',
+            data: {
+                'tls.crt': cert,
+                'tls.key': key,
+            }
+        }])
+
+        c.ManualInstructions.push(`Update your [site configuration](https://docs.sourcegraph.com/admin/config/site_config) to set \`externalURL\` to ${tls.hostname}`)
     }
 
     c.RawFiles.push(['ingress-nginx.yaml', docs.map(doc => doc.toString()).join('\n')])
