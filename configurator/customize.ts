@@ -1,5 +1,5 @@
 import * as k8s from "@kubernetes/client-node";
-import { Transform, transformDeployments, setResources, Cluster, storageClass, ingressNginx, serviceNginx } from './common'
+import { Transform, nodePort, setResources, Cluster, storageClass, ingressNginx, serviceNginx } from './common'
 
 export const transformations: Transform[] = [    
     // transformDeployments(d => d.metadata?.name === 'sourcegraph-frontend', d => {
@@ -14,9 +14,9 @@ export const transformations: Transform[] = [
 
     ingressNginx(),
     // serviceNginx('path/to/certificate.crt', 'path/to/private/key.key'),
+    // nodePort(),
 
     // TODO
-    // - Network Ingress
     // - TLS
     // - Customize site configuration
     // - Repository cloning

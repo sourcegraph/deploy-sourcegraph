@@ -28,6 +28,7 @@ export interface Cluster {
     StorageClasses: [string, k8s.V1StorageClass][]
     RawFiles: [string, string][]
     Unrecognized: string[]
+    ManualInstructions: string[]
 }
 
 export type Transform = (c: Cluster) => Promise<void>
@@ -94,4 +95,49 @@ export const serviceNginx = (tlsCertFile: string, tlsKeyFile: string): Transform
         'nginx.Service.yaml',
         YAML.parse(readFileSync(path.join('custom', 'nginx-svc', 'nginx.Service.yaml')).toString())
     ])
+}
+
+export const nodePort = (): Transform => async (c: Cluster) => {
+    c.Services.forEach(([filename, service]) => {
+        if (filename.endsWith('sourcegraph-frontend.Service.yaml')) {
+            service.spec!.type = 'NodePort'
+            service.spec!.ports?.forEach(port => {
+                if (port.name === 'http') {
+                    port.nodePort = port.port
+                }
+            })
+        }
+    })
+    c.ManualInstructions.push(`You've configured sourcegraph-frontend to be a NodePort service. This requires exposing a port on your cluster machines to the Internet.
+
+If you are updating an existing service, you may need to delete the old service first:
+
+  kubectl delete svc sourcegraph-frontend
+  kubectl apply --prune -l deploy=sourcegraph -f .
+
+Google Cloud Platform
+=====================
+
+  # Expose the necessary ports.
+  gcloud compute --project=$PROJECT firewall-rules create sourcegraph-frontend-http --direction=INGRESS --priority=1000 --network=default --action=ALLOW --rules=tcp:30080
+
+  # Find a node name
+  kubectl get pods -l app=sourcegraph-frontend -o=custom-columns=NODE:.spec.nodeName
+
+  # Get the EXTERNAL-IP address (will be ephemeral unless you
+  # [make it static](https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address#promote_ephemeral_ip)
+  kubectl get node $NODE -o wide
+
+AWS
+===
+
+Update the [AWS Security Group rules](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_SecurityGroups.html) for the nodes in your cluster to expose the NodePort port.
+
+Afterward, Sourcegraph should be accessible at $EXTERNAL_ADDR:30080, where $EXTERNAL_ADDR is the address of any node in the cluster.
+
+Other cloud providers
+=====================
+
+Follow your cloud provider documentation to expose the NodePort port on the cluster VMs to the Internet.
+`)
 }

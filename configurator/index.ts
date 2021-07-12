@@ -30,6 +30,7 @@ import { transformations } from './customize'
         StorageClasses: [],
         RawFiles: [],
         Unrecognized: [],
+        ManualInstructions: [],
     }
 
     function readCluster(root: string) {
@@ -128,6 +129,14 @@ import { transformations } from './customize'
         }))
         for (const [name, contents] of c.RawFiles) {
             fs.writeFileSync(path.join(outDir, name), contents)
+        }
+
+        if (c.ManualInstructions.length > 0) {
+            console.log("####################\n# Additional steps #\n####################\n")
+
+            for (const instruction of c.ManualInstructions) {
+                console.log(instruction + '\n\n\n')
+            }
         }
     }
 
