@@ -4,11 +4,13 @@ namespace: ns-sourcegraph
 bases:
   - ../bases/deployments
   - ../bases/pvcs
+resources:
+  - frontend/sourcegraph-frontend.RoleBinding.yaml
+  - prometheus/prometheus.RoleBinding.yaml
 patchesStrategicMerge:
   - codeintel-db/codeintel-db.Deployment.yaml
   - codeinsights-db/codeinsights-db.Deployment.yaml
   - frontend/sourcegraph-frontend.Deployment.yaml
-  - frontend/sourcegraph-frontend.RoleBinding.yaml
   - github-proxy/github-proxy.Deployment.yaml
   - gitserver/gitserver.StatefulSet.yaml
   - grafana/grafana.StatefulSet.yaml
@@ -19,7 +21,6 @@ patchesStrategicMerge:
   - precise-code-intel/worker.Deployment.yaml
   - prometheus/prometheus.ConfigMap.yaml
   - prometheus/prometheus.Deployment.yaml
-  - prometheus/prometheus.RoleBinding.yaml
   - query-runner/query-runner.Deployment.yaml
   - redis/redis-cache.Deployment.yaml
   - redis/redis-store.Deployment.yaml
