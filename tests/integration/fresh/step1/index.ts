@@ -25,7 +25,7 @@ const storageClass = new k8s.storage.v1.StorageClass(
     { provider: k8sProvider }
 )
 
-const nameSpace = new k8s.v1.nameSpace(
+const nameSpace = new k8s.core.v1.nameSpace(
     'sourcegraph-namespace',
     {
         metadata: {
