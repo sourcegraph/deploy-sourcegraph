@@ -30,8 +30,6 @@ if [[ "${VERBOSE:-"false"}" == "true" ]]; then
   TEST_ARGS+=("-v")
 fi
 
-kubectl create ns ns-sourcegraph
-
 TEST_ARGS+=("./...")
 
 echo "--- Running integration tests"

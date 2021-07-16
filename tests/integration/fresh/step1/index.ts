@@ -25,6 +25,15 @@ const storageClass = new k8s.storage.v1.StorageClass(
     { provider: k8sProvider }
 )
 
+const nameSpace = new k8s.v1.nameSpace(
+    'sourcegraph-namespace',
+    {
+      metadata: {
+        }
+  },
+  { provider: k8sProvider }
+)
+
 const globOptions = {
     ignore: ['**/kustomization.yaml'],
 }
@@ -39,7 +48,7 @@ baseFiles.then(
             },
             {
                 providers: { kubernetes: k8sProvider },
-                dependsOn: [storageClass],
+                dependsOn: [storageClass,nameSpace],
             }
         )
 )
