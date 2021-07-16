@@ -1,4 +1,7 @@
-This kustomization is for creating fresh Sourcegraph installations that want to run containers as non-root user.
+This kustomization is for creating fresh Sourcegraph installations that want to run containers as non-root users in clusters with security restrictions.
+It avoids creating Roles and does all the rolebinding in a namespace. It configures Prometheus to work in the namespace and not require ClusterRole wide privileges when doing service discovery for scraping targets. It also disables cAdvisor.
+
+This version and non-privileged need to stay in sync. This version is only used for cluster creation.
 
 This kustomization injects a fsGroup security context in each pod so that the volumes are mounted with the
 specified supplemental group id and non-root pod users can write to the mounted volumes.
