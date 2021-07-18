@@ -57,6 +57,16 @@ export const setResources = (containerNames: string[], resources: k8s.V1Resource
     return Promise.resolve()
 }
 
+export const setReplicas = (deploymentAndStatefulSetNames: string[], replicas: number): Transform => (c: Cluster) => {
+    c.Deployments
+        .filter(([,deployment]) => _.includes(deploymentAndStatefulSetNames, deployment.metadata?.name) && deployment.spec)
+        .forEach(([,deployment]) => deployment.spec!.replicas = replicas)
+    c.StatefulSets
+        .filter(([,statefulSet]) => _.includes(deploymentAndStatefulSetNames, statefulSet.metadata?.name) && statefulSet.spec)
+        .forEach(([,statefulSet]) => statefulSet.spec!.replicas = replicas)
+    return Promise.resolve()
+}
+
 export const storageClass = (base: 'gcp' | 'aws' | 'azure' | 'minikube' | 'generic', customizeStorageClass?: (sc: k8s.V1StorageClass) => void): Transform => (c: Cluster) => {
     const obj = YAML.parse(readFileSync(path.join('custom', `${base}.StorageClass.yaml`)).toString())
     if (customizeStorageClass) {
