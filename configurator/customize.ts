@@ -8,7 +8,7 @@ export const transformations: Transform[] = [
 
     setResources(['zoekt-webserver'], { limits: { cpu: '1' } }),
 
-    storageClass('gcp', (sc: k8s.V1StorageClass) => {
+    storageClass('minikube', (sc: k8s.V1StorageClass) => {
         // possible customizations here
     }),
 

@@ -57,7 +57,7 @@ export const setResources = (containerNames: string[], resources: k8s.V1Resource
     return Promise.resolve()
 }
 
-export const storageClass = (base: 'gcp' | 'aws' | 'azure' | 'generic', customizeStorageClass?: (sc: k8s.V1StorageClass) => void): Transform => (c: Cluster) => {
+export const storageClass = (base: 'gcp' | 'aws' | 'azure' | 'minikube' | 'generic', customizeStorageClass?: (sc: k8s.V1StorageClass) => void): Transform => (c: Cluster) => {
     const obj = YAML.parse(readFileSync(path.join('custom', `${base}.StorageClass.yaml`)).toString())
     if (customizeStorageClass) {
         customizeStorageClass(obj)
