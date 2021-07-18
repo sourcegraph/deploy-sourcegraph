@@ -67,6 +67,34 @@ export const setReplicas = (deploymentAndStatefulSetNames: string[], replicas: n
     return Promise.resolve()
 }
 
+export const setNodeSelector = (deploymentAndStatefulSetNames: string[], nodeSelector: {[key: string]: string}): Transform => (c: Cluster) => {
+    c.Deployments
+        .filter(([,deployment]) => _.includes(deploymentAndStatefulSetNames, deployment.metadata?.name) && deployment.spec?.template.spec)
+        .forEach(([,deployment]) => 
+            deployment.spec!.template.spec!.nodeSelector = _.merge({}, deployment.spec?.template.spec?.nodeSelector, nodeSelector)
+        )
+    c.StatefulSets
+        .filter(([,statefulSet]) => _.includes(deploymentAndStatefulSetNames, statefulSet.metadata?.name) && statefulSet.spec?.template.spec)
+        .forEach(([,statefulSet]) => 
+            statefulSet.spec!.template.spec!.nodeSelector = _.merge({}, statefulSet.spec?.template.spec?.nodeSelector, nodeSelector)
+        )
+    return Promise.resolve()
+}
+
+export const setAffinity = (deploymentAndStatefulSetNames: string[], affinity: k8s.V1Affinity): Transform => (c: Cluster) => {
+    c.Deployments
+        .filter(([,deployment]) => _.includes(deploymentAndStatefulSetNames, deployment.metadata?.name) && deployment.spec?.template.spec)
+        .forEach(([,deployment]) => 
+            deployment.spec!.template.spec!.affinity = affinity
+        )
+    c.StatefulSets
+        .filter(([,statefulSet]) => _.includes(deploymentAndStatefulSetNames, statefulSet.metadata?.name) && statefulSet.spec?.template.spec)
+        .forEach(([,statefulSet]) => 
+            statefulSet.spec!.template.spec!.affinity = affinity
+        )
+    return Promise.resolve()
+}
+
 export const storageClass = (base: 'gcp' | 'aws' | 'azure' | 'minikube' | 'generic', customizeStorageClass?: (sc: k8s.V1StorageClass) => void): Transform => (c: Cluster) => {
     const obj = YAML.parse(readFileSync(path.join('custom', `${base}.StorageClass.yaml`)).toString())
     if (customizeStorageClass) {

@@ -1,5 +1,5 @@
 import * as k8s from "@kubernetes/client-node";
-import { Transform, nodePort, setResources, Cluster, storageClass, ingressNginx, serviceNginx, sshCloning, setReplicas } from './common'
+import { Transform, nodePort, setResources, Cluster, storageClass, ingressNginx, serviceNginx, sshCloning, setReplicas, setNodeSelector, setAffinity } from './common'
 
 export const transformations: Transform[] = [
     // transformDeployments(d => d.metadata?.name === 'sourcegraph-frontend', d => {
@@ -8,6 +8,18 @@ export const transformations: Transform[] = [
 
     setResources(['zoekt-webserver'], { limits: { cpu: '1' } }),
     setReplicas(['gitserver'], 3),
+    setNodeSelector(['gitserver'], { disktype: 'ssd' }),
+    // setAffinity(['gitserver'], {
+    //     nodeAffinity: {
+    //         requiredDuringSchedulingIgnoredDuringExecution: {
+    //             nodeSelectorTerms: [
+    //                 {
+    //                     matchExpressions: [{ key: 'scheduler-profile', operator: 'In', values: ['foo']}]
+    //                 }
+    //             ]
+    //         }
+    //     }
+    // }),
 
     storageClass('minikube', (sc: k8s.V1StorageClass) => {
         // possible customizations here
