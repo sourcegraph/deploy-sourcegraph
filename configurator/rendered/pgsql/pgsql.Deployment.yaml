@@ -60,13 +60,6 @@ spec:
           ports:
             - containerPort: 5432
               name: pgsql
-          resources:
-            limits:
-              cpu: "4"
-              memory: 2Gi
-            requests:
-              cpu: "4"
-              memory: 2Gi
           volumeMounts:
             - mountPath: /data
               name: disk
@@ -80,13 +73,6 @@ spec:
           image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:37c01d94934a15baecbf40042da0799f7761f28d6084c0ceb7e038224fc4d613
           terminationMessagePolicy: FallbackToLogsOnError
           name: pgsql-exporter
-          resources:
-            limits:
-              cpu: 10m
-              memory: 50Mi
-            requests:
-              cpu: 10m
-              memory: 50Mi
       securityContext:
         runAsUser: 0
       volumes:

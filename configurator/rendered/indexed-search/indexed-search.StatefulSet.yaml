@@ -36,29 +36,18 @@ spec:
               scheme: HTTP
             periodSeconds: 5
             timeoutSeconds: 5
-          resources:
-            limits:
-              cpu: "1"
-              memory: 4G
-            requests:
-              cpu: 500m
-              memory: 2G
           volumeMounts:
             - mountPath: /data
               name: data
+          resources:
+            limits:
+              cpu: "1"
         - name: zoekt-indexserver
           image: index.docker.io/sourcegraph/search-indexer:insiders@sha256:be1812d9450b3f89cf118d6bab3a0ba62cfdb20a7f9823bc891b96fb083cab6d
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
             - containerPort: 6072
               name: index-http
-          resources:
-            limits:
-              cpu: "8"
-              memory: 8G
-            requests:
-              cpu: "4"
-              memory: 4G
           volumeMounts:
             - mountPath: /data
               name: data

@@ -1,10 +1,24 @@
 import * as k8s from "@kubernetes/client-node";
-import { Transform, nodePort, setResources, Cluster, storageClass, ingressNginx, serviceNginx, sshCloning, setReplicas, setNodeSelector, setAffinity, setRedis, setPostgres, nonRoot } from './common'
+import { Transform, nodePort, setResources, Cluster, platform, ingressNginx, serviceNginx, sshCloning, setReplicas, setNodeSelector, setAffinity, setRedis, setPostgres, nonRoot } from './common'
 
 export const transformations: Transform[] = [
-    // transformDeployments(d => d.metadata?.name === 'sourcegraph-frontend', d => {
-    //     d.metadata!.name += '-foobar2'
-    // })
+    platform('minikube', (sc: k8s.V1StorageClass) => {
+        // possible customizations here
+    }),
+
+
+
+    // ingressNginx(
+    //     {
+    //         certFile: 'path/to/certificate.crt',
+    //         keyFile: 'path/to/private/key.key',
+    //         hostname: 'sourcegraph.example.com',
+    //     }
+    // ),
+    // serviceNginx('path/to/certificate.crt', 'path/to/private/key.key'),
+    // nodePort(),
+
+
 
     setResources(['zoekt-webserver'], { limits: { cpu: '1' } }),
     setReplicas(['gitserver'], 3),
@@ -27,23 +41,15 @@ export const transformations: Transform[] = [
     }),
 
 
-    storageClass('minikube', (sc: k8s.V1StorageClass) => {
-        // possible customizations here
-    }),
-
-    // ingressNginx(
-    //     {
-    //         certFile: 'path/to/certificate.crt',
-    //         keyFile: 'path/to/private/key.key',
-    //         hostname: 'sourcegraph.example.com',
-    //     }
-    // ),
-    // serviceNginx('path/to/certificate.crt', 'path/to/private/key.key'),
-    // nodePort(),
-
     // sshCloning('~/.ssh/id_rsa', '~/.ssh/known_hosts')
 
     // nonRoot(),
+
+    // transformDeployments(d => d.metadata?.name === 'sourcegraph-frontend', d => {
+    //     d.metadata!.name += '-foobar2'
+    // })
+
+
 
     // TODO
     // - NetworkPolicy and NetworkPolicy with Namespaced Overlay Example
@@ -55,8 +61,8 @@ export const transformations: Transform[] = [
     // - [x] Custom Redis
     // - [x] Custom Postgres
     // - Overlays
-    //   - Minikube
     //   - [x] Non-root
+    //   - Minikube
     //   - Non-privileged
     //   - Namespaced
     // - Add license key

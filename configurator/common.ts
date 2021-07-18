@@ -163,12 +163,21 @@ const updateEnvironment = (curenv: Array<k8s.V1EnvVar>, newenv: { [name: string]
     }
 }
 
-export const storageClass = (base: 'gcp' | 'aws' | 'azure' | 'minikube' | 'generic', customizeStorageClass?: (sc: k8s.V1StorageClass) => void): Transform => (c: Cluster) => {
+export const platform = (base: 'gcp' | 'aws' | 'azure' | 'minikube' | 'generic', customizeStorageClass?: (sc: k8s.V1StorageClass) => void): Transform => (c: Cluster) => {
     const obj = YAML.parse(readFileSync(path.join('custom', `${base}.StorageClass.yaml`)).toString())
     if (customizeStorageClass) {
         customizeStorageClass(obj)
     }
     c.StorageClasses.push(['sourcegraph.StorageClass.yaml', obj])
+
+    if (base === 'minikube') {
+        const removeResources = (deployOrSS:k8s.V1Deployment | k8s.V1StatefulSet) => {
+            deployOrSS.spec?.template.spec?.containers.forEach(container => delete container['resources'])
+        }
+        c.Deployments.forEach(([,deployment]) => removeResources(deployment))
+        c.StatefulSets.forEach(([,ss]) => removeResources(ss))
+    }
+
     return Promise.resolve()
 }
 
