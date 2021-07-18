@@ -2,7 +2,7 @@ import * as k8s from "@kubernetes/client-node";
 import { Transform, nodePort, setResources, Cluster, platform, ingressNginx, serviceNginx, sshCloning, setReplicas, setNodeSelector, setAffinity, setRedis, setPostgres, nonRoot } from './common'
 
 export const transformations: Transform[] = [
-    platform('minikube', (sc: k8s.V1StorageClass) => {
+    platform('gcp', (sc: k8s.V1StorageClass) => {
         // possible customizations here
     }),
 

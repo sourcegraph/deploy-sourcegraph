@@ -33,6 +33,13 @@ spec:
           ports:
             - containerPort: 3180
               name: http
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1G
+            requests:
+              cpu: 100m
+              memory: 250M
         - name: jaeger-agent
           image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:22ecc0f4c041fb22b1b8c5a7c6f0f5233c80b147e26604ebe310a05860089dca
           env:
@@ -50,6 +57,13 @@ spec:
               protocol: UDP
             - containerPort: 6832
               protocol: UDP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 100m
+              memory: 100M
           args:
             - --reporter.grpc.host-port=jaeger-collector:14250
             - --reporter.type=grpc
