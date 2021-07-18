@@ -1,5 +1,5 @@
 import * as k8s from "@kubernetes/client-node";
-import { Transform, nodePort, setResources, Cluster, storageClass, ingressNginx, serviceNginx, sshCloning, setReplicas, setNodeSelector, setAffinity, setRedis, setPostgres } from './common'
+import { Transform, nodePort, setResources, Cluster, storageClass, ingressNginx, serviceNginx, sshCloning, setReplicas, setNodeSelector, setAffinity, setRedis, setPostgres, nonRoot } from './common'
 
 export const transformations: Transform[] = [
     // transformDeployments(d => d.metadata?.name === 'sourcegraph-frontend', d => {
@@ -43,6 +43,8 @@ export const transformations: Transform[] = [
 
     // sshCloning('~/.ssh/id_rsa', '~/.ssh/known_hosts')
 
+    // nonRoot(),
+
     // TODO
     // - NetworkPolicy and NetworkPolicy with Namespaced Overlay Example
     // - [x] TLS
@@ -54,9 +56,9 @@ export const transformations: Transform[] = [
     // - [x] Custom Postgres
     // - Overlays
     //   - Minikube
+    //   - [x] Non-root
     //   - Non-privileged
     //   - Namespaced
-    //   - Non-root
     // - Add license key
 
 

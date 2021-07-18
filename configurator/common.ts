@@ -59,23 +59,23 @@ export const setResources = (containerNames: string[], resources: k8s.V1Resource
 
 export const setReplicas = (deploymentAndStatefulSetNames: string[], replicas: number): Transform => (c: Cluster) => {
     c.Deployments
-        .filter(([,deployment]) => _.includes(deploymentAndStatefulSetNames, deployment.metadata?.name) && deployment.spec)
-        .forEach(([,deployment]) => deployment.spec!.replicas = replicas)
+        .filter(([, deployment]) => _.includes(deploymentAndStatefulSetNames, deployment.metadata?.name) && deployment.spec)
+        .forEach(([, deployment]) => deployment.spec!.replicas = replicas)
     c.StatefulSets
-        .filter(([,statefulSet]) => _.includes(deploymentAndStatefulSetNames, statefulSet.metadata?.name) && statefulSet.spec)
-        .forEach(([,statefulSet]) => statefulSet.spec!.replicas = replicas)
+        .filter(([, statefulSet]) => _.includes(deploymentAndStatefulSetNames, statefulSet.metadata?.name) && statefulSet.spec)
+        .forEach(([, statefulSet]) => statefulSet.spec!.replicas = replicas)
     return Promise.resolve()
 }
 
-export const setNodeSelector = (deploymentAndStatefulSetNames: string[], nodeSelector: {[key: string]: string}): Transform => (c: Cluster) => {
+export const setNodeSelector = (deploymentAndStatefulSetNames: string[], nodeSelector: { [key: string]: string }): Transform => (c: Cluster) => {
     c.Deployments
-        .filter(([,deployment]) => _.includes(deploymentAndStatefulSetNames, deployment.metadata?.name) && deployment.spec?.template.spec)
-        .forEach(([,deployment]) => 
+        .filter(([, deployment]) => _.includes(deploymentAndStatefulSetNames, deployment.metadata?.name) && deployment.spec?.template.spec)
+        .forEach(([, deployment]) =>
             deployment.spec!.template.spec!.nodeSelector = _.merge({}, deployment.spec?.template.spec?.nodeSelector, nodeSelector)
         )
     c.StatefulSets
-        .filter(([,statefulSet]) => _.includes(deploymentAndStatefulSetNames, statefulSet.metadata?.name) && statefulSet.spec?.template.spec)
-        .forEach(([,statefulSet]) => 
+        .filter(([, statefulSet]) => _.includes(deploymentAndStatefulSetNames, statefulSet.metadata?.name) && statefulSet.spec?.template.spec)
+        .forEach(([, statefulSet]) =>
             statefulSet.spec!.template.spec!.nodeSelector = _.merge({}, statefulSet.spec?.template.spec?.nodeSelector, nodeSelector)
         )
     return Promise.resolve()
@@ -83,13 +83,13 @@ export const setNodeSelector = (deploymentAndStatefulSetNames: string[], nodeSel
 
 export const setAffinity = (deploymentAndStatefulSetNames: string[], affinity: k8s.V1Affinity): Transform => (c: Cluster) => {
     c.Deployments
-        .filter(([,deployment]) => _.includes(deploymentAndStatefulSetNames, deployment.metadata?.name) && deployment.spec?.template.spec)
-        .forEach(([,deployment]) => 
+        .filter(([, deployment]) => _.includes(deploymentAndStatefulSetNames, deployment.metadata?.name) && deployment.spec?.template.spec)
+        .forEach(([, deployment]) =>
             deployment.spec!.template.spec!.affinity = affinity
         )
     c.StatefulSets
-        .filter(([,statefulSet]) => _.includes(deploymentAndStatefulSetNames, statefulSet.metadata?.name) && statefulSet.spec?.template.spec)
-        .forEach(([,statefulSet]) => 
+        .filter(([, statefulSet]) => _.includes(deploymentAndStatefulSetNames, statefulSet.metadata?.name) && statefulSet.spec?.template.spec)
+        .forEach(([, statefulSet]) =>
             statefulSet.spec!.template.spec!.affinity = affinity
         )
     return Promise.resolve()
@@ -97,9 +97,9 @@ export const setAffinity = (deploymentAndStatefulSetNames: string[], affinity: k
 
 export const setRedis = (redisCacheEndpoint: string, redisStoreEndpoint: string): Transform => (c: Cluster) => {
     c.Deployments.filter(
-        ([,deployment]) => _.includes(['sourcegraph-frontend', 'repo-updater'], deployment.metadata?.name)
+        ([, deployment]) => _.includes(['sourcegraph-frontend', 'repo-updater'], deployment.metadata?.name)
     ).forEach(
-        ([,deployment]) => {
+        ([, deployment]) => {
             deployment.spec?.template.spec?.containers.filter(
                 container => _.includes(['frontend', 'repo-updater'], container.name)).forEach(container => {
                     if (!container.env) {
@@ -110,7 +110,7 @@ export const setRedis = (redisCacheEndpoint: string, redisStoreEndpoint: string)
                         REDIS_STORE_ENDPOINT: redisStoreEndpoint,
                     })
                 }
-            )
+                )
         }
     )
     return Promise.resolve()
@@ -125,9 +125,9 @@ export const setPostgres = (postgresEndpoint: {
     PGSSLMODE?: string,
 }): Transform => (c: Cluster) => {
     c.Deployments.filter(
-        ([,deployment]) => _.includes(['sourcegraph-frontend', 'repo-updater'], deployment.metadata?.name)
+        ([, deployment]) => _.includes(['sourcegraph-frontend', 'repo-updater'], deployment.metadata?.name)
     ).forEach(
-        ([,deployment]) => {
+        ([, deployment]) => {
             deployment.spec?.template.spec?.containers.filter(
                 container => _.includes(['frontend', 'repo-updater'], container.name)).forEach(container => {
                     if (!container.env) {
@@ -135,13 +135,13 @@ export const setPostgres = (postgresEndpoint: {
                     }
                     updateEnvironment(container.env, postgresEndpoint)
                 }
-            )
+                )
         }
     )
     return Promise.resolve()
 }
 
-const updateEnvironment = (curenv: Array<k8s.V1EnvVar>, newenv: { [name: string]: string | undefined}) => {
+const updateEnvironment = (curenv: Array<k8s.V1EnvVar>, newenv: { [name: string]: string | undefined }) => {
     for (const key of _.keys(newenv)) {
         if (!newenv[key]) {
             continue
@@ -172,7 +172,7 @@ export const storageClass = (base: 'gcp' | 'aws' | 'azure' | 'minikube' | 'gener
     return Promise.resolve()
 }
 
-export const ingressNginx = (tls?: {certFile: string, keyFile: string, hostname: string}): Transform => async (c: Cluster) => {
+export const ingressNginx = (tls?: { certFile: string, keyFile: string, hostname: string }): Transform => async (c: Cluster) => {
     const body = await new Promise<any>(resolve => request('https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/cloud/deploy.yaml', (err, res, body) => {
         resolve(body)
     }))
@@ -197,7 +197,7 @@ export const ingressNginx = (tls?: {certFile: string, keyFile: string, hostname:
                             service: {
                                 name: 'sourcegraph-frontend',
                                 port: {
-                                    number: 300080    
+                                    number: 300080
                                 }
                             }
                         }
@@ -231,7 +231,7 @@ export const serviceNginx = (tlsCertFile: string, tlsKeyFile: string): Transform
     const y = YAML.parse(s) as k8s.V1ConfigMap
     const tlsCert = readFileSync(tlsCertFile).toString()
     const tlsKey = readFileSync(tlsKeyFile).toString()
-    y.data!['tls.crt'] =  tlsCert
+    y.data!['tls.crt'] = tlsCert
     y.data!['tls.key'] = tlsKey
     c.ConfigMaps.push(['nginx.ConfigMap.yaml', y])
     c.Deployments.push([
@@ -303,18 +303,106 @@ export const sshCloning = (sshKeyFile: string, knownHostsFile: string, root: boo
             known_hosts: knownHosts,
         }
     }])
-    c.StatefulSets.filter(([filename, ]) => filename.endsWith('gitserver.StatefulSet.yaml')).forEach(([filename, data]) => {
+    c.StatefulSets.filter(([filename,]) => filename.endsWith('gitserver.StatefulSet.yaml')).forEach(([filename, data]) => {
         data.spec!.template.spec!.containers.forEach(container => {
             if (container.name === 'gitserver') {
                 if (!container.volumeMounts) {
                     container.volumeMounts = []
                 }
-                container.volumeMounts.push({mountPath: `${sshDir}/.ssh`, name: 'ssh'})
+                container.volumeMounts.push({ mountPath: `${sshDir}/.ssh`, name: 'ssh' })
             }
         })
         if (!data.spec!.template.spec!.volumes) {
             data.spec!.template.spec!.volumes = []
         }
-        !data.spec!.template.spec!.volumes!.push({ name: 'ssh', secret: {defaultMode: 0o644, secretName: 'gitserver-ssh'}})
+        !data.spec!.template.spec!.volumes!.push({ name: 'ssh', secret: { defaultMode: 0o644, secretName: 'gitserver-ssh' } })
     })
+}
+
+// TODO: change non-root to be the default, and runAsRoot to be an option
+export const nonRoot = (): Transform => async (c: Cluster) => {
+    const runAsUserAndGroup: {
+        [name: string]: {
+            runAsUser?: number,
+            runAsGroup?: number,
+            containers?: {
+                [containerName: string]: {
+                    runAsUser?: number,
+                    runAsGroup?: number,
+                }
+            }
+        }
+    } = {
+        'codeinsights-db': {
+            runAsUser: 70,
+            containers: {
+                timescaledb: {
+                    runAsGroup: 70,
+                    runAsUser: 70,
+                }
+            }
+        },
+        'codeintel-db': {
+            runAsGroup: 999,
+            runAsUser: 999,
+        },
+        'grafana': {
+            containers: {
+                grafana: {
+                    runAsUser: 472,
+                    runAsGroup: 472,
+                }
+            }
+        },
+        'pgsql': {
+            runAsGroup: 999,
+            runAsUser: 999,
+        },
+        'redis-cache': {
+            runAsUser: 999,
+            runAsGroup: 1000,
+        },
+        'redis-store': {
+            runAsUser: 999,
+            runAsGroup: 1000,
+        }
+    }
+    const update = (deployOrSS: k8s.V1Deployment | k8s.V1StatefulSet) => {
+        if (!deployOrSS.metadata?.name) {
+            return
+        }
+        if (runAsUserAndGroup[deployOrSS.metadata.name]) {
+            _.merge(deployOrSS, {
+                spec: {
+                    template: {
+                        spec: {
+                            securityContext: _.omitBy({
+                                runAsUser: runAsUserAndGroup[deployOrSS.metadata.name].runAsUser,
+                                runAsGroup: runAsUserAndGroup[deployOrSS.metadata.name].runAsGroup,
+                            }, _.isUndefined),
+                        }
+                    }
+                }
+            })
+        }
+        deployOrSS.spec?.template.spec?.containers.forEach(container => {
+            const containerSecurityContext = {
+                allowPrivilegeEscalation: false,
+                runAsUser: 100,
+                runAsGroup: 101,
+            }
+            if (deployOrSS.metadata?.name) {
+                const containers = runAsUserAndGroup[deployOrSS.metadata.name]?.containers
+                _.merge(
+                    containerSecurityContext,
+                    _.omit(runAsUserAndGroup[deployOrSS.metadata.name], 'containers'),
+                    containers && containers[container.name],
+                )
+            }
+            container.securityContext = containerSecurityContext
+        })
+    }
+    c.Deployments.forEach(([, deployOrSS]) => update(deployOrSS))
+    c.StatefulSets.forEach(([, deployOrSS]) => update(deployOrSS))
+    return Promise.resolve()
 }
