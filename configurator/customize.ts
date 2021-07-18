@@ -1,5 +1,5 @@
 import * as k8s from "@kubernetes/client-node";
-import { Transform, nodePort, setResources, Cluster, storageClass, ingressNginx, serviceNginx, sshCloning, setReplicas, setNodeSelector, setAffinity } from './common'
+import { Transform, nodePort, setResources, Cluster, storageClass, ingressNginx, serviceNginx, sshCloning, setReplicas, setNodeSelector, setAffinity, setRedis, setPostgres } from './common'
 
 export const transformations: Transform[] = [
     // transformDeployments(d => d.metadata?.name === 'sourcegraph-frontend', d => {
@@ -20,6 +20,12 @@ export const transformations: Transform[] = [
     //         }
     //     }
     // }),
+
+    setRedis('my-redis:6379', 'my-redis:6379'),
+    setPostgres({
+        PGHOST: 'mypghost',
+    }),
+
 
     storageClass('minikube', (sc: k8s.V1StorageClass) => {
         // possible customizations here
@@ -43,17 +49,15 @@ export const transformations: Transform[] = [
     // - [x] Repository cloning
     // - [x] Replica count
     // - [x] Storage class (GCP, AWS, Azure, other)
-    // - NodeSelector (resource-hungry pods to larger nodes)
-    // - Aux directory to add other k8s objects to manifest
-    // - Custom Redis
-    // - Custom Postgres
-    // - Install cluster-wide, without RBAC
-    // - Add license key
+    // - [x] NodeSelector (resource-hungry pods to larger nodes)
+    // - [x] Custom Redis
+    // - [x] Custom Postgres
     // - Overlays
     //   - Minikube
     //   - Non-privileged
     //   - Namespaced
     //   - Non-root
+    // - Add license key
 
 
 ]

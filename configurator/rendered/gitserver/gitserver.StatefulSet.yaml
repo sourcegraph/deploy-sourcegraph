@@ -80,15 +80,6 @@ spec:
         - name: repos
       nodeSelector:
         disktype: ssd
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-              - matchExpressions:
-                  - key: scheduler-profile
-                    operator: In
-                    values:
-                      - foo
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:

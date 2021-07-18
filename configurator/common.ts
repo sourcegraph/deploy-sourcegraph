@@ -95,6 +95,74 @@ export const setAffinity = (deploymentAndStatefulSetNames: string[], affinity: k
     return Promise.resolve()
 }
 
+export const setRedis = (redisCacheEndpoint: string, redisStoreEndpoint: string): Transform => (c: Cluster) => {
+    c.Deployments.filter(
+        ([,deployment]) => _.includes(['sourcegraph-frontend', 'repo-updater'], deployment.metadata?.name)
+    ).forEach(
+        ([,deployment]) => {
+            deployment.spec?.template.spec?.containers.filter(
+                container => _.includes(['frontend', 'repo-updater'], container.name)).forEach(container => {
+                    if (!container.env) {
+                        container.env = []
+                    }
+                    updateEnvironment(container.env, {
+                        REDIS_CACHE_ENDPOINT: redisCacheEndpoint,
+                        REDIS_STORE_ENDPOINT: redisStoreEndpoint,
+                    })
+                }
+            )
+        }
+    )
+    return Promise.resolve()
+}
+
+export const setPostgres = (postgresEndpoint: {
+    PGPORT?: string,
+    PGHOST?: string,
+    PGUSER?: string,
+    PGPASSWORD?: string,
+    PGDATABASE?: string,
+    PGSSLMODE?: string,
+}): Transform => (c: Cluster) => {
+    c.Deployments.filter(
+        ([,deployment]) => _.includes(['sourcegraph-frontend', 'repo-updater'], deployment.metadata?.name)
+    ).forEach(
+        ([,deployment]) => {
+            deployment.spec?.template.spec?.containers.filter(
+                container => _.includes(['frontend', 'repo-updater'], container.name)).forEach(container => {
+                    if (!container.env) {
+                        container.env = []
+                    }
+                    updateEnvironment(container.env, postgresEndpoint)
+                }
+            )
+        }
+    )
+    return Promise.resolve()
+}
+
+const updateEnvironment = (curenv: Array<k8s.V1EnvVar>, newenv: { [name: string]: string | undefined}) => {
+    for (const key of _.keys(newenv)) {
+        if (!newenv[key]) {
+            continue
+        }
+        let foundExisting = false
+        for (const curEnvVar of curenv) {
+            if (curEnvVar.name === key) {
+                curEnvVar.value = newenv[key]
+                foundExisting = true
+                break
+            }
+        }
+        if (!foundExisting) {
+            curenv.push({
+                name: key,
+                value: newenv[key],
+            })
+        }
+    }
+}
+
 export const storageClass = (base: 'gcp' | 'aws' | 'azure' | 'minikube' | 'generic', customizeStorageClass?: (sc: k8s.V1StorageClass) => void): Transform => (c: Cluster) => {
     const obj = YAML.parse(readFileSync(path.join('custom', `${base}.StorageClass.yaml`)).toString())
     if (customizeStorageClass) {

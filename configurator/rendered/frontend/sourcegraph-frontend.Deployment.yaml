@@ -35,7 +35,7 @@ spec:
             - name: PGDATABASE
               value: sg
             - name: PGHOST
-              value: pgsql
+              value: mypghost
             - name: PGPORT
               value: "5432"
             - name: PGSSLMODE
@@ -68,6 +68,10 @@ spec:
               value: http://jaeger-query:16686
             - name: PROMETHEUS_URL
               value: http://prometheus:30090
+            - name: REDIS_CACHE_ENDPOINT
+              value: my-redis:6379
+            - name: REDIS_STORE_ENDPOINT
+              value: my-redis:6379
           terminationMessagePolicy: FallbackToLogsOnError
           livenessProbe:
             httpGet:
