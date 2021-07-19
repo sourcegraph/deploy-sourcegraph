@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/component: gitserver
   name: gitserver
 spec:
-  replicas: 3
+  replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -78,8 +78,6 @@ spec:
         runAsUser: 0
       volumes:
         - name: repos
-      nodeSelector:
-        disktype: ssd
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
