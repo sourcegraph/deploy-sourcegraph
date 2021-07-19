@@ -6,8 +6,6 @@ export const transformations: Transform[] = [
         // possible customizations here
     }),
 
-
-
     // ingressNginx(
     //     {
     //         certFile: 'path/to/certificate.crt',
@@ -20,9 +18,9 @@ export const transformations: Transform[] = [
 
 
 
-    setResources(['zoekt-webserver'], { limits: { cpu: '1' } }),
-    setReplicas(['gitserver'], 3),
-    setNodeSelector(['gitserver'], { disktype: 'ssd' }),
+    // setResources(['zoekt-webserver'], { limits: { cpu: '1' } }),
+    // setReplicas(['gitserver'], 3),
+    // setNodeSelector(['gitserver'], { disktype: 'ssd' }),
     // setAffinity(['gitserver'], {
     //     nodeAffinity: {
     //         requiredDuringSchedulingIgnoredDuringExecution: {
@@ -35,10 +33,10 @@ export const transformations: Transform[] = [
     //     }
     // }),
 
-    setRedis('my-redis:6379', 'my-redis:6379'),
-    setPostgres({
-        PGHOST: 'mypghost',
-    }),
+    // setRedis('my-redis:6379', 'my-redis:6379'),
+    // setPostgres({
+    //     PGHOST: 'mypghost',
+    // }),
 
 
     // sshCloning('~/.ssh/id_rsa', '~/.ssh/known_hosts')
@@ -48,24 +46,5 @@ export const transformations: Transform[] = [
     // transformDeployments(d => d.metadata?.name === 'sourcegraph-frontend', d => {
     //     d.metadata!.name += '-foobar2'
     // })
-
-
-
-    // TODO
-    // - NetworkPolicy and NetworkPolicy with Namespaced Overlay Example
-    // - [x] TLS
-    // - [x] Repository cloning
-    // - [x] Replica count
-    // - [x] Storage class (GCP, AWS, Azure, other)
-    // - [x] NodeSelector (resource-hungry pods to larger nodes)
-    // - [x] Custom Redis
-    // - [x] Custom Postgres
-    // - Overlays
-    //   - [x] Non-root
-    //   - Minikube
-    //   - Non-privileged
-    //   - Namespaced
-    // - Add license key
-
 
 ]

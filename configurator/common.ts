@@ -415,3 +415,11 @@ export const nonRoot = (): Transform => async (c: Cluster) => {
     c.StatefulSets.forEach(([, deployOrSS]) => update(deployOrSS))
     return Promise.resolve()
 }
+
+export const nonPrivileged = (): Transform => async (c: Cluster) => { 
+    await nonRoot()(c) // implies non-root for now
+
+    // NEXT: remove non-privileged changes
+
+    return Promise.resolve()
+}
