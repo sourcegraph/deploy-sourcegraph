@@ -42,7 +42,7 @@ spec:
               memory: "50Mi"
       containers:
         - name: pgsql
-          image: us.gcr.io/sourcegraph-dev/codeintel-db:bcfd0674d5db9a304040ea410b45b0cc1776ae2b@sha256:e3700e6dfbb6acbba0b9828b17f7fd7cc7a7d9e06f422124fc260bd4aee8461d
+          image: us.gcr.io/sourcegraph-dev/codeintel-db:099c4418d881924f912b770004a3b8ca56845cf4@sha256:cca598bb203d17c120a5eb8543a1cbd319b93b220532a680d1a7b67b264726f1
           terminationMessagePolicy: FallbackToLogsOnError
           readinessProbe:
             exec:
@@ -73,7 +73,7 @@ spec:
               value: postgres://sg:@localhost:5432/?sslmode=disable
             - name: PG_EXPORTER_EXTEND_QUERY_PATH
               value: /config/code_intel_queries.yaml
-          image: us.gcr.io/sourcegraph-dev/postgres_exporter:bcfd0674d5db9a304040ea410b45b0cc1776ae2b@sha256:e9fad617fd7fde34dc69c1275f54d469264c0470ffdcd2ee14d0d3ffa5814269
+          image: us.gcr.io/sourcegraph-dev/postgres_exporter:099c4418d881924f912b770004a3b8ca56845cf4@sha256:4ed91b156145c063a597ed56aeb692e6ecf120355768f828e4de83a333ea3e65
           terminationMessagePolicy: FallbackToLogsOnError
           name: pgsql-exporter
           resources:
