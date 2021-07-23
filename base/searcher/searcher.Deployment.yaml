@@ -37,7 +37,7 @@ spec:
                   fieldPath: metadata.name
             - name: CACHE_DIR
               value: /mnt/cache/$(POD_NAME)
-          image: us.gcr.io/sourcegraph-dev/searcher:18f04f99b03e95b6853d96de3a1a18e743c240a0@sha256:a0c6d8f11a5764310eeb23153263b5dbb753eb788c8a64c67ed537f7b39f76da
+          image: us.gcr.io/sourcegraph-dev/searcher:f3a1f9052e70996f2e299b93b3598f6165afec0f@sha256:7852a2c78446857111ab242e364510caa468df887915ef7a15493f34b14b930f
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
             - containerPort: 3181
@@ -65,7 +65,7 @@ spec:
             - mountPath: /mnt/cache
               name: cache-ssd
         - name: jaeger-agent
-          image: us.gcr.io/sourcegraph-dev/jaeger-agent:18f04f99b03e95b6853d96de3a1a18e743c240a0@sha256:6c7c96f6a11da2ea5795feb04edf4f40594ff6d59151eecdcfda8a9adbac7f99
+          image: us.gcr.io/sourcegraph-dev/jaeger-agent:f3a1f9052e70996f2e299b93b3598f6165afec0f@sha256:f2eae20a0eeb7f41e04eabd0dc51d41651db01fd33b17779cb7bd2736bb81dfd
           env:
             - name: POD_NAME
               valueFrom:
