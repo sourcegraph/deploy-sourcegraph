@@ -29,33 +29,33 @@ spec:
         prometheus.io/port: "16686"
     spec:
         containers:
-          - image: index.docker.io/sourcegraph/jaeger-all-in-one:insiders@sha256:393be1c3e0445949ff4ad0576d648e854fe39da1716a576dd248c0d33caa03f0
-            name: jaeger
-            args: ["--memory.max-traces=20000"]
-            ports:
-              - containerPort: 5775
-                protocol: UDP
-              - containerPort: 6831
-                protocol: UDP
-              - containerPort: 6832
-                protocol: UDP
-              - containerPort: 5778
-                protocol: TCP
-              - containerPort: 16686
-                protocol: TCP
-              - containerPort: 14250
-                protocol: TCP
-            readinessProbe:
-              httpGet:
-                path: "/"
-                port: 14269
-              initialDelaySeconds: 5
-            resources:
-              limits:
-                cpu: "1"
-                memory: 1G
-              requests:
-                cpu: 500m
-                memory: 500M
+        - name: jaeger
+          image: index.docker.io/sourcegraph/jaeger-all-in-one:insiders@sha256:56293846f2d790b0b43db04141eb4b4280c300d0bded3e9fd7bac90be9edb4f4
+          args: ["--memory.max-traces=20000"]
+          ports:
+            - containerPort: 5775
+              protocol: UDP
+            - containerPort: 6831
+              protocol: UDP
+            - containerPort: 6832
+              protocol: UDP
+            - containerPort: 5778
+              protocol: TCP
+            - containerPort: 16686
+              protocol: TCP
+            - containerPort: 14250
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: "/"
+              port: 14269
+            initialDelaySeconds: 5
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1G
+            requests:
+              cpu: 500m
+              memory: 500M
         securityContext:
           runAsUser: 0

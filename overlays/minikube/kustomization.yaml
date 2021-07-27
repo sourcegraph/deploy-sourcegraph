@@ -5,6 +5,9 @@ bases:
   - ../bases/deployments
   - ../bases/rbac-roles
   - ../bases/pvcs
+patchesStrategicMerge:
+  - prometheus/prometheus.ClusterRoleBinding.yaml
+  - cadvisor/cadvisor.ClusterRoleBinding.yaml
 patchesJson6902:
   - target:
       kind: Deployment
@@ -39,6 +42,12 @@ patchesJson6902:
   - target:
       kind: Deployment
       name: precise-code-intel-worker
+      group: apps
+      version: v1
+    path: delete-resources.yaml
+  - target:
+      kind: Deployment
+      name: worker
       group: apps
       version: v1
     path: delete-resources.yaml
@@ -97,33 +106,56 @@ patchesJson6902:
       version: v1
     path: delete-resources.yaml
   - target:
+      kind: Deployment
+      name: codeintel-db
+      group: apps
+      version: v1
+    path: delete-resources-2.yaml    
+  - target:
+      kind: Deployment
+      name: codeinsights-db
+      group: apps
+      version: v1
+    path: delete-resources.yaml  
+  - target:
+      kind: Deployment
+      name: minio
+      group: apps
+      version: v1
+    path: delete-resources.yaml      
+  - target:
       kind: PersistentVolumeClaim
       name: prometheus
       version: v1
-    path: delete-storageclassname.yaml
+    path: replace-storageclassname.yaml
   - target:
       kind: PersistentVolumeClaim
       name: pgsql
       version: v1
-    path: delete-storageclassname.yaml
+    path: replace-storageclassname.yaml
   - target:
       kind: PersistentVolumeClaim
       name: redis-cache
       version: v1
-    path: delete-storageclassname.yaml
+    path: replace-storageclassname.yaml
   - target:
       kind: PersistentVolumeClaim
       name: redis-store
       version: v1
-    path: delete-storageclassname.yaml
+    path: replace-storageclassname.yaml
   - target:
       kind: PersistentVolumeClaim
       name: codeintel-db
       version: v1
-    path: delete-storageclassname.yaml
+    path: replace-storageclassname.yaml
   - target:
       kind: PersistentVolumeClaim
       name: minio
       version: v1
-    path: delete-storageclassname.yaml
+    path: replace-storageclassname.yaml
+  - target:
+      kind: PersistentVolumeClaim
+      name: codeinsights-db
+      version: v1
+    path: replace-storageclassname.yaml    
 

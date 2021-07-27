@@ -24,17 +24,15 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-      - args:
-        - run
-        env:
-        image: index.docker.io/sourcegraph/gitserver:insiders@sha256:117b083a68b4a4e90de53fc2d2e69d404b069802a06a465de923a83064e4433e
+      - name: gitserver
+        args: ["run"]
+        image: index.docker.io/sourcegraph/gitserver:insiders@sha256:e0d2b3e8cf99554a6ab354155bed3807366f61519f6684b3694d6cd4f2ca74ab
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 5
           tcpSocket:
             port: rpc
           timeoutSeconds: 5
-        name: gitserver
         ports:
         - containerPort: 3178
           name: rpc
@@ -53,7 +51,7 @@ spec:
         # - mountPath: /root/.ssh
         #   name: ssh
       - name: jaeger-agent
-        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:d4da79b3911522e5ae3291183f2c1f67dfc542e01b5503fc27708dc64618a096
+        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:5af6b3a52b2d1307ec321c3d423b524c2ddd82287727c2ab60835bb286fc3b8b
         env:
           - name: POD_NAME
             valueFrom:

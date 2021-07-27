@@ -10,7 +10,7 @@ metadata:
   name: sourcegraph-frontend
 spec:
   minReadySeconds: 10
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -27,7 +27,9 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-      - args:
+      - name: frontend
+        image: index.docker.io/sourcegraph/frontend:insiders@sha256:b02fa46cb2564ab1ad57dbac3011fd9c198edc64e82c899ce6cb4b738c5c91da
+        args:
         - serve
         env:
         - name: PGDATABASE
@@ -40,6 +42,8 @@ spec:
           value: disable
         - name: PGUSER
           value: sg
+        - name: CODEINSIGHTS_PGDATASOURCE
+          value: postgres://postgres:password@codeinsights-db:5432/postgres
         - name: CODEINTEL_PGDATABASE
           value: sg
         - name: CODEINTEL_PGHOST
@@ -67,40 +71,42 @@ spec:
           value: http://jaeger-query:16686
         - name: PROMETHEUS_URL
           value: http://prometheus:30090
-        image: index.docker.io/sourcegraph/frontend:insiders@sha256:277bd3bd25ab8c83775d0cf4c616653d45461893a6659db6385a00508b2389d5
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
             path: /healthz
-            port: http
+            port: debug
             scheme: HTTP
           initialDelaySeconds: 300
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
-            path: /healthz
-            port: http
+            path: /ready
+            port: debug
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
-        name: frontend
         ports:
         - containerPort: 3080
           name: http
         - containerPort: 3090
           name: http-internal
+        - containerPort: 6060
+          name: debug
         resources:
           limits:
             cpu: "2"
+            ephemeral-storage: "8Gi"
             memory: 4G
           requests:
             cpu: "2"
+            ephemeral-storage: "4Gi"
             memory: 2G
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:d4da79b3911522e5ae3291183f2c1f67dfc542e01b5503fc27708dc64618a096
-        name: jaeger-agent
+      - name: jaeger-agent
+        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:5af6b3a52b2d1307ec321c3d423b524c2ddd82287727c2ab60835bb286fc3b8b
         env:
           - name: POD_NAME
             valueFrom:

@@ -10,7 +10,7 @@ metadata:
   name: searcher
 spec:
   minReadySeconds: 10
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -27,18 +27,21 @@ spec:
         app: searcher
     spec:
       containers:
-      - env:
+      - name: searcher
+        env:
         - name: SEARCHER_CACHE_SIZE_MB
-          value: "100000"
+          valueFrom:
+            resourceFieldRef:
+              containerName: searcher
+              resource: requests.ephemeral-storage
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: index.docker.io/sourcegraph/searcher:insiders@sha256:0031f1fe25bd56f287872e38e7b60f82279a753ec21cfd3616bf24a07d70bdb8
+        image: index.docker.io/sourcegraph/searcher:insiders@sha256:42a7d0cd560ca12347b08400f4d99c245173309f0ce889f490c81afe56b81c42
         terminationMessagePolicy: FallbackToLogsOnError
-        name: searcher
         ports:
         - containerPort: 3181
           name: http
@@ -55,15 +58,17 @@ spec:
         resources:
           limits:
             cpu: "2"
+            ephemeral-storage: "26G"
             memory: 2G
           requests:
             cpu: 500m
+            ephemeral-storage: "25G"
             memory: 500M
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:d4da79b3911522e5ae3291183f2c1f67dfc542e01b5503fc27708dc64618a096
-        name: jaeger-agent
+      - name: jaeger-agent
+        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:5af6b3a52b2d1307ec321c3d423b524c2ddd82287727c2ab60835bb286fc3b8b
         env:
           - name: POD_NAME
             valueFrom:
