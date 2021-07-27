@@ -42,7 +42,7 @@ spec:
             memory: "50Mi"
       containers:
       - name: pgsql
-        image: index.docker.io/sourcegraph/codeintel-db:insiders@sha256:ecdbc1e3dc81c40fbd9b5bfb0d8f6a0a2ee57021df91353f8bd6edadeac0403d
+        image: index.docker.io/sourcegraph/codeintel-db:insiders@sha256:7f9cfa844b19043d514674afd9ed688845464302b73b5e8c868404f3d540b67a
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
           exec:
@@ -73,7 +73,7 @@ spec:
           value: postgres://sg:@localhost:5432/?sslmode=disable
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
           value: /config/code_intel_queries.yaml
-        image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:ee314654151b9df6edc242bdaf2710eb98e793a6c348ce739ca468cbc3995ece
+        image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:84f604fbac160c8fd918e2e12d8ae4b027afe0c9fa857f39411b81eec1cbdb92
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
         resources:
