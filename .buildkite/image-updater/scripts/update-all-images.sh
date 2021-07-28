@@ -15,7 +15,6 @@ IMAGES=(
   gitserver
   codeinsights-db
   codeintel-db
-  executor-queue
   frontend
   github-proxy
   grafana
