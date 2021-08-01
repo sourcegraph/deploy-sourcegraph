@@ -1,5 +1,6 @@
 apiVersion: v1
 data:
+  strategies.json: '{"default_strategy": {"param": 1, "type": "const"}}'
   agent.yaml: |
     tempo:
         configs:
@@ -17,19 +18,17 @@ data:
                     remote_sampling:
                         insecure: true
                         strategy_file: /etc/agent/strategies.json
-                opencensus: null
-                otlp:
-                    protocols:
-                        grpc: null
-                        http: null
-                zipkin: null
+            automatic_logging:
+              spans: true
+              roots: true
             remote_write:
               - basic_auth:
                   username: ${TEMPO_USERNAME}
                   password: ${TEMPO_TOKEN}
                 endpoint: tempo-us-central1.grafana.net:443
                 retry_on_failure:
-                    enabled: false
+                    enabled: true
+                    max_elapsed_time: 5s
             scrape_configs:
               - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
                 job_name: kubernetes-pods
@@ -309,8 +308,7 @@ data:
         positions_directory: /tmp/positions
     server:
         http_listen_port: 8080
-        log_level: info
-  strategies.json: '{"default_strategy": {"param": 0.001, "type": "probabilistic"}}'
+        log_level: debug
 kind: ConfigMap
 metadata:
   name: grafana-agent
