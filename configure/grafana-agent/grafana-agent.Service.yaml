@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: grafana-agent
+  name: grafana-agent
+spec:
+  ports:
+  - name: agent-http-metrics
+    port: 8080
+    targetPort: 8080
+  - name: agent-tempo-jaeger-thrift-compact
+    port: 6831
+    protocol: UDP
+    targetPort: 6831
+  - name: agent-tempo-jaeger-thrift-binary
+    port: 6832
+    protocol: UDP
+    targetPort: 6832
+  - name: agent-tempo-jaeger-thrift-http
+    port: 14268
+    protocol: TCP
+    targetPort: 14268
+  - name: agent-tempo-jaeger-grpc
+    port: 14250
+    protocol: TCP
+    targetPort: 14250
+  - name: agent-tempo-zipkin
+    port: 9411
+    protocol: TCP
+    targetPort: 9411
+  - name: agent-tempo-otlp
+    port: 55680
+    protocol: TCP
+    targetPort: 55680
+  - name: agent-tempo-opencensus
+    port: 55678
+    protocol: TCP
+    targetPort: 55678
+  selector:
+    name: grafana-agent

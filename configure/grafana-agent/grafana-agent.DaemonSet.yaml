@@ -50,6 +50,27 @@ spec:
         ports:
         - containerPort: 8080
           name: http-metrics
+        - containerPort: 6831
+          name: tempo-jaeger-thrift-compact
+          protocol: UDP
+        - containerPort: 6832
+          name: tempo-jaeger-thrift-binary
+          protocol: UDP
+        - containerPort: 14268
+          name: tempo-jaeger-thrift-http
+          protocol: TCP
+        - containerPort: 14250
+          name: tempo-jaeger-grpc
+          protocol: TCP
+        - containerPort: 9411
+          name: tempo-zipkin
+          protocol: TCP
+        - containerPort: 55680
+          name: tempo-otlp
+          protocol: TCP
+        - containerPort: 55678
+          name: tempo-opencensus
+          protocol: TCP
         securityContext:
           privileged: true
           runAsUser: 0
