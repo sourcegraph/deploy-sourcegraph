@@ -69,12 +69,10 @@ spec:
               value: http://grafana:30070
             - name: JAEGER_SERVER_URL
               value: http://jaeger-query:16686
-            - name: JAEGER_REPORTER_LOG_SPANS
-              value: "true"
             - name: JAEGER_AGENT_HOST
-              value: grafana-agent
-            - name: JAEGER_AGENT_PORT
-              value: "6831"
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
             - name: JAEGER_SAMPLER_TYPE
               value: const
             - name: JAEGER_SAMPLER_PARAM
