@@ -34,6 +34,10 @@ spec:
               value: info
             - name: ENABLE_STREAMING_REPO_SYNCER
               value: "true"
+            - name: JAEGER_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
             - containerPort: 3182

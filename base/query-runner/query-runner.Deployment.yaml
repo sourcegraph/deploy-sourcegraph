@@ -28,6 +28,11 @@ spec:
     spec:
       containers:
         - name: query-runner
+          env:
+            - name: JAEGER_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           image: us.gcr.io/sourcegraph-dev/query-runner:a2d19524cb652e9c4c02931dd5e608170365eb8f@sha256:9d25ca0ee4d615a4d0bab44507dcc23689dae6a148efa964c2745b00ec7480ed
           terminationMessagePolicy: FallbackToLogsOnError
           ports:

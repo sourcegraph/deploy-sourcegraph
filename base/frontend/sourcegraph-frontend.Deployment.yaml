@@ -71,6 +71,10 @@ spec:
               value: http://jaeger-query:16686
             - name: JAEGER_REPORTER_LOG_SPANS
               value: "true"
+            - name: JAEGER_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
             - name: PROMETHEUS_URL
               value: http://prometheus:30090
             - name: EXECUTOR_FRONTEND_USERNAME

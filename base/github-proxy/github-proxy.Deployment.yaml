@@ -28,6 +28,11 @@ spec:
     spec:
       containers:
         - name: github-proxy
+          env:
+            - name: JAEGER_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           image: us.gcr.io/sourcegraph-dev/github-proxy:a2d19524cb652e9c4c02931dd5e608170365eb8f@sha256:bb0d94ee5051a9a550d548957b5fd3c9a7ad0efb766191574d5bdb2d5f72e7b0
           terminationMessagePolicy: FallbackToLogsOnError
           ports:

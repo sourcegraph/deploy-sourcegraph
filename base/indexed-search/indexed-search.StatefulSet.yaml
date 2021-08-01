@@ -23,6 +23,11 @@ spec:
     spec:
       containers:
         - name: zoekt-webserver
+          env:
+            - name: JAEGER_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           image: us.gcr.io/sourcegraph-dev/indexed-searcher:a2d19524cb652e9c4c02931dd5e608170365eb8f@sha256:ede7be935ab07792cdf7a508e01dc5316915e30e8661c270d8d1c4f15c9ebd15
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
@@ -47,6 +52,11 @@ spec:
             - mountPath: /data
               name: data
         - name: zoekt-indexserver
+          env:
+            - name: JAEGER_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           image: us.gcr.io/sourcegraph-dev/search-indexer:a2d19524cb652e9c4c02931dd5e608170365eb8f@sha256:5e9a2f7cdc3f46d84d3eaa03b8473d5a5850a7082291e3da961781d858b05a84
           terminationMessagePolicy: FallbackToLogsOnError
           ports:

@@ -37,6 +37,10 @@ spec:
                   fieldPath: metadata.name
             - name: CACHE_DIR
               value: /mnt/cache/$(POD_NAME)
+            - name: JAEGER_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
           image: us.gcr.io/sourcegraph-dev/symbols:a2d19524cb652e9c4c02931dd5e608170365eb8f@sha256:46cb611d6e84d4bff6c129529a609c7dd3c297de42f7b2341e7ddd7a71caf250
           terminationMessagePolicy: FallbackToLogsOnError
           livenessProbe:
