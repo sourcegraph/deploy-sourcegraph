@@ -24,11 +24,26 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
-        - name: LOKI_ENDPOINT
+        - name: LOKI_USERNAME
           valueFrom:
             secretKeyRef:
               name: grafana-agent-secrets
-              key: LOKI_ENDPOINT
+              key: LOKI_USERNAME
+        - name: LOKI_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: grafana-agent-secrets
+              key: LOKI_TOKEN
+        - name: TEMPO_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: grafana-agent-secrets
+              key: TEMPO_USERNAME
+        - name: TEMPO_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: grafana-agent-secrets
+              key: TEMPO_TOKEN
         image: grafana/agent:v0.16.1
         imagePullPolicy: IfNotPresent
         name: agent
