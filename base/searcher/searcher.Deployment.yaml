@@ -38,9 +38,13 @@ spec:
             - name: CACHE_DIR
               value: /mnt/cache/$(POD_NAME)
             - name: JAEGER_AGENT_HOST
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
+              value: grafana-agent
+            - name: JAEGER_AGENT_PORT
+              value: "6831"
+            - name: JAEGER_SAMPLER_TYPE
+              value: const
+            - name: JAEGER_SAMPLER_PARAM
+              value: "1"
           image: us.gcr.io/sourcegraph-dev/searcher:a2d19524cb652e9c4c02931dd5e608170365eb8f@sha256:a79f5f4620056204398f7b905688b981008871a585e33152422b1cd1b10bc4f4
           terminationMessagePolicy: FallbackToLogsOnError
           ports:

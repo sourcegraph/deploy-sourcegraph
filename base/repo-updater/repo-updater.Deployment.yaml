@@ -35,9 +35,13 @@ spec:
             - name: ENABLE_STREAMING_REPO_SYNCER
               value: "true"
             - name: JAEGER_AGENT_HOST
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
+              value: grafana-agent
+            - name: JAEGER_AGENT_PORT
+              value: "6831"
+            - name: JAEGER_SAMPLER_TYPE
+              value: const
+            - name: JAEGER_SAMPLER_PARAM
+              value: "1"
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
             - containerPort: 3182
