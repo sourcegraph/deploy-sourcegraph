@@ -16,6 +16,7 @@ spec:
       containers:
       - args:
         - -config.file=/etc/agent/agent.yaml
+        - -config.expand-env
         command:
         - /bin/agent
         env:
@@ -23,6 +24,11 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
+        - name: LOKI_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: grafana-agent-secrets
+              key: LOKI_ENDPOINT
         image: grafana/agent:v0.16.1
         imagePullPolicy: IfNotPresent
         name: agent
