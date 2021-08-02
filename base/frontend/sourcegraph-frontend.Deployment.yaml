@@ -70,7 +70,9 @@ spec:
             - name: JAEGER_SERVER_URL
               value: http://jaeger-query:16686
             - name: JAEGER_AGENT_HOST
-              value: grafana-agent
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
             - name: JAEGER_AGENT_PORT
               value: "6831"
             - name: JAEGER_SAMPLER_TYPE

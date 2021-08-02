@@ -30,7 +30,9 @@ spec:
         - name: query-runner
           env:
             - name: JAEGER_AGENT_HOST
-              value: grafana-agent
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
             - name: JAEGER_AGENT_PORT
               value: "6831"
             - name: JAEGER_SAMPLER_TYPE

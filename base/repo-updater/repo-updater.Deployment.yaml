@@ -35,7 +35,9 @@ spec:
             - name: ENABLE_STREAMING_REPO_SYNCER
               value: "true"
             - name: JAEGER_AGENT_HOST
-              value: grafana-agent
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
             - name: JAEGER_AGENT_PORT
               value: "6831"
             - name: JAEGER_SAMPLER_TYPE
