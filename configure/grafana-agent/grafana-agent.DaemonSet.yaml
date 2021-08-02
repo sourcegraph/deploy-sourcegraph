@@ -50,26 +50,25 @@ spec:
         ports:
         - containerPort: 8080
           name: http-metrics
-        - hostPort: 6831
+        - containerPort: 6831
+          hostPort: 6831
           name: thrift-compact
           protocol: UDP
-        - hostPort: 6832
+        - containerPort: 6832
+          hostPort: 6832
           name: thrift-binary
           protocol: UDP
-        - hostPort: 14268
+        - containerPort: 14268
+          hostPort: 14268
           name: thrift-http
           protocol: TCP
-        - hostPort: 14250
+        - containerPort: 14250
+          hostPort: 14250
           name: thrift-grpc
           protocol: TCP
-        - hostPort: 9411
-          name: zipkin
-          protocol: TCP
-        - hostPort: 55680
+        - containerPort: 55680
+          hostPort: 55680
           name: otlp
-          protocol: TCP
-        - hostPort: 55678
-          name: opencensus
           protocol: TCP
         securityContext:
           privileged: true
