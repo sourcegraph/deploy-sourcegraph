@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codeinsights-db
+spec:
+  template:
+    spec:
+      containers:
+        - name: timescaledb
+          securityContext:
+            # Required to prevent escalations to root, postgres runs as this user
+            allowPrivilegeEscalation: false
+            runAsUser: 70
+            runAsGroup: 70
+      securityContext:
+        # Required to prevent escalations to root, postgres runs as this user
+        runAsUser: 70 
