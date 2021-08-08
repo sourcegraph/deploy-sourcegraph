@@ -144,7 +144,7 @@ export const setAffinity =
     return Promise.resolve();
   };
 
-export const setRedis =
+export const redis =
   (redisCacheEndpoint: string, redisStoreEndpoint: string): Transform =>
   (c: Cluster) => {
     c.Deployments.filter(([, deployment]) =>
@@ -167,10 +167,11 @@ export const setRedis =
           });
         });
     });
+    removeComponent(/^redis\-/, c)
     return Promise.resolve();
   };
 
-export const setPostgres =
+export const postgres =
   (postgresEndpoint: {
     PGPORT?: string;
     PGHOST?: string;
@@ -197,8 +198,29 @@ export const setPostgres =
           updateEnvironment(container.env, postgresEndpoint);
         });
     });
+    removeComponent(/^pgsql/, c)
     return Promise.resolve();
   };
+
+const removeComponent = (pattern: RegExp, c: Cluster) => {
+    c.Deployments = c.Deployments.filter(([, e]) => (!e.metadata?.name) || !pattern.test(e.metadata.name))
+    c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([, e]) => (!e.metadata?.name) || !pattern.test(e.metadata.name))
+    c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([, e]) => (!e.metadata?.name) || !pattern.test(e.metadata.name))
+    c.PersistentVolumes = c.PersistentVolumes.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+    c.Services = c.Services.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+    c.ClusterRoles = c.ClusterRoles.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+    c.ClusterRoleBindings = c.ClusterRoleBindings.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+    c.ConfigMaps = c.ConfigMaps.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+    c.DaemonSets = c.DaemonSets.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+    c.Ingresss = c.Ingresss.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+    c.PodSecurityPolicys = c.PodSecurityPolicys.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+    c.Roles = c.Roles.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+    c.RoleBindings = c.RoleBindings.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+    c.ServiceAccounts = c.ServiceAccounts.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+    c.Secrets = c.Secrets.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+    c.StatefulSets = c.StatefulSets.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+    c.StorageClasses = c.StorageClasses.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+}
 
 const updateEnvironment = (
   curenv: Array<k8s.V1EnvVar>,
