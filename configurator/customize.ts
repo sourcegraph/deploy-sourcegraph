@@ -17,25 +17,35 @@ import {
 export const transformations: Transform[] = [
   //// [ ] Specify the cloud provider that hosts the Kubernetes cluster and make any modifications to
   //// the storage class used for persistent storage
-  platform("gcp", (sc: k8s.V1StorageClass) => {
-    // Make modifications to the storage class here
+  platform("gcp", (storageClass: k8s.V1StorageClass) => {
+    // Make optional customizations to the storage class here
   }),
 
   //// [ ] Select an ingress mechanism
   ////
-  //// (a) Use a Nginx Ingress controller (https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
-  //// to expose Sourcegraph to end-user traffic. This is the recommended method of ingress.
+  //// (a) Make the sourcegraph-frontend Service a NodePort Service.
+  //// Using this ingress method, you will have to expose the designated port on the
+  //// nodes to end-user traffic in your cloud provider configuration.
+  //// This is the easiest way to get up and running, but Sourcegraph will not have TLS enabled,
+  //// this is recommended only for testing or proofs of concept.
+  //
+  ingress({ ingressType: 'NodePort'}),
+  //
+  //
+  //// (b) Use a Nginx Ingress controller (https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
+  //// to expose Sourcegraph to end-user traffic. This is the recommended method of ingress for production.
   //
   // ingress({
-  //     ingressType: 'NginxIngressController',
-  //     tls: {
-  //         certFile: '[[REPLACE]]path/to/certificate.crt',
-  //         keyFile: '[[REPLACE]]path/to/key.key',
-  //         hostname: '[[REPLACE]]sourcegraph.example.com',
-  //     },
+  //   ingressType: "NginxIngressController",
+  //   tls: {
+  //     certFile: "[[REPLACE]]path/to/certificate.crt",
+  //     keyFile: "[[REPLACE]]path/to/key.key",
+  //     hostname: "[[REPLACE]]sourcegraph.example.com",
+  //   },
   // }),
   //
-  //// (b) Use a Nginx NodePort Service (https://kubernetes.io/docs/concepts/services-networking/service/#nodeport)
+  //
+  //// (c) Use a Nginx NodePort Service (https://kubernetes.io/docs/concepts/services-networking/service/#nodeport)
   //// to expose Sourcegraph to end-user traffic.
   //
   // ingress({
@@ -45,15 +55,19 @@ export const transformations: Transform[] = [
   //         keyFile: '',
   //     },
   // }),
-  //
-  //// (c) Make the sourcegraph-frontend Service a NodePort Service.
-  //// Using this ingress method, you will have to expose the designated port on the
-  //// nodes to end-user traffic in your cloud provider configuration.
-  //
-  // ingress({ ingressType: 'NodePort'}),
 
   // ==============================================================================================
-  // Optional customizations below
+  //
+  //
+  //
+  //
+  //
+  //             Optional customizations below
+  //
+  //
+  //
+  //
+  //
   // ==============================================================================================
 
   //// Use an external Redis (like Redis Enterprise Cloud or Amazon ElastiCache).
