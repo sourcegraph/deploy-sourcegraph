@@ -6,7 +6,7 @@
     "scripts": {
         "initialize": "[ -f customize.ts ] || cp customize.default.ts customize.ts",
         "generate": "yarn initialize && tsc && rm -rf rendered && node bin/index.js",
-        "generate-default": "tsc && node bin/index.js rendered-default",
+        "generate-default": "tsc && rm -rf rendered-default && node bin/index.js rendered-default",
         "compare": "diff -ru rendered-default rendered",
         "remove-user-supplied-files": "rm -f customize.ts; rm -rf rendered"
     },
