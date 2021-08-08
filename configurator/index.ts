@@ -6,11 +6,13 @@ import * as path from "path";
 import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
 import * as mkdirp from "mkdirp";
 import { Cluster } from "./common";
-import { transformations } from "./customize";
+import { transformations as userTransformations } from "./customize";
+import { transformations as defaultTransformations } from "./customize.default";
 
 (async function () {
   const sourceDir = "../base";
   const outDir = process.argv.length >= 3 ? process.argv[2] : 'rendered'
+  const transformations = outDir === 'rendered-default' ? defaultTransformations : userTransformations
 
   const cluster: Cluster = {
     Deployments: [],

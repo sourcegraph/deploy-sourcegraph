@@ -29,7 +29,7 @@ export const transformations: Transform[] = [
   //// This is the easiest way to get up and running, but Sourcegraph will not have TLS enabled,
   //// this is recommended only for testing or proofs of concept.
   //
-  // ingress({ ingressType: 'NodePort'}),
+  ingress({ ingressType: 'NodePort'}),
   //
   //
   //// (b) Use a Nginx Ingress controller (https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/)
