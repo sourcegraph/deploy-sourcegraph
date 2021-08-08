@@ -608,3 +608,8 @@ export const nonPrivileged = (): Transform => async (c: Cluster) => {
 
   return Promise.resolve();
 };
+
+export const unsafeArbitraryTransformations = (transform: (c: Cluster) => void): Transform => async(c: Cluster) => {
+    transform(c)
+    return Promise.resolve()
+}

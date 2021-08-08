@@ -12,6 +12,7 @@ import {
   redis,
   postgres,
   nonRoot,
+  unsafeArbitraryTransformations,
 } from "./common";
 
 export const transformations: Transform[] = [
@@ -126,5 +127,17 @@ export const transformations: Transform[] = [
   //
   // transformDeployments(d => d.metadata?.name === 'sourcegraph-frontend', d => {
   //     d.metadata!.name += '-my-suffix'
+  // })
+
+  //// Make arbitrary changes to the manifest.
+  //// Note: this voids the warranty. Please contact Sourcegraph support if you find the need to 
+  //// use this mechanism.
+  //
+  // unsafeArbitraryTransformations((c: Cluster) => {
+  //   c.Services.forEach(([, s]) => {
+  //     if (s.metadata) {
+  //       s.metadata.name = s.metadata.name && s.metadata.name + '-suffix'
+  //     }
+  //   })
   // })
 ];
