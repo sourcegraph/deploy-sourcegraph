@@ -10,7 +10,7 @@ import { transformations } from "./customize";
 
 (async function () {
   const sourceDir = "../base";
-  const outDir = "rendered";
+  const outDir = process.argv.length >= 3 ? process.argv[2] : 'rendered'
 
   const cluster: Cluster = {
     Deployments: [],
