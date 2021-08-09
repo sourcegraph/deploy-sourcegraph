@@ -12,7 +12,8 @@ import { resolve } from "dns";
 
 export interface Overlay {
   Bases: { [key: string]: PatchTarget };
-  Patches: [string, PatchTarget][];
+  Patches: [string, any][];
+  Create: [string, any][];
 
   Deployments: [string, k8s.V1Deployment][];
   PersistentVolumeClaims: [string, k8s.V1PersistentVolumeClaim][];
@@ -90,6 +91,40 @@ export const patchCustomRedis =
       })(c);
     });
     await Promise.all(patches)
+  };
+
+export const patchPlatform =
+  (
+    base: "gcp" | "aws" | "azure" | "minikube" | "generic",
+    customizeStorageClass?: (sc: k8s.V1StorageClass) => void
+  ): Transform =>
+  (c: Overlay) => {
+    const obj = YAML.parse(
+      readFileSync(path.join("custom", `${base}.StorageClass.yaml`)).toString()
+    );
+    if (customizeStorageClass) {
+      customizeStorageClass(obj);
+    }
+    c.Create.push(["sourcegraph.StorageClass.yaml", obj])
+
+    // TODO: should we reveal Bases internals to allow for operations like these?
+    // Maybe the right way to do this is to not include resources at all in the bases,
+    // and only provide them in overlays. Alternatively, could selectively provide some
+    // aggregated metadata in Bases.
+    //
+    // if (base === "minikube") {
+    //   const removeResources = (
+    //     deployOrSS: k8s.V1Deployment | k8s.V1StatefulSet
+    //   ) => {
+    //     deployOrSS.spec?.template.spec?.containers.forEach(
+    //       (container) => delete container["resources"]
+    //     );
+    //   };
+    //   c.Deployments.forEach(([, deployment]) => removeResources(deployment));
+    //   c.StatefulSets.forEach(([, ss]) => removeResources(ss));
+    // }
+
+    return Promise.resolve();
   };
 
 // TODO

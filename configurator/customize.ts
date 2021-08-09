@@ -1,6 +1,7 @@
-import { patchApp, patchRedis } from "./common";
+import { patchApp, patchCustomRedis, patchPlatform } from "./common";
 
 export const transformations = [
+  patchPlatform("gcp"),
   patchApp("gitserver.statefulset", (app) => {
     app.spec = {
       replicas: 9000,
@@ -11,5 +12,5 @@ export const transformations = [
       },
     }
   }),
-  patchRedis("rediscash.com", "redisstore.com")
+  patchCustomRedis("rediscash.com", "redisstore.com"),
 ];

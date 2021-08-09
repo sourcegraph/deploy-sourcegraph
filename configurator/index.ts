@@ -1,5 +1,5 @@
 import * as k8s from "@kubernetes/client-node";
-import { fstat, readdirSync, readFile, readFileSync } from "fs";
+import { readFileSync } from "fs";
 import * as fs from "fs";
 import * as YAML from "yaml";
 import * as path from "path";
@@ -7,28 +7,36 @@ import * as mkdirp from "mkdirp";
 import { Overlay, PatchTarget } from "./common";
 import { transformations as userTransformations } from "./customize";
 import { transformations as defaultTransformations } from "./customize.default";
-import * as glob from "glob"
-import { Dictionary } from "lodash";
+import * as glob from "glob";
 
 (async function () {
-  const outDir = process.argv.length >= 3 ? process.argv[2] : '../overlays/rendered'
-  const transformations = outDir === 'rendered-default' ? defaultTransformations : userTransformations
+  const outDir =
+    process.argv.length >= 3 ? process.argv[2] : "../overlays/rendered";
+  const transformations =
+    outDir === "rendered-default"
+      ? defaultTransformations
+      : userTransformations;
 
-  const basesFiles = glob.sync('../base/**/*.yaml')
+  const basesFiles = glob.sync("../base/**/*.yaml");
   const bases = basesFiles.reduce((acc, base) => {
     const target = YAML.parse(readFileSync(base).toString()) as PatchTarget;
-    const identifier = path.basename(base).replace(path.extname(base), '').toLowerCase()
+    const identifier = path
+      .basename(base)
+      .replace(path.extname(base), "")
+      .toLowerCase();
     acc[identifier] = {
       apiVersion: target.apiVersion,
       kind: target.kind,
       metadata: target.metadata,
     };
-    return acc
-  }, {} as { [key: string]: PatchTarget })
+    return acc;
+  }, {} as { [key: string]: PatchTarget });
 
   const overlay: Overlay = {
     Bases: bases,
     Patches: [],
+    Create: [],
+
     Unrecognized: [],
     ManualInstructions: [],
 
@@ -57,34 +65,43 @@ import { Dictionary } from "lodash";
       await t(overlay);
     }
   } catch (error) {
-    console.error("Failed to generate manifest: ", error)
+    console.error("Failed to generate manifest: ", error);
   }
 
+  const resources = basesFiles.map((f) => f.replace("../", ""));
   async function writeOverlay(c: Overlay) {
-    const fileContents = [];
-    fileContents.push(
-      ...c.Patches
-    );
-    const patches: string[] = []
+    const patches: string[] = [];
     await mkdirp(outDir);
-    await Promise.all(
-      fileContents.map(async (c) => {
-        const filename = path.join(outDir, c[0] + '.yaml');
-        patches.push(path.basename(filename));
+    await Promise.all([
+      ...c.Patches.map(async (c) => {
+        const patchFile = c[0] + ".yaml"
+        patches.push(patchFile);
+        const filename = path.join(outDir, patchFile);
         const directory = path.dirname(filename);
         await mkdirp(directory);
         fs.writeFileSync(filename, YAML.stringify(c[1]));
-      })
-    );
+      }),
+      ...c.Create.map(async (c) => {
+        const resourceFile = path.join('base', c[0])
+        resources.push(resourceFile);
+        const filename = path.join(outDir, resourceFile);
+        const directory = path.dirname(filename);
+        await mkdirp(directory);
+        fs.writeFileSync(filename, YAML.stringify(c[1]));
+      }),
+    ]);
     for (const [name, contents] of c.RawFiles) {
       fs.writeFileSync(path.join(outDir, name), contents);
     }
-    fs.writeFileSync(path.join(outDir, 'kustomization.yaml'), YAML.stringify({
-      apiVersion: 'kustomize.config.k8s.io/v1beta1',
-      kind: 'Kustomization',
-      patchesStrategicMerge: patches,
-      resources: basesFiles,
-    }))
+    fs.writeFileSync(
+      path.join(outDir, "kustomization.yaml"),
+      YAML.stringify({
+        apiVersion: "kustomize.config.k8s.io/v1beta1",
+        kind: "Kustomization",
+        patchesStrategicMerge: patches,
+        resources,
+      })
+    );
 
     if (c.ManualInstructions.length > 0) {
       console.log(

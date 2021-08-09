@@ -12,6 +12,7 @@ cleanup() {
 trap cleanup EXIT
 
 cp -R overlays "${BUILD_DIR}"
+rsync -a --relative base/ "${BUILD_DIR}"/overlays/"$1"/
 cp -R base "${BUILD_DIR}"/overlays/bases/deployments/base
 cp -R base "${BUILD_DIR}"/overlays/bases/rbac-roles/base
 cp -R base "${BUILD_DIR}"/overlays/bases/pvcs/base
