@@ -2,7 +2,7 @@ import * as k8s from "@kubernetes/client-node";
 import {
   Transform,
   setResources,
-  Cluster,
+  Overlay,
   platform,
   ingress,
   sshCloning,

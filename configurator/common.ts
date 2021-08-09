@@ -10,7 +10,10 @@ import * as request from "request";
 import { reject } from "lodash";
 import { resolve } from "dns";
 
-export interface Cluster {
+export interface Overlay {
+  Bases: { [key: string]: PatchTarget };
+  Patches: [string, PatchTarget][];
+
   Deployments: [string, k8s.V1Deployment][];
   PersistentVolumeClaims: [string, k8s.V1PersistentVolumeClaim][];
   PersistentVolumes: [string, k8s.V1PersistentVolume][];
@@ -28,18 +31,37 @@ export interface Cluster {
   StatefulSets: [string, k8s.V1StatefulSet][];
   StorageClasses: [string, k8s.V1StorageClass][];
   RawFiles: [string, string][];
+  
   Unrecognized: string[];
   ManualInstructions: string[];
 }
 
-export type Transform = (c: Cluster) => Promise<void>;
+export type Transform = (c: Overlay) => Promise<void>;
+
+export type PatchTarget = { apiVersion?: string, kind?: string, metadata?: k8s.V1ObjectMeta }
+
+type DeepPartial<T> = {
+  [P in keyof T]?: DeepPartial<T[P]>;
+};
+
+export const patchApp = (target: string, patch: (app: DeepPartial<k8s.V1Deployment | k8s.V1StatefulSet>) => void): Transform => (c: Overlay) => {
+  const base = c.Bases[target.toLowerCase()];
+  if (!base) c.Unrecognized.push(target);
+
+  const app = base;
+  patch(app);
+  c.Patches.push([target, app]);
+  return Promise.resolve();
+}
+
+// TODO
 
 // Returns a thing that transforms all deployments that match a particular criteria
 export const transformDeployments = (
   selector: (d: k8s.V1Deployment) => boolean,
   transform: (d: k8s.V1Deployment) => void
 ): Transform => {
-  return (c: Cluster) => {
+  return (c: Overlay) => {
     c.Deployments.filter(([, d]) => selector(d)).forEach(([, d]) =>
       transform(d)
     );
@@ -52,7 +74,7 @@ export const setResources =
     containerNames: string[],
     resources: k8s.V1ResourceRequirements
   ): Transform =>
-  (c: Cluster) => {
+  (c: Overlay) => {
     const updateContainer = (c: k8s.V1Container) => {
       c.resources || (c.resources = {});
       _.merge(c.resources, resources);
@@ -73,7 +95,7 @@ export const setResources =
 
 export const setReplicas =
   (deploymentAndStatefulSetNames: string[], replicas: number): Transform =>
-  (c: Cluster) => {
+  (c: Overlay) => {
     c.Deployments.filter(
       ([, deployment]) =>
         _.includes(deploymentAndStatefulSetNames, deployment.metadata?.name) &&
@@ -92,7 +114,7 @@ export const setNodeSelector =
     deploymentAndStatefulSetNames: string[],
     nodeSelector: { [key: string]: string }
   ): Transform =>
-  (c: Cluster) => {
+  (c: Overlay) => {
     c.Deployments.filter(
       ([, deployment]) =>
         _.includes(deploymentAndStatefulSetNames, deployment.metadata?.name) &&
@@ -125,7 +147,7 @@ export const setAffinity =
     deploymentAndStatefulSetNames: string[],
     affinity: k8s.V1Affinity
   ): Transform =>
-  (c: Cluster) => {
+  (c: Overlay) => {
     c.Deployments.filter(
       ([, deployment]) =>
         _.includes(deploymentAndStatefulSetNames, deployment.metadata?.name) &&
@@ -146,7 +168,7 @@ export const setAffinity =
 
 export const redis =
   (redisCacheEndpoint: string, redisStoreEndpoint: string): Transform =>
-  (c: Cluster) => {
+  (c: Overlay) => {
     c.Deployments.filter(([, deployment]) =>
       _.includes(
         ["sourcegraph-frontend", "repo-updater"],
@@ -180,7 +202,7 @@ export const postgres =
     PGDATABASE?: string;
     PGSSLMODE?: string;
   }): Transform =>
-  (c: Cluster) => {
+  (c: Overlay) => {
     c.Deployments.filter(([, deployment]) =>
       _.includes(
         ["sourcegraph-frontend", "repo-updater"],
@@ -202,7 +224,7 @@ export const postgres =
     return Promise.resolve();
   };
 
-const removeComponent = (pattern: RegExp, c: Cluster) => {
+const removeComponent = (pattern: RegExp, c: Overlay) => {
     c.Deployments = c.Deployments.filter(([, e]) => (!e.metadata?.name) || !pattern.test(e.metadata.name))
     c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([, e]) => (!e.metadata?.name) || !pattern.test(e.metadata.name))
     c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([, e]) => (!e.metadata?.name) || !pattern.test(e.metadata.name))
@@ -252,7 +274,7 @@ export const platform =
     base: "gcp" | "aws" | "azure" | "minikube" | "generic",
     customizeStorageClass?: (sc: k8s.V1StorageClass) => void
   ): Transform =>
-  (c: Cluster) => {
+  (c: Overlay) => {
     const obj = YAML.parse(
       readFileSync(path.join("custom", `${base}.StorageClass.yaml`)).toString()
     );
@@ -311,7 +333,7 @@ export const ingress = (
 
 const ingressNginx =
   (tls?: { certFile: string; keyFile: string; hostname: string }): Transform =>
-  async (c: Cluster) => {
+  async (c: Overlay) => {
     const body = await new Promise<any>((resolve) =>
       request(
         "https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/cloud/deploy.yaml",
@@ -386,7 +408,7 @@ const ingressNginx =
 
 const serviceNginx =
   (tlsCertFile: string, tlsKeyFile: string): Transform =>
-  async (c: Cluster) => {
+  async (c: Overlay) => {
     const s = readFileSync(
       path.join("custom", "nginx-svc", "nginx.ConfigMap.yaml")
     ).toString();
@@ -414,7 +436,7 @@ const serviceNginx =
     ]);
   };
 
-const nodePort = (): Transform => async (c: Cluster) => {
+const nodePort = (): Transform => async (c: Overlay) => {
   c.Services.forEach(([filename, service]) => {
     if (filename.endsWith("sourcegraph-frontend.Service.yaml")) {
       service.spec!.type = "NodePort";
@@ -466,7 +488,7 @@ export const sshCloning =
     knownHostsFile: string,
     root: boolean = true
   ): Transform =>
-  async (c: Cluster) => {
+  async (c: Overlay) => {
     const sshKey = readFileSync(sshKeyFile).toString("base64");
     const knownHosts = readFileSync(knownHostsFile).toString("base64");
     const sshDir = root ? "/root" : "/home/sourcegraph";
@@ -508,7 +530,7 @@ export const sshCloning =
   };
 
 // TODO: change non-root to be the default, and runAsRoot to be an option
-export const nonRoot = (): Transform => async (c: Cluster) => {
+export const nonRoot = (): Transform => async (c: Overlay) => {
   const runAsUserAndGroup: {
     [name: string]: {
       runAsUser?: number;
@@ -601,7 +623,7 @@ export const nonRoot = (): Transform => async (c: Cluster) => {
   return Promise.resolve();
 };
 
-export const nonPrivileged = (): Transform => async (c: Cluster) => {
+export const nonPrivileged = (): Transform => async (c: Overlay) => {
   await nonRoot()(c); // implies non-root for now
 
   // NEXT: remove non-privileged changes
@@ -609,7 +631,7 @@ export const nonPrivileged = (): Transform => async (c: Cluster) => {
   return Promise.resolve();
 };
 
-export const unsafeArbitraryTransformations = (transform: (c: Cluster) => void): Transform => async(c: Cluster) => {
+export const unsafeArbitraryTransformations = (transform: (c: Overlay) => void): Transform => async(c: Overlay) => {
     transform(c)
     return Promise.resolve()
 }

@@ -3,18 +3,36 @@ import { fstat, readdirSync, readFile, readFileSync } from "fs";
 import * as fs from "fs";
 import * as YAML from "yaml";
 import * as path from "path";
-import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
 import * as mkdirp from "mkdirp";
-import { Cluster } from "./common";
+import { Overlay, PatchTarget } from "./common";
 import { transformations as userTransformations } from "./customize";
 import { transformations as defaultTransformations } from "./customize.default";
+import * as glob from "glob"
+import { Dictionary } from "lodash";
 
 (async function () {
-  const sourceDir = "../base";
-  const outDir = process.argv.length >= 3 ? process.argv[2] : 'rendered'
+  const outDir = process.argv.length >= 3 ? process.argv[2] : '../overlays/rendered'
   const transformations = outDir === 'rendered-default' ? defaultTransformations : userTransformations
 
-  const cluster: Cluster = {
+  const basesFiles = glob.sync('../base/**/*.yaml')
+  const bases = basesFiles.reduce((acc, base) => {
+    const target = YAML.parse(readFileSync(base).toString()) as PatchTarget;
+    const identifier = path.basename(base).replace(path.extname(base), '').toLowerCase()
+    acc[identifier] = {
+      apiVersion: target.apiVersion,
+      kind: target.kind,
+      metadata: target.metadata,
+    };
+    return acc
+  }, {} as { [key: string]: PatchTarget })
+
+  const overlay: Overlay = {
+    Bases: bases,
+    Patches: [],
+    Unrecognized: [],
+    ManualInstructions: [],
+
+    // TODO
     Deployments: [],
     PersistentVolumeClaims: [],
     PersistentVolumes: [],
@@ -32,150 +50,27 @@ import { transformations as defaultTransformations } from "./customize.default";
     StatefulSets: [],
     StorageClasses: [],
     RawFiles: [],
-    Unrecognized: [],
-    ManualInstructions: [],
   };
-
-  function readCluster(root: string) {
-    const contents = readdirSync(root, { withFileTypes: true });
-    for (const entry of contents) {
-      if (entry.isFile()) {
-        if (entry.name.endsWith(".yaml")) {
-          const k8sType = path.extname(
-            entry.name.substring(0, entry.name.length - ".yaml".length)
-          );
-          const filename = path.join(root, entry.name);
-          const relativeFilename = path.relative(sourceDir, filename);
-          switch (k8sType) {
-            case ".Deployment":
-              cluster.Deployments.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
-            case ".PersistentVolumeClaim":
-              cluster.PersistentVolumeClaims.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
-            case ".PersistentVolume":
-              cluster.PersistentVolumes.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
-            case ".Service":
-            case ".IndexerService":
-              cluster.Services.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
-            case ".ClusterRole":
-              cluster.ClusterRoles.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
-            case ".ClusterRoleBinding":
-              cluster.ClusterRoleBindings.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
-            case ".ConfigMap":
-              cluster.ConfigMaps.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
-            case ".DaemonSet":
-              cluster.DaemonSets.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
-            case ".Ingress":
-              cluster.Ingresss.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
-            case ".PodSecurityPolicy":
-              cluster.PodSecurityPolicys.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
-            case ".Role":
-              cluster.Roles.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
-            case ".RoleBinding":
-              cluster.RoleBindings.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
-            case ".ServiceAccount":
-              cluster.ServiceAccounts.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
-            case ".StatefulSet":
-              cluster.StatefulSets.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
-            default:
-              cluster.Unrecognized.push(entry.name);
-          }
-        }
-      } else if (entry.isDirectory()) {
-        readCluster(path.join(root, entry.name));
-      } else {
-        console.error("Ignoring unrecognized file type, name: ", entry.name);
-      }
-    }
-  }
-  readCluster(sourceDir);
 
   try {
     for (const t of transformations) {
-      await t(cluster);
+      await t(overlay);
     }
   } catch (error) {
-      console.error("Failed to generate manifest: ", error)
+    console.error("Failed to generate manifest: ", error)
   }
 
-  async function writeCluster(c: Cluster) {
+  async function writeOverlay(c: Overlay) {
     const fileContents = [];
     fileContents.push(
-      ...c.Deployments,
-      ...c.PersistentVolumeClaims,
-      ...c.PersistentVolumes,
-      ...c.Services,
-      ...c.ClusterRoles,
-      ...c.ClusterRoleBindings,
-      ...c.ConfigMaps,
-      ...c.DaemonSets,
-      ...c.Ingresss,
-      ...c.PodSecurityPolicys,
-      ...c.Roles,
-      ...c.RoleBindings,
-      ...c.ServiceAccounts,
-      ...c.StatefulSets,
-      ...c.StorageClasses,
-      ...c.Secrets
+      ...c.Patches
     );
+    const patches: string[] = []
+    await mkdirp(outDir);
     await Promise.all(
       fileContents.map(async (c) => {
-        const filename = path.join(outDir, c[0]);
+        const filename = path.join(outDir, c[0] + '.yaml');
+        patches.push(path.basename(filename));
         const directory = path.dirname(filename);
         await mkdirp(directory);
         fs.writeFileSync(filename, YAML.stringify(c[1]));
@@ -184,6 +79,12 @@ import { transformations as defaultTransformations } from "./customize.default";
     for (const [name, contents] of c.RawFiles) {
       fs.writeFileSync(path.join(outDir, name), contents);
     }
+    fs.writeFileSync(path.join(outDir, 'kustomization.yaml'), YAML.stringify({
+      apiVersion: 'kustomize.config.k8s.io/v1beta1',
+      kind: 'Kustomization',
+      patchesStrategicMerge: patches,
+      resources: basesFiles,
+    }))
 
     if (c.ManualInstructions.length > 0) {
       console.log(
@@ -196,7 +97,7 @@ import { transformations as defaultTransformations } from "./customize.default";
     }
   }
 
-  await writeCluster(cluster);
+  await writeOverlay(overlay);
 })().then(() => {
   console.log("Done");
 });

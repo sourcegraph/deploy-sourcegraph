@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Stores clones of repositories to perform Git operations.
+  labels:
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: gitserver
+  name: gitserver
+spec:
+  replicas: 9000
+  template:
+    spec:
+      containers:
+        - name: gitserver
+          resources:
+            limits:
+              cpu: "9000"
