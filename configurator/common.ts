@@ -9,24 +9,6 @@ export interface Overlay {
   Patches: [string, any][];
   Create: [string, any][];
 
-  Deployments: [string, k8s.V1Deployment][];
-  PersistentVolumeClaims: [string, k8s.V1PersistentVolumeClaim][];
-  PersistentVolumes: [string, k8s.V1PersistentVolume][];
-  Services: [string, k8s.V1Service][];
-  ClusterRoles: [string, k8s.V1ClusterRole][];
-  ClusterRoleBindings: [string, k8s.V1ClusterRoleBinding][];
-  ConfigMaps: [string, k8s.V1ConfigMap][];
-  DaemonSets: [string, k8s.V1DaemonSet][];
-  Ingresss: [string, k8s.V1Ingress][];
-  PodSecurityPolicys: [string, k8s.V1beta1PodSecurityPolicy][];
-  Roles: [string, k8s.V1Role][];
-  RoleBindings: [string, k8s.V1RoleBinding][];
-  ServiceAccounts: [string, k8s.V1ServiceAccount][];
-  Secrets: [string, k8s.V1Secret][];
-  StatefulSets: [string, k8s.V1StatefulSet][];
-  StorageClasses: [string, k8s.V1StorageClass][];
-  RawFiles: [string, string][];
-
   Unrecognized: string[];
   ManualInstructions: string[];
 }

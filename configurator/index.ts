@@ -39,25 +39,6 @@ import * as glob from "glob";
 
     Unrecognized: [],
     ManualInstructions: [],
-
-    // TODO
-    Deployments: [],
-    PersistentVolumeClaims: [],
-    PersistentVolumes: [],
-    Services: [],
-    ClusterRoles: [],
-    ClusterRoleBindings: [],
-    ConfigMaps: [],
-    DaemonSets: [],
-    Ingresss: [],
-    PodSecurityPolicys: [],
-    Roles: [],
-    RoleBindings: [],
-    Secrets: [],
-    ServiceAccounts: [],
-    StatefulSets: [],
-    StorageClasses: [],
-    RawFiles: [],
   };
 
   try {
@@ -100,9 +81,6 @@ import * as glob from "glob";
         fs.writeFileSync(filename, YAML.stringify(c[1]));
       }),
     ]);
-    for (const [name, contents] of c.RawFiles) {
-      fs.writeFileSync(path.join(outDir, name), contents);
-    }
     fs.writeFileSync(
       path.join(outDir, "kustomization.yaml"),
       YAML.stringify({
