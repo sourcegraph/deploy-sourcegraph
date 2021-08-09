@@ -1,4 +1,4 @@
-import { patchApp } from "./common";
+import { patchApp, patchRedis } from "./common";
 
 export const transformations = [
   patchApp("gitserver.statefulset", (app) => {
@@ -11,4 +11,5 @@ export const transformations = [
       },
     }
   }),
+  patchRedis("rediscash.com", "redisstore.com")
 ];

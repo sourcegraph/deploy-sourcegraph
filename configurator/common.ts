@@ -31,28 +31,66 @@ export interface Overlay {
   StatefulSets: [string, k8s.V1StatefulSet][];
   StorageClasses: [string, k8s.V1StorageClass][];
   RawFiles: [string, string][];
-  
+
   Unrecognized: string[];
   ManualInstructions: string[];
 }
 
 export type Transform = (c: Overlay) => Promise<void>;
 
-export type PatchTarget = { apiVersion?: string, kind?: string, metadata?: k8s.V1ObjectMeta }
+export type PatchTarget = {
+  apiVersion?: string;
+  kind?: string;
+  metadata?: k8s.V1ObjectMeta;
+};
 
 type DeepPartial<T> = {
   [P in keyof T]?: DeepPartial<T[P]>;
 };
 
-export const patchApp = (target: string, patch: (app: DeepPartial<k8s.V1Deployment | k8s.V1StatefulSet>) => void): Transform => (c: Overlay) => {
-  const base = c.Bases[target.toLowerCase()];
-  if (!base) c.Unrecognized.push(target);
+// a bare-bones patch. primary way to make simple changes
+export const patchApp =
+  (
+    target: string,
+    patch: (app: DeepPartial<k8s.V1Deployment | k8s.V1StatefulSet>) => void
+  ): Transform =>
+  async (c: Overlay) => {
+    const base = c.Bases[target.toLowerCase()];
+    if (!base) c.Unrecognized.push(target);
 
-  const app = base;
-  patch(app);
-  c.Patches.push([target, app]);
-  return Promise.resolve();
-}
+    const app = { ...base };
+    patch(app);
+    c.Patches.push([target, app]);
+  };
+
+// a more complicated group of patches that we provide out of the box
+export const patchCustomRedis =
+  (redisCacheEndpoint: string, redisStoreEndpoint: string): Transform =>
+  async (c: Overlay) => {
+    const patches = [
+      { target: "sourcegraph-frontend.deployment", container: "frontend" },
+      { target: "repo-updater.deployment", container: "redis" },
+    ].map(({ target, container }) => {
+      return patchApp(target, (app) => {
+        app.spec = {
+          template: {
+            spec: {
+              containers: [
+                {
+                  name: container,
+                  env: [
+                    { name: "REDIS_CACHE_ENDPOINT", value: redisCacheEndpoint },
+                    { name: "REDIS_STORE_ENDPOINT", value: redisStoreEndpoint },
+                  ],
+                },
+              ],
+            },
+          },
+        };
+      })(c);
+    });
+    await Promise.all(patches)
+  };
 
 // TODO
 
@@ -189,7 +227,7 @@ export const redis =
           });
         });
     });
-    removeComponent(/^redis\-/, c)
+    removeComponent(/^redis\-/, c);
     return Promise.resolve();
   };
 
@@ -220,29 +258,63 @@ export const postgres =
           updateEnvironment(container.env, postgresEndpoint);
         });
     });
-    removeComponent(/^pgsql/, c)
+    removeComponent(/^pgsql/, c);
     return Promise.resolve();
   };
 
 const removeComponent = (pattern: RegExp, c: Overlay) => {
-    c.Deployments = c.Deployments.filter(([, e]) => (!e.metadata?.name) || !pattern.test(e.metadata.name))
-    c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([, e]) => (!e.metadata?.name) || !pattern.test(e.metadata.name))
-    c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([, e]) => (!e.metadata?.name) || !pattern.test(e.metadata.name))
-    c.PersistentVolumes = c.PersistentVolumes.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
-    c.Services = c.Services.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
-    c.ClusterRoles = c.ClusterRoles.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
-    c.ClusterRoleBindings = c.ClusterRoleBindings.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
-    c.ConfigMaps = c.ConfigMaps.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
-    c.DaemonSets = c.DaemonSets.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
-    c.Ingresss = c.Ingresss.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
-    c.PodSecurityPolicys = c.PodSecurityPolicys.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
-    c.Roles = c.Roles.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
-    c.RoleBindings = c.RoleBindings.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
-    c.ServiceAccounts = c.ServiceAccounts.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
-    c.Secrets = c.Secrets.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
-    c.StatefulSets = c.StatefulSets.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
-    c.StorageClasses = c.StorageClasses.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
-}
+  c.Deployments = c.Deployments.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.PersistentVolumes = c.PersistentVolumes.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.Services = c.Services.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.ClusterRoles = c.ClusterRoles.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.ClusterRoleBindings = c.ClusterRoleBindings.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.ConfigMaps = c.ConfigMaps.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.DaemonSets = c.DaemonSets.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.Ingresss = c.Ingresss.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.PodSecurityPolicys = c.PodSecurityPolicys.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.Roles = c.Roles.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.RoleBindings = c.RoleBindings.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.ServiceAccounts = c.ServiceAccounts.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.Secrets = c.Secrets.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.StatefulSets = c.StatefulSets.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+  c.StorageClasses = c.StorageClasses.filter(
+    ([, e]) => !e.metadata?.name || !pattern.test(e.metadata.name)
+  );
+};
 
 const updateEnvironment = (
   curenv: Array<k8s.V1EnvVar>,
@@ -327,7 +399,9 @@ export const ingress = (
     case "NodePort":
       return nodePort();
     default:
-        throw new Error('Unrecognized ingress type: ' + (params as any).ingressType)
+      throw new Error(
+        "Unrecognized ingress type: " + (params as any).ingressType
+      );
   }
 };
 
@@ -631,7 +705,9 @@ export const nonPrivileged = (): Transform => async (c: Overlay) => {
   return Promise.resolve();
 };
 
-export const unsafeArbitraryTransformations = (transform: (c: Overlay) => void): Transform => async(c: Overlay) => {
-    transform(c)
-    return Promise.resolve()
-}
+export const unsafeArbitraryTransformations =
+  (transform: (c: Overlay) => void): Transform =>
+  async (c: Overlay) => {
+    transform(c);
+    return Promise.resolve();
+  };

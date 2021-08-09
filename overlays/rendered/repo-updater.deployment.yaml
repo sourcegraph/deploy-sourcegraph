@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Handles repository metadata (not Git data) lookups and updates from
+      external code hosts and other similar services.
+  labels:
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: repo-updater
+  name: repo-updater
+spec:
+  template:
+    spec:
+      containers:
+        - name: redis
+          env:
+            - name: REDIS_CACHE_ENDPOINT
+              value: rediscash.com
+            - name: REDIS_STORE_ENDPOINT
+              value: redisstore.com
