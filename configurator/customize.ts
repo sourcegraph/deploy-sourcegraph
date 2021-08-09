@@ -1,6 +1,6 @@
-import { patchApp, patchCustomRedis, patchPlatform } from "./common";
+import { Transform, patchApp, patchCustomRedis, patchPlatform } from "./common";
 
-export const transformations = [
+export const transformations: Transform[] = [
   patchPlatform("gcp"),
   patchApp("gitserver.statefulset", (app) => {
     app.spec = {
