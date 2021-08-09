@@ -70,13 +70,23 @@ import * as glob from "glob";
 
   const resources = basesFiles.map((f) => f.replace("../", ""));
   async function writeOverlay(c: Overlay) {
-    const patches: string[] = [];
+    const patchFiles: { [key: string]: string } = {}
+
     await mkdirp(outDir);
     await Promise.all([
       ...c.Patches.map(async (c) => {
-        const patchFile = c[0] + ".yaml"
-        patches.push(patchFile);
+        let patchName = c[0]
+        if (patchFiles[patchName]) {
+          let altPatchName = patchName;
+          for (let i = 1; patchFiles[altPatchName]; i++) {
+            altPatchName = patchName + `-${i}`
+          }
+          patchName = altPatchName
+        }
+        const patchFile = patchName + ".yaml"
         const filename = path.join(outDir, patchFile);
+        patchFiles[patchName] = patchFile;
+
         const directory = path.dirname(filename);
         await mkdirp(directory);
         fs.writeFileSync(filename, YAML.stringify(c[1]));
@@ -98,7 +108,7 @@ import * as glob from "glob";
       YAML.stringify({
         apiVersion: "kustomize.config.k8s.io/v1beta1",
         kind: "Kustomization",
-        patchesStrategicMerge: patches,
+        patchesStrategicMerge: Object.values(patchFiles),
         resources,
       })
     );

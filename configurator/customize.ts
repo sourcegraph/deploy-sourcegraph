@@ -13,4 +13,9 @@ export const transformations: Transform[] = [
     }
   }),
   patchCustomRedis("rediscash.com", "redisstore.com"),
+  patchApp("sourcegraph-frontend.deployment", (app) => {
+    app.spec = {
+      replicas: 9000,
+    }
+  }),
 ];
