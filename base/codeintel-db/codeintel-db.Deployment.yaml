@@ -26,7 +26,7 @@ spec:
     spec:
       initContainers:
       - name: correct-data-dir-permissions
-        image: index.docker.io/sourcegraph/alpine-3.12:insiders@sha256:dbe2829a9438852c5a4696d0574ecffcf9cc01edb91830241ae547e60d5ebc28
+        image: index.docker.io/sourcegraph/alpine-3.12:insiders@sha256:6a4c00c387763bc43fb72906242652e70fc7d4b43d8157ad3f9dd8ee81329972
         command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
         volumeMounts:
         - mountPath: /data
@@ -42,7 +42,7 @@ spec:
             memory: "50Mi"
       containers:
       - name: pgsql
-        image: index.docker.io/sourcegraph/codeintel-db:insiders@sha256:8131b6b5f5f2989c334fa6ba6483126480f0fd9de385ca75237725272a0a88a5
+        image: index.docker.io/sourcegraph/codeintel-db:insiders@sha256:8a9ead5ebf8b969a84fd898fe322f129df1a6496249b5a17ed629f55be89cbe5
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
           exec:
@@ -73,7 +73,7 @@ spec:
           value: postgres://sg:@localhost:5432/?sslmode=disable
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
           value: /config/code_intel_queries.yaml
-        image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:486814a1ec92ff97f08b8936fe879940a4e7504837a7419bfab4ec9aff56969b
+        image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:dc6dc119e9367babdb41a3f832afd7df102432f5d15faee0d2b66ef5841be781
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
         resources:
