@@ -88,6 +88,12 @@ spec:
                 secretKeyRef:
                   name: code-intel-secrets
                   key: EXECUTOR_FRONTEND_PASSWORD
+            - name: EXECUTOR_METRIC_GCP_PROJECT_ID
+              value: sourcegraph-code-intel
+            - name: EXECUTOR_METRIC_ENVIRONMENT_LABEL
+              value: dogfood
+            - name: EXECUTOR_METRIC_GOOGLE_APPLICATION_CREDENTIALS_FILE
+              value: /secrets/service_account.json
             - name: SRC_LOG_LEVEL
               value: info
           terminationMessagePolicy: FallbackToLogsOnError
@@ -125,6 +131,9 @@ spec:
             - mountPath: /secrets/kms/
               name: kms-service-account
               readOnly: true
+            - mountPath: /secrets/
+              name: codeintel-bucket-service-account
+              readOnly: true
       securityContext:
         runAsUser: 0
       serviceAccountName: sourcegraph-frontend
@@ -134,3 +143,6 @@ spec:
         - name: kms-service-account
           secret:
             secretName: kms-service-account-key
+        - name: codeintel-bucket-service-account
+          secret:
+            secretName: codeintel-bucket-sa-secret
