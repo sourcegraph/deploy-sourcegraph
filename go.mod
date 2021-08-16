@@ -7,7 +7,7 @@ require (
 	github.com/pulumi/pulumi v1.12.0
 	github.com/sethgrid/pester v1.1.0
 	github.com/slimsag/update-docker-tags v0.7.0
-	github.com/sourcegraph/sourcegraph/enterprise/dev/ci/images v0.0.0-20210816081946-73ba9ee558e2
+	github.com/sourcegraph/sourcegraph/enterprise/dev/ci/images v0.0.0-20210816084822-f018333c31db
 	golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550 // indirect
 	golang.org/x/xerrors v0.0.0-20191011141410-1b5146add898 // indirect
 )
