@@ -11,19 +11,18 @@ IMAGE_FETCH_TOKEN=$(gcloud auth print-access-token)
 export IMAGE_FETCH_TOKEN
 
 IMAGES=(
+  alpine-3.12
   cadvisor
   gitserver
   codeinsights-db
   codeintel-db
-  executor-queue
   frontend
   github-proxy
   grafana
   indexed-searcher
   jaeger-agent
   jaeger-all-in-one minio
-  postgres-11.4
-  postgres-12.6
+  postgres-12.6-alpine
   postgres_exporter
   precise-code-intel-worker
   prometheus

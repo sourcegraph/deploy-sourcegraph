@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
         - name: timescaledb
-          image: us.gcr.io/sourcegraph-dev/codeinsights-db:b42301f610584d5ea01155d1fc3e3b2c4dfe807f@sha256:ff8166ff465dcefbff9e12031821538ca2a3cab39c0c0d05fd1a5606b582aef8
+          image: us.gcr.io/sourcegraph-dev/codeinsights-db:2ead0754b1c7c8e853f762663ee6a3ee7d5393bb@sha256:69741ff8aa153f0d01f8f7e983d59d60e0de6673800292b94595c881267630dc
           env:
             - name: POSTGRES_PASSWORD # Accessible by Sourcegraph applications on the network only, so password auth is not used.
               value: password
@@ -39,10 +39,10 @@ spec:
           resources:
             limits:
               cpu: "4"
-              memory: 2Gi
+              memory: 16Gi
             requests:
               cpu: "4"
-              memory: 2Gi
+              memory: 16Gi
           volumeMounts:
             - mountPath: /var/lib/postgresql/data/
               name: disk
@@ -63,6 +63,7 @@ spec:
       #     requests:
       #       cpu: 10m
       #       memory: 50Mi
+      terminationGracePeriodSeconds: 120
       securityContext:
         runAsUser: 0
       volumes:
