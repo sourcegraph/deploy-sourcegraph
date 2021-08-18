@@ -35,7 +35,17 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-          image: us.gcr.io/sourcegraph-dev/precise-code-intel-worker:b42301f610584d5ea01155d1fc3e3b2c4dfe807f@sha256:45068b5b3c30827f8d7c94ffb19992356a9976b8f7cf1bae7c5e87766f0090ba
+            - name: JAEGER_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: JAEGER_AGENT_PORT
+              value: "6831"
+            - name: JAEGER_SAMPLER_TYPE
+              value: const
+            - name: JAEGER_SAMPLER_PARAM
+              value: "1"
+          image: us.gcr.io/sourcegraph-dev/precise-code-intel-worker:746499254698a34fe5c0b6b5934f095a82cb953a@sha256:da7aff16eeddfb04850c816eea882c01c367b50b92caa553141177b9bf4db8b0
           terminationMessagePolicy: FallbackToLogsOnError
           livenessProbe:
             httpGet:
