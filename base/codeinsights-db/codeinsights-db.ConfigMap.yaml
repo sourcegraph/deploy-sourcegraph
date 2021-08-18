@@ -80,7 +80,7 @@ data:
               # defaults to 'localhost'; use '*' for all
               # (change requires restart)
     #port = 5432				# (change requires restart)
-    max_connections = 20			# (change requires restart)
+    max_connections = 200			# (change requires restart)
     #superuser_reserved_connections = 3	# (change requires restart)
     #unix_socket_directories = '/var/run/postgresql'	# comma-separated list of directories
               # (change requires restart)
@@ -146,8 +146,8 @@ data:
               # (change requires restart)
     # Caution: it is not advisable to set max_prepared_transactions nonzero unless
     # you actively intend to use prepared transactions.
-    work_mem = 3184kB				# min 64kB
-    maintenance_work_mem = 254773kB		# min 1MB
+    work_mem = 5MB				# min 64kB
+    maintenance_work_mem = 1GB		# min 1MB
     #autovacuum_work_mem = -1		# min 1MB, or -1 to use maintenance_work_mem
     #max_stack_depth = 2MB			# min 100kB
     #shared_memory_type = mmap		# the default is the first option
@@ -229,7 +229,7 @@ data:
               # (change requires restart)
     #wal_init_zero = on			# zero-fill new WAL files
     #wal_recycle = on			# recycle WAL files
-    wal_buffers = 15285kB			# min 32kB, -1 sets based on shared_buffers
+    wal_buffers = 16MB			# min 32kB, -1 sets based on shared_buffers
               # (change requires restart)
     #wal_writer_delay = 200ms		# 1-10000 milliseconds
     #wal_writer_flush_after = 1MB		# measured in pages, 0 disables
@@ -240,8 +240,8 @@ data:
     # - Checkpoints -
 
     #checkpoint_timeout = 5min		# range 30s-1d
-    max_wal_size = 1GB
-    min_wal_size = 512MB
+    max_wal_size = 8GB
+    min_wal_size = 2GB
     checkpoint_completion_target = 0.9	# checkpoint target duration, 0.0 - 1.0
     #checkpoint_flush_after = 256kB		# measured in pages, 0 disables
     #checkpoint_warning = 30s		# 0 disables
@@ -403,7 +403,7 @@ data:
 
     #min_parallel_table_scan_size = 8MB
     #min_parallel_index_scan_size = 512kB
-    effective_cache_size = 1492MB
+    effective_cache_size = 12GB
 
     # - Genetic Query Optimizer -
 
