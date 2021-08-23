@@ -68,6 +68,8 @@ spec:
               name: disk
             - mountPath: /conf
               name: pgsql-conf
+            - mountPath: /dev/shm
+              name: dshm
         - name: pgsql-exporter
           env:
             - name: DATA_SOURCE_NAME
@@ -94,3 +96,7 @@ spec:
           configMap:
             defaultMode: 0777
             name: pgsql-conf
+        - name: dshm
+            emptyDir:
+              medium: Memory
+              sizeLimit: 8GB
