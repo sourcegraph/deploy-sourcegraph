@@ -97,7 +97,7 @@ spec:
         configMap:
           defaultMode: 0777
           name: pgsql-conf
-      - name: dshm # This is a weird thing to exceed the 64mb limit in k8s on shared memory for postgres. The sizeLimit value should match the shared_buffer size in the pgsql configuration.
+      - name: dshm # Allocate shared memory to match the shared_buffers value  
         emptyDir:
           medium: Memory
           sizeLimit: 1G
