@@ -69,6 +69,8 @@ spec:
           name: disk
         - mountPath: /conf
           name: pgsql-conf
+        - mountPath: /dev/shm
+          name: dshm
       - env:
         - name: DATA_SOURCE_NAME
           value: postgres://sg:@localhost:5432/?sslmode=disable
@@ -95,3 +97,7 @@ spec:
         configMap:
           defaultMode: 0777
           name: pgsql-conf
+      - name: dshm # This is a weird thing to exceed the 64mb limit in k8s on shared memory for postgres. The sizeLimit value should match the shared_buffer size in the pgsql configuration.
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1G
