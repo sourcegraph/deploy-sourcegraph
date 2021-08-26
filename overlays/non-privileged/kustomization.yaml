@@ -4,7 +4,9 @@ namespace: ns-sourcegraph
 resources:
   - ../bases/deployments
   - ../bases/pvcs
-  - frontend/sourcegraph-frontend.RoleBinding.yaml
+  - frontend/sourcegraph-frontend.Role.yaml
+  - frontend/sourcegraph-frontend-viewer.RoleBinding.yaml
+  - frontend/sourcegraph-frontend-nonprivileged.RoleBinding.yaml
   - prometheus/prometheus.RoleBinding.yaml
 patchesStrategicMerge:
   - codeintel-db/codeintel-db.Deployment.yaml
