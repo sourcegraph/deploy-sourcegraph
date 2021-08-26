@@ -26,12 +26,14 @@ spec:
     spec:
       containers:
       - name: timescaledb
-        image: index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:89b9cd78f1424039c4847f8f28b4e69ff27e4b3bbf665054f009548ada5a9b46
+        image: index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:447566bf781c0343fde9b6f0193137e27864ba2e91acc9262296cdb4400281eb
         env:
         - name: POSTGRES_PASSWORD # Accessible by Sourcegraph applications on the network only, so password auth is not used.
           value: password
         - name: PGDATA
           value: /var/lib/postgresql/data/pgdata
+        - name: POSTGRESQL_CONF_DIR
+          value: "/conf"
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 5432
