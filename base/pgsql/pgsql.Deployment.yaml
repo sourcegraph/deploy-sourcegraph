@@ -69,6 +69,8 @@ spec:
           name: disk
         - mountPath: /conf
           name: pgsql-conf
+        - mountPath: /dev/shm
+          name: dshm
       - env:
         - name: DATA_SOURCE_NAME
           value: postgres://sg:@localhost:5432/?sslmode=disable
@@ -95,3 +97,7 @@ spec:
         configMap:
           defaultMode: 0777
           name: pgsql-conf
+      - name: dshm # Allocate shared memory to match the shared_buffers value  
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1G
