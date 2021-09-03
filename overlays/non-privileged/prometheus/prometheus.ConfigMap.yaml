@@ -7,15 +7,10 @@ data:
 
     alerting:
       alertmanagers:
-        - kubernetes_sd_configs:
-          - role: endpoints
-            namespaces:
-              names:
-                - ns-sourcegraph
-          relabel_configs:
-            - source_labels: [__meta_kubernetes_service_name]
-              regex: alertmanager
-              action: keep
+        # Bundled Alertmanager, started by prom-wrapper
+        - static_configs:
+            - targets: ['127.0.0.1:9093']
+          path_prefix: /alertmanager
 
     rule_files:
       - '*_rules.yml'
