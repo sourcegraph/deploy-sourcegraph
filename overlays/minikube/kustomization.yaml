@@ -1,14 +1,14 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: ns-sourcegraph
-bases:
+resources:
   - ../bases/deployments
   - ../bases/rbac-roles
   - ../bases/pvcs
 patchesStrategicMerge:
   - prometheus/prometheus.ClusterRoleBinding.yaml
   - cadvisor/cadvisor.ClusterRoleBinding.yaml
-patchesJson6902:
+patches:
   - target:
       kind: Deployment
       name: sourcegraph-frontend
@@ -125,37 +125,14 @@ patchesJson6902:
     path: delete-resources.yaml      
   - target:
       kind: PersistentVolumeClaim
-      name: prometheus
-      version: v1
-    path: replace-storageclassname.yaml
+    patch: |- 
+      - op: replace
+        path: /spec/storageClassName
+        # This is the default storage class for minikube
+        value: standard
   - target:
       kind: PersistentVolumeClaim
-      name: pgsql
-      version: v1
-    path: replace-storageclassname.yaml
-  - target:
-      kind: PersistentVolumeClaim
-      name: redis-cache
-      version: v1
-    path: replace-storageclassname.yaml
-  - target:
-      kind: PersistentVolumeClaim
-      name: redis-store
-      version: v1
-    path: replace-storageclassname.yaml
-  - target:
-      kind: PersistentVolumeClaim
-      name: codeintel-db
-      version: v1
-    path: replace-storageclassname.yaml
-  - target:
-      kind: PersistentVolumeClaim
-      name: minio
-      version: v1
-    path: replace-storageclassname.yaml
-  - target:
-      kind: PersistentVolumeClaim
-      name: codeinsights-db
-      version: v1
-    path: replace-storageclassname.yaml    
-
+    patch: |-
+      - op: replace 
+        path: /spec/resources/requests/storage
+        value: 10Gi
