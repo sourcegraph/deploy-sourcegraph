@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   annotations:
     description: Saved search query runner / notification service.
+    kubectl.kubernetes.io/default-container: query-runner
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
@@ -28,7 +29,7 @@ spec:
     spec:
       containers:
       - name: query-runner
-        image: index.docker.io/sourcegraph/query-runner:insiders@sha256:d0523ae382b4bb279fdc6346ab270e99041be5e41b8465ea742b8de00e3e46e6
+        image: index.docker.io/sourcegraph/query-runner:insiders@sha256:ecf3635de924bf173b88ea6416a787c6e021dfa88e3ae9ea24ee21f662283731
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 3183
@@ -40,7 +41,7 @@ spec:
           requests:
             cpu: 500m
             memory: 1G
-      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:d9a509b9267efae4b6f316789302ea9d460bd81551cead8b56485327b64da968
+      - image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:bdf311cfb02b4799a9a42173ff0539768b0581759e3981e7c611b805fe1f1c8e
         name: jaeger-agent
         env:
           - name: POD_NAME
