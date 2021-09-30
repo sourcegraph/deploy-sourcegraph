@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: not-used
+spec:
+  template:
+    spec:
+      containers:
+        - name: zoekt-webserver
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          volumeMounts:
+          - name: ci-volume
+            mountPath: /data
+            subPathExpr: $(POD_NAME)
+        - name: zoekt-indexserver
+          env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+          volumeMounts:
+          - name: ci-volume
+            mountPath: /data
+            subPathExpr: $(POD_NAME)
+      volumes:
+        - name: ci-volume
+          hostPath:
+            path: /mnt/disks/ssd0/buildkite/cluster-statefulset/
+            type: DirectoryOrCreate

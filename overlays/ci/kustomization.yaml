@@ -1,0 +1,263 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+
+resources:
+- ../bases/deployments
+- ../bases/rbac-roles
+              
+patches:
+- patch: |-
+    - op: remove
+      path: /spec/volumeClaimTemplates
+  target:
+    kind: StatefulSet
+# - patch: |-
+#     - op: add
+#       path: /spec/template/spec/volumes
+#       value: 
+#         volumes:
+#         - name: ci-volume
+#           hostPath:
+#             path: /mnt/disks/ssd0/buildkite/cluster-statefulset/
+#             type: DirectoryOrCreate
+#   target:
+#     kind: StatefulSet
+- path: index-server-patch.yaml
+  target:
+    kind: StatefulSet
+    name: indexed-search
+- path: gitserver-patch.yaml
+  target:
+    kind: StatefulSet
+    name: gitserver
+- path: grafana-patch.yaml
+  target:
+    kind: StatefulSet
+    name: grafana
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: unused
+    spec:
+      template:
+        spec:
+          containers:
+          - name: pgsql
+            env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            volumeMounts:
+            - mountPath: /conf
+              name: pgsql-conf
+            - mountPath: /data
+              name: disk
+              subPathExpr: $(POD_NAME)
+          volumes:
+          - name: disk
+            hostPath:
+              path: /mnt/disks/ssd0/buildkite/cluster-deployments/
+              type: DirectoryOrCreate
+            persistentVolumeClaim: null
+          - name: pgsql-conf
+            configMap:
+              defaultMode: 0777
+              name: pgsql-conf
+  target:
+    kind: Deployment
+    name: pgsql
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: unused
+    spec:
+      template:
+        spec:
+          containers:
+          - name: pgsql
+            env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            volumeMounts:
+            - mountPath: /conf
+              name: pgsql-conf
+            - mountPath: /data
+              name: disk
+              subPathExpr: $(POD_NAME)
+          volumes:
+          - name: disk
+            hostPath:
+              path: /mnt/disks/ssd0/buildkite/cluster-deployments/
+              type: DirectoryOrCreate
+            persistentVolumeClaim: null
+          - name: pgsql-conf
+            configMap:
+              defaultMode: 0777
+              name: codeintel-db-conf
+  target:
+    kind: Deployment
+    name: codeintel-db
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: unused
+    spec:
+      template:
+        spec:
+          containers:
+          - name: timescaledb
+            env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            volumeMounts:
+            - mountPath: /conf
+              name: timescaledb-conf
+            - mountPath: /var/lib/postgresql/data/
+              name: disk
+              subPathExpr: $(POD_NAME)
+          volumes:
+          - name: disk
+            hostPath:
+              path: /mnt/disks/ssd0/buildkite/cluster-deployments/
+              type: DirectoryOrCreate
+            persistentVolumeClaim: null              
+          - name: timescaledb-conf
+            configMap:
+              defaultMode: 0777
+              name: codeinsights-db-conf
+  target:
+    kind: Deployment
+    name: codeinsights-db
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: unused
+    spec:
+      template:
+        spec:
+          containers:
+          - name: prometheus
+            env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            volumeMounts:
+            - mountPath: /prometheus
+              name: data
+              subPathExpr: $(POD_NAME)
+            - mountPath: /sg_prometheus_add_ons
+              name: config
+          volumes:
+          - name: data
+            hostPath:
+              # directory location on host
+              path: /mnt/disks/ssd0/buildkite/cluster-deployments/
+              type: DirectoryOrCreate
+            persistentVolumeClaim: null
+  target:
+    kind: Deployment
+    name: prometheus
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: unused
+    spec:
+      template:
+        spec:
+          containers:
+          - name: minio
+            env:
+              - name: POD_NAME
+                valueFrom:
+                  fieldRef:
+                    apiVersion: v1
+                    fieldPath: metadata.name
+            volumeMounts:
+            - mountPath: data
+              name: minio-data
+              subPathExpr: $(POD_NAME)
+          volumes:
+            - name: minio-data
+              hostPath:
+                path: /mnt/disks/ssd0/buildkite/cluster-deployments/
+                type: DirectoryOrCreate
+              persistentVolumeClaim: null
+  target:
+    kind: Deployment
+    name: minio
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: unused
+    spec:
+      template:
+        spec:
+          containers:
+          - name: redis-store
+            env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            volumeMounts:
+            - mountPath: /redis-data
+              name: redis-data
+              subPathExpr: $(POD_NAME)
+          volumes:
+          - name: redis-data
+            hostPath:
+              # directory location on host
+              path: /mnt/disks/ssd0/buildkite/cluster-deployments/
+              type: DirectoryOrCreate
+            persistentVolumeClaim: null
+  target:
+    kind: Deployment
+    name: redis-store
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: unused
+    spec:
+      template:
+        spec:
+          containers:
+          - name: redis-cache
+            env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+            volumeMounts:
+            - mountPath: /redis-data
+              name: redis-data
+              subPathExpr: $(POD_NAME)
+          volumes:
+          - name: redis-data
+            hostPath:
+              # directory location on host
+              path: /mnt/disks/ssd0/buildkite/cluster-deployments/
+              type: DirectoryOrCreate
+            persistentVolumeClaim: null            
+  target:
+    kind: Deployment
+    name: redis-cache
