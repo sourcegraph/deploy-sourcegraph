@@ -35,7 +35,6 @@ func getImages(dir string) error {
 		}
 
 		if strings.HasPrefix(path, ".git") {
-			// Highly doubt anyone would ever want us to traverse git directories.
 			return nil
 		}
 
@@ -51,23 +50,6 @@ func getImages(dir string) error {
 			matches = append(matches, match)
 		}
 
-		// for _, image := range matches {
-		// 	var count int
-		// 	for _, upstream := range ciimages.DeploySourcegraphDockerImages {
-		// 		fmt.Printf("testing image: %s from file %s and upstream: %s\n", image, path, upstream)
-		// 		if image == upstream {
-		// 			fmt.Printf("the count is: %v\n", count)
-		// 			count++
-		// 			break
-		// 		}
-		// 	}
-		// 	if count < 1 {
-		// 		fmt.Printf("image: %s found in %s has no valid match upstream\n", image, path)
-		// 		os.Exit(1)
-		// 	} else {
-		// 		fmt.Printf("Found match for %s in %s\n", image, path)
-		// 	}
-		// }
 		return nil
 
 	})
