@@ -38,9 +38,6 @@ func getImages(dir string) error {
 			// Highly doubt anyone would ever want us to traverse git directories.
 			return nil
 		}
-		if !strings.HasSuffix(path, ".yaml") {
-			return nil
-		}
 
 		data, err := ioutil.ReadFile(path)
 		if err != nil {
