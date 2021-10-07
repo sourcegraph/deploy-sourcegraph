@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	ciimages "github.com/sourcegraph/sourcegraph/enterprise/dev/ci/images"
+	images "github.com/sourcegraph/sourcegraph/enterprise/dev/ci/images"
 )
 
 func main() {
@@ -56,7 +56,7 @@ func getImages(dir string) error {
 
 	matches = Unique(matches)
 	for i, image := range matches {
-		if image != ciimages.SourcegraphDockerImages[i] {
+		if image != images.SourcegraphDockerImages[i] {
 			fmt.Printf("image: %s was found in is not in the upstream list.\n", image)
 		}
 	}
