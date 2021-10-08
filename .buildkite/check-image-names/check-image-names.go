@@ -13,21 +13,25 @@ import (
 	"github.com/sourcegraph/sourcegraph/enterprise/dev/ci/images"
 )
 
+var (
+	i       = regexp.MustCompile(`image: index\.docker\.io\/sourcegraph/(?P<image>[a-z0-9-_.]+):[a-z0-9-_]+@sha256:[[:alnum:]]+`)
+	matches []string
+	data    []byte
+)
+
 func main() {
 
 	path := os.Args[1]
 
-	getImages(path)
+	checkImages(path)
 
 }
 
-func getImages(dir string) error {
+func checkImages(path string) error {
 
-	i := regexp.MustCompile(`image: index\.docker\.io\/sourcegraph/(?P<image>[a-z0-9-_.]+):[a-z0-9-_]+@sha256:[[:alnum:]]+`)
-	var matches []string
-
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
+			fmt.Println(err)
 			return err
 		}
 		if info.IsDir() {
@@ -38,7 +42,7 @@ func getImages(dir string) error {
 			return nil
 		}
 
-		data, err := ioutil.ReadFile(path)
+		data, err = ioutil.ReadFile(path)
 		if err != nil {
 			return errors.Wrap(err, "when reading file contents")
 		}
@@ -54,7 +58,6 @@ func getImages(dir string) error {
 		}
 
 		return nil
-
 	})
 	matches = Unique(matches)
 	for i, image := range matches {
@@ -63,7 +66,6 @@ func getImages(dir string) error {
 			os.Exit(1)
 		}
 	}
-
 	return err
 
 }
