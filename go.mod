@@ -4,7 +4,6 @@ go 1.16
 
 require (
 	cloud.google.com/go/logging v1.4.2 // indirect
-	github.com/Masterminds/semver/v3 v3.1.0
 	github.com/docker/docker v1.13.1 // indirect
 	github.com/fatih/color v1.10.0 // indirect
 	github.com/pkg/errors v0.9.1
@@ -16,6 +15,7 @@ require (
 	github.com/stretchr/testify v1.7.0 // indirect
 	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
+	gotest.tools/v3 v3.0.3
 )
 
 replace github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.4.3+incompatible
