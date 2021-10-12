@@ -62,8 +62,8 @@ func CheckImages(path string) error {
 	matches = Unique(matches)
 	for i, image := range matches {
 		if image != images.DeploySourcegraphDockerImages[i] {
-			err := fmt.Errorf("image: %s is not in the upstream list", image)
-			return err
+			return fmt.Errorf("image: %s is not in the upstream list", image)
+			// return err
 		}
 	}
 
