@@ -53,8 +53,8 @@ func CheckImages(path string) error {
 		// to compare with upstream.
 		matchedImages := i.FindAllSubmatch(data, -1)
 		for _, match := range matchedImages {
-			matched := string(match[1])
-			matches = append(matches, matched)
+			matchd := string(match[1])
+			matches = append(matches, matchd)
 		}
 
 		return nil
@@ -63,7 +63,6 @@ func CheckImages(path string) error {
 	for i, image := range matches {
 		if image != images.DeploySourcegraphDockerImages[i] {
 			return fmt.Errorf("image: %s is not in the upstream list", image)
-			// return err
 		}
 	}
 
