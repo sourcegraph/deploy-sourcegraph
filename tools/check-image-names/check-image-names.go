@@ -53,8 +53,8 @@ func CheckImages(path string) error {
 		// to compare with upstream.
 		matchedImages := i.FindAllSubmatch(data, -1)
 		for _, match := range matchedImages {
-			matchd := string(match[1])
-			matches = append(matches, matchd)
+			matched := string(match[1])
+			matches = append(matches, matched)
 		}
 
 		return nil
