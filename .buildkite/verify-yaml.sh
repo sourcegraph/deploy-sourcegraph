@@ -3,7 +3,7 @@
 set -ex
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-./tests/integration/validation/verify-kubeval.sh
+./tests/integration/validation/verify-yaml.sh
 
 gcloud container clusters get-credentials dogfood --zone us-central1-f --project sourcegraph-dogfood
 
