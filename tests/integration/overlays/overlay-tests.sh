@@ -59,3 +59,9 @@ setup_restricted
 deploy_restricted
 verify
 cleanup_restricted
+
+. base.sh
+setup_base
+deploy_base
+verify
+cleanup_base
