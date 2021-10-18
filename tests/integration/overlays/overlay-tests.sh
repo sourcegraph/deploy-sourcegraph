@@ -65,3 +65,11 @@ setup_base
 deploy_base
 verify
 cleanup_base
+
+# FIXME: This is actually failing:
+#statefulsets.apps "gitserver" is forbidden: User "system:serviceaccount:default:sourcegraph-frontend" cannot list resource "statefulsets" in API group "apps" in the namespace "default"
+. storage.sh
+setup_storage
+deploy_storage
+verify
+cleanup_storage
