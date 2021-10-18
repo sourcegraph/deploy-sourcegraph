@@ -73,3 +73,9 @@ setup_storage
 deploy_storage
 verify
 cleanup_storage
+
+. namespaced.sh
+setup_namespaced
+deploy_namespaced
+verify
+cleanup_namespaced
