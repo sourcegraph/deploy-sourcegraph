@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   annotations:
     description: Backend for symbols operations.
+    kubectl.kubernetes.io/default-container: symbols
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
@@ -40,7 +41,7 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: index.docker.io/sourcegraph/symbols:insiders@sha256:e677ee54036feb05cf2f1a421849b8f8660ddd3bcc51b34b4976c0bfe30df05c
+        image: index.docker.io/sourcegraph/symbols:insiders@sha256:468ce5a77133f508f1ef5f4010b7676c4db7f6795137f768e36fc46ee5c6c072
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -74,7 +75,7 @@ spec:
         - mountPath: /mnt/cache
           name: cache-ssd
       - name: jaeger-agent
-        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:5af6b3a52b2d1307ec321c3d423b524c2ddd82287727c2ab60835bb286fc3b8b
+        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:b980c65f7675a83c2181ba9b5d98efd257709dec1c261d1f93197238076249ab
         env:
           - name: POD_NAME
             valueFrom:

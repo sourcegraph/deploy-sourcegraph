@@ -3,6 +3,7 @@ kind: StatefulSet
 metadata:
   annotations:
     description: Stores clones of repositories to perform Git operations.
+    kubectl.kubernetes.io/default-container: gitserver
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
@@ -26,7 +27,7 @@ spec:
       containers:
       - name: gitserver
         args: ["run"]
-        image: index.docker.io/sourcegraph/gitserver:insiders@sha256:e0d2b3e8cf99554a6ab354155bed3807366f61519f6684b3694d6cd4f2ca74ab
+        image: index.docker.io/sourcegraph/gitserver:insiders@sha256:37f04a63676a2496bfb87f55442e574dc20dcba66a8ebd636c7f7212fef2e0d4
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 5
@@ -51,7 +52,7 @@ spec:
         # - mountPath: /root/.ssh
         #   name: ssh
       - name: jaeger-agent
-        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:5af6b3a52b2d1307ec321c3d423b524c2ddd82287727c2ab60835bb286fc3b8b
+        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:b980c65f7675a83c2181ba9b5d98efd257709dec1c261d1f93197238076249ab
         env:
           - name: POD_NAME
             valueFrom:

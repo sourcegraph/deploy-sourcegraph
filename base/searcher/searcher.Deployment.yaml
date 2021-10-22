@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   annotations:
     description: Backend for text search operations.
+    kubectl.kubernetes.io/default-container: searcher
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
@@ -40,7 +41,7 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        image: index.docker.io/sourcegraph/searcher:insiders@sha256:42a7d0cd560ca12347b08400f4d99c245173309f0ce889f490c81afe56b81c42
+        image: index.docker.io/sourcegraph/searcher:insiders@sha256:bde5e1eaaf73adf6e915ec47a788bdee96b72d617b89acb0e350001addc08d28
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 3181
@@ -68,7 +69,7 @@ spec:
         - mountPath: /mnt/cache
           name: cache-ssd
       - name: jaeger-agent
-        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:5af6b3a52b2d1307ec321c3d423b524c2ddd82287727c2ab60835bb286fc3b8b
+        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:b980c65f7675a83c2181ba9b5d98efd257709dec1c261d1f93197238076249ab
         env:
           - name: POD_NAME
             valueFrom:

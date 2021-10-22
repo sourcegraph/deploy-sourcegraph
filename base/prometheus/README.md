@@ -15,7 +15,7 @@ A Prometheus instance is part of the default Sourcegraph cluster installation.
 
 ## Developer notes
 
-Ensure changes here are also made in our namespaced overlay [../../overlays/namespaced/](../../overlays/namespaced/)
+Ensure changes here are also made in all namespaces that change the Prometheus ConfigMap: [`file:overlays AND file:prometheus.ConfigMap.yaml`](https://sourcegraph.com/search?q=context:global+repo:%5Egithub%5C.com/sourcegraph/deploy-sourcegraph%24+file:overlays+AND+file:prometheus.ConfigMap.yaml+&patternType=literal)
 
 ## Optional Steps
 

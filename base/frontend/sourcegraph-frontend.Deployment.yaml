@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
+    kubectl.kubernetes.io/default-container: frontend
     description: Serves the frontend of Sourcegraph via HTTP(S).
   labels:
     deploy: sourcegraph
@@ -28,7 +29,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: index.docker.io/sourcegraph/frontend:insiders@sha256:b02fa46cb2564ab1ad57dbac3011fd9c198edc64e82c899ce6cb4b738c5c91da
+        image: index.docker.io/sourcegraph/frontend:insiders@sha256:cc01a2f65e5bb9ef8d762eaa973cf1287507c74d5d4c76b3e00d278c40b356a9
         args:
         - serve
         env:
@@ -54,8 +55,6 @@ spec:
           value: disable
         - name: CODEINTEL_PGUSER
           value: sg
-        - name: SRC_GIT_SERVERS
-          value: gitserver-0.gitserver:3178
         # POD_NAME is used by CACHE_DIR
         - name: POD_NAME
           valueFrom:
@@ -106,7 +105,7 @@ spec:
         - mountPath: /mnt/cache
           name: cache-ssd
       - name: jaeger-agent
-        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:5af6b3a52b2d1307ec321c3d423b524c2ddd82287727c2ab60835bb286fc3b8b
+        image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:b980c65f7675a83c2181ba9b5d98efd257709dec1c261d1f93197238076249ab
         env:
           - name: POD_NAME
             valueFrom:

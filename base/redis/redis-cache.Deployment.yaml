@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   annotations:
     description: Redis for storing short-lived caches.
+    kubectl.kubernetes.io/default-container: redis-cache
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
@@ -25,7 +26,7 @@ spec:
     spec:
       containers:
       - name: redis-cache
-        image: index.docker.io/sourcegraph/redis-cache:insiders@sha256:35245d84f0d154d12501ea4b997fa21913939cc4ce7c4de288b44d1d7e50624c
+        image: index.docker.io/sourcegraph/redis-cache:insiders@sha256:3c83d172a9c320ef4a5a236a76df7611d7f8f76021eb3bf22b28200ce764acce
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 30
