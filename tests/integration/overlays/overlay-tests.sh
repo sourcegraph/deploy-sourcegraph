@@ -41,7 +41,7 @@ if [ "${NOCLEANUP:-}" != "true" ]; then
   CLEANUP="$CLUSTER_CLEANUP; $CLEANUP"
 fi
 
-verify () {
+verify() {
   # hit it with one request
 
   kubectl -n $NAMESPACE port-forward svc/sourcegraph-frontend 30080 &

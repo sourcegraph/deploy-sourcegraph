@@ -3,7 +3,7 @@
 OUTPUT_FOLDER=generated-cluster-namespaced
 NAMESPACE=ns-sourcegraph
 
-setup_namespaced () {
+setup_namespaced() {
   kubectl apply -f sourcegraph.StorageClass.yaml
 
   kubectl create namespace ${NAMESPACE}
@@ -16,7 +16,7 @@ EOM
   kubectl create secret -n ${NAMESPACE} generic gitserver-ssh --from-literal=rsa=supersecret --from-literal=config=topsecret
 }
 
-deploy_namespaced () {
+deploy_namespaced() {
   mkdir $OUTPUT_FOLDER
   CLEANUP="rm -rf ${OUTPUT_FOLDER}; $CLEANUP"
   "${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh namespaced ${CURRENT_DIR}/${OUTPUT_FOLDER}

@@ -3,7 +3,7 @@
 OUTPUT_FOLDER=generated-cluster-base
 NAMESPACE=default
 
-setup_base () {
+setup_base() {
   kubectl apply -f sourcegraph.StorageClass.yaml
 
   /bin/cat <<EOM >deploy_sourcegraph_git_ssh_config
@@ -14,7 +14,7 @@ EOM
   kubectl create secret -n ${NAMESPACE} generic gitserver-ssh --from-literal=rsa=supersecret --from-literal=config=topsecret
 }
 
-deploy_base () {
+deploy_base() {
   mkdir $OUTPUT_FOLDER
   CLEANUP="rm -rf ${OUTPUT_FOLDER}; $CLEANUP"
   cp -r ${DEPLOY_SOURCEGRAPH_ROOT}/base ${CURRENT_DIR}/${OUTPUT_FOLDER}

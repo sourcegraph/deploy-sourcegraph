@@ -3,7 +3,7 @@
 OUTPUT_FOLDER=generated-cluster-restricted
 NAMESPACE=ns-sourcegraph
 
-setup_restricted () {
+setup_restricted() {
   kubectl apply -f sourcegraph.StorageClass.yaml
 
   kubectl apply -f nonroot-policy.yaml
@@ -27,7 +27,7 @@ EOM
   kubectl create secret -n ${NAMESPACE} generic gitserver-ssh --from-literal=rsa=supersecret --from-literal=config=topsecret
 }
 
-deploy_restricted () {
+deploy_restricted() {
   mkdir $OUTPUT_FOLDER
   CLEANUP="rm -rf ${OUTPUT_FOLDER}; $CLEANUP"
   "${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh non-privileged-create-cluster ${CURRENT_DIR}/${OUTPUT_FOLDER}

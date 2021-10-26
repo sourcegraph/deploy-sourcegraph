@@ -3,14 +3,14 @@
 OUTPUT_FOLDER=generated-cluster-storage
 NAMESPACE=default
 
-setup_storage () {
+setup_storage() {
   cat sourcegraph.StorageClass.yaml | yj | jq '.metadata.name = "new-storageclass"' | jy -o new-storageclass.StorageClass.yaml
   kubectl apply -f new-storageclass.StorageClass.yaml
 
   PVC=${DEPLOY_SOURCEGRAPH_ROOT}/overlays/storageclass/replace-storageclass-name-pvc.yaml
-  cat $PVC| yj | jq '.[].value = "new-storageclass"' | jy -o $PVC
+  cat $PVC | yj | jq '.[].value = "new-storageclass"' | jy -o $PVC
   PVC=${DEPLOY_SOURCEGRAPH_ROOT}/overlays/storageclass/replace-storageclass-name-sts.yaml
-  cat $PVC| yj | jq '.[].value = "new-storageclass"' | jy -o $PVC
+  cat $PVC | yj | jq '.[].value = "new-storageclass"' | jy -o $PVC
 
   /bin/cat <<EOM >deploy_sourcegraph_git_ssh_config
 Host *
@@ -20,7 +20,7 @@ EOM
   kubectl create secret -n ${NAMESPACE} generic gitserver-ssh --from-literal=rsa=supersecret --from-literal=config=topsecret
 }
 
-deploy_storage () {
+deploy_storage() {
   mkdir $OUTPUT_FOLDER
   CLEANUP="rm -rf ${OUTPUT_FOLDER}; $CLEANUP"
   "${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh storageclass ${CURRENT_DIR}/${OUTPUT_FOLDER}
