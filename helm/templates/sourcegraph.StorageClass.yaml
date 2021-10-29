@@ -1,0 +1,11 @@
+{{- if .Values.storageClass.create }}
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name:  {{ .Values.storageClass.name }}
+  labels:
+    deploy: sourcegraph-storage
+provisioner: kubernetes.io/gce-pd
+parameters:
+  type: pd-ssd # This configures SSDs (recommended).
+{{- end -}}

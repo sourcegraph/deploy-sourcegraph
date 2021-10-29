@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Backend for indexed text search operations.
+  labels:
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: indexed-search
+  name: indexed-search
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: indexed-search
+  serviceName: indexed-search
+  template:
+    metadata:
+      labels:
+        app: indexed-search
+        deploy: sourcegraph
+    spec:
+      containers:
+      - name: zoekt-webserver
+        image: index.docker.io/sourcegraph/indexed-searcher:3.33.0@sha256:7855ac5b971a02e4f40a51606b8869ca134eafa836d2f2a282e28f75fbf5a7db
+        terminationMessagePolicy: FallbackToLogsOnError
+        ports:
+        - containerPort: 6070
+          name: http
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4G
+          requests:
+            cpu: 500m
+            memory: 2G
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      - name: zoekt-indexserver
+        image: index.docker.io/sourcegraph/search-indexer:3.33.0@sha256:4004fc3330b0e8a362690cc411c3f0780a8840b94e5faa7f4067399d9fd61c1a
+        terminationMessagePolicy: FallbackToLogsOnError
+        ports:
+        - containerPort: 6072
+          name: index-http
+        resources:
+          # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
+          # lower lag between a new commit and it being indexed for search.
+          limits:
+            cpu: "8"
+            memory: 8G
+          requests:
+            cpu: "4"
+            memory: 4G
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: data
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      labels:
+        deploy: sourcegraph
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          # The size of disk to used for search indexes.
+          # This should typically be gitserver disk size multipled by the number of gitserver shards.
+          storage: 200Gi
+      storageClassName: {{ .Values.storageClass.name }}

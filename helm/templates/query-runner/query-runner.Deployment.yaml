@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Saved search query runner / notification service.
+    kubectl.kubernetes.io/default-container: query-runner
+  labels:
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: query-runner
+  name: query-runner
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: query-runner
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        deploy: sourcegraph
+        app: query-runner
+    spec:
+      containers:
+      - name: query-runner
+        image: index.docker.io/sourcegraph/query-runner:3.33.0@sha256:f0236d1008b9806e6c3f7ca49dcc42ac89fb0d598555e878b968fdda95d72a3f
+        terminationMessagePolicy: FallbackToLogsOnError
+        ports:
+        - containerPort: 3183
+          name: http
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1G
+          requests:
+            cpu: 500m
+            memory: 1G
+      - image: index.docker.io/sourcegraph/jaeger-agent:3.33.0@sha256:3c3bb9885b86b720039aceaf5ffd826c1ef5e8121e063f9274a3de3aab660fb0
+        name: jaeger-agent
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+        ports:
+        - containerPort: 5775
+          protocol: UDP
+        - containerPort: 5778
+          protocol: TCP
+        - containerPort: 6831
+          protocol: UDP
+        - containerPort: 6832
+          protocol: UDP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 500M
+          requests:
+            cpu: 100m
+            memory: 100M
+        args:
+          - --reporter.grpc.host-port=jaeger-collector:14250
+          - --reporter.type=grpc
+      securityContext:
+        runAsUser: 0
