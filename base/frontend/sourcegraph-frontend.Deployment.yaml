@@ -28,32 +28,32 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: index.docker.io/sourcegraph/frontend:3.28.0@sha256:3cf4f8380659c0f27544e836ac88b57a46b8dfb0cd85429edcd85dbe25104c32
+        image: 355207333203.dkr.ecr.us-west-2.amazonaws.com/sourcegraph-frontend:3.28.0-ajacobs-sourcegraph-with-chamber # TODO: replace this with non-branched image
         args:
         - serve
         env:
         - name: PGDATABASE
-          value: sg
+          value: FROM_CHAMBER
         - name: PGHOST
-          value: pgsql
+          value: sourcegraph.ckoaaogeaxdh.us-west-2.rds.amazonaws.com # sourcegraph-pg from terracode-tooling/stage/us-west-2/sourcegraph/rds.tf
         - name: PGPORT
           value: "5432"
         - name: PGSSLMODE
-          value: disable
+          value: require
         - name: PGUSER
-          value: sg
+          value: FROM_CHAMBER
         - name: CODEINSIGHTS_PGDATASOURCE
           value: postgres://postgres:password@codeinsights-db:5432/postgres
         - name: CODEINTEL_PGDATABASE
-          value: sg
+          value: FROM_CHAMBER
         - name: CODEINTEL_PGHOST
-          value: codeintel-db
+          value: sourcegraph-codeintel.ckoaaogeaxdh.us-west-2.rds.amazonaws.com # sourcegraph-codeintel-pg from terracode-tooling/stage/us-west-2/sourcegraph/rds.tf
         - name: CODEINTEL_PGPORT
           value: "5432"
         - name: CODEINTEL_PGSSLMODE
-          value: disable
+          value: require
         - name: CODEINTEL_PGUSER
-          value: sg
+          value: FROM_CHAMBER
         - name: SRC_GIT_SERVERS
           value: gitserver-0.gitserver:3178
         # POD_NAME is used by CACHE_DIR
