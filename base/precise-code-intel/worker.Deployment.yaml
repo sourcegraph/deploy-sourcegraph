@@ -29,13 +29,27 @@ spec:
       containers:
       - name: precise-code-intel-worker
         env:
+        # BEGIN EXTERNAL BLOB STORAGE CONFIGURATION
+        - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
+          value: S3
+        - name: PRECISE_CODE_INTEL_UPLOAD_BUCKET
+          value: sourcegraph-precise-code-intel-stage-usw2 # precise-code-intel-bucket from terracode-tooling/stage/us-west-2/sourcegraph/s3.tf
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ACCESS_KEY_ID
+          value: FROM_CHAMBER
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_SECRET_ACCESS_KEY
+          value: FROM_CHAMBER
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_REGION
+          value: us-west-2
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
+          value: https://s3.$(PRECISE_CODE_INTEL_UPLOAD_AWS_REGION).amazonaws.com
+        # END EXTERNAL BLOB STORAGE CONFIGURATION
         - name: NUM_WORKERS
           value: '4'
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/precise-code-intel-worker:3.28.0@sha256:80f0ad97f81f63fca0cd062e6be7a15642f4bc187ea9280cb658dd32edd1016d
+        image: 355207333203.dkr.ecr.us-west-2.amazonaws.com/sourcegraph-precise-code-intel-worker:3.28.0 # image built in sourcegraph/images repo
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
