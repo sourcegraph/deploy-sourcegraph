@@ -12,6 +12,7 @@ spec:
           allowPrivilegeEscalation: false
           runAsUser: 100
           runAsGroup: 101
+          readOnlyRootFilesystem: true
       # See the customization guide (../../../docs/configure.md) for information
       # about configuring gitserver to use an SSH key. Note that the mount path changes
       # from /root to /home/sourcegraph with this non-root overlay. Don't forget to uncomment
@@ -24,6 +25,12 @@ spec:
           allowPrivilegeEscalation: false
           runAsUser: 100
           runAsGroup: 101
+          readOnlyRootFilesystem: true
+      securityContext:
+        runAsUser: 100
+        runAsGroup: 101
+        fsGroup: 101
+        fsGroupChangePolicy: "OnRootMismatch"          
       # Uncomment this section along with the other section (see the docstring above the `mountPath` block above) if you're using a SSH key for git cloning.
       # volumes:
       # - name: ssh

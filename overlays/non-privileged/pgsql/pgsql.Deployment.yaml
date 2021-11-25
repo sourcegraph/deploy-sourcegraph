@@ -12,6 +12,7 @@ spec:
           allowPrivilegeEscalation: false
           runAsUser: 999
           runAsGroup: 999
+          readOnlyRootFilesystem: true
       containers:
       - name: pgsql
         securityContext:
@@ -19,6 +20,17 @@ spec:
           allowPrivilegeEscalation: false
           runAsUser: 999
           runAsGroup: 999
+          readOnlyRootFilesystem: true
+        volumeMounts:
+            - mountPath: /var/run/postgresql
+              name: lockdir          
       securityContext:
         # Required to prevent escalations to root.
         runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        fsGroupChangePolicy: "OnRootMismatch"        
+      volumes:
+      - emptyDir: {}
+        name: lockdir 
+

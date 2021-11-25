@@ -12,3 +12,14 @@ spec:
           allowPrivilegeEscalation: false
           runAsUser: 100
           runAsGroup: 101
+        volumeMounts:
+          - name: minio
+            mountPath: /minio
+      securityContext:
+        runAsUser: 100
+        runAsGroup: 101      
+        fsGroup: 101
+        fsGroupChangePolicy: "OnRootMismatch"            
+      volumes:
+      - emptyDir: {}
+        name: minio

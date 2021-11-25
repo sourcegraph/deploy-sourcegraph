@@ -12,6 +12,16 @@ spec:
             allowPrivilegeEscalation: false
             runAsUser: 70
             runAsGroup: 70
+            readOnlyRootFilesystem: true
+          volumeMounts:
+          - mountPath: /var/run/postgresql
+            name: lockdir
       securityContext:
         # Required to prevent escalations to root, postgres runs as this user
-        runAsUser: 70 
+        runAsUser: 70
+        fsGroup: 70
+        fsGroupChangePolicy: "OnRootMismatch"         
+      volumes:
+      - emptyDir: {}
+        name: lockdir
+
