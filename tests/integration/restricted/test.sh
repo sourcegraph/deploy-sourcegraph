@@ -64,7 +64,7 @@ kubectl create secret -n ns-sourcegraph generic gitserver-ssh --from-literal=rsa
 
 mkdir generated-cluster
 CLEANUP="rm -rf generated-cluster; $CLEANUP"
-"${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh non-privileged-create-cluster ${CURRENT_DIR}/generated-cluster
+"${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh non-privileged ${CURRENT_DIR}/generated-cluster
 
 GS=${CURRENT_DIR}/generated-cluster/apps_v1_statefulset_gitserver.yaml
 cat $GS | yj | jq '.spec.template.spec.containers[].volumeMounts += [{mountPath: "/home/sourcegraph/.ssh", name: "ssh"}]' | jy -o $GS
