@@ -1,18 +1,31 @@
 steps:
   - label: ":k8s:"
     command: .buildkite/verify-yaml.sh
+    agents: { queue: standard }
+
   - label: ":k8s:"
     command: .buildkite/verify-label.sh
+    agents: { queue: standard }
+
   - label: ":k8s:"
     command: .buildkite/verify-rbac-labels.sh
+    agents: { queue: standard }
+
   - label: ':lipstick:'
     command: .buildkite/prettier-check.sh
+    agents: { queue: standard }
+
   - label: ':lipstick:'
     command: .buildkite/shfmt.sh
+    agents: { queue: standard }
+
   - label: ":git: :sleuth_or_spy:"
     command: .buildkite/verify-release/verify-release.sh
+    agents: { queue: standard }
+
   - label: ":k8s: :sleuth_or_spy:" 
     command: .buildkite/check-image-names.sh
+    agents: { queue: standard }
 
   - wait
 
@@ -25,6 +38,7 @@ steps:
       # Can be set to true to help debug test results, but ensure that created resources
       # are removed manually
       NOCLEANUP: "false"
+    agents: { queue: standard }
 
   - label: ":k8s:"
     concurrency: 3
@@ -34,3 +48,4 @@ steps:
       # Can be set to true to help debug test results, but ensure that created resources
       # are removed manually
       NOCLEANUP: "false"
+    agents: { queue: standard }
