@@ -172,6 +172,10 @@ patches:
         spec:
           containers:
           - name: minio
+            args: 
+            - minio
+            - server
+            - /data-minio
             env:
               - name: POD_NAME
                 valueFrom:
@@ -179,9 +183,10 @@ patches:
                     apiVersion: v1
                     fieldPath: metadata.name
             volumeMounts:
-            - mountPath: data
+            - mountPath: /data-minio
               name: minio-data
               subPathExpr: $(POD_NAME)
+          
           volumes:
             - name: minio-data
               hostPath:
