@@ -1,14 +1,17 @@
 {
   "$schema": "http://json.schemastore.org/renovate",
   "extends": ["config:base"],
-  "enabled": false,
-  "prHourlyLimit": 0,
+  "enabled": true,
+  "prHourlyLimit": 5,
   "masterIssue": true,
   "pinDigests": true,
   "baseBranches": ["master"],
   "kubernetes": {
     "fileMatch": ["(^|/)[^/]*\\.yaml$"]
   },
+  "schedule": [
+    "before 3am on Monday"
+  ],
   "packageRules": [
     {
       "groupName": "Sourcegraph Docker insiders images",
