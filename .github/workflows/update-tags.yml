@@ -11,8 +11,8 @@ jobs:
   dispatch:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # renovate: tag=v2
+      - uses: actions/setup-go@331ce1d993939866bb63c32c6cbbfd48fa76fc57 # renovate: tag=v2
         with:
           go-version: '^1.14'
 
@@ -20,7 +20,7 @@ jobs:
       - name: Pin tags to ${{ github.event.inputs.semver }}
         run: tools/update-docker-tags.sh "${{ github.event.inputs.semver }}"
       - name: Open pull request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@dcd5fd746d53dd8de555c0f10bca6c35628be47a # renovate: tag=v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           base: ${{ github.event.inputs.branch }}
