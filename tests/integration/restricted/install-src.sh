@@ -4,8 +4,8 @@ if [ ! "$(which src)" ]; then
   echo "Installing src to /usr/local/bin"
   mkdir -p /tmp/src
   cd /tmp/src
-  wget https://github.com/sourcegraph/src-cli/releases/download/3.21.7/src-cli_3.21.7_linux_amd64.tar.gz
-  tar xvzf src-cli_3.21.7_linux_amd64.tar.gz
+  wget https://github.com/sourcegraph/src-cli/releases/download/3.35.0/src-cli_3.35.0_linux_amd64.tar.gz
+  tar xvzf src-cli_3.35.0_linux_amd64.tar.gz
   cp src /usr/local/bin/src
   chmod a+x /usr/local/bin/src
 fi
