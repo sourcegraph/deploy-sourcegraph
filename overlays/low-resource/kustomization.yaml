@@ -366,7 +366,23 @@ patches:
   target:
     kind: Deployment
     name: redis-cache
-
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: unused
+    spec:
+      template:
+        spec:
+          containers:
+            - name: frontend
+              env:
+              - name: NEW_MIGRATIONS
+                value: true
+  target:
+    kind: Deployment
+    name: sourcegraph-frontend                
+    
 patchesStrategicMerge:
 - cadvisor/delete-Daemonset.yaml
 - cadvisor/delete-ClusterRole.yaml
