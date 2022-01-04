@@ -378,10 +378,58 @@ patches:
             - name: frontend
               env:
               - name: NEW_MIGRATIONS
-                value: true
+                value: "true"
   target:
     kind: Deployment
-    name: sourcegraph-frontend                
+    name: sourcegraph-frontend  
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: unused
+    spec:
+      template:
+        spec:
+          containers:
+            - name: worker
+              env:
+              - name: NEW_MIGRATIONS
+                value: "true"
+  target:
+    kind: Deployment
+    name: worker
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: unused
+    spec:
+      template:
+        spec:
+          containers:
+            - name: precise-code-intel-worker 
+              env:
+              - name: NEW_MIGRATIONS
+                value: "true"
+  target:
+    kind: Deployment
+    name: precise-code-intel-worker    
+- patch: |-
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: unused
+    spec:
+      template:
+        spec:
+          containers:
+            - name: repo-updater
+              env:
+              - name: NEW_MIGRATIONS
+                value: "true"
+  target:
+    kind: Deployment
+    name: repo-updater                          
     
 patchesStrategicMerge:
 - cadvisor/delete-Daemonset.yaml
