@@ -24,7 +24,7 @@ trap cleanup EXIT
 
 "${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh non-privileged-create-cluster "${GENERATED_BASE}"
 
-TEST_ARGS=("test" "-timeout" "25m")
+TEST_ARGS=("test" "-timeout" "5m")
 
 if [[ "${VERBOSE:-"false"}" == "true" ]]; then
   TEST_ARGS+=("-v")
