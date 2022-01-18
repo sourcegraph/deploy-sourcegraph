@@ -1,0 +1,28 @@
+apiVersion:  v1
+kind: ConfigMap
+metadata: 
+  labels: 
+    deploy: sourcegraph
+    app.kubernetes.io/component: frontend
+  annotations: 
+    description: Configuration for the frontend of Sourcegraph.
+  name: sourcegraph-frontend-environment
+data: 
+  PGDATABASE: sg
+  PGHOST: pgsql
+  PGPORT: "5432"
+  PGSSLMODE: disable
+  PGUSER: sg
+  CODEINSIGHTS_PGDATASOURCE: postgres://postgres:password@codeinsights-db:5432/postgres
+  CODEINTEL_PGDATABASE: sg
+  CODEINTEL_PGHOST: codeintel-db
+  CODEINTEL_PGPORT: "5432"
+  CODEINTEL_PGSSLMODE: disable
+  CODEINTEL_PGUSER: sg
+  # CACHE_DIR stores larger items we cache. Majority of it is zip
+  # archives of repositories at a commit.
+  CACHE_DIR: /mnt/cache/$(POD_NAME)
+  GRAFANA_SERVER_URL: http://grafana:30070
+  JAEGER_SERVER_URL: http://jaeger-query:16686
+  PROMETHEUS_URL: http://prometheus:30090
+
