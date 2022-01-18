@@ -16,6 +16,6 @@
 # Run the DB migration job and wait for it to complete
 kubectl delete -f base/migrator/migrator.Job.yaml --ignore-not-found=true
 kubectl apply -f base/migrator/migrator.Job.yaml
-kubectl wait -f base/migrator/migrator.job.yaml --for=condition=complete
+kubectl wait -f base/migrator/migrator.job.yaml --for=condition=complete --timeout=-1s
 
 kubectl apply --prune -l deploy=sourcegraph -f base --recursive $@
