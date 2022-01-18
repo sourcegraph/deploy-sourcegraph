@@ -27,6 +27,13 @@ spec:
         app: sourcegraph-frontend
         deploy: sourcegraph
     spec:
+      initContainers:
+      - name: migrator
+        image: sourcegraph/migrator:3.35.1
+        args: ['up']
+        envFrom:
+        - configMapRef:
+            name: sourcegraph-frontend-environment
       containers:
       - name: frontend
         image: index.docker.io/sourcegraph/frontend:insiders@sha256:f6b962027b6cdb4a1cdea2573d9dfd89f353e2efb5ac2c485bf086bfa01e7a93
