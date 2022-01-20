@@ -1,0 +1,126 @@
+# These manifests are provided in the event that someone may wish to execute
+# database migrations outside of a code deployment.
+#
+# For more information, please see: https://docs.sourcegraph.com/admin/install/kubernetes/operations#database-migrations
+
+# ---
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: migrator
+#   annotations:
+#     description: Database migrator for Postgres databases
+#   labels:
+#     app.component.kubernetes/component: migrator
+#     deploy: sourcegraph
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: migrator
+#         image: "sourcegraph/migrator:3.36.0"
+#         args: ["up"]
+#         env:
+#           - name: PGHOST
+#             value: "pgsql"
+#           - name: PGPORT
+#             value: "5432"
+#           - name: PGUSER
+#             value: "sg"
+#           - name: PGPASSWORD
+#             value: "sg"
+#           - name: PGDATABASE
+#             value: "sg"
+#           - name: PGSSLMODE
+#             value: "disable"
+#           - name: CODEINTEL_PGHOST
+#             value: "codeintel-db"
+#           - name: CODEINTEL_PGPORT
+#             value: "5432"
+#           - name: CODEINTEL_PGUSER
+#             value: "sg"
+#           - name: CODEINTEL_PGPASSWORD
+#             value: "sg"
+#           - name: CODEINTEL_PGDATABASE
+#             value: "sg"
+#           - name: CODEINTEL_PGSSLMODE
+#             value: "disable"
+#           - name: CODEINSIGHTS_PGHOST
+#             value: "codeinsights-db"
+#           - name: CODEINSIGHTS_PGPORT
+#             value: "5432"
+#           - name: CODEINSIGHTS_PGUSER
+#             value: "postgres"
+#           - name: CODEINSIGHTS_PGPASSWORD
+#             value: "password"
+#           - name: CODEINSIGHTS_PGDATABASE
+#             value: "postgres"
+#           - name: CODEINSIGHTS_PGSSLMODE
+#             value: "disable"
+#       restartPolicy: OnFailure
+#   backoffLimit: 4
+# ---
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: migrator-frontend
+#   annotations:
+#     description: Database migrator for the frontend database
+#   labels:
+#     app.component.kubernetes/component: migrator
+#     deploy: sourcegraph
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: migrator
+#         image: "sourcegraph/migrator:3.36.0"
+#         args: ["up", "-db", "frontend"]
+#         env:
+#           - name: PGHOST
+#             value: "pgsql"
+#           - name: PGPORT
+#             value: "5432"
+#           - name: PGUSER
+#             value: "sg"
+#           - name: PGPASSWORD
+#             value: "sg"
+#           - name: PGDATABASE
+#             value: "sg"
+#           - name: PGSSLMODE
+#             value: "disable"
+#       restartPolicy: OnFailure
+#   backoffLimit: 4
+# 
+# ---
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: migrator-codeintel
+#   annotations:
+#     description: Database migrator for the codeintel database
+#   labels:
+#     app.component.kubernetes/component: migrator
+#     deploy: sourcegraph
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: migrator
+#         image: "sourcegraph/migrator:3.36.0"
+#         args: ["up", "-db", "codeintel"]
+#         env:
+#           - name: CODEINTEL_PGHOST
+#             value: "codeintel-db"
+#           - name: CODEINTEL_PGPORT
+#             value: "5432"
+#           - name: CODEINTEL_PGUSER
+#             value: "sg"
+#           - name: CODEINTEL_PGPASSWORD
+#             value: "sg"
+#           - name: CODEINTEL_PGDATABASE
+#             value: "sg"
+#           - name: CODEINTEL_PGSSLMODE
+#             value: "disable"
+#       restartPolicy: OnFailure
+#   backoffLimit: 4
