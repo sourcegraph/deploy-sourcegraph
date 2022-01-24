@@ -13,6 +13,9 @@ spec:
           runAsUser: 100
           runAsGroup: 101
           readOnlyRootFilesystem: true
+          volumeMounts:
+            - mountPath: /tmp
+              name: tmpdir
       - name: jaeger-agent
         securityContext:
           # Required to prevent escalations to root.
@@ -20,3 +23,6 @@ spec:
           runAsUser: 100
           runAsGroup: 101
           readOnlyRootFilesystem: true
+      volumes:
+      - emptyDir: {}
+        name: tmpdir
