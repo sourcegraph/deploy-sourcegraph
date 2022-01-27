@@ -38,38 +38,35 @@ steps:
   - label: ":pulumi: :k8s:"
     concurrency: 3
     concurrency_group: deploy-sourcegraph/integration
-    command: .buildkite/integration-test.sh
+    command: .buildkite/integration-test.sh 1.19
     env:
       VERBOSE: "true"
       # Can be set to true to help debug test results, but ensure that created resources
       # are removed manually
       NOCLEANUP: "false"
-      TEST_K8S_VERSION: "1.19"
     agents: { queue: standard }
 
   - label: ":pulumi: :k8s:"
     concurrency: 3
     concurrency_group: deploy-sourcegraph/integration
-    command: .buildkite/integration-test.sh
+    command: .buildkite/integration-test.sh 1.20
     env:
       VERBOSE: "true"
       # Can be set to true to help debug test results, but ensure that created resources
       # are removed manually
       NOCLEANUP: "false"
-      TEST_K8S_VERSION: "1.20"
     agents: { queue: standard }
 
-      #  - label: ":pulumi: :k8s:"
-      #    concurrency: 3
-      #    concurrency_group: deploy-sourcegraph/integration
-      #    command: .buildkite/integration-test.sh
-      #    env:
-      #      VERBOSE: "true"
-      #      # Can be set to true to help debug test results, but ensure that created resources
-      #      # are removed manually
-      #      NOCLEANUP: "false"
-      #      TEST_K8S_VERSION: "1.21"
-      #    agents: { queue: standard }
+  - label: ":pulumi: :k8s:"
+    concurrency: 3
+    concurrency_group: deploy-sourcegraph/integration
+    command: .buildkite/integration-test.sh 1.21
+    env:
+      VERBOSE: "true"
+      # Can be set to true to help debug test results, but ensure that created resources
+      # are removed manually
+      NOCLEANUP: "false"
+    agents: { queue: standard }
 
   - label: ":k8s:"
     concurrency: 3
