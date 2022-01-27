@@ -23,7 +23,8 @@ func TestFreshDeployment(t *testing.T) {
 	// Specify which k8s version to test against
 	k8sVersion, present := os.LookupEnv("TEST_K8S_VERSION")
 	if !present {
-		log.Fatal("$TEST_K8S_VERSION not specified")
+		t.Error("$TEST_K8S_VERSION not specified")
+		t.FailNow()
 	}
 
 	// Validate on specified kubernetes version
