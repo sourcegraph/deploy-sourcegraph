@@ -36,7 +36,7 @@ steps:
   - wait
 
   - label: ":pulumi: :k8s:"
-    concurrency: 3
+    concurrency: 6
     concurrency_group: deploy-sourcegraph/integration
     command: .buildkite/integration-test.sh 1.19
     env:
@@ -47,7 +47,7 @@ steps:
     agents: { queue: standard }
 
   - label: ":pulumi: :k8s:"
-    concurrency: 3
+    concurrency: 6
     concurrency_group: deploy-sourcegraph/integration
     command: .buildkite/integration-test.sh 1.20
     env:
@@ -58,7 +58,7 @@ steps:
     agents: { queue: standard }
 
   - label: ":pulumi: :k8s:"
-    concurrency: 3
+    concurrency: 6
     concurrency_group: deploy-sourcegraph/integration
     command: .buildkite/integration-test.sh 1.21
     env:
