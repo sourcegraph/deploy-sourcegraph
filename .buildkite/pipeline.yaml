@@ -27,6 +27,12 @@ steps:
     command: .buildkite/check-image-names.sh
     agents: { queue: standard }
 
+   # This runs the Checkov Terraform Code scanner
+  # https://www.checkov.io/
+  - command: .buildkite/ci-checkov.sh
+    label: ':lock: security - checkov' 
+    agents: { queue: "standard" }
+
   - wait
 
   - label: ":pulumi: :k8s:"
