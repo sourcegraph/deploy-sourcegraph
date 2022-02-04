@@ -20,34 +20,38 @@ func TestFreshDeployment(t *testing.T) {
 	// Configure if the test should clean up after itself - useful for debugging
 	noCleanup := os.Getenv("NOCLEANUP") == "true"
 
-	// Validate on various kubernetes versions
-	for _, k8sVersion := range []string{"1.19", "1.20", "1.21"} {
-		k8sVersion := k8sVersion
-		t.Run(fmt.Sprintf("GKE version %q", k8sVersion), func(t *testing.T) {
-			config, err := commonConfig()
-			if err != nil {
-				t.Errorf("failed to generate Pulumi test configuration: %s", err)
-				t.FailNow()
-			}
-			config["kubernetesVersionPrefix"] = k8sVersion
-
-			tester := integration.ProgramTestManualLifeCycle(t, &integration.ProgramTestOptions{
-				Dir: "step1",
-
-				Config:               config,
-				ExpectRefreshChanges: true,
-				Quick:                false,
-				Verbose:              testing.Verbose(),
-				SkipStackRemoval:     noCleanup,
-
-				ExtraRuntimeValidation: ValidateFrontendIsReachable,
-			})
-			if err := testLifecycle(t, tester, noCleanup); err != nil {
-				t.Errorf("failed to run test: %s", err)
-				t.FailNow()
-			}
-		})
+	// Specify which k8s version to test against
+	k8sVersion, present := os.LookupEnv("TEST_K8S_VERSION")
+	if !present {
+		t.Error("$TEST_K8S_VERSION not specified")
+		t.FailNow()
 	}
+
+	// Validate on specified kubernetes version
+	t.Run(fmt.Sprintf("GKE version %q", k8sVersion), func(t *testing.T) {
+		config, err := commonConfig()
+		if err != nil {
+			t.Errorf("failed to generate Pulumi test configuration: %s", err)
+			t.FailNow()
+		}
+		config["kubernetesVersionPrefix"] = k8sVersion
+
+		tester := integration.ProgramTestManualLifeCycle(t, &integration.ProgramTestOptions{
+			Dir: "step1",
+
+			Config:               config,
+			ExpectRefreshChanges: true,
+			Quick:                false,
+			Verbose:              testing.Verbose(),
+			SkipStackRemoval:     noCleanup,
+
+			ExtraRuntimeValidation: ValidateFrontendIsReachable,
+		})
+		if err := testLifecycle(t, tester, noCleanup); err != nil {
+			t.Errorf("failed to run test: %s", err)
+			t.FailNow()
+		}
+	})
 }
 
 func commonConfig() (map[string]string, error) {
