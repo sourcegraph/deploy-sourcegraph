@@ -10,7 +10,7 @@ require (
 	github.com/pulumi/pulumi v1.12.0
 	github.com/sethgrid/pester v1.1.0
 	github.com/sourcegraph/sourcegraph/enterprise/dev/ci/images v0.0.0-20220208010905-d160df06b91c
-	github.com/sourcegraph/update-docker-tags v0.9.0
+	github.com/sourcegraph/update-docker-tags v0.10.0
 	github.com/spf13/cobra v1.1.3 // indirect
 	github.com/stretchr/testify v1.7.0
 	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
