@@ -5,6 +5,12 @@ metadata:
 spec:
   template:
     spec:
+      initContainers:
+        - name: migrator
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsUser: 100
+            runAsGroup: 101
       containers:
       - name: frontend
         securityContext:
