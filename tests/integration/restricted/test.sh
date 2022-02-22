@@ -17,8 +17,7 @@ CLEANUP=""
 trap 'bash -c "$CLEANUP"' EXIT
 
 CLUSTER_NAME_SUFFIX=$(echo ${BUILD_UUID} | head -c 8)
-CLUSTER_NAME_PREFIX="ds-test-restricted"
-CLUSTER_NAME="${CLUSTER_NAME_PREFIX}-${CLUSTER_NAME_SUFFIX}"
+CLUSTER_NAME="ds-test-restricted-${CLUSTER_NAME_SUFFIX}"
 # get the STABLE channel version from GKE
 CLUSTER_VERSION=$(gcloud container get-server-config --zone us-central1-a -q 2>&1 | grep "defaultClusterVersion" | awk '{ print $2}')
 
@@ -38,8 +37,7 @@ gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE
 # Configure if the test should clean up after itself - useful for debugging
 if [ "${NOCLEANUP:-}" != "true" ]; then
   CLUSTER_CLEANUP="gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
-  DISK_CLEANUP="gcloud compute disks delete $(gcloud compute disks list --format="value(name)" --filter="name~^gke-${CLUSTER_NAME_PREFIX}.*-pvc-.* AND -users:*" --project ${TEST_GCP_PROJECT}) --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
-  CLEANUP="$CLUSTER_CLEANUP; $DISK_CLEANUP; $CLEANUP"
+  CLEANUP="$CLUSTER_CLEANUP; $CLEANUP"
 fi
 
 kubectl apply -f sourcegraph.StorageClass.yaml
