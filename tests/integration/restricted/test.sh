@@ -16,6 +16,7 @@ BUILD_UUID="${BUILD_UUID:-dev}"
 CLEANUP=""
 trap 'bash -c "$CLEANUP"' EXIT
 
+exit 1
 CLUSTER_NAME_SUFFIX=$(echo ${BUILD_UUID} | head -c 8)
 CLUSTER_NAME="ds-test-restricted-${CLUSTER_NAME_SUFFIX}"
 # get the STABLE channel version from GKE
