@@ -38,7 +38,7 @@ gcloud container clusters get-credentials ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE
 # Configure if the test should clean up after itself - useful for debugging
 if [ "${NOCLEANUP:-}" != "true" ]; then
   CLUSTER_CLEANUP="gcloud container clusters delete ${CLUSTER_NAME} --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
-  DISK_CLEANUP="gcloud compute disks delete $(gcloud compute disks list --format="table(name,users)" --filter="name~^gke-${CLUSTER_NAME_PREFIX}.*-pvc-.* AND -users:*" --project ${TEST_GCP_PROJECT}) --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
+  DISK_CLEANUP="gcloud compute disks delete $(gcloud compute disks list --format="value(name)" --filter="name~^gke-${CLUSTER_NAME_PREFIX}.*-pvc-.* AND -users:*" --project ${TEST_GCP_PROJECT}) --zone ${TEST_GCP_ZONE} --project ${TEST_GCP_PROJECT} --quiet"
   CLEANUP="$CLUSTER_CLEANUP; $DISK_CLEANUP; $CLEANUP"
 fi
 
@@ -49,7 +49,7 @@ kubectl apply -f nonroot-policy.yaml
 kubectl create namespace ns-sourcegraph
 
 # Deleting the namespace during cleanup is a cheap way to delete associated PVC's - see https://issuetracker.google.com/issues/121034250?pli=1
-CLEANUP="kubectl delete namespace ns-sourcegraph --timeout=60; $CLEANUP"
+CLEANUP="kubectl delete namespace ns-sourcegraph --timeout=60s; $CLEANUP"
 
 kubectl create serviceaccount -n ns-sourcegraph fake-user
 
