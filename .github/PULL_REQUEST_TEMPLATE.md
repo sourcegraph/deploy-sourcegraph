@@ -12,6 +12,7 @@
 * [ ] [K8s Upgrade notes updated](https://github.com/sourcegraph/sourcegraph/blob/main/doc/admin/updates/kubernetes.md)
 * [ ] Sister [deploy-sourcegraph-docker](https://github.com/sourcegraph/deploy-sourcegraph-docker) change:
 * [ ] All images have a valid tag and SHA256 sum
+
 ### Test plan
 
 <!--
