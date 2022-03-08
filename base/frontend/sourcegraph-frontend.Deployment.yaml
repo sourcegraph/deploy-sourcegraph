@@ -31,6 +31,13 @@ spec:
       - name: migrator
         image: index.docker.io/sourcegraph/migrator:3.36.3@sha256:4339ced184eb228da06b5050da11794ea221f47be8a7ca24369a54a8cece923b
         args: ["up"]
+        resources:
+          limits:
+            cpu: 500m
+            memory: 100M
+          requests:
+            cpu: 100m
+            memory: 50M
         env:
         - name: PGDATABASE
           value: sg
