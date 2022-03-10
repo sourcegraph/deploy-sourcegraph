@@ -7,7 +7,7 @@ spec:
     spec:
       initContainers:
         - name: transfer-cache
-          image: index.docker.io/sourcegraph/alpine-3.12:3.36.3@sha256:98d8f68fe165fe9a665b6409955edc6d162ffc8a0fcdc02b574d938c8f87e18c
+          image: index.docker.io/sourcegraph/alpine-3.12:3.37.0@sha256:946f83cf1d822434f242c522cf71717de6cf014a6fc226c9ed82f27ad7e17aa3
           command: ["sh", "-c", "if [[ \"$(stat -c '%u' /mnt/cache)\" -ne 100 ]]; then chown -R 100:101 /mnt/cache; fi"]
           volumeMounts:
             - mountPath: /mnt/cache
