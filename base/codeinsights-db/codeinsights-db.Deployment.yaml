@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: Code Insights TimescaleDB instance.
+    description: Code Insights Postgres DB instance.
   labels:
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
@@ -25,11 +25,15 @@ spec:
         group: backend
     spec:
       containers:
-      - name: timescaledb
-        image: index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:7d45a8e25d3df823dd5ae6faa087a9d3432f84d2c103929cbf401d0e35b3baa5
+      - name: codeinsights
+        image: index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:9aadfeff9139933a078042e65f046d22d6d2cdabac3e4e7cd7ce7e7ae1aa61c0
         env:
+        - name: POSTGRES_DB
+          value: postgres
         - name: POSTGRES_PASSWORD # Accessible by Sourcegraph applications on the network only, so password auth is not used.
           value: password
+        - name: POSTGRES_USER
+          value: postgres
         - name: PGDATA
           value: /var/lib/postgresql/data/pgdata
         - name: POSTGRESQL_CONF_DIR
@@ -37,7 +41,7 @@ spec:
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 5432
-          name: timescaledb
+          name: codeinsights-db
         resources:
           limits:
             cpu: "4"
@@ -49,7 +53,22 @@ spec:
         - mountPath: /var/lib/postgresql/data/
           name: disk
         - mountPath: /conf
-          name: timescaledb-conf
+          name: codeinsights-conf
+      - name: codeinsights-exporter
+        image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:50b1d8b7b71bb7eca9bf53098b1b159d3d400f5aa95751dd62d96a07f460996a
+        env:
+        - name: DATA_SOURCE_NAME
+          value: postgres://postgres:password@localhost:5432/?sslmode=disable
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/code_insights_queries.yaml
+        terminationMessagePolicy: FallbackToLogsOnError
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
       terminationGracePeriodSeconds: 120
       securityContext:
         runAsUser: 0
@@ -57,7 +76,7 @@ spec:
       - name: disk
         persistentVolumeClaim:
           claimName: codeinsights-db
-      - name: timescaledb-conf
+      - name: codeinsights-conf
         configMap:
           defaultMode: 0777
           name: codeinsights-db-conf
