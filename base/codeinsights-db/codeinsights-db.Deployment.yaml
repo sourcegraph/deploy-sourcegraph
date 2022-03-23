@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: Code Insights TimescaleDB instance.
+    description: Code Insights Postgres DB instance.
   labels:
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
@@ -25,11 +25,15 @@ spec:
         group: backend
     spec:
       containers:
-      - name: timescaledb
+      - name: codeinsights
         image: index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:7d45a8e25d3df823dd5ae6faa087a9d3432f84d2c103929cbf401d0e35b3baa5
         env:
+        - name: POSTGRES_DB
+          value: postgres
         - name: POSTGRES_PASSWORD # Accessible by Sourcegraph applications on the network only, so password auth is not used.
           value: password
+        - name: POSTGRES_USER
+          value: postgres
         - name: PGDATA
           value: /var/lib/postgresql/data/pgdata
         - name: POSTGRESQL_CONF_DIR
@@ -37,7 +41,7 @@ spec:
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 5432
-          name: timescaledb
+          name: codeinsights-db
         resources:
           limits:
             cpu: "4"
@@ -49,7 +53,7 @@ spec:
         - mountPath: /var/lib/postgresql/data/
           name: disk
         - mountPath: /conf
-          name: timescaledb-conf
+          name: codeinsights-conf
       terminationGracePeriodSeconds: 120
       securityContext:
         runAsUser: 0
@@ -57,7 +61,7 @@ spec:
       - name: disk
         persistentVolumeClaim:
           claimName: codeinsights-db
-      - name: timescaledb-conf
+      - name: codeinsights-conf
         configMap:
           defaultMode: 0777
           name: codeinsights-db-conf
