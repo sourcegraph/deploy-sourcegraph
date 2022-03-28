@@ -9,7 +9,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/pulumi/pulumi v1.12.0
 	github.com/sethgrid/pester v1.1.0
-	github.com/sourcegraph/sourcegraph/enterprise/dev/ci/images v0.0.0-20220310141749-bd60b4b0391c
+	github.com/sourcegraph/sourcegraph/enterprise/dev/ci/images v0.0.0-20220327200838-d3688ba19706
 	github.com/sourcegraph/update-docker-tags v0.10.0
 	github.com/spf13/cobra v1.1.3 // indirect
 	github.com/stretchr/testify v1.7.0
