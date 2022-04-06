@@ -1,31 +1,31 @@
 steps:
   - label: ":k8s:"
     command: .buildkite/verify-yaml.sh
-    agents: { queue: job }
+    agents: { queue: standard }
 
   - label: ":k8s:"
     command: .buildkite/verify-label.sh
-    agents: { queue: job }
+    agents: { queue: standard }
 
   - label: ":k8s:"
     command: .buildkite/verify-rbac-labels.sh
-    agents: { queue: job }
+    agents: { queue: standard }
 
   - label: ':lipstick:'
     command: .buildkite/prettier-check.sh
-    agents: { queue: job }
+    agents: { queue: standard }
 
   - label: ':lipstick:'
     command: .buildkite/shfmt.sh
-    agents: { queue: job }
+    agents: { queue: standard }
 
   - label: ":git: :sleuth_or_spy:"
     command: .buildkite/verify-release/verify-release.sh
-    agents: { queue: job }
+    agents: { queue: standard }
 
   - label: ":k8s: :sleuth_or_spy:" 
     command: .buildkite/check-image-names.sh
-    agents: { queue: job }
+    agents: { queue: standard }
 
   - wait
 
@@ -38,7 +38,7 @@ steps:
       # Can be set to true to help debug test results, but ensure that created resources
       # are removed manually
       NOCLEANUP: "false"
-    agents: { queue: job }
+    agents: { queue: standard }
 
   - label: ":pulumi: :k8s:"
     concurrency: 6
@@ -49,7 +49,7 @@ steps:
       # Can be set to true to help debug test results, but ensure that created resources
       # are removed manually
       NOCLEANUP: "false"
-    agents: { queue: job }
+    agents: { queue: standard }
 
   - label: ":pulumi: :k8s:"
     concurrency: 6
@@ -60,7 +60,7 @@ steps:
       # Can be set to true to help debug test results, but ensure that created resources
       # are removed manually
       NOCLEANUP: "false"
-    agents: { queue: job }
+    agents: { queue: standard }
 
   - label: ":k8s:"
     concurrency: 3
@@ -70,4 +70,4 @@ steps:
       # Can be set to true to help debug test results, but ensure that created resources
       # are removed manually
       NOCLEANUP: "false"
-    agents: { queue: job }
+    agents: { queue: standard }
