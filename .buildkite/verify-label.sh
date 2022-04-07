@@ -1,15 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -ex
+set -e -o pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
-.buildkite/install-yj.sh
+command -v yj >/dev/null 2>&1 || .buildkite/install-yj.sh
 
-if find base -name "*.yaml" -exec sh -c "cat {} | yj | jq --raw-output '.metadata.labels.deploy'" \; | tee /tmp/deploy-label | grep -v sourcegraph; then
-  echo "> There exists a yaml file in base/ that does not contain .metadata.labels.deploy == sourcegraph"
-  echo "> Run the following command to fix:"
-  echo "find base/ -name \"*.yaml\" -exec sh -c \"cat {} | yj | jq '.metadata.labels.deploy = \\\"sourcegraph\\\"' | jy -o {}\" \;"
-
-  exit 1
-fi
+find base -name "*.yaml" -not -name 'kustomization.yaml' -print0 | while IFS= read -r -d '' file; do
+  if ! yj <"$file" | jq '.metadata.labels.deploy == "sourcegraph"' >/dev/null; then
+    echo "$file does not contain .metadata.labels.deploy == sourcegraph"
+    exit 1
+  fi
+done
