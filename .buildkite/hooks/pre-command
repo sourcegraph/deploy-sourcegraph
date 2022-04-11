@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 set -xeu
-cd $BUILDKITE_BUILD_CHECKOUT_PATH
+pushd $BUILDKITE_BUILD_CHECKOUT_PATH
 
 echo "Installing asdf dependencies as defined in '$BUILDKITE_BUILD_CHECKOUT_PATH/.tool-versions':"
 asdf install
+
+popd
