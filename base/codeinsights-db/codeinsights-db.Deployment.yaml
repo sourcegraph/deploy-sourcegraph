@@ -24,6 +24,22 @@ spec:
         app: codeinsights-db
         group: backend
     spec:
+      initContainers:
+      - name: correct-data-dir-permissions
+        image: index.docker.io/sourcegraph/alpine-3.12:insiders@sha256:3d926ffec4cdd54b5197bf16dded63e37b1a7045e2623ae9f8eda0a63bbf8231
+        command: ["sh", "-c", "if [ -d /var/lib/postgresql/data/pgdata ]; then chmod 750 /var/lib/postgresql/data/pgdata; fi"]
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data/
+          name: disk
+        securityContext:
+          runAsUser: 0
+        resources:
+          limits:
+            cpu: "10m"
+            memory: "50Mi"
+          requests:
+            cpu: "10m"
+            memory: "50Mi"
       containers:
       - name: codeinsights
         image: index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:290959786a7186109241cc0437fadb23bb36200ab2016079439d77d353c2ffca
