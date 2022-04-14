@@ -27,6 +27,10 @@ steps:
     command: .buildkite/check-image-names.sh
     agents: { queue: standard }
 
+  - label: ":k8s:"
+    command: .buildkite/verify-overlays.sh
+    agents: { queue: standard }    
+
   - wait
 
   - label: ":pulumi: :k8s:"
