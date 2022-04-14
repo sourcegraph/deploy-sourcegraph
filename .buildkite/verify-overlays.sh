@@ -7,7 +7,7 @@ OVERLAYS=()
 mapfile -t OVERLAYS < <(find overlays -maxdepth 1 -type d ! -name '.*' ! -name 'bases' ! -name 'overlays' -printf '%f\n')
 
 for o in "${OVERLAYS[@]}"; do
-  echo "Checking ${o} overlay."
+  echo "<<<< GENERATING ${o} OVERLAYS >>>>>"
   DIR=generated-cluster-${o}
   mkdir "${DIR}"
   ./overlay-generate-cluster.sh "${o}" "${DIR}"
