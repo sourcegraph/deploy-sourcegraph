@@ -70,6 +70,21 @@ spec:
           name: disk
         - mountPath: /conf
           name: codeinsights-conf
+      - env:
+        - name: DATA_SOURCE_NAME
+          value: postgres://postgres:@localhost:5432/?sslmode=disable
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/code_insights_queries.yaml
+        image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:66dfd2836c975bf132348259a4e7bf78f4969c4f3fb5a781878b25e8e2d661dc
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: pgsql-exporter
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
       terminationGracePeriodSeconds: 120
       securityContext:
         runAsUser: 0
