@@ -1,0 +1,8 @@
+# This overlay is a utility to help run migrator commands in kubernetes without altering your base fork
+# Learn more at: https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#kubernetes
+- op: replace
+  path: /spec/template/spec/containers/0/args[]
+  value: ["up", "-db", "all"] # Command to be selected learn more: https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#commands
+- op: replace
+  path: /spec/template/spec/containers/0/image
+  value: "index.docker.io/sourcegraph/migrator:3.39.0@sha256:19d32b7d713f6e79fe9058a53870a2b82b3fc192f350a613c216b0d205b197ca" # Your image here

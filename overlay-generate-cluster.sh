@@ -15,6 +15,7 @@ cp -R overlays "${BUILD_DIR}"
 cp -R base "${BUILD_DIR}"/overlays/bases/deployments/base
 cp -R base "${BUILD_DIR}"/overlays/bases/rbac-roles/base
 cp -R base "${BUILD_DIR}"/overlays/bases/pvcs/base
+cp -R configure "${BUILD_DIR}"/overlays/bases/jobs/configure
 
 mkdir -p $2
 
