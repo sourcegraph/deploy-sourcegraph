@@ -58,10 +58,15 @@ spec:
         - name: disk
           mountPath: /dev/disk
           readOnly: true
+        - name: kmsg
+          mountPath: /dev/kmsg
+          readOnly: true
         ports:
         - name: http
           containerPort: 48080
           protocol: TCP
+        securityContext:
+          privileged: true
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30
       volumes:
@@ -80,3 +85,6 @@ spec:
       - name: disk
         hostPath:
           path: /dev/disk
+      - name: kmsg
+        hostPath:
+          path: /dev/kmsg

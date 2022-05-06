@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cadvisor
+spec:
+  template:
+    spec:
+      containers:
+      - name: cadvisor
+        volumeMounts:
+        - name: kmsg
+          mountPath: /dev/kmsg
+          readOnly: true
+          $patch: delete
+        securityContext:
+          privileged: null
+      volumes:
+      - name: kmsg
+        hostPath:
+          path: /dev/kmsg
+        $patch: delete
