@@ -47,7 +47,7 @@ kubectl apply -f nonroot-policy.yaml
 kubectl create namespace ns-sourcegraph
 
 # Deleting the namespace during cleanup is a cheap way to delete associated PVC's - see https://issuetracker.google.com/issues/121034250?pli=1
-CLEANUP="kubectl delete namespace ns-sourcegraph --timeout=60s; $CLEANUP"
+CLEANUP="kubectl delete namespace ns-sourcegraph --timeout=180s; $CLEANUP"
 
 kubectl create serviceaccount -n ns-sourcegraph fake-user
 
