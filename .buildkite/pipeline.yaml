@@ -75,3 +75,9 @@ steps:
       # are removed manually
       NOCLEANUP: "false"
     agents: { queue: standard }
+
+  - wait
+
+  - label: ":k8s:"
+    command: .buildkite/cleanup-disks.sh
+    agents: { queue: standard }
