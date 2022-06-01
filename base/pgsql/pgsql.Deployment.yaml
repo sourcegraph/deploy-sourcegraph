@@ -54,6 +54,12 @@ spec:
           exec:
             command:
               - /liveness.sh
+        startupProbe:
+          exec:
+            command:
+              - /liveness.sh
+          failureThreshold: 360
+          periodSeconds: 10
         name: pgsql
         ports:
         - containerPort: 5432
@@ -98,7 +104,7 @@ spec:
         configMap:
           defaultMode: 0777
           name: pgsql-conf
-      - name: dshm # Allocate shared memory to match the shared_buffers value  
+      - name: dshm # Allocate shared memory to match the shared_buffers value
         emptyDir:
           medium: Memory
           sizeLimit: 1G

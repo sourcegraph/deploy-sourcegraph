@@ -54,6 +54,12 @@ spec:
           exec:
             command:
               - /liveness.sh
+        startupProbe:
+          exec:
+            command:
+              - /liveness.sh
+          failureThreshold: 360
+          periodSeconds: 10
         ports:
         - containerPort: 5432
           name: pgsql
