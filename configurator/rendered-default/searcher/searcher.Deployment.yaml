@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   annotations:
     description: Backend for text search operations.
+    kubectl.kubernetes.io/default-container: searcher
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
@@ -10,7 +11,7 @@ metadata:
   name: searcher
 spec:
   minReadySeconds: 10
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -30,14 +31,18 @@ spec:
         - name: searcher
           env:
             - name: SEARCHER_CACHE_SIZE_MB
-              value: "100000"
+              valueFrom:
+                resourceFieldRef:
+                  containerName: searcher
+                  resource: requests.ephemeral-storage
+                  divisor: 1M
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
             - name: CACHE_DIR
               value: /mnt/cache/$(POD_NAME)
-          image: index.docker.io/sourcegraph/searcher:insiders@sha256:9e7dedef58f0b30cea96501e73aeabc632deec8db126a5bafa58ea890343a180
+          image: index.docker.io/sourcegraph/searcher:insiders@sha256:2ac95c00f424330c42b7d2051592b4b1974fcd3575cc221fbb6c84c7944c1e0e
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
             - containerPort: 3181
@@ -55,17 +60,17 @@ spec:
           resources:
             limits:
               cpu: "2"
-              ephemeral-storage: 8Gi
+              ephemeral-storage: 26G
               memory: 2G
             requests:
               cpu: 500m
-              ephemeral-storage: 4Gi
+              ephemeral-storage: 25G
               memory: 500M
           volumeMounts:
             - mountPath: /mnt/cache
               name: cache-ssd
         - name: jaeger-agent
-          image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:22ecc0f4c041fb22b1b8c5a7c6f0f5233c80b147e26604ebe310a05860089dca
+          image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:c56b7e45efab76e285c791c932c91aeed64551e160b2417a5b3df6acef664b34
           env:
             - name: POD_NAME
               valueFrom:

@@ -135,7 +135,7 @@ data:
 
     #
 
-    # * `prometheus.io/scrape`: Only scrape services that have a value of `true`
+    # * `sourcegraph.prometheus/scrape`: Only scrape services that have a value of `true`
 
     # * `prometheus.io/scheme`: If the metrics endpoint is secured then you will need
 
@@ -153,6 +153,7 @@ data:
       - role: endpoints
 
       relabel_configs:
+        # Sourcegraph specific customization, only scrape pods with our annotation
       - source_labels: [__meta_kubernetes_service_annotation_sourcegraph_prometheus_scrape]
         action: keep
         regex: true
@@ -241,7 +242,7 @@ data:
 
     #
 
-    # * `prometheus.io/scrape`: Only scrape pods that have a value of `true`
+    # * `sourcegraph.prometheus/scrape`: Only scrape pods that have a value of `true`
 
     # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
 
@@ -253,6 +254,7 @@ data:
       - role: pod
 
       relabel_configs:
+        # Sourcegraph specific customization, only scrape pods with our annotation
       - source_labels: [__meta_kubernetes_pod_annotation_sourcegraph_prometheus_scrape]
         action: keep
         regex: true

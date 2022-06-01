@@ -26,7 +26,7 @@ spec:
       serviceAccountName: cadvisor
       containers:
         - name: cadvisor
-          image: index.docker.io/sourcegraph/cadvisor:insiders@sha256:6feaf15d27c770e1f185f5572fee82cbf799247463d558eea174cf4960eb13e0
+          image: index.docker.io/sourcegraph/cadvisor:insiders@sha256:d4d8b87931155b949118695f2b7b214b97a398d9548d5ea436a637c96c36fced
           args:
             - --store_container_labels=false
             - --whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name,io.kubernetes.pod.namespace,io.kubernetes.pod.uid
@@ -53,10 +53,15 @@ spec:
             - name: disk
               mountPath: /dev/disk
               readOnly: true
+            - name: kmsg
+              mountPath: /dev/kmsg
+              readOnly: true
           ports:
             - name: http
               containerPort: 48080
               protocol: TCP
+          securityContext:
+            privileged: true
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30
       volumes:
@@ -75,3 +80,6 @@ spec:
         - name: disk
           hostPath:
             path: /dev/disk
+        - name: kmsg
+          hostPath:
+            path: /dev/kmsg

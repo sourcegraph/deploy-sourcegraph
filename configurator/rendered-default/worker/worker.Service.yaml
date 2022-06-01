@@ -5,16 +5,19 @@ metadata:
     prometheus.io/port: "6060"
     sourcegraph.prometheus/scrape: "true"
   labels:
-    app: query-runner
+    app: worker
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: query-runner
-  name: query-runner
+    app.kubernetes.io/component: worker
+  name: worker
 spec:
   ports:
     - name: http
-      port: 80
+      port: 3189
       targetPort: http
+    - name: debug
+      port: 6060
+      targetPort: debug
   selector:
-    app: query-runner
+    app: worker
   type: ClusterIP

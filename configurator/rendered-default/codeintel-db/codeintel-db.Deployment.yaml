@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   annotations:
     description: Postgres database for various data.
+    kubectl.kubernetes.io/default-container: pgsql
   labels:
     app.kubernetes.io/component: codeintel-db
     deploy: sourcegraph
@@ -26,7 +27,7 @@ spec:
     spec:
       initContainers:
         - name: correct-data-dir-permissions
-          image: index.docker.io/sourcegraph/alpine:3.12@sha256:ce099fbcd3cf70b338fc4cb2a4e1fa9ae847de21afdb0a849a393b87d94fb174
+          image: index.docker.io/sourcegraph/alpine-3.14:insiders@sha256:c12d8679188e14a5e7d581aa5550ab411f2013fb0662a3f697d378460fe7b5f4
           command:
             - sh
             - -c
@@ -45,7 +46,7 @@ spec:
               memory: 50Mi
       containers:
         - name: pgsql
-          image: index.docker.io/sourcegraph/codeintel-db:insiders@sha256:aa937c1c8ab20f3c809f04480d5a73791b05be59d3183726fd499ae0a123e982
+          image: index.docker.io/sourcegraph/codeintel-db:insiders@sha256:8c6d086559c97408a2080660693a4b3d8f8bb8d3cd64d09379dc6a20c21469dc
           terminationMessagePolicy: FallbackToLogsOnError
           readinessProbe:
             exec:
@@ -56,16 +57,22 @@ spec:
             exec:
               command:
                 - /liveness.sh
+          startupProbe:
+            exec:
+              command:
+                - /liveness.sh
+            failureThreshold: 360
+            periodSeconds: 10
           ports:
             - containerPort: 5432
               name: pgsql
           resources:
             limits:
               cpu: "4"
-              memory: 2Gi
+              memory: 4Gi
             requests:
               cpu: "4"
-              memory: 2Gi
+              memory: 4Gi
           volumeMounts:
             - mountPath: /data
               name: disk
@@ -76,7 +83,7 @@ spec:
               value: postgres://sg:@localhost:5432/?sslmode=disable
             - name: PG_EXPORTER_EXTEND_QUERY_PATH
               value: /config/code_intel_queries.yaml
-          image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:37c01d94934a15baecbf40042da0799f7761f28d6084c0ceb7e038224fc4d613
+          image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:058803235a9deca67412edb01ec6fe22f58a7326c2f565281f7e745701df3080
           terminationMessagePolicy: FallbackToLogsOnError
           name: pgsql-exporter
           resources:
@@ -86,6 +93,7 @@ spec:
             requests:
               cpu: 10m
               memory: 50Mi
+      terminationGracePeriodSeconds: 120
       securityContext:
         runAsUser: 0
       volumes:
@@ -94,5 +102,5 @@ spec:
             claimName: codeintel-db
         - name: pgsql-conf
           configMap:
-            defaultMode: 511
+            defaultMode: 777
             name: codeintel-db-conf

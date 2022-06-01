@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   annotations:
     description: MinIO for storing LSIF uploads.
+    kubectl.kubernetes.io/default-container: minio
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
@@ -30,7 +31,7 @@ spec:
               value: AKIAIOSFODNN7EXAMPLE
             - name: MINIO_SECRET_KEY
               value: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-          image: index.docker.io/sourcegraph/minio:insiders@sha256:4f39c3fa2ecf208c0df013e36883d25c3eb8a88ec10d6b1718c2f2b62a34c665
+          image: index.docker.io/sourcegraph/minio:insiders@sha256:d5377e0c6e4ed742c551f253591d4a1a7f3a104ca17c51d46d6324206577f209
           args:
             - minio
             - server

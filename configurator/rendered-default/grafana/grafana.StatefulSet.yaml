@@ -3,6 +3,7 @@ kind: StatefulSet
 metadata:
   annotations:
     description: Metrics/monitoring dashboards and alerts.
+    kubectl.kubernetes.io/default-container: grafana
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
@@ -25,7 +26,7 @@ spec:
     spec:
       containers:
         - name: grafana
-          image: index.docker.io/sourcegraph/grafana:insiders@sha256:2a6a8e90937498068a4006f6b0d0f53dc8e635894975143dcfed24d4a6b3c0d5
+          image: index.docker.io/sourcegraph/grafana:insiders@sha256:7e23d7509d2107b8f0fe0942c98da2a6d31cab1e4e5f96bd31564a3a756aa104
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
             - containerPort: 3370
@@ -48,7 +49,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            defaultMode: 511
+            defaultMode: 777
             name: grafana
   volumeClaimTemplates:
     - metadata:

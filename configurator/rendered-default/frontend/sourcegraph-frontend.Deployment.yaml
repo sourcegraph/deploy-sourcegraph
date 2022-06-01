@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
+    kubectl.kubernetes.io/default-container: frontend
     description: Serves the frontend of Sourcegraph via HTTP(S).
   labels:
     deploy: sourcegraph
@@ -26,9 +27,44 @@ spec:
         app: sourcegraph-frontend
         deploy: sourcegraph
     spec:
+      initContainers:
+        - name: migrator
+          image: index.docker.io/sourcegraph/migrator:insiders@sha256:27f0661fb17329a8355f44a14b4276d19d0b635dbe4a76e8d02afbdc0dd92021
+          args:
+            - up
+          resources:
+            limits:
+              cpu: 500m
+              memory: 100M
+            requests:
+              cpu: 100m
+              memory: 50M
+          env:
+            - name: PGDATABASE
+              value: sg
+            - name: PGHOST
+              value: pgsql
+            - name: PGPORT
+              value: "5432"
+            - name: PGSSLMODE
+              value: disable
+            - name: PGUSER
+              value: sg
+            - name: CODEINSIGHTS_PGDATASOURCE
+              value: postgres://postgres:password@codeinsights-db:5432/postgres
+            - name: CODEINTEL_PGDATABASE
+              value: sg
+            - name: CODEINTEL_PGHOST
+              value: codeintel-db
+            - name: CODEINTEL_PGPORT
+              value: "5432"
+            - name: CODEINTEL_PGSSLMODE
+              value: disable
+            - name: CODEINTEL_PGUSER
+              value: sg
       containers:
         - name: frontend
-          image: index.docker.io/sourcegraph/frontend:insiders@sha256:53c8a0233ed9f3aff61f98fc51e15c2aedf51060591422cb53fc65b37bb64dc4
+          image: index.docker.io/sourcegraph/frontend:insiders@sha256:3fb1105d32e317645c080720d17e73a9da5fdcbee567bda31a51883c2dd7ac39
           args:
             - serve
           env:
@@ -54,8 +90,6 @@ spec:
               value: disable
             - name: CODEINTEL_PGUSER
               value: sg
-            - name: SRC_GIT_SERVERS
-              value: gitserver-0.gitserver:3178
             - name: POD_NAME
               valueFrom:
                 fieldRef:
@@ -103,7 +137,7 @@ spec:
             - mountPath: /mnt/cache
               name: cache-ssd
         - name: jaeger-agent
-          image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:22ecc0f4c041fb22b1b8c5a7c6f0f5233c80b147e26604ebe310a05860089dca
+          image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:c56b7e45efab76e285c791c932c91aeed64551e160b2417a5b3df6acef664b34
           env:
             - name: POD_NAME
               valueFrom:

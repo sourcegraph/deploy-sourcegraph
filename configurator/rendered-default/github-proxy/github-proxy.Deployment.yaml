@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   annotations:
     description: Rate-limiting proxy for the GitHub API.
+    kubectl.kubernetes.io/default-container: github-proxy
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
@@ -28,7 +29,7 @@ spec:
     spec:
       containers:
         - name: github-proxy
-          image: index.docker.io/sourcegraph/github-proxy:insiders@sha256:265c9b8488f9c439fb9d56c08c088467e84d039a8aec194ee824c9184104bd12
+          image: index.docker.io/sourcegraph/github-proxy:insiders@sha256:d6ee6be362ecadfc9337e3bcf2b9a9a467ece8c69269d7721838049be622f51b
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
             - containerPort: 3180
@@ -41,7 +42,7 @@ spec:
               cpu: 100m
               memory: 250M
         - name: jaeger-agent
-          image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:22ecc0f4c041fb22b1b8c5a7c6f0f5233c80b147e26604ebe310a05860089dca
+          image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:c56b7e45efab76e285c791c932c91aeed64551e160b2417a5b3df6acef664b34
           env:
             - name: POD_NAME
               valueFrom:
