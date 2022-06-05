@@ -59,7 +59,7 @@ function transformFilename(sourceDir: string, filename: string): string {
       }
     }
     const mappings: { [key: string]: string } = {
-      'codeinsights-db': 'codeinsights-db-conf'
+      'codeinsights-db': 'codeinsights-db-conf' // TODO: only apply this on the configmap change...
       // NEXT: finish this and make sure the filenames match
     }
     if (mappings[name]) {
