@@ -50,10 +50,20 @@ function transformFilename(sourceDir: string, filename: string): string {
   let [name, kind, ext] = baseParts
   let prefix = 'apps_v1'
 
-  if (dirParts.length > 0) {
-    const dirName = dirParts[dirParts.length-1]
-    if (dirName !== name && dirName !== 'sourcegraph-frontend') {
-      name = dirName + '-' + name
+  {
+    // Adjustments
+    if (dirParts.length > 0) {
+      const dirName = dirParts[dirParts.length-1]
+      if (dirName !== name && dirName !== 'frontend' && dirName !== 'redis' && dirName !== 'jaeger') {
+        name = dirName + '-' + name
+      }
+    }
+    const mappings: { [key: string]: string } = {
+      'codeinsights-db': 'codeinsights-db-conf'
+      // NEXT: finish this and make sure the filenames match
+    }
+    if (mappings[name]) {
+      name = mappings[name]
     }
   }
 
