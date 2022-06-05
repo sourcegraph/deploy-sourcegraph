@@ -2,10 +2,14 @@ apiVersion: v1
 data:
   prometheus.yml: >
     global:
+
+
       scrape_interval:     30s
       evaluation_interval: 30s
 
     alerting:
+
+
       alertmanagers:
         # Bundled Alertmanager, started by prom-wrapper
         - static_configs:
@@ -22,6 +26,8 @@ data:
         #      action: keep
 
     rule_files:
+
+
       - '*_rules.yml'
       - "/sg_config_prometheus/*_rules.yml"
       - "/sg_prometheus_add_ons/*_rules.yml"
@@ -57,6 +63,8 @@ data:
 
     - job_name: 'kubernetes-apiservers'
 
+
+
       kubernetes_sd_configs:
       - role: endpoints
 
@@ -90,6 +98,8 @@ data:
         regex: default;kubernetes;https
 
     - job_name: 'kubernetes-nodes'
+
+
 
       # Default to scraping over https. If required, just disable this or change to
       # `http`.
@@ -149,6 +159,8 @@ data:
 
     - job_name: 'kubernetes-service-endpoints'
 
+
+
       kubernetes_sd_configs:
       - role: endpoints
 
@@ -205,6 +217,8 @@ data:
 
     - job_name: 'kubernetes-services'
 
+
+
       metrics_path: /probe
       params:
         module: [http_2xx]
@@ -248,6 +262,8 @@ data:
     # * `prometheus.io/port`: Scrape the pod on the indicated port instead of the default of `9102`.
 
     - job_name: 'kubernetes-pods'
+
+
 
       kubernetes_sd_configs:
       - role: pod
@@ -299,11 +315,15 @@ data:
     # Scrape prometheus itself for metrics.
 
     - job_name: 'builtin-prometheus'
+
+
       static_configs:
         - targets: ['127.0.0.1:9092']
           labels:
             app: prometheus
     - job_name: 'builtin-alertmanager'
+
+
       metrics_path: /alertmanager/metrics
       static_configs:
         - targets: ['127.0.0.1:9093']
