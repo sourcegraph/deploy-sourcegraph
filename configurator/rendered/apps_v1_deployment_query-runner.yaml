@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Saved search query runner / notification service.
+    kubectl.kubernetes.io/default-container: query-runner
+  labels:
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: query-runner
+  name: query-runner
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: query-runner
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        deploy: sourcegraph
+        app: query-runner
+    spec:
+      containers:
+        - name: query-runner
+          image: index.docker.io/sourcegraph/query-runner:3.34.1@sha256:f25ff41178d3ab9013c400ceb10d2612932c019bcbaa6c87e82f6b2aa730e247
+          terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - containerPort: 3183
+              name: http
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1G
+            requests:
+              cpu: 500m
+              memory: 1G
+        - image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+          name: jaeger-agent
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+          ports:
+            - containerPort: 5775
+              protocol: UDP
+            - containerPort: 5778
+              protocol: TCP
+            - containerPort: 6831
+              protocol: UDP
+            - containerPort: 6832
+              protocol: UDP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500M
+            requests:
+              cpu: 100m
+              memory: 100M
+          args:
+            - --reporter.grpc.host-port=jaeger-collector:14250
+            - --reporter.type=grpc
+      securityContext:
+        runAsUser: 0
