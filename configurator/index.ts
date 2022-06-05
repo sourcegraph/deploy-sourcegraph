@@ -37,16 +37,26 @@ import { transformations as defaultTransformations } from "./customize.default";
   };
 
 function transformFilename(sourceDir: string, filename: string): string {
-  // return path.relative(sourceDir, filename);
+  const rel = path.relative(sourceDir, filename);
+  // return rel
   
   const yaml = YAML.parse(readFileSync(filename).toString())
-  const parts = path.basename(filename).split('.')
-  if (parts.length < 3) {
+  const dirParts = path.dirname(rel).split(path.sep)
+  const baseParts = path.basename(filename).split('.')
+  if (baseParts.length < 3) {
     console.log('ERROR: could not transform filename', filename)
     return filename
   }
-  const [name, kind, ext] = parts
+  let [name, kind, ext] = baseParts
   let prefix = 'apps_v1'
+
+  if (dirParts.length > 0) {
+    const dirName = dirParts[dirParts.length-1]
+    if (dirName !== name && dirName !== 'sourcegraph-frontend') {
+      name = dirName + '-' + name
+    }
+  }
+
   if (typeof yaml.apiVersion === 'string' || yaml.apiVersion instanceof String) {
     prefix = (yaml.apiVersion as string).replace('/', '_')
   }
