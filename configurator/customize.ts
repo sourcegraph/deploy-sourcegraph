@@ -16,6 +16,7 @@ import {
   nonRoot,
   unsafeArbitraryTransformations,
   deepPartial,
+  setNamespace,
 } from "./common";
 
 export const transformations: Transform[] = [
@@ -143,4 +144,7 @@ export const transformations: Transform[] = [
   //     }
   //   })
   // })
+
+  setNamespace(/TODO/, 'sourcegraph'),
+  
 ]

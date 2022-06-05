@@ -7,7 +7,7 @@ import * as path from "path";
 import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
 import * as mkdirp from "mkdirp";
 import * as request from "request";
-import { isObject, reject } from "lodash";
+import { flatten, isObject, reject } from "lodash";
 import { resolve } from "dns";
 
 export interface Cluster {
@@ -628,4 +628,56 @@ export function deepPartial(source?: object, pick?: object): object | undefined 
     }
   }
   return dest
+}
+
+export const setNamespace = (pattern: RegExp, namespace: string): Transform => async (c: Cluster) => {
+  flatten<[string, {metadata?: {namespace?: string}}]>([
+    c.Deployments,
+    c.PersistentVolumeClaims,
+    c.PersistentVolumes,
+    c.Services,
+    c.ClusterRoles,
+    c.ClusterRoleBindings,
+    c.ConfigMaps,
+    c.DaemonSets,
+    c.Ingresss,
+    c.PodSecurityPolicys,
+    c.Roles,
+    c.RoleBindings,
+    c.ServiceAccounts,
+    c.Secrets,
+    c.StatefulSets,
+    c.StorageClasses
+  ]).forEach(([name, d]) => {
+    if (!d.metadata) {
+      d.metadata = {}
+    }
+    d.metadata.namespace = namespace
+  })
+
+  // const objs: [string, { metadata: { namespace: string }}] = flatten([
+  //   c.Deployments,
+  //   c.PersistentVolumeClaims,
+  //   c.PersistentVolumes,
+  //   c.Services,
+  //   c.ClusterRoles,
+  //   c.ClusterRoleBindings,
+  //   c.ConfigMaps,
+  //   c.DaemonSets,
+  //   c.Ingresss,
+  //   c.PodSecurityPolicys,
+  //   c.Roles,
+  //   c.RoleBindings,
+  //   c.ServiceAccounts,
+  //   c.Secrets,
+  //   c.StatefulSets,
+  //   c.StorageClasses
+  // ])
+  
+  // c.Deployments.forEach(([name, d]) => {
+  //   if (!d.metadata) {
+  //     d.metadata = {}
+  //   }
+  //   d.metadata.namespace = namespace
+  // })
 }
