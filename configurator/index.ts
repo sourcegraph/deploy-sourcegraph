@@ -50,19 +50,25 @@ function transformFilename(sourceDir: string, filename: string): string {
   let [name, kind, ext] = baseParts
   let prefix = 'apps_v1'
 
+  let foo = false
+  if (name === 'backend') {
+    foo = true
+  }
+
   {
     // Adjustments
     if (dirParts.length > 0) {
       const dirName = dirParts[dirParts.length-1]
-      if (dirName !== name && dirName !== 'frontend' && dirName !== 'redis' && dirName !== 'jaeger') {
+      if ([name, 'frontend', 'redis', 'jaeger', '.'].indexOf(dirName) === -1) {
         name = dirName + '-' + name
       }
     }
     const mappings: { [key: string]: string } = {
-      'codeinsights-db': 'codeinsights-db-conf' // TODO: only apply this on the configmap change...
-      // NEXT: finish this and make sure the filenames match
+      'codeinsights-db': 'codeinsights-db-conf', // TODO: only apply this on the configmap change...
+      'codeintel-db': 'codeintel-db-conf',
+      'pgsql': 'pgsql-conf',
     }
-    if (mappings[name]) {
+    if (kind.toLowerCase() === 'configmap' && mappings[name]) {
       name = mappings[name]
     }
   }
@@ -70,7 +76,11 @@ function transformFilename(sourceDir: string, filename: string): string {
   if (typeof yaml.apiVersion === 'string' || yaml.apiVersion instanceof String) {
     prefix = (yaml.apiVersion as string).replace('/', '_')
   }
-  
+
+  if (kind === 'IndexerService' && name === 'indexed-search') {
+    return 'v1_service_indexed-search-indexer.yaml'
+  }
+
   return prefix + '_' + kind.toLowerCase() + '_' + name.toLowerCase() + '.' + ext
 }
 
