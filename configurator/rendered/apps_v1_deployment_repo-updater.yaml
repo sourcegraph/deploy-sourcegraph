@@ -5,9 +5,9 @@ metadata:
     description: Handles repository metadata (not Git data) lookups and updates from external code hosts and other similar services.
     kubectl.kubernetes.io/default-container: repo-updater
   labels:
+    app.kubernetes.io/component: repo-updater
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: repo-updater
   name: repo-updater
 spec:
   minReadySeconds: 10
@@ -24,14 +24,21 @@ spec:
   template:
     metadata:
       labels:
-        deploy: sourcegraph
         app: repo-updater
+        deploy: sourcegraph
     spec:
       containers:
-        - name: repo-updater
+        - env: null
           image: index.docker.io/sourcegraph/repo-updater:3.34.1@sha256:4c2551af17fa87c2b5d93edda4deb1856e2b5f6fff48a5b4ea507fe4a7d1eb04
-          env: null
-          terminationMessagePolicy: FallbackToLogsOnError
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: debug
+              scheme: HTTP
+            periodSeconds: 1
+            timeoutSeconds: 5
+          name: repo-updater
           ports:
             - containerPort: 3182
               name: http
@@ -45,14 +52,6 @@ spec:
               scheme: HTTP
             periodSeconds: 1
             timeoutSeconds: 5
-          livenessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /healthz
-              port: debug
-              scheme: HTTP
-            periodSeconds: 1
-            timeoutSeconds: 5
           resources:
             limits:
               cpu: "1"
@@ -60,14 +59,18 @@ spec:
             requests:
               cpu: "1"
               memory: 500Mi
-        - name: jaeger-agent
-          image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+          terminationMessagePolicy: FallbackToLogsOnError
+        - args:
+            - --reporter.grpc.host-port=jaeger-collector:14250
+            - --reporter.type=grpc
           env:
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: metadata.name
+          image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+          name: jaeger-agent
           ports:
             - containerPort: 5775
               protocol: UDP
@@ -84,8 +87,5 @@ spec:
             requests:
               cpu: 100m
               memory: 100M
-          args:
-            - --reporter.grpc.host-port=jaeger-collector:14250
-            - --reporter.type=grpc
       securityContext:
         runAsUser: 0

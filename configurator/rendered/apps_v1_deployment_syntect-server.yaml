@@ -4,9 +4,9 @@ metadata:
   annotations:
     description: Backend for syntax highlighting operations.
   labels:
+    app.kubernetes.io/component: syntect-server
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: syntect-server
   name: syntect-server
 spec:
   minReadySeconds: 10
@@ -23,14 +23,12 @@ spec:
   template:
     metadata:
       labels:
-        deploy: sourcegraph
         app: syntect-server
+        deploy: sourcegraph
     spec:
       containers:
-        - name: syntect-server
-          env: null
+        - env: null
           image: index.docker.io/sourcegraph/syntax-highlighter:3.34.1@sha256:23cb46271e3e205f7da1b01fcea3704a23b7c6fb5a41f4171d4596278523f35a
-          terminationMessagePolicy: FallbackToLogsOnError
           livenessProbe:
             httpGet:
               path: /health
@@ -38,6 +36,7 @@ spec:
               scheme: HTTP
             initialDelaySeconds: 5
             timeoutSeconds: 5
+          name: syntect-server
           ports:
             - containerPort: 9238
               name: http
@@ -51,5 +50,6 @@ spec:
             requests:
               cpu: 250m
               memory: 2G
+          terminationMessagePolicy: FallbackToLogsOnError
       securityContext:
         runAsUser: 0

@@ -6,16 +6,16 @@ metadata:
     sourcegraph.prometheus/scrape: "true"
   labels:
     app: sourcegraph-frontend
+    app.kubernetes.io/component: frontend
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: frontend
   name: sourcegraph-frontend
 spec:
   ports:
     - name: http
+      nodePort: 30080
       port: 30080
       targetPort: http
-      nodePort: 30080
   selector:
     app: sourcegraph-frontend
   type: NodePort

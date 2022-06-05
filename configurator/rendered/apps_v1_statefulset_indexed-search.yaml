@@ -4,9 +4,9 @@ metadata:
   annotations:
     description: Backend for indexed text search operations.
   labels:
+    app.kubernetes.io/component: indexed-search
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: indexed-search
   name: indexed-search
 spec:
   replicas: 1
@@ -22,9 +22,8 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-        - name: zoekt-webserver
-          image: index.docker.io/sourcegraph/indexed-searcher:3.34.1@sha256:8c6e197065fc81bd0e6798beb66bc461328e4f114f2caddb870f2ed17f9ca5ed
-          terminationMessagePolicy: FallbackToLogsOnError
+        - image: index.docker.io/sourcegraph/indexed-searcher:3.34.1@sha256:8c6e197065fc81bd0e6798beb66bc461328e4f114f2caddb870f2ed17f9ca5ed
+          name: zoekt-webserver
           ports:
             - containerPort: 6070
               name: http
@@ -43,12 +42,12 @@ spec:
             requests:
               cpu: 500m
               memory: 2G
+          terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /data
               name: data
-        - name: zoekt-indexserver
-          image: index.docker.io/sourcegraph/search-indexer:3.34.1@sha256:7667dfef8482b430487d7c801aa9879188f5aad1d24171ddf8d679a40ac6febc
-          terminationMessagePolicy: FallbackToLogsOnError
+        - image: index.docker.io/sourcegraph/search-indexer:3.34.1@sha256:7667dfef8482b430487d7c801aa9879188f5aad1d24171ddf8d679a40ac6febc
+          name: zoekt-indexserver
           ports:
             - containerPort: 6072
               name: index-http
@@ -59,6 +58,7 @@ spec:
             requests:
               cpu: "4"
               memory: 4G
+          terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /data
               name: data

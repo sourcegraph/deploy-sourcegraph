@@ -5,9 +5,9 @@ metadata:
     description: Rate-limiting proxy for the GitHub API.
     kubectl.kubernetes.io/default-container: github-proxy
   labels:
+    app.kubernetes.io/component: github-proxy
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: github-proxy
   name: github-proxy
 spec:
   minReadySeconds: 10
@@ -28,9 +28,8 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-        - name: github-proxy
-          image: index.docker.io/sourcegraph/github-proxy:3.34.1@sha256:9b616b61419010bf47afd2a14d9e426cb1677ca45a0968f3bf3a35109b1998ff
-          terminationMessagePolicy: FallbackToLogsOnError
+        - image: index.docker.io/sourcegraph/github-proxy:3.34.1@sha256:9b616b61419010bf47afd2a14d9e426cb1677ca45a0968f3bf3a35109b1998ff
+          name: github-proxy
           ports:
             - containerPort: 3180
               name: http
@@ -41,14 +40,18 @@ spec:
             requests:
               cpu: 100m
               memory: 250M
-        - name: jaeger-agent
-          image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+          terminationMessagePolicy: FallbackToLogsOnError
+        - args:
+            - --reporter.grpc.host-port=jaeger-collector:14250
+            - --reporter.type=grpc
           env:
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: metadata.name
+          image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+          name: jaeger-agent
           ports:
             - containerPort: 5775
               protocol: UDP
@@ -65,8 +68,5 @@ spec:
             requests:
               cpu: 100m
               memory: 100M
-          args:
-            - --reporter.grpc.host-port=jaeger-collector:14250
-            - --reporter.type=grpc
       securityContext:
         runAsUser: 0

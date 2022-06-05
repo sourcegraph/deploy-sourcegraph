@@ -5,9 +5,9 @@ metadata:
     description: Metrics/monitoring dashboards and alerts.
     kubectl.kubernetes.io/default-container: grafana
   labels:
+    app.kubernetes.io/component: grafana
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: grafana
   name: grafana
 spec:
   replicas: 1
@@ -16,8 +16,6 @@ spec:
     matchLabels:
       app: grafana
   serviceName: grafana
-  updateStrategy:
-    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -25,17 +23,11 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-        - name: grafana
-          image: index.docker.io/sourcegraph/grafana:3.34.1@sha256:a1a7c9f5d709b8ed395727965bed1671c39c472673a5984f7d1b6731afee449b
-          terminationMessagePolicy: FallbackToLogsOnError
+        - image: index.docker.io/sourcegraph/grafana:3.34.1@sha256:a1a7c9f5d709b8ed395727965bed1671c39c472673a5984f7d1b6731afee449b
+          name: grafana
           ports:
             - containerPort: 3370
               name: http
-          volumeMounts:
-            - mountPath: /var/lib/grafana
-              name: grafana-data
-            - mountPath: /sg_config_grafana/provisioning/datasources
-              name: config
           resources:
             limits:
               cpu: "1"
@@ -43,14 +35,22 @@ spec:
             requests:
               cpu: 100m
               memory: 512Mi
-      serviceAccountName: grafana
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /var/lib/grafana
+              name: grafana-data
+            - mountPath: /sg_config_grafana/provisioning/datasources
+              name: config
       securityContext:
         runAsUser: 0
+      serviceAccountName: grafana
       volumes:
-        - name: config
-          configMap:
+        - configMap:
             defaultMode: 777
             name: grafana
+          name: config
+  updateStrategy:
+    type: RollingUpdate
   volumeClaimTemplates:
     - metadata:
         name: grafana-data

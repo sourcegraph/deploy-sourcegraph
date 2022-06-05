@@ -6,11 +6,11 @@ metadata:
     prometheus.io/port: "6060"
     sourcegraph.prometheus/scrape: "true"
   labels:
+    app: gitserver
+    app.kubernetes.io/component: gitserver
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: gitserver
     type: gitserver
-    app: gitserver
   name: gitserver
 spec:
   clusterIP: None
@@ -19,6 +19,6 @@ spec:
       port: 10811
       targetPort: 10811
   selector:
-    type: gitserver
     app: gitserver
+    type: gitserver
   type: ClusterIP

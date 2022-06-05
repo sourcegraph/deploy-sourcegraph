@@ -5,9 +5,9 @@ metadata:
     description: Stores clones of repositories to perform Git operations.
     kubectl.kubernetes.io/default-container: gitserver
   labels:
+    app.kubernetes.io/component: gitserver
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: gitserver
   name: gitserver
 spec:
   replicas: 1
@@ -20,21 +20,20 @@ spec:
     metadata:
       labels:
         app: gitserver
+        deploy: sourcegraph
         group: backend
         type: gitserver
-        deploy: sourcegraph
     spec:
       containers:
-        - name: gitserver
-          args:
+        - args:
             - run
           image: index.docker.io/sourcegraph/gitserver:3.34.1@sha256:db8bcdf3f07f3d4ab4262f41dd11853f62811bd3a4e5e981802ddc3dee3a0af1
-          terminationMessagePolicy: FallbackToLogsOnError
           livenessProbe:
             initialDelaySeconds: 5
             tcpSocket:
               port: rpc
             timeoutSeconds: 5
+          name: gitserver
           ports:
             - containerPort: 3178
               name: rpc
@@ -45,17 +44,21 @@ spec:
             requests:
               cpu: "4"
               memory: 8G
+          terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /data/repos
               name: repos
-        - name: jaeger-agent
-          image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+        - args:
+            - --reporter.grpc.host-port=jaeger-collector:14250
+            - --reporter.type=grpc
           env:
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: metadata.name
+          image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+          name: jaeger-agent
           ports:
             - containerPort: 5775
               protocol: UDP
@@ -72,9 +75,6 @@ spec:
             requests:
               cpu: 100m
               memory: 100M
-          args:
-            - --reporter.grpc.host-port=jaeger-collector:14250
-            - --reporter.type=grpc
       securityContext:
         runAsUser: 0
       volumes:

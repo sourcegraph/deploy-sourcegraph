@@ -1,10 +1,10 @@
-kind: StorageClass
 apiVersion: storage.k8s.io/v1
+kind: StorageClass
 metadata:
-  name: sourcegraph
   labels:
     deploy: sourcegraph
-provisioner: kubernetes.io/aws-ebs
+  name: sourcegraph
 parameters:
   type: gp2 # This configures SSDs (recommended).
+provisioner: kubernetes.io/aws-ebs
 reclaimPolicy: Retain

@@ -2,12 +2,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubectl.kubernetes.io/default-container: frontend
     description: Serves the frontend of Sourcegraph via HTTP(S).
+    kubectl.kubernetes.io/default-container: frontend
   labels:
+    app.kubernetes.io/component: frontend
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: frontend
   name: sourcegraph-frontend
 spec:
   minReadySeconds: 10
@@ -28,9 +28,7 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-        - name: frontend
-          image: index.docker.io/sourcegraph/frontend:3.34.1@sha256:f073f591e49867a1a9a530a54bf600466f2ac35479d5fa5e46b9b792623eb42b
-          args:
+        - args:
             - serve
           env:
             - name: PGDATABASE
@@ -67,7 +65,7 @@ spec:
               value: http://jaeger-query:16686
             - name: PROMETHEUS_URL
               value: http://prometheus:30090
-          terminationMessagePolicy: FallbackToLogsOnError
+          image: index.docker.io/sourcegraph/frontend:3.34.1@sha256:f073f591e49867a1a9a530a54bf600466f2ac35479d5fa5e46b9b792623eb42b
           livenessProbe:
             httpGet:
               path: /healthz
@@ -75,13 +73,7 @@ spec:
               scheme: HTTP
             initialDelaySeconds: 300
             timeoutSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: debug
-              scheme: HTTP
-            periodSeconds: 5
-            timeoutSeconds: 5
+          name: frontend
           ports:
             - containerPort: 3080
               name: http
@@ -89,6 +81,13 @@ spec:
               name: http-internal
             - containerPort: 6060
               name: debug
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: debug
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
           resources:
             limits:
               cpu: "2"
@@ -98,17 +97,21 @@ spec:
               cpu: "2"
               ephemeral-storage: 4Gi
               memory: 2G
+          terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /mnt/cache
               name: cache-ssd
-        - name: jaeger-agent
-          image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+        - args:
+            - --reporter.grpc.host-port=jaeger-collector:14250
+            - --reporter.type=grpc
           env:
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: metadata.name
+          image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+          name: jaeger-agent
           ports:
             - containerPort: 5775
               protocol: UDP
@@ -125,9 +128,6 @@ spec:
             requests:
               cpu: 100m
               memory: 100M
-          args:
-            - --reporter.grpc.host-port=jaeger-collector:14250
-            - --reporter.type=grpc
       securityContext:
         runAsUser: 0
       serviceAccountName: sourcegraph-frontend

@@ -4,9 +4,9 @@ metadata:
   annotations:
     description: Handles conversion of uploaded precise code intelligence bundles.
   labels:
+    app.kubernetes.io/component: precise-code-intel
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: precise-code-intel
   name: precise-code-intel-worker
 spec:
   minReadySeconds: 10
@@ -23,12 +23,11 @@ spec:
   template:
     metadata:
       labels:
-        deploy: sourcegraph
         app: precise-code-intel-worker
+        deploy: sourcegraph
     spec:
       containers:
-        - name: precise-code-intel-worker
-          env:
+        - env:
             - name: NUM_WORKERS
               value: "4"
             - name: POD_NAME
@@ -36,7 +35,6 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
           image: index.docker.io/sourcegraph/precise-code-intel-worker:insiders@sha256:3742b9a2da997e9e8e68d4c2f641249f0e26d47dc4c6b19a0a230a17dee41834
-          terminationMessagePolicy: FallbackToLogsOnError
           livenessProbe:
             httpGet:
               path: /healthz
@@ -44,6 +42,12 @@ spec:
               scheme: HTTP
             initialDelaySeconds: 60
             timeoutSeconds: 5
+          name: precise-code-intel-worker
+          ports:
+            - containerPort: 3188
+              name: http
+            - containerPort: 6060
+              name: debug
           readinessProbe:
             httpGet:
               path: /ready
@@ -51,11 +55,6 @@ spec:
               scheme: HTTP
             periodSeconds: 5
             timeoutSeconds: 5
-          ports:
-            - containerPort: 3188
-              name: http
-            - containerPort: 6060
-              name: debug
           resources:
             limits:
               cpu: "2"
@@ -63,5 +62,6 @@ spec:
             requests:
               cpu: 500m
               memory: 2G
+          terminationMessagePolicy: FallbackToLogsOnError
       securityContext:
         runAsUser: 0

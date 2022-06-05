@@ -5,9 +5,9 @@ metadata:
     description: DaemonSet to ensure all nodes run a cAdvisor pod.
     seccomp.security.alpha.kubernetes.io/pod: docker/default
   labels:
+    app.kubernetes.io/component: cadvisor
     deploy: sourcegraph
     sourcegraph-resource-requires: cluster-admin
-    app.kubernetes.io/component: cadvisor
   name: cadvisor
 spec:
   selector:
@@ -20,66 +20,66 @@ spec:
         prometheus.io/port: "48080"
         sourcegraph.prometheus/scrape: "true"
       labels:
-        deploy: sourcegraph
         app: cadvisor
+        deploy: sourcegraph
     spec:
-      serviceAccountName: cadvisor
+      automountServiceAccountToken: false
       containers:
-        - name: cadvisor
-          image: index.docker.io/sourcegraph/cadvisor:insiders@sha256:d4d8b87931155b949118695f2b7b214b97a398d9548d5ea436a637c96c36fced
-          args:
+        - args:
             - --store_container_labels=false
             - --whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name,io.kubernetes.pod.namespace,io.kubernetes.pod.uid
-          resources:
-            requests:
-              memory: 200Mi
-              cpu: 150m
-            limits:
-              memory: 2000Mi
-              cpu: 300m
-          volumeMounts:
-            - name: rootfs
-              mountPath: /rootfs
-              readOnly: true
-            - name: var-run
-              mountPath: /var/run
-              readOnly: true
-            - name: sys
-              mountPath: /sys
-              readOnly: true
-            - name: docker
-              mountPath: /var/lib/docker
-              readOnly: true
-            - name: disk
-              mountPath: /dev/disk
-              readOnly: true
-            - name: kmsg
-              mountPath: /dev/kmsg
-              readOnly: true
+          image: index.docker.io/sourcegraph/cadvisor:insiders@sha256:d4d8b87931155b949118695f2b7b214b97a398d9548d5ea436a637c96c36fced
+          name: cadvisor
           ports:
-            - name: http
-              containerPort: 48080
+            - containerPort: 48080
+              name: http
               protocol: TCP
+          resources:
+            limits:
+              cpu: 300m
+              memory: 2000Mi
+            requests:
+              cpu: 150m
+              memory: 200Mi
           securityContext:
             privileged: true
-      automountServiceAccountToken: false
+          volumeMounts:
+            - mountPath: /rootfs
+              name: rootfs
+              readOnly: true
+            - mountPath: /var/run
+              name: var-run
+              readOnly: true
+            - mountPath: /sys
+              name: sys
+              readOnly: true
+            - mountPath: /var/lib/docker
+              name: docker
+              readOnly: true
+            - mountPath: /dev/disk
+              name: disk
+              readOnly: true
+            - mountPath: /dev/kmsg
+              name: kmsg
+              readOnly: true
+      serviceAccountName: cadvisor
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: rootfs
-          hostPath:
+        - hostPath:
             path: /
-        - name: var-run
-          hostPath:
+          name: rootfs
+        - hostPath:
             path: /var/run
-        - name: sys
-          hostPath:
+          name: var-run
+        - hostPath:
             path: /sys
-        - name: docker
-          hostPath:
+          name: sys
+        - hostPath:
             path: /var/lib/docker
-        - name: disk
-          hostPath:
+          name: docker
+        - hostPath:
             path: /dev/disk
-        - name: kmsg
-          hostPath:
+          name: disk
+        - hostPath:
             path: /dev/kmsg
+          name: kmsg

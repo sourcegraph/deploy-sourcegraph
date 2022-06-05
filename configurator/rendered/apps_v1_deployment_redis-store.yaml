@@ -4,9 +4,9 @@ metadata:
   annotations:
     description: Redis for storing semi-persistent data like user sessions.
   labels:
+    app.kubernetes.io/component: redis
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: redis
   name: redis-store
 spec:
   minReadySeconds: 10
@@ -20,17 +20,16 @@ spec:
   template:
     metadata:
       labels:
-        deploy: sourcegraph
         app: redis-store
+        deploy: sourcegraph
     spec:
       containers:
-        - name: redis-store
-          image: index.docker.io/sourcegraph/redis-store:3.34.1@sha256:c0f07e5da450bc2e6f4d03fb793b8b6086676c6baf9b2243eaadd53cc931a886
-          terminationMessagePolicy: FallbackToLogsOnError
+        - image: index.docker.io/sourcegraph/redis-store:3.34.1@sha256:c0f07e5da450bc2e6f4d03fb793b8b6086676c6baf9b2243eaadd53cc931a886
           livenessProbe:
             initialDelaySeconds: 30
             tcpSocket:
               port: redis
+          name: redis-store
           ports:
             - containerPort: 6379
               name: redis
@@ -45,12 +44,12 @@ spec:
             requests:
               cpu: "1"
               memory: 7Gi
+          terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /redis-data
               name: redis-data
-        - name: redis-exporter
-          image: index.docker.io/sourcegraph/redis_exporter:3.34.1@sha256:f3f51453e4261734f08579fe9c812c66ee443626690091401674be4fb724da70
-          terminationMessagePolicy: FallbackToLogsOnError
+        - image: index.docker.io/sourcegraph/redis_exporter:3.34.1@sha256:f3f51453e4261734f08579fe9c812c66ee443626690091401674be4fb724da70
+          name: redis-exporter
           ports:
             - containerPort: 9121
               name: redisexp
@@ -61,6 +60,7 @@ spec:
             requests:
               cpu: 10m
               memory: 100Mi
+          terminationMessagePolicy: FallbackToLogsOnError
       securityContext:
         runAsUser: 0
       volumes:

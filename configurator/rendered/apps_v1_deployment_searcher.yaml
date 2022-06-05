@@ -5,9 +5,9 @@ metadata:
     description: Backend for text search operations.
     kubectl.kubernetes.io/default-container: searcher
   labels:
+    app.kubernetes.io/component: searcher
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: searcher
   name: searcher
 spec:
   minReadySeconds: 10
@@ -24,18 +24,17 @@ spec:
   template:
     metadata:
       labels:
-        deploy: sourcegraph
         app: searcher
+        deploy: sourcegraph
     spec:
       containers:
-        - name: searcher
-          env:
+        - env:
             - name: SEARCHER_CACHE_SIZE_MB
               valueFrom:
                 resourceFieldRef:
                   containerName: searcher
-                  resource: requests.ephemeral-storage
                   divisor: 1M
+                  resource: requests.ephemeral-storage
             - name: POD_NAME
               valueFrom:
                 fieldRef:
@@ -43,7 +42,7 @@ spec:
             - name: CACHE_DIR
               value: /mnt/cache/$(POD_NAME)
           image: index.docker.io/sourcegraph/searcher:3.34.1@sha256:b598c48d677127f22300fd85d4a220e8ed0d3ef5c0fbe2500f04821e6ef09d07
-          terminationMessagePolicy: FallbackToLogsOnError
+          name: searcher
           ports:
             - containerPort: 3181
               name: http
@@ -66,17 +65,21 @@ spec:
               cpu: 500m
               ephemeral-storage: 25G
               memory: 500M
+          terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /mnt/cache
               name: cache-ssd
-        - name: jaeger-agent
-          image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+        - args:
+            - --reporter.grpc.host-port=jaeger-collector:14250
+            - --reporter.type=grpc
           env:
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: metadata.name
+          image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+          name: jaeger-agent
           ports:
             - containerPort: 5775
               protocol: UDP
@@ -93,9 +96,6 @@ spec:
             requests:
               cpu: 100m
               memory: 100M
-          args:
-            - --reporter.grpc.host-port=jaeger-collector:14250
-            - --reporter.type=grpc
       securityContext:
         runAsUser: 0
       volumes:

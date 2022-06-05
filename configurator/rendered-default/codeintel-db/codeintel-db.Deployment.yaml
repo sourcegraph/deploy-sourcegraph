@@ -21,58 +21,39 @@ spec:
   template:
     metadata:
       labels:
-        deploy: sourcegraph
         app: codeintel-db
+        deploy: sourcegraph
         group: backend
     spec:
-      initContainers:
-        - name: correct-data-dir-permissions
-          image: index.docker.io/sourcegraph/alpine-3.14:insiders@sha256:c12d8679188e14a5e7d581aa5550ab411f2013fb0662a3f697d378460fe7b5f4
-          command:
-            - sh
-            - -c
-            - if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi
-          volumeMounts:
-            - mountPath: /data
-              name: disk
-          securityContext:
-            runAsUser: 0
-          resources:
-            limits:
-              cpu: 10m
-              memory: 50Mi
-            requests:
-              cpu: 10m
-              memory: 50Mi
       containers:
-        - name: pgsql
-          image: index.docker.io/sourcegraph/codeintel-db:insiders@sha256:8c6d086559c97408a2080660693a4b3d8f8bb8d3cd64d09379dc6a20c21469dc
-          terminationMessagePolicy: FallbackToLogsOnError
+        - image: index.docker.io/sourcegraph/codeintel-db:insiders@sha256:8c6d086559c97408a2080660693a4b3d8f8bb8d3cd64d09379dc6a20c21469dc
+          livenessProbe:
+            exec:
+              command:
+                - /liveness.sh
+            initialDelaySeconds: 15
+          name: pgsql
+          ports:
+            - containerPort: 5432
+              name: pgsql
           readinessProbe:
             exec:
               command:
                 - /ready.sh
-          livenessProbe:
-            initialDelaySeconds: 15
-            exec:
-              command:
-                - /liveness.sh
+          resources:
+            limits:
+              cpu: "4"
+              memory: 4Gi
+            requests:
+              cpu: "4"
+              memory: 4Gi
           startupProbe:
             exec:
               command:
                 - /liveness.sh
             failureThreshold: 360
             periodSeconds: 10
-          ports:
-            - containerPort: 5432
-              name: pgsql
-          resources:
-            limits:
-              cpu: "4"
-              memory: 4Gi
-            requests:
-              cpu: "4"
-              memory: 4Gi
+          terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /data
               name: disk
@@ -84,7 +65,6 @@ spec:
             - name: PG_EXPORTER_EXTEND_QUERY_PATH
               value: /config/code_intel_queries.yaml
           image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:058803235a9deca67412edb01ec6fe22f58a7326c2f565281f7e745701df3080
-          terminationMessagePolicy: FallbackToLogsOnError
           name: pgsql-exporter
           resources:
             limits:
@@ -93,14 +73,34 @@ spec:
             requests:
               cpu: 10m
               memory: 50Mi
-      terminationGracePeriodSeconds: 120
+          terminationMessagePolicy: FallbackToLogsOnError
+      initContainers:
+        - command:
+            - sh
+            - -c
+            - if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi
+          image: index.docker.io/sourcegraph/alpine-3.14:insiders@sha256:c12d8679188e14a5e7d581aa5550ab411f2013fb0662a3f697d378460fe7b5f4
+          name: correct-data-dir-permissions
+          resources:
+            limits:
+              cpu: 10m
+              memory: 50Mi
+            requests:
+              cpu: 10m
+              memory: 50Mi
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - mountPath: /data
+              name: disk
       securityContext:
         runAsUser: 0
+      terminationGracePeriodSeconds: 120
       volumes:
         - name: disk
           persistentVolumeClaim:
             claimName: codeintel-db
-        - name: pgsql-conf
-          configMap:
+        - configMap:
             defaultMode: 777
             name: codeintel-db-conf
+          name: pgsql-conf

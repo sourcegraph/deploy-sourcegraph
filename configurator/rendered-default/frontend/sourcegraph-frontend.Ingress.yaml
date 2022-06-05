@@ -6,18 +6,18 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: 150m
   labels:
     app: sourcegraph-frontend
+    app.kubernetes.io/component: frontend
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: frontend
   name: sourcegraph-frontend
 spec:
   rules:
     - http:
         paths:
-          - path: /
-            pathType: Prefix
-            backend:
+          - backend:
               service:
                 name: sourcegraph-frontend
                 port:
                   number: 30080
+            path: /
+            pathType: Prefix

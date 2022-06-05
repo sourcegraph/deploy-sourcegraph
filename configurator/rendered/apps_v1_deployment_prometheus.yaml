@@ -4,9 +4,9 @@ metadata:
   annotations:
     description: Collects metrics and aggregates them into graphs.
   labels:
+    app.kubernetes.io/component: prometheus
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: prometheus
   name: prometheus
 spec:
   minReadySeconds: 10
@@ -20,28 +20,22 @@ spec:
   template:
     metadata:
       labels:
-        deploy: sourcegraph
         app: prometheus
+        deploy: sourcegraph
     spec:
       containers:
-        - name: prometheus
-          image: index.docker.io/sourcegraph/prometheus:3.34.1@sha256:3be3824f43f64d2e1a8c1bcae5509ff2289a45fec5b3227e93cde0a4b9c343bc
-          terminationMessagePolicy: FallbackToLogsOnError
-          readinessProbe:
-            httpGet:
-              path: /-/ready
-              port: 9090
-            timeoutSeconds: 3
-            failureThreshold: 120
-            periodSeconds: 5
+        - image: index.docker.io/sourcegraph/prometheus:3.34.1@sha256:3be3824f43f64d2e1a8c1bcae5509ff2289a45fec5b3227e93cde0a4b9c343bc
+          name: prometheus
           ports:
             - containerPort: 9090
               name: http
-          volumeMounts:
-            - mountPath: /prometheus
-              name: data
-            - mountPath: /sg_prometheus_add_ons
-              name: config
+          readinessProbe:
+            failureThreshold: 120
+            httpGet:
+              path: /-/ready
+              port: 9090
+            periodSeconds: 5
+            timeoutSeconds: 3
           resources:
             limits:
               cpu: "2"
@@ -49,10 +43,16 @@ spec:
             requests:
               cpu: 500m
               memory: 6G
-      terminationGracePeriodSeconds: 120
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /prometheus
+              name: data
+            - mountPath: /sg_prometheus_add_ons
+              name: config
       securityContext:
         runAsUser: 0
       serviceAccountName: prometheus
+      terminationGracePeriodSeconds: 120
       volumes:
         - name: data
           persistentVolumeClaim:

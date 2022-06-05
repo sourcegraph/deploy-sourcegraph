@@ -5,9 +5,9 @@ metadata:
     description: Backend for symbols operations.
     kubectl.kubernetes.io/default-container: symbols
   labels:
+    app.kubernetes.io/component: symbols
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: symbols
   name: symbols
 spec:
   minReadySeconds: 10
@@ -24,18 +24,17 @@ spec:
   template:
     metadata:
       labels:
-        deploy: sourcegraph
         app: symbols
+        deploy: sourcegraph
     spec:
       containers:
-        - name: symbols
-          env:
+        - env:
             - name: SYMBOLS_CACHE_SIZE_MB
               valueFrom:
                 resourceFieldRef:
                   containerName: symbols
-                  resource: requests.ephemeral-storage
                   divisor: 1M
+                  resource: requests.ephemeral-storage
             - name: POD_NAME
               valueFrom:
                 fieldRef:
@@ -43,7 +42,6 @@ spec:
             - name: CACHE_DIR
               value: /mnt/cache/$(POD_NAME)
           image: index.docker.io/sourcegraph/symbols:3.34.1@sha256:201eab7eba77a722a7dc7005a8d9f7b4b41397dbc34c31062dacb3d14aa4cd21
-          terminationMessagePolicy: FallbackToLogsOnError
           livenessProbe:
             httpGet:
               path: /healthz
@@ -51,6 +49,12 @@ spec:
               scheme: HTTP
             initialDelaySeconds: 60
             timeoutSeconds: 5
+          name: symbols
+          ports:
+            - containerPort: 3184
+              name: http
+            - containerPort: 6060
+              name: debug
           readinessProbe:
             httpGet:
               path: /healthz
@@ -58,11 +62,6 @@ spec:
               scheme: HTTP
             periodSeconds: 5
             timeoutSeconds: 5
-          ports:
-            - containerPort: 3184
-              name: http
-            - containerPort: 6060
-              name: debug
           resources:
             limits:
               cpu: "2"
@@ -72,17 +71,21 @@ spec:
               cpu: 500m
               ephemeral-storage: 10G
               memory: 500M
+          terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /mnt/cache
               name: cache-ssd
-        - name: jaeger-agent
-          image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+        - args:
+            - --reporter.grpc.host-port=jaeger-collector:14250
+            - --reporter.type=grpc
           env:
             - name: POD_NAME
               valueFrom:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: metadata.name
+          image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+          name: jaeger-agent
           ports:
             - containerPort: 5775
               protocol: UDP
@@ -99,9 +102,6 @@ spec:
             requests:
               cpu: 100m
               memory: 100M
-          args:
-            - --reporter.grpc.host-port=jaeger-collector:14250
-            - --reporter.type=grpc
       securityContext:
         runAsUser: 0
       volumes:
