@@ -7,7 +7,7 @@ import * as path from "path";
 import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
 import * as mkdirp from "mkdirp";
 import * as request from "request";
-import { reject } from "lodash";
+import { isObject, reject } from "lodash";
 import { resolve } from "dns";
 
 export interface Cluster {
@@ -612,4 +612,20 @@ export const nonPrivileged = (): Transform => async (c: Cluster) => {
 export const unsafeArbitraryTransformations = (transform: (c: Cluster) => void): Transform => async(c: Cluster) => {
     transform(c)
     return Promise.resolve()
+}
+
+export function deepPartial(source?: object, pick?: object): object | undefined {
+  if (!source) {
+    return source
+  }
+  if (!pick) {
+    return {}
+  }
+  const dest = _.pick(source, _.toPairs(pick).map(([key,]) => key))
+  for (const k of _.keys(dest)) {
+    if (isObject((pick as any)[k])) {
+      (dest as any)[k] = deepPartial((dest as any)[k], (pick as any)[k])
+    }
+  }
+  return dest
 }

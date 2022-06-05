@@ -5,7 +5,7 @@ import * as YAML from "yaml";
 import * as path from "path";
 import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
 import * as mkdirp from "mkdirp";
-import { Cluster } from "./common";
+import { Cluster, deepPartial } from "./common";
 import { transformations as userTransformations } from "./customize";
 import { transformations as defaultTransformations } from "./customize.default";
 
@@ -36,104 +36,121 @@ import { transformations as defaultTransformations } from "./customize.default";
     ManualInstructions: [],
   };
 
-  function readCluster(root: string) {
-    const contents = readdirSync(root, { withFileTypes: true });
-    for (const entry of contents) {
-      if (entry.isFile()) {
-        if (entry.name.endsWith(".yaml")) {
-          const k8sType = path.extname(
-            entry.name.substring(0, entry.name.length - ".yaml".length)
+function transformFilename(sourceDir: string, filename: string): string {
+  // return path.relative(sourceDir, filename);
+  
+  const yaml = YAML.parse(readFileSync(filename).toString())
+  const parts = path.basename(filename).split('.')
+  if (parts.length < 3) {
+    console.log('ERROR: could not transform filename', filename)
+    return filename
+  }
+  const [name, kind, ext] = parts
+  let prefix = 'apps_v1'
+  if (typeof yaml.apiVersion === 'string' || yaml.apiVersion instanceof String) {
+    prefix = (yaml.apiVersion as string).replace('/', '_')
+  }
+  
+  return prefix + '_' + kind.toLowerCase() + '_' + name.toLowerCase() + '.' + ext
+}
+
+function readCluster(root: string) {
+  const contents = readdirSync(root, { withFileTypes: true });
+  for (const entry of contents) {
+    if (entry.isFile()) {
+      if (entry.name.endsWith(".yaml")) {
+        const k8sType = path.extname(
+          entry.name.substring(0, entry.name.length - ".yaml".length)
           );
           const filename = path.join(root, entry.name);
-          const relativeFilename = path.relative(sourceDir, filename);
           switch (k8sType) {
             case ".Deployment":
-              cluster.Deployments.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
+            cluster.Deployments.push([
+              transformFilename(sourceDir, filename),
+              YAML.parse(readFileSync(filename).toString()),
+            ]);
+            break;
             case ".PersistentVolumeClaim":
-              cluster.PersistentVolumeClaims.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
+            cluster.PersistentVolumeClaims.push([
+              transformFilename(sourceDir, filename),
+              YAML.parse(readFileSync(filename).toString()),
+            ]);
+            break;
             case ".PersistentVolume":
-              cluster.PersistentVolumes.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
+            cluster.PersistentVolumes.push([
+              transformFilename(sourceDir, filename),
+              YAML.parse(readFileSync(filename).toString()),
+            ]);
+            break;
             case ".Service":
             case ".IndexerService":
-              cluster.Services.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
+            cluster.Services.push([
+              transformFilename(sourceDir, filename),
+              YAML.parse(readFileSync(filename).toString()),
+            ]);
+            break;
             case ".ClusterRole":
-              cluster.ClusterRoles.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
+            cluster.ClusterRoles.push([
+              transformFilename(sourceDir, filename),
+              YAML.parse(readFileSync(filename).toString()),
+            ]);
+            break;
             case ".ClusterRoleBinding":
-              cluster.ClusterRoleBindings.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
+            cluster.ClusterRoleBindings.push([
+              transformFilename(sourceDir, filename),
+              YAML.parse(readFileSync(filename).toString()),
+            ]);
+            break;
             case ".ConfigMap":
-              cluster.ConfigMaps.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
+            cluster.ConfigMaps.push([
+              transformFilename(sourceDir, filename),
+              YAML.parse(readFileSync(filename).toString()),
+            ]);
+            break;
             case ".DaemonSet":
-              cluster.DaemonSets.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
+            cluster.DaemonSets.push([
+              transformFilename(sourceDir, filename),
+              YAML.parse(readFileSync(filename).toString()),
+            ]);
+            break;
             case ".Ingress":
-              cluster.Ingresss.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
+            cluster.Ingresss.push([
+              transformFilename(sourceDir, filename),
+              YAML.parse(readFileSync(filename).toString()),
+            ]);
+            break;
             case ".PodSecurityPolicy":
-              cluster.PodSecurityPolicys.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
+            cluster.PodSecurityPolicys.push([
+              transformFilename(sourceDir, filename),
+              YAML.parse(readFileSync(filename).toString()),
+            ]);
+            break;
             case ".Role":
-              cluster.Roles.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
+            cluster.Roles.push([
+              transformFilename(sourceDir, filename),
+              YAML.parse(readFileSync(filename).toString()),
+            ]);
+            break;
             case ".RoleBinding":
-              cluster.RoleBindings.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
+            cluster.RoleBindings.push([
+              transformFilename(sourceDir, filename),
+              YAML.parse(readFileSync(filename).toString()),
+            ]);
+            break;
             case ".ServiceAccount":
-              cluster.ServiceAccounts.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
+            cluster.ServiceAccounts.push([
+              transformFilename(sourceDir, filename),
+              YAML.parse(readFileSync(filename).toString()),
+            ]);
+            break;
             case ".StatefulSet":
-              cluster.StatefulSets.push([
-                relativeFilename,
-                YAML.parse(readFileSync(filename).toString()),
-              ]);
-              break;
+            cluster.StatefulSets.push([
+              transformFilename(sourceDir, filename),
+              YAML.parse(readFileSync(filename).toString()),
+            ]);
+            break;
             default:
-              cluster.Unrecognized.push(entry.name);
+            cluster.Unrecognized.push(entry.name);
           }
         }
       } else if (entry.isDirectory()) {

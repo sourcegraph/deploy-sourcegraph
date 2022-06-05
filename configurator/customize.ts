@@ -1,4 +1,6 @@
 import * as k8s from "@kubernetes/client-node";
+import { V1RoleRef } from "@kubernetes/client-node";
+import _ = require("lodash");
 import {
   Transform,
   setResources,
@@ -13,6 +15,7 @@ import {
   postgres,
   nonRoot,
   unsafeArbitraryTransformations,
+  deepPartial,
 } from "./common";
 
 export const transformations: Transform[] = [
@@ -140,4 +143,4 @@ export const transformations: Transform[] = [
   //     }
   //   })
   // })
-];
+]
