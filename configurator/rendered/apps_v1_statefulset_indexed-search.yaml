@@ -10,7 +10,7 @@ metadata:
   name: indexed-search
   namespace: sourcegraph
 spec:
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -39,10 +39,10 @@ spec:
           resources:
             limits:
               cpu: "2"
-              memory: 4G
+              memory: 16G
             requests:
-              cpu: 500m
-              memory: 2G
+              cpu: "1"
+              memory: 16G
           terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /data
@@ -54,11 +54,11 @@ spec:
               name: index-http
           resources:
             limits:
-              cpu: "8"
-              memory: 8G
+              cpu: "4"
+              memory: 16G
             requests:
               cpu: "4"
-              memory: 4G
+              memory: 8G
           terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
             - mountPath: /data
@@ -71,13 +71,11 @@ spec:
     type: RollingUpdate
   volumeClaimTemplates:
     - metadata:
-        labels:
-          deploy: sourcegraph
         name: data
       spec:
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 200Gi
-        storageClassName: sourcegraph
+            storage: 100Gi
+        storageClassName: sourcegraph-storage-class

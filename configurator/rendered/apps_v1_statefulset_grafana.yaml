@@ -47,7 +47,7 @@ spec:
       serviceAccountName: grafana
       volumes:
         - configMap:
-            defaultMode: 777
+            defaultMode: 511
             name: grafana
           name: config
   updateStrategy:
@@ -60,5 +60,5 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 2Gi
-        storageClassName: sourcegraph
+            storage: 10Gi
+        storageClassName: sourcegraph-storage-class
