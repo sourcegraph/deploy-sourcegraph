@@ -7,9 +7,10 @@ import * as path from "path";
 import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
 import * as mkdirp from "mkdirp";
 import * as request from "request";
-import { flatten, isObject, merge, reject } from "lodash";
+import { difference, flatten, isObject, merge, reject } from "lodash";
 import { resolve } from "dns";
-import { V1Container, V1Deployment, V1ObjectMeta, V1Volume } from "@kubernetes/client-node";
+import { V1Container, V1Deployment, V1Ingress, V1ObjectMeta, V1PersistentVolumeClaim, V1PersistentVolumeClaimTemplate, V1Volume } from "@kubernetes/client-node";
+import { StatefulSet } from "@pulumi/kubernetesx";
 
 export interface Cluster {
   Deployments: [string, k8s.V1Deployment][];
@@ -163,10 +164,21 @@ export const setAffinity =
     return Promise.resolve();
   };
 
-export const setVolume = (deploymentName: string, volumeName: string, properties: Partial<V1Volume>): Transform => async (c: Cluster) => {
-  c.Deployments.filter(([,d]) => d.metadata?.name === deploymentName).forEach(([, d]) => {
+export const setVolume = (deploymentOrStatefulSetName: string, volumeName: string, properties: Partial<V1Volume>): Transform => async (c: Cluster) => {
+  flatten([c.Deployments, c.StatefulSets]).filter(([,d]) => d.metadata?.name === deploymentOrStatefulSetName).forEach(([, d]) => {
     d.spec?.template.spec?.volumes?.filter(v => v.name === volumeName).forEach(v => {
       merge(v, properties)
+    })
+  })
+}
+
+export const setVolumeClaimTemplate = (statefulSetName: string, volumeName: string, properties: DeepPartial<V1PersistentVolumeClaim>, update?: (v: V1PersistentVolumeClaim) => void): Transform => async (c: Cluster) => {
+  c.StatefulSets.filter(([,s]) => s.metadata?.name === statefulSetName).forEach(([, s]) => {
+    s.spec?.volumeClaimTemplates?.filter(v => v.metadata?.name === volumeName).forEach(v => {
+      merge(v, properties)
+      if (update) {
+        update(v)
+      }
     })
   })
 }
@@ -661,6 +673,43 @@ export const setNamespace = (pattern: RegExp, namespace: string): Transform => s
   meta.namespace = namespace
 })
 
+export const setMetadata2 = (name: string, kind: string, toMerge: DeepPartial<V1ObjectMeta>, update?: (obj: V1ObjectMeta) => void): Transform => async (c: Cluster) => {
+  flatten<[string, { metadata?: V1ObjectMeta, kind?: string }]>([
+    c.Deployments,
+    c.PersistentVolumeClaims,
+    c.PersistentVolumes,
+    c.Services,
+    c.ClusterRoles,
+    c.ClusterRoleBindings,
+    c.ConfigMaps,
+    c.DaemonSets,
+    c.Ingresss,
+    c.PodSecurityPolicys,
+    c.Roles,
+    c.RoleBindings,
+    c.ServiceAccounts,
+    c.Secrets,
+    c.StatefulSets,
+    c.StorageClasses
+  ]).map(([, obj]) => obj)
+    .filter(obj => obj.metadata?.name === name && obj.kind === kind)
+    .forEach(obj=> {
+    merge(obj.metadata, toMerge)
+    if (update) {
+      if (!obj.metadata) {
+        obj.metadata = {}
+      }
+      update(obj.metadata)
+    }
+  })
+}
+
+export const setIngress = (name: string, toMerge: DeepPartial<V1Ingress>): Transform => async (c: Cluster) => {
+  c.Ingresss.filter(([,ingress]) => ingress.metadata?.name === name).forEach(([,ingress]) => {
+    merge(ingress, toMerge)
+  })
+}
+
 export const setMetadata = (pattern: RegExp, updateMeta: (meta: V1ObjectMeta) => void): Transform => async (c: Cluster) => {
   flatten<[string, {metadata?: V1ObjectMeta}]>([
     c.Deployments,
@@ -692,3 +741,16 @@ export const setMetadata = (pattern: RegExp, updateMeta: (meta: V1ObjectMeta) =>
 
 export const setDeployment = (pattern: RegExp, updateDeployment: (deployment: V1Deployment) => void): Transform => async (c: Cluster) => 
   c.Deployments.filter(([name,]) => name.match(pattern)).forEach(([, d]) => updateDeployment(d))
+
+type DeepPartial<T> = T extends object ? {
+    [P in keyof T]?: DeepPartial<T[P]>;
+} : T;
+
+export const setStatefulSet = (name: string, toMerge: DeepPartial<k8s.V1StatefulSet>): Transform => async (c: Cluster) => {
+  c.StatefulSets.filter(([, s]) => s.metadata?.name === name).forEach(([,s]) => {
+    merge(s, toMerge)
+  })
+}
+
+
+// TODO: show warning if name not found

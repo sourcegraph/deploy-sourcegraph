@@ -1,6 +1,6 @@
 import * as k8s from "@kubernetes/client-node";
 import { V1RoleRef } from "@kubernetes/client-node";
-import { merge, values } from "lodash";
+import { concat, merge, values } from "lodash";
 import _ = require("lodash");
 import {
   Transform,
@@ -22,6 +22,10 @@ import {
   setDeployment,
   setVolume,
   setEnvVars,
+  setStatefulSet,
+  setVolumeClaimTemplate,
+  setMetadata2,
+  setIngress,
 } from "./common";
 
 export const transformations: Transform[] = [
@@ -158,11 +162,6 @@ export const transformations: Transform[] = [
   // })
 
   setNamespace(/.*/, 'sourcegraph'),
-  // setMetadata(/.*codeinsights.*/, meta => {
-  //   const labels = meta.labels || {}
-  //   labels.deploy = 'sourcegraph-db'
-  //   meta.labels = labels
-  // })
 
   setResources(['timescaledb'], {
     limits: { cpu: '4' },
@@ -180,6 +179,100 @@ export const transformations: Transform[] = [
       value: 'gitserver-0.gitserver:3178 gitserver-1.gitserver:3178',
     },
   ]),
+  setResources(['symbols'], {
+    limits: {
+      cpu: '4',
+      'ephemeral-storage': '10G',
+      memory: '4G',
+    },
+    requests: {
+      cpu: '1',
+      memory: '1G',
+    },
+  }),
+  setReplicas(['gitserver'], 2),
+  setEnvVars('gitserver', [
+    {
+      name: 'SRC_ENABLE_GC_AUTO',
+      value: 'false',
+    },
+  ]),
+  setResources(['gitserver'], {
+    limits: { cpu: '8' },
+    requests: { memory: '4G' },
+  }),
+  setVolumeClaimTemplate('gitserver', 'repos', {
+    spec: {
+      storageClassName: 'sourcegraph-storage-class',
+      resources: {
+        requests: {
+          storage: '1Ti'
+        }
+      }
+    }
+  }),
+
+  setVolume('grafana', 'config', { configMap: { defaultMode: 511 } }),
+  setVolumeClaimTemplate('grafana', 'grafana-data', {
+    spec: {
+      resources: {
+        requests: {
+          storage: '10Gi',
+        }
+      },
+      storageClassName: 'sourcegraph-storage-class'
+    }    
+  }),
+
+  setReplicas(['indexed-search'], 2),
+  setResources(['zoekt-webserver'], {
+    requests: { cpu: '1', memory: '16G' },
+    limits: { memory: '16G' },
+  }),
+  setResources(['zoekt-indexserver'], {
+    requests: { memory: '8G' },
+    limits: { cpu: '4', memory: '16G' },
+  }),
+  setVolumeClaimTemplate('indexed-search', 'data', {
+    spec: {
+      storageClassName: 'sourcegraph-storage-class',
+      resources: { requests: { storage: '100Gi' } },
+    },
+  }, v => {
+    if (v.metadata) {
+      delete v.metadata.labels
+    }
+  }),
+
+  setMetadata2('sourcegraph-frontend', 'Ingress', {
+    annotations: {
+     'nginx.ingress.kubernetes.io/affinity': 'cookie',
+     'nginx.ingress.kubernetes.io/affinity-mode': 'persistent',
+    },
+  }),
+
+  setIngress('sourcegraph-frontend', {
+    spec: {
+      rules: [
+        {
+          host: 'sourcegraph.canaveral-beta.us-west-2.aws',
+          http: {
+            paths: [
+              {
+                pathType: 'ImplementationSpecific'
+              }
+            ]
+          }
+        },
+      ],
+      tls: [
+        {
+          hosts: ['sourcegraph.canaveral-beta.us-west-2.aws'],
+          secretName: 'sourcegraph-tls',
+        }
+      ]
+    }
+  }),
 
   // TODO: rename to setMetadata
   setDeployment(/.*(codeinsights|codeintel|pgsql).*/, deployment => {
@@ -199,38 +292,5 @@ export const transformations: Transform[] = [
         },
       },
     })
-    // if (deployment.metadata?.labels?.deploy) {
-    //   deployment.metadata.labels.deploy = 'sourcegraph-db'
-    // }
-    // if (deployment.spec?.template?.metadata?.labels) {
-    //   deployment.spec.template.metadata.labels.deploy = 'sourcegraph-db'
-    // }
-
-    // deployment.spec?.template.spec?.containers.filter(c => c.name === 'timescaledb').forEach(container => {
-    //   merge(container, {
-    //     resources: {
-    //       limits: {
-    //         cpu: '4',
-    //       },
-    //       requests: {
-    //         cpu: '1',
-    //       },
-    //     },
-    //   })
-    // })
-    // deployment.spec?.template.spec?.volumes?.filter(v => v.name === 'timescaledb-conf').forEach(volume => {
-    //   merge(volume, {
-    //     configMap: {
-    //       defaultMode: 0o777,
-    //     }
-    //   })
-    // })
-    // deployment.spec?.template.spec?.volumes?.filter(v => v.name === 'pgsql-conf').forEach(volume => {
-    //   merge(volume, {
-    //     configMap: {
-    //       defaultMode: 511,
-    //     }
-    //   })
-    // })
   })
 ]
