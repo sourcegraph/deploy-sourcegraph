@@ -26,6 +26,7 @@ import {
   setVolumeClaimTemplate,
   setMetadata2,
   setIngress,
+  setDeployment2,
 } from "./common";
 
 export const transformations: Transform[] = [
@@ -154,13 +155,6 @@ export const transformations: Transform[] = [
   //   })
   // })
 
-
-  // unsafeArbitraryTransformations((c: Cluster) => {
-  //   c.Deployments.forEach(([name, obj]) => {
-  //     if (name.indexOf)
-  //   })
-  // })
-
   setNamespace(/.*/, 'sourcegraph'),
 
   setResources(['timescaledb'], {
@@ -274,23 +268,44 @@ export const transformations: Transform[] = [
     }
   }),
 
-  // TODO: rename to setMetadata
-  setDeployment(/.*(codeinsights|codeintel|pgsql).*/, deployment => {
-    merge(deployment, {
-      metadata: {
-        labels: {
-          deploy: 'sourcegraph-db',
-        },
-      },
-      spec: {
-        template: {
-          metadata: {
-            labels: {
-              deploy: 'sourcegraph-db',
-            },
-          },
-        },
-      },
-    })
-  })
+  setMetadata2('codeinsights-db-conf', 'ConfigMap', {
+    labels: {
+      deploy: 'sourcegraph-db',
+    }
+  }),
+
+  setDeployment2('codeinsights-db', {
+    metadata: { labels: { deploy: 'sourcegraph-db' } },
+    spec: { template: { metadata: { labels: { deploy: 'sourcegraph-db'} } } },
+  }),
+  setDeployment2('codeintel-db', {
+    metadata: { labels: { deploy: 'sourcegraph-db' } },
+    spec: { template: { metadata: { labels: { deploy: 'sourcegraph-db'} } } },
+  }),
+  setDeployment2('pgsql', {
+    metadata: { labels: { deploy: 'sourcegraph-db' } },
+    spec: { template: { metadata: { labels: { deploy: 'sourcegraph-db'} } } },
+  }),
+
+    
+
+  // // TODO: rename to setMetadata
+  // setDeployment(/.*(codeinsights|codeintel|pgsql).*/, deployment => {
+  //   merge(deployment, {
+  //     metadata: {
+  //       labels: {
+  //         deploy: 'sourcegraph-db',
+  //       },
+  //     },
+  //     spec: {
+  //       template: {
+  //         metadata: {
+  //           labels: {
+  //             deploy: 'sourcegraph-db',
+  //           },
+  //         },
+  //       },
+  //     },
+  //   })
+  // })
 ]

@@ -739,6 +739,10 @@ export const setMetadata = (pattern: RegExp, updateMeta: (meta: V1ObjectMeta) =>
   })
 }
 
+export const setDeployment2 = (name: string, toMerge: DeepPartial<V1Deployment>): Transform => async (c: Cluster) => {
+  c.Deployments.filter(([,d]) => d.metadata?.name === name).forEach(([,d]) => merge(d, toMerge))
+}
+
 export const setDeployment = (pattern: RegExp, updateDeployment: (deployment: V1Deployment) => void): Transform => async (c: Cluster) => 
   c.Deployments.filter(([name,]) => name.match(pattern)).forEach(([, d]) => updateDeployment(d))
 
