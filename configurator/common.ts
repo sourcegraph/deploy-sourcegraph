@@ -7,9 +7,9 @@ import * as path from "path";
 import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
 import * as mkdirp from "mkdirp";
 import * as request from "request";
-import { flatten, isObject, reject } from "lodash";
+import { flatten, isObject, merge, reject } from "lodash";
 import { resolve } from "dns";
-import { V1Deployment, V1ObjectMeta } from "@kubernetes/client-node";
+import { V1Container, V1Deployment, V1ObjectMeta, V1Volume } from "@kubernetes/client-node";
 
 export interface Cluster {
   Deployments: [string, k8s.V1Deployment][];
@@ -71,6 +71,24 @@ export const setResources =
       .forEach((c) => c && updateContainer(c));
     return Promise.resolve();
   };
+
+export const setEnvVars = (containerName: string, env: Array<k8s.V1EnvVar>): Transform => async (c: Cluster) => {
+  allContainers(c).filter(c => c.name === containerName).forEach(c => {
+    c.env = _.concat(env, c.env || [])
+  })
+}
+
+const allContainers = (c: Cluster): k8s.V1Container[] => {
+  const dContainers = c.Deployments.map(([, d]) => d.spec?.template.spec?.containers || [])
+  const ssContainers = c.StatefulSets.map(([, d]) => d.spec?.template.spec?.containers || [])
+  return [..._.flatten(dContainers), ..._.flatten(ssContainers)]
+  // return _.flatten([
+  //   ,
+  //   _.flatten(
+  //     c.StatefulSets.map(([, d]) => d.spec?.template.spec?.containers)
+  //   ),
+  // ]).filter(c => c !== undefined)
+}
 
 export const setReplicas =
   (deploymentAndStatefulSetNames: string[], replicas: number): Transform =>
@@ -144,6 +162,14 @@ export const setAffinity =
     );
     return Promise.resolve();
   };
+
+export const setVolume = (deploymentName: string, volumeName: string, properties: Partial<V1Volume>): Transform => async (c: Cluster) => {
+  c.Deployments.filter(([,d]) => d.metadata?.name === deploymentName).forEach(([, d]) => {
+    d.spec?.template.spec?.volumes?.filter(v => v.name === volumeName).forEach(v => {
+      merge(v, properties)
+    })
+  })
+}
 
 export const redis =
   (redisCacheEndpoint: string, redisStoreEndpoint: string): Transform =>

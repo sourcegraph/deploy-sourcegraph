@@ -1,5 +1,6 @@
 import * as k8s from "@kubernetes/client-node";
 import { V1RoleRef } from "@kubernetes/client-node";
+import { merge, values } from "lodash";
 import _ = require("lodash");
 import {
   Transform,
@@ -19,6 +20,8 @@ import {
   setNamespace,
   setMetadata,
   setDeployment,
+  setVolume,
+  setEnvVars,
 } from "./common";
 
 export const transformations: Transform[] = [
@@ -161,13 +164,73 @@ export const transformations: Transform[] = [
   //   meta.labels = labels
   // })
 
+  setResources(['timescaledb'], {
+    limits: { cpu: '4' },
+    requests: { cpu: '1' },
+  }),
+  setVolume('codeinsights-db', 'timescaledb-conf', { configMap: { defaultMode: 0o777 } }),
+  setVolume('codeintel-db', 'pgsql-conf', { configMap: { defaultMode: 511 }}),
+  setVolume('pgsql', 'pgsql-conf', { configMap: { defaultMode: 511 }}),
+  setVolume('prometheus', 'config', { configMap: { defaultMode: 511 }}),
+  setReplicas(['searcher'], 1),
+  setResources(['searcher'], { limits: { memory: '4G' }, requests: { memory: '1G' }}),
+  setEnvVars('frontend', [ 
+    {
+      name: 'SRC_GIT_SERVERS',
+      value: 'gitserver-0.gitserver:3178 gitserver-1.gitserver:3178',
+    },
+  ]),
+
+  // TODO: rename to setMetadata
   setDeployment(/.*(codeinsights|codeintel|pgsql).*/, deployment => {
-    if (!deployment.metadata) {
-      deployment.metadata = {}
-    }
-    if (!deployment.metadata.labels) {
-      deployment.metadata.labels = {}
-    }
-    deployment.metadata.labels.deploy = 'sourcegraph-db'
+    merge(deployment, {
+      metadata: {
+        labels: {
+          deploy: 'sourcegraph-db',
+        },
+      },
+      spec: {
+        template: {
+          metadata: {
+            labels: {
+              deploy: 'sourcegraph-db',
+            },
+          },
+        },
+      },
+    })
+    // if (deployment.metadata?.labels?.deploy) {
+    //   deployment.metadata.labels.deploy = 'sourcegraph-db'
+    // }
+    // if (deployment.spec?.template?.metadata?.labels) {
+    //   deployment.spec.template.metadata.labels.deploy = 'sourcegraph-db'
+    // }
+
+    // deployment.spec?.template.spec?.containers.filter(c => c.name === 'timescaledb').forEach(container => {
+    //   merge(container, {
+    //     resources: {
+    //       limits: {
+    //         cpu: '4',
+    //       },
+    //       requests: {
+    //         cpu: '1',
+    //       },
+    //     },
+    //   })
+    // })
+    // deployment.spec?.template.spec?.volumes?.filter(v => v.name === 'timescaledb-conf').forEach(volume => {
+    //   merge(volume, {
+    //     configMap: {
+    //       defaultMode: 0o777,
+    //     }
+    //   })
+    // })
+    // deployment.spec?.template.spec?.volumes?.filter(v => v.name === 'pgsql-conf').forEach(volume => {
+    //   merge(volume, {
+    //     configMap: {
+    //       defaultMode: 511,
+    //     }
+    //   })
+    // })
   })
 ]
