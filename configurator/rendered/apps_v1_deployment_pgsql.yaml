@@ -6,7 +6,7 @@ metadata:
     kubectl.kubernetes.io/default-container: pgsql
   labels:
     app.kubernetes.io/component: pgsql
-    deploy: sourcegraph
+    deploy: sourcegraph-db
     sourcegraph-resource-requires: no-cluster-admin
   name: pgsql
   namespace: sourcegraph
@@ -23,7 +23,7 @@ spec:
     metadata:
       labels:
         app: pgsql
-        deploy: sourcegraph
+        deploy: sourcegraph-db
         group: backend
     spec:
       containers:
@@ -99,7 +99,7 @@ spec:
           persistentVolumeClaim:
             claimName: pgsql
         - configMap:
-            defaultMode: 777
+            defaultMode: 511
             name: pgsql-conf
           name: pgsql-conf
         - emptyDir:

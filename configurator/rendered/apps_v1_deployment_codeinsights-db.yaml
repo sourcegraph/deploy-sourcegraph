@@ -5,7 +5,7 @@ metadata:
     description: Code Insights TimescaleDB instance.
   labels:
     app.kubernetes.io/component: codeinsights-db
-    deploy: sourcegraph
+    deploy: sourcegraph-db
     sourcegraph-resource-requires: no-cluster-admin
   name: codeinsights-db
   namespace: sourcegraph
@@ -22,7 +22,7 @@ spec:
     metadata:
       labels:
         app: codeinsights-db
-        deploy: sourcegraph
+        deploy: sourcegraph-db
         group: backend
     spec:
       containers:
@@ -43,7 +43,7 @@ spec:
               cpu: "4"
               memory: 2Gi
             requests:
-              cpu: "4"
+              cpu: "1"
               memory: 2Gi
           terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
@@ -59,6 +59,6 @@ spec:
           persistentVolumeClaim:
             claimName: codeinsights-db
         - configMap:
-            defaultMode: 777
+            defaultMode: 511
             name: codeinsights-db-conf
           name: timescaledb-conf
