@@ -17,6 +17,8 @@ import {
   unsafeArbitraryTransformations,
   deepPartial,
   setNamespace,
+  setMetadata,
+  setDeployment,
 } from "./common";
 
 export const transformations: Transform[] = [
@@ -145,6 +147,27 @@ export const transformations: Transform[] = [
   //   })
   // })
 
-  setNamespace(/TODO/, 'sourcegraph'),
-  
+
+  // unsafeArbitraryTransformations((c: Cluster) => {
+  //   c.Deployments.forEach(([name, obj]) => {
+  //     if (name.indexOf)
+  //   })
+  // })
+
+  setNamespace(/.*/, 'sourcegraph'),
+  // setMetadata(/.*codeinsights.*/, meta => {
+  //   const labels = meta.labels || {}
+  //   labels.deploy = 'sourcegraph-db'
+  //   meta.labels = labels
+  // })
+
+  setDeployment(/.*(codeinsights|codeintel|pgsql).*/, deployment => {
+    if (!deployment.metadata) {
+      deployment.metadata = {}
+    }
+    if (!deployment.metadata.labels) {
+      deployment.metadata.labels = {}
+    }
+    deployment.metadata.labels.deploy = 'sourcegraph-db'
+  })
 ]

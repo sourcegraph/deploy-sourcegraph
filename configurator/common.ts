@@ -9,6 +9,7 @@ import * as mkdirp from "mkdirp";
 import * as request from "request";
 import { flatten, isObject, reject } from "lodash";
 import { resolve } from "dns";
+import { V1Deployment, V1ObjectMeta } from "@kubernetes/client-node";
 
 export interface Cluster {
   Deployments: [string, k8s.V1Deployment][];
@@ -630,8 +631,12 @@ export function deepPartial(source?: object, pick?: object): object | undefined 
   return dest
 }
 
-export const setNamespace = (pattern: RegExp, namespace: string): Transform => async (c: Cluster) => {
-  flatten<[string, {metadata?: {namespace?: string}}]>([
+export const setNamespace = (pattern: RegExp, namespace: string): Transform => setMetadata(pattern, meta => {
+  meta.namespace = namespace
+})
+
+export const setMetadata = (pattern: RegExp, updateMeta: (meta: V1ObjectMeta) => void): Transform => async (c: Cluster) => {
+  flatten<[string, {metadata?: V1ObjectMeta}]>([
     c.Deployments,
     c.PersistentVolumeClaims,
     c.PersistentVolumes,
@@ -649,35 +654,15 @@ export const setNamespace = (pattern: RegExp, namespace: string): Transform => a
     c.StatefulSets,
     c.StorageClasses
   ]).forEach(([name, d]) => {
+    if (!name.match(pattern)) {
+      return;
+    }
     if (!d.metadata) {
       d.metadata = {}
     }
-    d.metadata.namespace = namespace
+    updateMeta(d.metadata)
   })
-
-  // const objs: [string, { metadata: { namespace: string }}] = flatten([
-  //   c.Deployments,
-  //   c.PersistentVolumeClaims,
-  //   c.PersistentVolumes,
-  //   c.Services,
-  //   c.ClusterRoles,
-  //   c.ClusterRoleBindings,
-  //   c.ConfigMaps,
-  //   c.DaemonSets,
-  //   c.Ingresss,
-  //   c.PodSecurityPolicys,
-  //   c.Roles,
-  //   c.RoleBindings,
-  //   c.ServiceAccounts,
-  //   c.Secrets,
-  //   c.StatefulSets,
-  //   c.StorageClasses
-  // ])
-  
-  // c.Deployments.forEach(([name, d]) => {
-  //   if (!d.metadata) {
-  //     d.metadata = {}
-  //   }
-  //   d.metadata.namespace = namespace
-  // })
 }
+
+export const setDeployment = (pattern: RegExp, updateDeployment: (deployment: V1Deployment) => void): Transform => async (c: Cluster) => 
+  c.Deployments.filter(([name,]) => name.match(pattern)).forEach(([, d]) => updateDeployment(d))
