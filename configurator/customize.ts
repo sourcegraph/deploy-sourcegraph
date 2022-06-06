@@ -286,26 +286,4 @@ export const transformations: Transform[] = [
     metadata: { labels: { deploy: 'sourcegraph-db' } },
     spec: { template: { metadata: { labels: { deploy: 'sourcegraph-db'} } } },
   }),
-
-    
-
-  // // TODO: rename to setMetadata
-  // setDeployment(/.*(codeinsights|codeintel|pgsql).*/, deployment => {
-  //   merge(deployment, {
-  //     metadata: {
-  //       labels: {
-  //         deploy: 'sourcegraph-db',
-  //       },
-  //     },
-  //     spec: {
-  //       template: {
-  //         metadata: {
-  //           labels: {
-  //             deploy: 'sourcegraph-db',
-  //           },
-  //         },
-  //       },
-  //     },
-  //   })
-  // })
 ]
