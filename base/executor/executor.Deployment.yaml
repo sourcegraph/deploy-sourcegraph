@@ -44,10 +44,10 @@ spec:
             - name: EXECUTOR_QUEUE_NAME
               value: "codeintel"
 
-            # Hit dind sidecar
+            # Use docker daemon running in dind sidecar
             - name: DOCKER_HOST
               value: tcp://localhost:2375
-              # Dind docker invocation blows up if you set --cpus or --memory :/
+            # Docker invocation over dind blows up if you supply --cpus or --memory
             - name: EXECUTOR_JOB_NUM_CPUS
               value: "0"
             - name: EXECUTOR_JOB_MEMORY
