@@ -54,13 +54,6 @@ spec:
             scheme: HTTP
           periodSeconds: 1
           timeoutSeconds: 5
-        resources:
-          limits:
-            cpu: "1"
-            memory: 2Gi
-          requests:
-            cpu: "1"
-            memory: 500Mi
       - name: jaeger-agent      
         image: index.docker.io/sourcegraph/jaeger-agent:insiders@sha256:c56b7e45efab76e285c791c932c91aeed64551e160b2417a5b3df6acef664b34
         env:
@@ -78,13 +71,6 @@ spec:
           protocol: UDP
         - containerPort: 6832
           protocol: UDP
-        resources:
-          limits:
-            cpu: "1"
-            memory: 500M
-          requests:
-            cpu: 100m
-            memory: 100M
         args:
           - --reporter.grpc.host-port=jaeger-collector:14250
           - --reporter.type=grpc

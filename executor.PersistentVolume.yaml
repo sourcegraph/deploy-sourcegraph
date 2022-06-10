@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: executor-scratch
+  labels:
+    type: local
+    deploy: sourcegraph
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-storage
+  hostPath:
+    # Note: path must be equivalent in host, pod, and containers
+    path: /Users/efritz/executor-scratch

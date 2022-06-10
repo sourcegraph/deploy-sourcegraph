@@ -38,13 +38,6 @@ spec:
           initialDelaySeconds: 5
           tcpSocket:
             port: redis
-        resources:
-          limits:
-            cpu: "1"
-            memory: 7Gi
-          requests:
-            cpu: "1"
-            memory: 7Gi
         volumeMounts:
         - mountPath: /redis-data
           name: redis-data
@@ -54,13 +47,6 @@ spec:
         ports:
         - containerPort: 9121
           name: redisexp
-        resources:
-          limits:
-            cpu: 10m
-            memory: 100Mi
-          requests:
-            cpu: 10m
-            memory: 100Mi
       securityContext:
         runAsUser: 0
       volumes:

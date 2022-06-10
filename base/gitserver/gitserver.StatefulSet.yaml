@@ -38,13 +38,6 @@ spec:
         - containerPort: 3178
           protocol: TCP
           name: rpc
-        resources:
-          limits:
-            cpu: "4"
-            memory: 8G
-          requests:
-            cpu: "4" 
-            memory: 8G
         volumeMounts:
         - mountPath: /data/repos
           name: repos
@@ -69,13 +62,6 @@ spec:
           protocol: UDP
         - containerPort: 6832
           protocol: UDP
-        resources:
-          limits:
-            cpu: "1"
-            memory: 500M
-          requests:
-            cpu: 100m
-            memory: 100M
         args:
           - --reporter.grpc.host-port=jaeger-collector:14250
           - --reporter.type=grpc
@@ -102,4 +88,4 @@ spec:
           # The size of disk used to mirror your git repositories.
           # If you change this, also change indexed-search's disk size.
           storage: 200Gi
-      storageClassName: sourcegraph
+    

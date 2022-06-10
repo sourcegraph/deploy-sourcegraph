@@ -36,13 +36,6 @@ spec:
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
-        resources:
-          limits:
-            cpu: "2"
-            memory: 4G
-          requests:
-            cpu: 500m
-            memory: 2G
         volumeMounts:
         - mountPath: /data
           name: data
@@ -52,15 +45,6 @@ spec:
         ports:
         - containerPort: 6072
           name: index-http
-        resources:
-          # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
-          # lower lag between a new commit and it being indexed for search.
-          limits:
-            cpu: "8"
-            memory: 8G
-          requests:
-            cpu: "4"
-            memory: 4G
         volumeMounts:
         - mountPath: /data
           name: data
@@ -83,4 +67,4 @@ spec:
           # The size of disk to used for search indexes.
           # This should typically be gitserver disk size multipled by the number of gitserver shards.
           storage: 200Gi
-      storageClassName: sourcegraph
+    

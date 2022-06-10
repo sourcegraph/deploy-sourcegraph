@@ -34,13 +34,6 @@ spec:
           name: disk
         securityContext:
           runAsUser: 0
-        resources:
-          limits:
-            cpu: "10m"
-            memory: "50Mi"
-          requests:
-            cpu: "10m"
-            memory: "50Mi"
       containers:
       - env:
         image: index.docker.io/sourcegraph/postgres-12-alpine:135107_2022-03-03_9498a8bd3366@sha256:e26b159dc7c0c47d136886390c899816e669a3c2c1ead689bdad0b610364e45e
@@ -64,13 +57,6 @@ spec:
         ports:
         - containerPort: 5432
           name: pgsql
-        resources:
-          limits:
-            cpu: "4"
-            memory: 4Gi
-          requests:
-            cpu: "4"
-            memory: 4Gi
         volumeMounts:
         - mountPath: /data
           name: disk
@@ -86,13 +72,6 @@ spec:
         image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:058803235a9deca67412edb01ec6fe22f58a7326c2f565281f7e745701df3080
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
-        resources:
-          limits:
-            cpu: 10m
-            memory: 50Mi
-          requests:
-            cpu: 10m
-            memory: 50Mi
       terminationGracePeriodSeconds: 120
       securityContext:
         runAsUser: 0

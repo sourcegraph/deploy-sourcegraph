@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Runs krazy kode.
+  labels:
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: executor
+  name: executor
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: executor
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        deploy: sourcegraph
+        app: executor
+    spec:
+      containers:
+        - name: executor
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+
+              # Note: Must match `executors.frontendURL` in site config
+            - name: EXECUTOR_FRONTEND_URL
+              value: "http://sourcegraph-frontend:30080"
+              # Note: Must match `executors.accessToken` in site config
+            - name: EXECUTOR_FRONTEND_PASSWORD
+              value: "hunter2hunter2hunter2"
+              # Choose what work to process
+            - name: EXECUTOR_QUEUE_NAME
+              value: "codeintel"
+
+            # Hit dind sidecar
+            - name: DOCKER_HOST
+              value: tcp://localhost:2375
+              # Dind docker invocation blows up if you set --cpus or --memory :/
+            - name: EXECUTOR_JOB_NUM_CPUS
+              value: "0"
+            - name: EXECUTOR_JOB_MEMORY
+              value: "0"
+            # Note: Must match the mount point shared with the dind sidecar
+            - name: TMPDIR
+              value: /scratch
+          image: index.docker.io/sourcegraph/executor:insiders@sha256:2cfa8f547eadbff999f523055889ffa2ff308bdf11408c777f98c035ebc16878
+          terminationMessagePolicy: FallbackToLogsOnError
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: debug
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: debug
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 6060
+              name: debug
+          # resources:
+          #   limits:
+          #     cpu: "2"
+          #     memory: 4G
+          #   requests:
+          #     cpu: 500m
+          #     memory: 2G
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+            privileged: true
+          volumeMounts:
+            # Note: Must match the value mounted in the dind sidecar as well
+            - name: executor-scratch
+              mountPath: /scratch
+        - name: dind
+          image: docker:20.10.7-dind@sha256:b36fdccb118bfaa8d5026da5183a077b87bc790051fcd2c5686bfb8f7fa2563c
+          command:
+            - "dockerd"
+            - "--tls=false"
+            - "--mtu=1200"
+            # - '--registry-mirror=http://private-docker-registry:5000'
+            - "--host=tcp://0.0.0.0:2375"
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+          # resources:
+          #   limits:
+          #     cpu: "2"
+          #     memory: 4G
+          #   requests:
+          #     cpu: 500m
+          #     memory: 2G
+          ports:
+            - containerPort: 2375
+              protocol: TCP
+          securityContext:
+            privileged: true
+          volumeMounts:
+            # Note: Must match the value mounted in the executor container as well
+            - name: executor-scratch
+              mountPath: /scratch
+      volumes:
+        - name: executor-scratch
+          emptyDir: {}

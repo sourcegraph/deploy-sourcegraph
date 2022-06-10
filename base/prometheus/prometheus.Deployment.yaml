@@ -42,20 +42,6 @@ spec:
           name: data
         - mountPath: /sg_prometheus_add_ons
           name: config
-        # Prometheus is relied upon to monitor services for sending alerts to site admins when
-        # something is wrong with Sourcegraph, thus its memory requests and limits are the same to
-        # guarantee it has enough memory to perform its job reliably and prevent conflicts with
-        # other pods on the same host node.
-        #
-        # The limit chosen here is based on what works reliably on Sourcegraph.com with lots
-        # of traffic.
-        resources:
-          limits:
-            cpu: "2"
-            memory: 6G
-          requests:
-            cpu: 500m
-            memory: 6G
       terminationGracePeriodSeconds: 120
       securityContext:
         runAsUser: 0

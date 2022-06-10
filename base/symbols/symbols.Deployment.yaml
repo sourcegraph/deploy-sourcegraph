@@ -63,15 +63,6 @@ spec:
           name: http
         - containerPort: 6060
           name: debug
-        resources:
-          limits:
-            cpu: "2"
-            ephemeral-storage: "12G"
-            memory: 2G
-          requests:
-            cpu: 500m
-            ephemeral-storage: "10G"
-            memory: 500M
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
@@ -92,13 +83,6 @@ spec:
           protocol: UDP
         - containerPort: 6832
           protocol: UDP
-        resources:
-          limits:
-            cpu: "1"
-            memory: 500M
-          requests:
-            cpu: 100m
-            memory: 100M
         args:
           - --reporter.grpc.host-port=jaeger-collector:14250
           - --reporter.type=grpc

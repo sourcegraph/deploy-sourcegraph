@@ -31,13 +31,6 @@ spec:
       - name: migrator
         image: index.docker.io/sourcegraph/migrator:insiders@sha256:27f0661fb17329a8355f44a14b4276d19d0b635dbe4a76e8d02afbdc0dd92021
         args: ["up"]
-        resources:
-          limits:
-            cpu: 500m
-            memory: 100M
-          requests:
-            cpu: 100m
-            memory: 50M
         env:
         - name: PGDATABASE
           value: sg
@@ -126,15 +119,6 @@ spec:
           name: http-internal
         - containerPort: 6060
           name: debug
-        resources:
-          limits:
-            cpu: "2"
-            ephemeral-storage: "8Gi"
-            memory: 4G
-          requests:
-            cpu: "2"
-            ephemeral-storage: "4Gi"
-            memory: 2G
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
@@ -155,13 +139,6 @@ spec:
           protocol: UDP
         - containerPort: 6832
           protocol: UDP
-        resources:
-          limits:
-            cpu: "1"
-            memory: 500M
-          requests:
-            cpu: 100m
-            memory: 100M
         args:
           - --reporter.grpc.host-port=jaeger-collector:14250
           - --reporter.type=grpc

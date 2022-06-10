@@ -36,17 +36,6 @@ spec:
           name: grafana-data
         - mountPath: /sg_config_grafana/provisioning/datasources
           name: config
-        # Grafana is relied upon to send alerts to site admins when something is wrong with
-        # Sourcegraph, thus its memory requests and limits are the same to guarantee it has enough
-        # memory to perform its job reliably and prevent conflicts with other pods on the same
-        # host node.
-        resources:
-          limits:
-            cpu: "1"
-            memory: 512Mi
-          requests:
-            cpu: 100m
-            memory: 512Mi
       serviceAccountName: grafana
       securityContext:
         runAsUser: 0
@@ -63,4 +52,4 @@ spec:
       resources:
         requests:
           storage: 2Gi
-      storageClassName: sourcegraph
+    
