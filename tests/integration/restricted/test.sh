@@ -73,6 +73,11 @@ sed -i "s/ns-sourcegraph/$NAMESPACE/" "${DEPLOY_SOURCEGRAPH_ROOT}/overlays/non-p
 
 "${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh non-privileged-create-cluster ${CURRENT_DIR}/generated-cluster
 
+# TODO There must be a better way to do this
+sed -i "s/ns-sourcegraph/$NAMESPACE/" "${CURRENT_DIR}/generated-cluster/rbac.authorization.k8s.io_v1_rolebinding_sourcegraph-frontend-nonprivileged.yaml"
+sed -i "s/ns-sourcegraph/$NAMESPACE/" "${CURRENT_DIR}/generated-cluster/v1_configmap_prometheus.yaml"
+sed -i "s/ns-sourcegraph/$NAMESPACE/" "${CURRENT_DIR}/generated-cluster/rbac.authorization.k8s.io_v1_rolebinding_prometheus-nonprivileged.yaml"
+
 GS=${CURRENT_DIR}/generated-cluster/apps_v1_statefulset_gitserver.yaml
 cat $GS | yj | jq '.spec.template.spec.containers[].volumeMounts += [{mountPath: "/home/sourcegraph/.ssh", name: "ssh"}]' | jy -o $GS
 cat $GS | yj | jq '.spec.template.spec.volumes += [{name: "ssh", secret: {defaultMode: 384, secretName:"gitserver-ssh"}}]' | jy -o $GS
