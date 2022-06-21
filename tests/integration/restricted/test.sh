@@ -69,6 +69,8 @@ kubectl create secret -n $NAMESPACE generic gitserver-ssh --from-literal=rsa=sup
 
 mkdir generated-cluster
 CLEANUP="rm -rf generated-cluster; $CLEANUP"
+sed -i "s/ns-sourcegraph/$NAMESPACE/" overlays/non-privileged-create-cluster/kustomization.yaml
+
 "${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh non-privileged-create-cluster ${CURRENT_DIR}/generated-cluster
 
 GS=${CURRENT_DIR}/generated-cluster/apps_v1_statefulset_gitserver.yaml
