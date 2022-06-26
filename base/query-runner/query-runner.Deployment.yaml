@@ -2,20 +2,20 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: Rate-limiting proxy for the GitHub API.
-    kubectl.kubernetes.io/default-container: github-proxy
+    description: Saved search query runner / notification service.
+    kubectl.kubernetes.io/default-container: query-runner
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: github-proxy
-  name: github-proxy
+    app.kubernetes.io/component: query-runner
+  name: query-runner
 spec:
   minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: github-proxy
+      app: query-runner
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -24,25 +24,25 @@ spec:
   template:
     metadata:
       labels:
-        app: github-proxy
         deploy: sourcegraph
+        app: query-runner
     spec:
       containers:
-      - name: github-proxy
-        image: index.docker.io/sourcegraph/github-proxy:3.34.1@sha256:9b616b61419010bf47afd2a14d9e426cb1677ca45a0968f3bf3a35109b1998ff
+      - name: query-runner
+        image: index.docker.io/sourcegraph/query-runner:3.34.1@sha256:f25ff41178d3ab9013c400ceb10d2612932c019bcbaa6c87e82f6b2aa730e247
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
-        - containerPort: 3180
+        - containerPort: 3183
           name: http
         resources:
           limits:
             cpu: "1"
             memory: 1G
           requests:
-            cpu: 100m
-            memory: 250M
-      - name: jaeger-agent
-        image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+            cpu: 500m
+            memory: 1G
+      - image: index.docker.io/sourcegraph/jaeger-agent:3.34.1@sha256:0e7c12cfe26f48b368852eb42dbcccf36ce798b2c8261f71ab67be088c363f11
+        name: jaeger-agent
         env:
           - name: POD_NAME
             valueFrom:
