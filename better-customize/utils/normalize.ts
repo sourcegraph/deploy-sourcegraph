@@ -1,5 +1,4 @@
 import * as YAML from "yaml";
-import { resolve } from "dns";
 import { readdirSync, readFile, writeFile } from "fs";
 import * as path from "path";
 
