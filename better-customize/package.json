@@ -1,0 +1,28 @@
+{
+    "name": "sourcegraph",
+    "devDependencies": {
+        "@types/node": "^10.0.0"
+    },
+    "scripts": {
+        "initialize": "cp customize.default.ts customize.ts",
+        "generate": "([ -f customize.ts ] || yarn initialize) && tsc && rm -rf rendered && node bin/index.js",
+        "normalize": "[ ! -z \"${NORMALIZE}\" ] && tsc && node bin/index.js",
+        "generate-default": "tsc && rm -rf rendered-default && node bin/index.js rendered-default",
+        "compare": "diff -ru rendered-default rendered || true",
+        "reset": "rm -f customize.ts; rm -rf rendered"
+    },
+    "dependencies": {
+        "@kubernetes/client-node": "^0.14.3",
+        "@pulumi/kubernetes": "^2.0.0",
+        "@pulumi/kubernetesx": "^0.1.1",
+        "@pulumi/pulumi": "^2.0.0",
+        "@types/lodash": "^4.14.170",
+        "@types/mkdirp": "^1.0.1",
+        "@types/request": "^2.48.5",
+        "lodash": "^4.17.21",
+        "mkdirp": "^1.0.4",
+        "request": "^2.88.2",
+        "typescript": "4.7.4",
+        "yaml": "^2.1.1"
+    }
+}
