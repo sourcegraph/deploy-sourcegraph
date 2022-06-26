@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Code Insights TimescaleDB instance.
+  labels:
+    app.kubernetes.io/component: codeinsights-db
+    deploy: sourcegraph-db
+    sourcegraph-resource-requires: no-cluster-admin
+  name: codeinsights-db
+  namespace: sourcegraph
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: codeinsights-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: codeinsights-db
+        deploy: sourcegraph-db
+        group: backend
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+            - name: POSTGRESQL_CONF_DIR
+              value: /conf
+          image: index.docker.io/sourcegraph/codeinsights-db:3.34.1@sha256:dd5264fb99f78fc70c35babe8e38a4ddb57959ad6853515f967691af0c8d22bf
+          name: timescaledb
+          ports:
+            - containerPort: 5432
+              name: timescaledb
+          resources:
+            limits:
+              cpu: "4"
+              memory: 2Gi
+            requests:
+              cpu: "1"
+              memory: 2Gi
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data/
+              name: disk
+            - mountPath: /conf
+              name: timescaledb-conf
+      securityContext:
+        runAsUser: 0
+      terminationGracePeriodSeconds: 120
+      volumes:
+        - name: disk
+          persistentVolumeClaim:
+            claimName: codeinsights-db
+        - configMap:
+            defaultMode: 511
+            name: codeinsights-db-conf
+          name: timescaledb-conf

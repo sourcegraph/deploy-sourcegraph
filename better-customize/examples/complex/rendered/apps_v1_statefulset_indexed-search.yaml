@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Backend for indexed text search operations.
+  labels:
+    app.kubernetes.io/component: indexed-search
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: indexed-search
+  namespace: sourcegraph
+spec:
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: indexed-search
+  serviceName: indexed-search
+  template:
+    metadata:
+      labels:
+        app: indexed-search
+        deploy: sourcegraph
+    spec:
+      containers:
+        - image: index.docker.io/sourcegraph/indexed-searcher:3.34.1@sha256:8c6e197065fc81bd0e6798beb66bc461328e4f114f2caddb870f2ed17f9ca5ed
+          name: zoekt-webserver
+          ports:
+            - containerPort: 6070
+              name: http
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          resources:
+            limits:
+              cpu: "2"
+              memory: 16G
+            requests:
+              cpu: "1"
+              memory: 16G
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /data
+              name: data
+        - image: index.docker.io/sourcegraph/search-indexer:3.34.1@sha256:7667dfef8482b430487d7c801aa9879188f5aad1d24171ddf8d679a40ac6febc
+          name: zoekt-indexserver
+          ports:
+            - containerPort: 6072
+              name: index-http
+          resources:
+            limits:
+              cpu: "4"
+              memory: 16G
+            requests:
+              cpu: "4"
+              memory: 8G
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /data
+              name: data
+      securityContext:
+        runAsUser: 0
+      volumes:
+        - name: data
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 100Gi
+        storageClassName: sourcegraph-storage-class
