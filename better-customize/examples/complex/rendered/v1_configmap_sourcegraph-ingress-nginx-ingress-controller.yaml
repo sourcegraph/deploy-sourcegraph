@@ -1,0 +1,22 @@
+apiVersion: v1
+data:
+  enable-access-log-for-default-backend: "true"
+  enable-underscores-in-headers: "true"
+  hsts: "false"
+  proxy-body-size: "0"
+  proxy-buffering: "off"
+  proxy-connect-timeout: "900"
+  proxy-read-timeout: "900"
+  proxy-request-buffering: "off"
+  proxy-send-timeout: "900"
+kind: ConfigMap
+metadata:
+  labels:
+    app: nginx-ingress
+    chart: nginx-ingress-1.39.0
+    component: controller
+    deploy: sourcegraph
+    heritage: Helm
+    release: sourcegraph-ingress
+  name: sourcegraph-ingress-nginx-ingress-controller
+  namespace: sourcegraph

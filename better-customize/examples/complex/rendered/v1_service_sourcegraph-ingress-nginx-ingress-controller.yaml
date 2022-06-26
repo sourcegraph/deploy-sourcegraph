@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: sourcegraph-ingress.canaveral-beta.us-west-2.aws
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-internal: 10.0.0.0/8
+  finalizers:
+    - service.kubernetes.io/load-balancer-cleanup
+  labels:
+    app: nginx-ingress
+    chart: nginx-ingress-1.39.0
+    component: controller
+    deploy: sourcegraph
+    heritage: Helm
+    release: sourcegraph-ingress
+  name: sourcegraph-ingress-nginx-ingress-controller
+  namespace: sourcegraph
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: https
+  selector:
+    app: nginx-ingress
+    app.kubernetes.io/component: controller
+    release: sourcegraph-ingress
+  sessionAffinity: None
+  type: LoadBalancer
