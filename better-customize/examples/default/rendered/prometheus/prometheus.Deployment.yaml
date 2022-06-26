@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Collects metrics and aggregates them into graphs.
+  labels:
+    app.kubernetes.io/component: prometheus
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: prometheus
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: prometheus
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        deploy: sourcegraph
+    spec:
+      containers:
+        - image: index.docker.io/sourcegraph/prometheus:3.34.1@sha256:3be3824f43f64d2e1a8c1bcae5509ff2289a45fec5b3227e93cde0a4b9c343bc
+          name: prometheus
+          ports:
+            - containerPort: 9090
+              name: http
+          readinessProbe:
+            failureThreshold: 120
+            httpGet:
+              path: /-/ready
+              port: 9090
+            periodSeconds: 5
+            timeoutSeconds: 3
+          resources:
+            limits:
+              cpu: "2"
+              memory: 6G
+            requests:
+              cpu: 500m
+              memory: 6G
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /prometheus
+              name: data
+            - mountPath: /sg_prometheus_add_ons
+              name: config
+      securityContext:
+        runAsUser: 0
+      serviceAccountName: prometheus
+      terminationGracePeriodSeconds: 120
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: prometheus
+        - configMap:
+            defaultMode: 777
+            name: prometheus
+          name: config

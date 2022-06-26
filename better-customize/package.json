@@ -5,9 +5,9 @@
     },
     "scripts": {
         "initialize": "cp customize.default.ts customize.ts",
-        "generate": "([ -f customize.ts ] || yarn initialize) && tsc && rm -rf rendered && node bin/index.js",
+        "generate": "([ -f customize.ts ] || yarn initialize) && [ -z \"${EXAMPLE}\" ] && tsc && rm -rf rendered && node bin/index.js",
+        "generate-example": "[ ! -z \"${EXAMPLE}\" ] && tsc && rm -rf examples/${EXAMPLE}/rendered && node bin/index.js",
         "normalize": "[ ! -z \"${NORMALIZE}\" ] && tsc && node bin/index.js",
-        "generate-default": "tsc && rm -rf rendered-default && node bin/index.js rendered-default",
         "compare": "diff -ru rendered-default rendered || true",
         "reset": "rm -f customize.ts; rm -rf rendered"
     },
