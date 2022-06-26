@@ -4,6 +4,7 @@ import {
   ingress,
   Config,
   defaultFilenameMapper,
+  overlay,
 } from "./common";
 
 export const configuration = async (): Promise<Config> => ({
@@ -11,13 +12,13 @@ export const configuration = async (): Promise<Config> => ({
   outputDirectory: '../rendered',
   filenameMapper: defaultFilenameMapper,
   transformations: [
-    //// [ ] Specify the cloud provider that hosts the Kubernetes cluster and make any modifications to
+    //// [ ] Required step 1/2: Specify the cloud provider that hosts the Kubernetes cluster and make any modifications to
     //// the storage class used for persistent storage
     platform("gcp", (storageClass: k8s.V1StorageClass) => {
       // Make optional customizations to the storage class here
     }),
     
-    //// [ ] Select an ingress mechanism
+    //// [ ] Required step 2/2: Select an ingress mechanism
     ////
     //// (a) Make the sourcegraph-frontend Service a NodePort Service.
     //// Using this ingress method, you will have to expose the designated port on the
@@ -52,19 +53,13 @@ export const configuration = async (): Promise<Config> => ({
     //     },
     // }),
     
-    // ==============================================================================================
-    //
-    //
-    //
+    // ===============================================================================
     //
     //
     //             Optional customizations below
     //
     //
-    //
-    //
-    //
-    // ==============================================================================================
+    // ===============================================================================
     
     //// Use an external Redis (like Redis Enterprise Cloud or Amazon ElastiCache).
     //// This removes Redis from the manifest.
@@ -82,34 +77,7 @@ export const configuration = async (): Promise<Config> => ({
     //     PGDATABASE: 'postgres',
     //     PGSSLMODE: 'disable',
     // }),
-    
-    //// Adjust the resource allocation for specific services
-    //
-    // setResources(['zoekt-webserver'], { limits: { cpu: '1' } }),
-    
-    //// Adjust the replica count for specific services
-    //
-    // setReplicas(['gitserver'], 3),
-    
-    //// Set a nodeSelector field (https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/) for certain services
-    //
-    // setNodeSelector(['gitserver'], { disktype: 'ssd' }),
-    
-    //// Set affinity (https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-    //// for certain services
-    //
-    // setAffinity(['gitserver'], {
-    //     nodeAffinity: {
-    //         requiredDuringSchedulingIgnoredDuringExecution: {
-    //             nodeSelectorTerms: [
-    //                 {
-    //                     matchExpressions: [{ key: 'scheduler-profile', operator: 'In', values: ['foo']}]
-    //                 }
-    //             ]
-    //         }
-    //     }
-    // }),
-    
+
     //// Enable cloning via SSH (instead of HTTPS)
     //
     // sshCloning('~/.ssh/id_rsa', '~/.ssh/known_hosts')
@@ -117,13 +85,36 @@ export const configuration = async (): Promise<Config> => ({
     //// Run containers as non-root user
     //
     // nonRoot(),
-    
-    //// Add a suffix to the name of every Deployment.
+
+    //// Update resource allocation, replica counts, etc. by applying overlays
+    //// to cluster objects
     //
-    // transformDeployments(d => d.metadata?.name === 'sourcegraph-frontend', d => {
-    //     d.metadata!.name += '-my-suffix'
-    // })
-    
+    // overlay('sourcegraph-frontend', {
+    //   ingress: {
+    //     metadata: {
+    //       annotations: {
+    //         'nginx.ingress.kubernetes.io/affinity': 'cookie',
+    //         'nginx.ingress.kubernetes.io/affinity-mode': 'persistent',
+    //       }
+    //     },
+    //   },
+    //   deployment: {
+    //     spec: {
+    //       replicas: 10,
+    //       template: {
+    //         spec: {
+    //           containers: [
+    //             {
+    //               name: 'frontend',
+    //               resources: { requests: { cpu: '5', memory: '10G' }, limits: { cpu: '10', memory: '20G' }},
+    //             }
+    //           ]
+    //         }
+    //       }
+    //     }
+    //   }
+    // }),
+
     //// Make arbitrary changes to the manifest.
     //// Note: this voids the warranty. Please contact Sourcegraph support if you find the need to 
     //// use this mechanism.
