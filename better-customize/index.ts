@@ -12,7 +12,7 @@ import { normalizeOptions, normalizeYAMLRecursive } from './utils/normalize'
     return
   }
 
-  const configImportPath = process.env.EXAMPLE ? `./examples/${process.env.EXAMPLE}/customize` : './customize'
+  const configImportPath = process.env.EXAMPLE ? `./examples/${process.env.EXAMPLE}/config` : './config'
   const config: Config = await (await import(configImportPath)).configuration()
   const cluster: Cluster = {
     Deployments: [],
