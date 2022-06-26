@@ -437,6 +437,63 @@ export const nonPrivileged = (): Transform => async (c: Cluster) => {
   return Promise.resolve();
 };
 
+export const redis =
+  (redisCacheEndpoint: string, redisStoreEndpoint: string): Transform =>
+  (c: Cluster) => {
+    c.Deployments.filter(([, deployment]) =>
+      _.includes(
+        ["sourcegraph-frontend", "repo-updater"],
+        deployment.metadata?.name
+      )
+    ).forEach(([, deployment]) => {
+      deployment.spec?.template.spec?.containers
+        .filter((container) =>
+          _.includes(["frontend", "repo-updater"], container.name)
+        )
+        .forEach((container) => {
+          if (!container.env) {
+            container.env = [];
+          }
+          updateEnvironment(container.env, {
+            REDIS_CACHE_ENDPOINT: redisCacheEndpoint,
+            REDIS_STORE_ENDPOINT: redisStoreEndpoint,
+          });
+        });
+    });
+    removeComponentRegexp(/^redis\-/, c)
+    return Promise.resolve();
+  };
+
+export const postgres =
+  (postgresEndpoint: {
+    PGPORT?: string;
+    PGHOST?: string;
+    PGUSER?: string;
+    PGPASSWORD?: string;
+    PGDATABASE?: string;
+    PGSSLMODE?: string;
+  }): Transform =>
+  (c: Cluster) => {
+    c.Deployments.filter(([, deployment]) =>
+      _.includes(
+        ["sourcegraph-frontend", "repo-updater"],
+        deployment.metadata?.name
+      )
+    ).forEach(([, deployment]) => {
+      deployment.spec?.template.spec?.containers
+        .filter((container) =>
+          _.includes(["frontend", "repo-updater"], container.name)
+        )
+        .forEach((container) => {
+          if (!container.env) {
+            container.env = [];
+          }
+          updateEnvironment(container.env, postgresEndpoint);
+        });
+    });
+    removeComponentRegexp(/^pgsql/, c)
+    return Promise.resolve();
+  };
 
 interface NameAndKindOptions {
   omit: [string, string][]
@@ -564,4 +621,51 @@ export const normalize = (): Transform => async (c: Cluster) => {
   
 export function defaultFilenameMapper(sourceDir: string, filename: string): string {
   return path.relative(sourceDir, filename)
+}
+
+
+
+const updateEnvironment = (
+  curenv: Array<k8s.V1EnvVar>,
+  newenv: { [name: string]: string | undefined }
+) => {
+  for (const key of _.keys(newenv)) {
+    if (!newenv[key]) {
+      continue;
+    }
+    let foundExisting = false;
+    for (const curEnvVar of curenv) {
+      if (curEnvVar.name === key) {
+        curEnvVar.value = newenv[key];
+        foundExisting = true;
+        break;
+      }
+    }
+    if (!foundExisting) {
+      curenv.push({
+        name: key,
+        value: newenv[key],
+      });
+    }
+  }
+};
+
+const removeComponentRegexp = (pattern: RegExp, c: Cluster) => {
+  c.Deployments = c.Deployments.filter(([, e]) => (!e.metadata?.name) || !pattern.test(e.metadata.name))
+  c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([, e]) => (!e.metadata?.name) || !pattern.test(e.metadata.name))
+  c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([, e]) => (!e.metadata?.name) || !pattern.test(e.metadata.name))
+  c.PersistentVolumes = c.PersistentVolumes.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+  c.Services = c.Services.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+  c.ClusterRoles = c.ClusterRoles.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+  c.ClusterRoleBindings = c.ClusterRoleBindings.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+  c.ConfigMaps = c.ConfigMaps.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+  c.DaemonSets = c.DaemonSets.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+  c.Ingresss = c.Ingresss.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+  c.PodSecurityPolicys = c.PodSecurityPolicys.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+  c.Roles = c.Roles.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+  c.RoleBindings = c.RoleBindings.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+  c.ServiceAccounts = c.ServiceAccounts.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+  c.Secrets = c.Secrets.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+  c.StatefulSets = c.StatefulSets.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
+  c.StorageClasses = c.StorageClasses.filter(([, e]) => (!e.metadata?.name || !pattern.test(e.metadata.name)))
 }
