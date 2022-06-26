@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nginx-ingress
+    app.kubernetes.io/component: default-backend
+    chart: nginx-ingress-1.39.0
+    deploy: sourcegraph
+    heritage: Helm
+    release: sourcegraph-ingress
+  name: sourcegraph-ingress-nginx-ingress-default-backend
+  namespace: sourcegraph
+spec:
+  progressDeadlineSeconds: 600
+  replicas: null
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: nginx-ingress
+      release: sourcegraph-ingress
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: nginx-ingress
+        app.kubernetes.io/component: default-backend
+        release: sourcegraph-ingress
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: fleet
+                    operator: In
+                    values:
+                      - sourcegraph
+      containers:
+        - image: k8s.gcr.io/defaultbackend-amd64:1.5
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 5
+          name: nginx-ingress-default-backend
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /healthz
+              port: 8080
+              scheme: HTTP
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 5
+          resources:
+            limits:
+              memory: 100Mi
+            requests:
+              memory: 20Mi
+          securityContext:
+            runAsUser: 65534
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        fleet: sourcegraph
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: sourcegraph-ingress-nginx-ingress-backend
+      serviceAccountName: sourcegraph-ingress-nginx-ingress-backend
+      terminationGracePeriodSeconds: 60
