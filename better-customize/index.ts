@@ -1,11 +1,9 @@
-import * as k8s from "@kubernetes/client-node";
-import { fstat, readdirSync, readFile, readFileSync } from "fs";
+import { readdirSync, readFileSync } from "fs";
 import * as fs from "fs";
 import * as YAML from "yaml";
 import * as path from "path";
-import { PersistentVolume } from "@pulumi/kubernetes/core/v1";
 import * as mkdirp from "mkdirp";
-import { Cluster, Config, normalize, Transform } from "./common";
+import { Cluster, Config } from "./common";
 import { normalizeOptions, normalizeYAMLRecursive } from './utils/normalize'
 
 (async function () {

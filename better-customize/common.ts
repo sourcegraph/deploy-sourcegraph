@@ -4,8 +4,8 @@ import { readFileSync } from "fs";
 import * as YAML from "yaml";
 import * as path from "path";
 import * as request from "request";
-import { flatten, isObject, merge } from "lodash";
-import { V1ConfigMap, V1Deployment, V1Ingress, V1ObjectMeta, V1PersistentVolumeClaim, V1Service, V1StatefulSet, V1Volume } from "@kubernetes/client-node";
+import { flatten } from "lodash";
+import { V1ConfigMap, V1Deployment, V1Ingress, V1ObjectMeta, V1PersistentVolumeClaim, V1Service, V1StatefulSet } from "@kubernetes/client-node";
 
 export interface Config {
   sourceDirectory: string
