@@ -4,7 +4,7 @@
 1. Run `yarn generate` to generate the initial cluster manifest.
 1. Modify `config.ts` to add your customizations.
    1. Run `yarn generate` to regenerate the cluster manifest.
-   1. Run `yarn compare` to view the differences between your cluster manfiest and the default cluster manifest.
+   1. Run `diff -ru ./rendered ./examples/default/rendered` to view the differences between your cluster manifest and the default cluster manifest.
 1. Commit your changes to your fork, including the contents of `config.ts` and `rendered/`.
 
 Notes:
@@ -20,3 +20,5 @@ Notes:
 1. Run `yarn generate`. Use `git diff` to show the differences to the manifest as a result of the
    upgrade. Verify these are correct. If necessary, make changes to `config.ts` and regenerate.
 1. Commit the changes.
+
+# [Development](development.md)
