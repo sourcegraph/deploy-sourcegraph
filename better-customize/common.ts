@@ -316,7 +316,7 @@ export const sshCloning =
     ]);
     c.StatefulSets.filter(([filename]) =>
       filename.endsWith("gitserver.StatefulSet.yaml")
-    ).forEach(([filename, data]) => {
+    ).forEach(([, data]) => {
       data.spec!.template.spec!.containers.forEach((container) => {
         if (container.name === "gitserver") {
           if (!container.volumeMounts) {

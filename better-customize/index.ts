@@ -150,6 +150,7 @@ function readCluster(root: string) {
     }
   } catch (error) {
       console.error("Failed to generate manifest: ", error)
+      return
   }
 
   async function writeCluster(c: Cluster) {
