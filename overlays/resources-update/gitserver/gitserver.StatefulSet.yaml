@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gitserver
+spec:
+  template:
+    spec:
+      containers:
+      - name: gitserver
+        resources:
+          limits:
+            cpu: "4"
+            memory: 8G
+          requests:
+            cpu: "4" 
+            memory: 8G
+      - metadata:
+          name: repos
+        spec:
+          resources:
+            requests:
+              # The size of disk used to mirror your git repositories.
+              # If you change this, also change indexed-search's disk size.
+              storage: 200Gi
