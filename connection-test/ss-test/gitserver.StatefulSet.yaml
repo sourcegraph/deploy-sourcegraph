@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    deploy: sourcegraph
+  name: ss-test
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ss-test
+  serviceName: ss-test
+  template:
+    metadata:
+      labels:
+        app: ss-test
+        deploy: sourcegraph
+    spec:
+      containers:
+      - name: ss-test
+        command: [ "/bin/sh", "-c", "--" ]
+        args: ["while true; do echo -e 'HTTP/1.1 200 OK\r\n\r\nOK\n' | nc -l -s 0.0.0.0 -p 3178; done"]
+        image: index.docker.io/sourcegraph/alpine-3.14:3.40.1 #FIXME, use custom registry
+        ports:
+        - containerPort: 3178
+          name: rpc
+        resources:
+          limits:
+            cpu: .1
+            memory: 100Mi
+          requests:
+            cpu: .1
+            memory: 100Mi
+        volumeMounts:
+        - mountPath: /data/repos
+          name: repos
+      - name: curl-test
+        command: [ "/bin/sh", "-c", "--" ]
+        args: ["while true; do nc -zvw 5 deployment-test 6060; sleep 10; done"]
+        image: index.docker.io/sourcegraph/alpine-3.14:3.40.1 #FIXME, use custom registry
+        ports:
+        - containerPort: 3178
+          name: rpc
+        resources:
+          limits:
+            cpu: .1
+            memory: 100Mi
+          requests:
+            cpu: .1
+            memory: 100Mi
+      volumes:
+      - name: repos
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: repos
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Mi
+      storageClassName: sourcegraph # FIXME: use custom storageClassName

@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    deploy: sourcegraph
+  name: deployment-test
+spec:
+  minReadySeconds: 10
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: deployment-test
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: deployment-test
+        deploy: sourcegraph
+    spec:
+      containers:
+      - name: listen
+        image: index.docker.io/sourcegraph/alpine-3.14:3.40.1 #FIXME, use custom registry
+        command: [ "/bin/sh", "-c", "--" ]
+        args: ["while true; do echo -e 'HTTP/1.1 200 OK\r\n\r\nOK\n' | nc -l -s 0.0.0.0 -p 6060; done"]
+        ports:
+        - containerPort: 6060
+          name: debug
+        resources:
+          limits:
+            cpu: .1
+            memory: 100Mi
+          requests:
+            cpu: .1
+            memory: 100Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 100
+          runAsGroup: 101
+      - name: read
+        image: index.docker.io/sourcegraph/alpine-3.14:3.40.1 #FIXME, use custom registry
+        command: [ "/bin/sh", "-c", "--" ]
+        args: ["while true; do nc -zvw 5 ss-test-0.ss-test 3178; nc -zvw 5 ss-test-1.ss-test 3178; sleep 10; done"]
+        resources:
+          limits:
+            cpu: .1
+            memory: 100Mi
+          requests:
+            cpu: .1
+            memory: 100Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 100
+          runAsGroup: 101

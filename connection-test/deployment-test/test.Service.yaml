@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: deployment-test
+    deploy: sourcegraph
+  name: deployment-test
+spec:
+  ports:
+  - name: http
+    port: 6060
+    targetPort: debug
+  selector:
+    app: deployment-test
+  type: ClusterIP
