@@ -3,22 +3,7 @@ kind: Kustomization
 namespace: default
 resources:
   - ../bases/deployments
+  - ../bases/pvcs
 patchesStrategicMerge:
-  - cadvisor/cadvisor.DaemonSet.yaml
-  - codeintel-db/codeintel-db.Deployment.yaml
-  - codeinsights-db/codeinsights-db.Deployment.yaml
-  - frontend/sourcegraph-frontend.Deployment.yaml
-  - gitserver/gitserver.StatefulSet.yaml
-  - grafana/grafana.StatefulSet.yaml
-  - indexed-search/indexed-search.StatefulSet.yaml
-  - minio/minio.Deployment.yaml
-  - pgsql/pgsql.Deployment.yaml
-  - precise-code-intel/worker.Deployment.yaml
-  - prometheus/prometheus.Deployment.yaml
-  - redis/redis-cache.Deployment.yaml
-  - redis/redis-store.Deployment.yaml
-  - repo-updater/repo-updater.Deployment.yaml
-  - searcher/searcher.Deployment.yaml
-  - symbols/symbols.Deployment.yaml
-  - syntect-server/syntect-server.Deployment.yaml
-  - worker/worker.Deployment.yaml
+  # Update the resources listed in the ./resources.yaml
+  - resources.yaml
