@@ -1,6 +1,6 @@
 # Kustomize Overlay - Envoy Filter
 
-This overlay applies a new envoy filter to enable trailers for gitserver to resolve the following error message caused by enabling service mesh:
+This overlay applies a new envoy filter to enable HTTP trailers for gitserver to resolve the following error message caused by enabling service mesh:
 
 ```
 "git command [git rev-parse HEAD] failed (stderr: \"\"): strconv.Atoi: parsing \"\"
