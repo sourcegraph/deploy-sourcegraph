@@ -29,7 +29,7 @@ spec:
     spec:
       initContainers:
       - name: correct-data-dir-permissions
-        image: index.docker.io/sourcegraph/alpine-3.12:insiders@sha256:b5716faa7c5d40542132176960ae2d5708a20a8dd5dcd1e63d41af4c27a1b0c4
+        image: index.docker.io/sourcegraph/alpine-3.14:insiders@sha256:067def0c8cd9e3c73c2a634f41f64657919a9b3b96f042f796ba959a12542c34
         command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
         volumeMounts:
         - mountPath: /data
@@ -45,7 +45,7 @@ spec:
             memory: "50Mi"
       containers:
       - env:
-        image: index.docker.io/sourcegraph/postgres-12.6-alpine:insiders@sha256:e4927ccbf208ec95ea463225936575b68dc4b547c4e61ff81818bf60db77f121
+        image: index.docker.io/sourcegraph/postgres-12-alpine:135107_2022-03-03_9498a8bd3366@sha256:e26b159dc7c0c47d136886390c899816e669a3c2c1ead689bdad0b610364e45e
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
           exec:
@@ -56,6 +56,12 @@ spec:
           exec:
             command:
               - /liveness.sh
+        startupProbe:
+          exec:
+            command:
+              - /liveness.sh
+          failureThreshold: 360
+          periodSeconds: 10
         name: pgsql
         ports:
         - containerPort: 5432
@@ -79,7 +85,7 @@ spec:
           value: postgres://sg:@localhost:5432/?sslmode=disable
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
           value: /config/queries.yaml
-        image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:bae17598220d76969bfe9df40a6f27ec239c059ff5c24befa367bae2b2343f07
+        image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:7d0732b762fc24196b4ca594a0584894f4f2f81a40cd891e3f9f4a845cb5009d
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
         resources:
@@ -100,7 +106,7 @@ spec:
         configMap:
           defaultMode: 0777
           name: pgsql-conf
-      - name: dshm # Allocate shared memory to match the shared_buffers value  
+      - name: dshm # Allocate shared memory to match the shared_buffers value
         emptyDir:
           medium: Memory
           sizeLimit: 1G

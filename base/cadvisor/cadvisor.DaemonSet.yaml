@@ -26,7 +26,7 @@ spec:
       serviceAccountName: cadvisor
       containers:
       - name: cadvisor
-        image: index.docker.io/sourcegraph/cadvisor:insiders@sha256:5c8cf42cbbc029d07b6f97b1543ed3d41fcd5f8c4c47693f3682b0ac48d03adb
+        image: index.docker.io/sourcegraph/cadvisor:insiders@sha256:e5d2901ef7624faf0eab020fe6b17e4fb9f4482e8a29e754f78038595fcdf157
         args:
         # Kubernetes-specific flags below (other flags are baked into the Docker image)
         #
@@ -58,10 +58,15 @@ spec:
         - name: disk
           mountPath: /dev/disk
           readOnly: true
+        - name: kmsg
+          mountPath: /dev/kmsg
+          readOnly: true
         ports:
         - name: http
           containerPort: 48080
           protocol: TCP
+        securityContext:
+          privileged: true
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30
       volumes:
@@ -80,3 +85,6 @@ spec:
       - name: disk
         hostPath:
           path: /dev/disk
+      - name: kmsg
+        hostPath:
+          path: /dev/kmsg

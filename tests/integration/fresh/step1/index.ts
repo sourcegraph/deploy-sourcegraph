@@ -18,6 +18,8 @@ const storageClass = new k8s.storage.v1.StorageClass(
         },
         provisioner: 'kubernetes.io/gce-pd',
 
+        reclaimPolicy: 'Delete',
+
         parameters: {
             type: 'pd-ssd',
         },

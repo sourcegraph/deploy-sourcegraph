@@ -55,7 +55,7 @@ patches:
     name: pgsql
     group: apps
     version: v1
-  path: delete-resources-2.yaml
+  path: delete-resources-4.yaml
 - target:
     kind: Deployment
     name: prometheus
@@ -103,13 +103,13 @@ patches:
     name: codeintel-db
     group: apps
     version: v1
-  path: delete-resources-2.yaml    
+  path: delete-resources-4.yaml    
 - target:
     kind: Deployment
     name: codeinsights-db
     group: apps
     version: v1
-  path: delete-resources.yaml  
+  path: delete-resources-4.yaml  
 - target:
     kind: Deployment
     name: minio
@@ -214,7 +214,7 @@ patches:
       template:
         spec:
           containers:
-          - name: timescaledb
+          - name: codeinsights
             env:
             - name: POD_NAME
               valueFrom:
@@ -223,7 +223,7 @@ patches:
                   fieldPath: metadata.name
             volumeMounts:
             - mountPath: /conf
-              name: timescaledb-conf
+              name: codeinsights-conf
             - mountPath: /var/lib/postgresql/data/
               name: disk
               subPathExpr: $(POD_NAME)
@@ -233,7 +233,7 @@ patches:
               path: /mnt/disks/ssd0/buildkite/cluster-deployments/
               type: DirectoryOrCreate
             persistentVolumeClaim: null              
-          - name: timescaledb-conf
+          - name: codeinsights-conf
             configMap:
               defaultMode: 0777
               name: codeinsights-db-conf

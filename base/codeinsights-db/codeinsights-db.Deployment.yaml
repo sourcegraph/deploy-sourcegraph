@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: Code Insights TimescaleDB instance.
+    description: Code Insights Postgres DB instance.
   labels:
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
@@ -24,12 +24,32 @@ spec:
         app: codeinsights-db
         group: backend
     spec:
+      initContainers:
+      - name: correct-data-dir-permissions
+        image: index.docker.io/sourcegraph/alpine-3.14:insiders@sha256:067def0c8cd9e3c73c2a634f41f64657919a9b3b96f042f796ba959a12542c34
+        command: ["sh", "-c", "if [ -d /var/lib/postgresql/data/pgdata ]; then chmod 750 /var/lib/postgresql/data/pgdata; fi"]
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data/
+          name: disk
+        securityContext:
+          runAsUser: 0
+        resources:
+          limits:
+            cpu: "10m"
+            memory: "50Mi"
+          requests:
+            cpu: "10m"
+            memory: "50Mi"
       containers:
-      - name: timescaledb
-        image: index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:aab2e4a00ccda36b3ecaf536c53ba5f57b909ada763094245da18a328531bc44
+      - name: codeinsights
+        image: index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:0000731bd18415ea72ca6affd956660f9455f751380314a1a3151aca5020158b
         env:
+        - name: POSTGRES_DB
+          value: postgres
         - name: POSTGRES_PASSWORD # Accessible by Sourcegraph applications on the network only, so password auth is not used.
           value: password
+        - name: POSTGRES_USER
+          value: postgres
         - name: PGDATA
           value: /var/lib/postgresql/data/pgdata
         - name: POSTGRESQL_CONF_DIR
@@ -37,7 +57,7 @@ spec:
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 5432
-          name: timescaledb
+          name: codeinsights-db
         resources:
           limits:
             cpu: "4"
@@ -49,7 +69,22 @@ spec:
         - mountPath: /var/lib/postgresql/data/
           name: disk
         - mountPath: /conf
-          name: timescaledb-conf
+          name: codeinsights-conf
+      - env:
+        - name: DATA_SOURCE_NAME
+          value: postgres://postgres:@localhost:5432/?sslmode=disable
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/code_insights_queries.yaml
+        image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:7d0732b762fc24196b4ca594a0584894f4f2f81a40cd891e3f9f4a845cb5009d
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: pgsql-exporter
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
       terminationGracePeriodSeconds: 120
       securityContext:
         runAsUser: 0
@@ -57,7 +92,7 @@ spec:
       - name: disk
         persistentVolumeClaim:
           claimName: codeinsights-db
-      - name: timescaledb-conf
+      - name: codeinsights-conf
         configMap:
           defaultMode: 0777
           name: codeinsights-db-conf

@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   annotations:
-    description: Configuration for TimescaleDB
+    description: Configuration for CodeInsightsDB
   labels:
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
@@ -10,13 +10,6 @@ metadata:
   name: codeinsights-db-conf
 data:
   postgresql.conf: |
-    # --------------------------------------------------------------------------
-    # IMPORTANT: This is a TimescaleDB configuration file, not vanilla Postgres.
-    # Consider reading https://docs.timescale.com/latest/getting-started/configuring
-    # or running the 'timescaledb-tune' command from within the container to update
-    # your configuration file instead of making edits otherwise.
-    # --------------------------------------------------------------------------
-    #
     # -----------------------------
     # PostgreSQL configuration file
     # -----------------------------
@@ -692,7 +685,7 @@ data:
 
     # - Shared Library Preloading -
 
-    shared_preload_libraries = 'timescaledb'        # (change requires restart)
+    shared_preload_libraries = ''        # (change requires restart)
     #local_preload_libraries = ''
     #session_preload_libraries = ''
     #jit_provider = 'llvmjit'                # JIT library to use
@@ -767,7 +760,3 @@ data:
     #------------------------------------------------------------------------------
 
     # Add settings for extensions here
-    timescaledb.telemetry_level=basic
-    timescaledb.max_background_workers = 8
-    timescaledb.last_tuned = '2021-02-16T03:10:41Z'
-    timescaledb.last_tuned_version = '0.10.0'

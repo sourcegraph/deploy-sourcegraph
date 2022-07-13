@@ -5,8 +5,15 @@ metadata:
 spec:
   template:
     spec:
+      initContainers:
+        - name: correct-data-dir-permissions
+          securityContext:
+            # Required to prevent escalations to root.
+            allowPrivilegeEscalation: false
+            runAsUser: 70
+            runAsGroup: 70
       containers:
-        - name: timescaledb
+        - name: codeinsights
           securityContext:
             # Required to prevent escalations to root, postgres runs as this user
             allowPrivilegeEscalation: false
@@ -14,4 +21,4 @@ spec:
             runAsGroup: 70
       securityContext:
         # Required to prevent escalations to root, postgres runs as this user
-        runAsUser: 70 
+        runAsUser: 70

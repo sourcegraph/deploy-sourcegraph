@@ -27,12 +27,38 @@ steps:
     command: .buildkite/check-image-names.sh
     agents: { queue: standard }
 
+  - label: ":k8s:"
+    command: .buildkite/verify-overlays.sh
+    agents: { queue: standard }    
+
   - wait
 
   - label: ":pulumi: :k8s:"
-    concurrency: 3
+    concurrency: 6
     concurrency_group: deploy-sourcegraph/integration
-    command: .buildkite/integration-test.sh
+    command: .buildkite/integration-test.sh 1.19
+    env:
+      VERBOSE: "true"
+      # Can be set to true to help debug test results, but ensure that created resources
+      # are removed manually
+      NOCLEANUP: "false"
+    agents: { queue: standard }
+
+  - label: ":pulumi: :k8s:"
+    concurrency: 6
+    concurrency_group: deploy-sourcegraph/integration
+    command: .buildkite/integration-test.sh 1.20
+    env:
+      VERBOSE: "true"
+      # Can be set to true to help debug test results, but ensure that created resources
+      # are removed manually
+      NOCLEANUP: "false"
+    agents: { queue: standard }
+
+  - label: ":pulumi: :k8s:"
+    concurrency: 6
+    concurrency_group: deploy-sourcegraph/integration
+    command: .buildkite/integration-test.sh 1.21
     env:
       VERBOSE: "true"
       # Can be set to true to help debug test results, but ensure that created resources
@@ -48,4 +74,10 @@ steps:
       # Can be set to true to help debug test results, but ensure that created resources
       # are removed manually
       NOCLEANUP: "false"
+    agents: { queue: standard }
+
+  - wait
+
+  - label: ":k8s:"
+    command: .buildkite/cleanup-disks.sh
     agents: { queue: standard }
