@@ -1,6 +1,6 @@
 module github.com/sourcegraph/deploy-sourcegraph
 
-go 1.16
+go 1.19
 
 require (
 	cloud.google.com/go/logging v1.4.2 // indirect
