@@ -33,6 +33,8 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://otel-collector:4317
         image: index.docker.io/sourcegraph/worker:insiders@sha256:d2f8fc873957ae5a32f23de750fdf822dcb48f2dec0e627f4b2d2ccb68ec3980
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:

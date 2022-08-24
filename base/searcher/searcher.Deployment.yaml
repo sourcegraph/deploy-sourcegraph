@@ -42,6 +42,8 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://otel-collector:4317
         image: index.docker.io/sourcegraph/searcher:insiders@sha256:a471f8449f1ad85f352e5ff8b7b32dab1864e412b2c7017886a93fe7d08a499b
         terminationMessagePolicy: FallbackToLogsOnError
         ports:

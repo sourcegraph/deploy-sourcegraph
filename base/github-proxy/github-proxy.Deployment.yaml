@@ -30,6 +30,9 @@ spec:
       containers:
       - name: github-proxy
         image: index.docker.io/sourcegraph/github-proxy:insiders@sha256:92478e7c31c8cdd3fe402e628659387a3fc5bfa90752b931aed1a6fdad1a8236
+        env:
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: http://otel-collector:4317
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 3180
