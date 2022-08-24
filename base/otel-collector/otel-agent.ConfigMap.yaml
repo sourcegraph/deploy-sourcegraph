@@ -1,0 +1,45 @@
+# Config for the agent pods running as a DaemonSet, which forward data to the gateway pod
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-agent
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: otel-collector
+    sourcegraph-resource-requires: no-cluster-admin
+data:
+  config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc: # port 4317
+          http: # port 4318
+    
+    exporters:
+      otlp:
+        endpoint: "otel-collector:4317"
+        tls:
+          insecure: true
+        sending_queue:
+          num_consumers: 4
+          queue_size: 100
+        retry_on_failure:
+          enabled: true
+    
+    extensions:
+      health_check:
+        port: 13133
+      zpages:
+        endpoint: "localhost:55679"
+    
+    service:
+      extensions:
+        - zpages
+        - health_check
+      pipelines:
+        traces:
+          receivers:
+            - otlp
+          exporters:
+            - otlp
+          
