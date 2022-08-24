@@ -1,41 +1,43 @@
 apiVersion: apps/v1
-kind: DaemonSet
+kind: Deployment
 metadata:
   annotations:
-    description: Forwards telemetry data to the OpenTelemetry Collector Deployment.
+    description: Receives, processes, and exports telemetry data.
   labels:
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: otel-collector
-  name: otel-agent
+    sourcegraph-resource-requires: no-cluster-admin
+  name: otel-collector
 spec:
   selector:
     matchLabels:
-      app: otel-agent
+      app: otel-collector
   minReadySeconds: 5
+  progressDeadlineSeconds: 120
+  replicas: 1
   revisionHistoryLimit: 10
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: otel-agent
+        kubectl.kubernetes.io/default-container: otel-collector
       labels:
         deploy: sourcegraph
-        app: otel-agent
+        app: otel-collector
     spec:
       containers:
-        - name: otel-agent
+        - name: otel-collector
           image: index.docker.io/sourcegraph/opentelemetry-collector:insiders@sha256:f301f4b1aee0e6b733019717e156f5aa3177cf6ec727100df3bedde834928864
           command:
             - "/bin/otelcol-sourcegraph"
-            - "--config=/etc/otel-agent/config.yaml"
+            - "--config=/etc/otel-collector/config.yaml"
           terminationMessagePolicy: FallbackToLogsOnError
           resources:
             limits:
-              cpu: "500m"
-              memory: 500Mi
+              cpu: "1"
+              memory: 2Gi
             requests:
-              cpu: "100m"
-              memory: 100Mi
+              cpu: "0.5"
+              memory: 512Mi
           readinessProbe:
             httpGet:
               path: /
@@ -53,12 +55,12 @@ spec:
               name: otlp-http
           volumeMounts:
             - name: config
-              mountPath: /etc/otel-agent
+              mountPath: /etc/otel-collector
       terminationGracePeriodSeconds: 120
       volumes:
         - name: config
           configMap:
-            name: otel-agent
+            name: otel-collector
             items:
               - key: config.yaml
                 path: config.yaml
