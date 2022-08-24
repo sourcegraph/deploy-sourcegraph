@@ -15,7 +15,11 @@ data:
           http: # port 4318
     
     exporters:
-            
+      logging:
+        loglevel: info
+        sampling_initial: 5
+        sampling_thereafter: 200
+
     extensions:
       health_check:
         port: 13133
@@ -31,3 +35,5 @@ data:
           receivers:
             - otlp
           exporters:
+            - logging
+            
