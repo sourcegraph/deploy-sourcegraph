@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: otel-agent
+spec:
+  template:
+    spec:
+      containers:
+        - name: otel-agent
+          securityContext:
+            # Required to prevent escalations to root.
+            allowPrivilegeEscalation: false
+            runAsUser: 100
+            runAsGroup: 101
