@@ -29,7 +29,7 @@ spec:
           image: index.docker.io/sourcegraph/opentelemetry-collector:insiders@sha256:f301f4b1aee0e6b733019717e156f5aa3177cf6ec727100df3bedde834928864
           command:
             - "/bin/otelcol-sourcegraph"
-            - "--config=/etc/otel-collector/config.yaml"
+            - "--config=/etc/otel-collector/configs/logging.yaml"
           terminationMessagePolicy: FallbackToLogsOnError
           resources:
             limits:
@@ -55,14 +55,4 @@ spec:
               name: otlp-http
             - containerPort: 8888
               name: metrics
-          volumeMounts:
-            - name: config
-              mountPath: /etc/otel-collector
       terminationGracePeriodSeconds: 120
-      volumes:
-        - name: config
-          configMap:
-            name: otel-collector
-            items:
-              - key: config.yaml
-                path: config.yaml
