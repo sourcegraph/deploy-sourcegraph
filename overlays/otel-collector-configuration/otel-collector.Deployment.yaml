@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+spec:
+  template:
+    spec:
+      containers:
+        - name: otel-collector
+          command:
+            - "/bin/otelcol-sourcegraph"
+            - "--config=/etc/otel-collector/config.yaml"
+          volumeMounts:
+            - name: config
+              mountPath: /etc/otel-collector
+      volumes:
+        - name: config
+          configMap:
+            name: otel-collector
+            items:
+              - key: config.yaml
+                path: config.yaml
