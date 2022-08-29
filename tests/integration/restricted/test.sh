@@ -102,7 +102,7 @@ CLEANUP="kill $!; $CLEANUP"
 sleep 2 # (initial delay in port-forward activating)
 curl --retry-connrefused --retry 2 --retry-delay 10 -m 30 http://localhost:30080
 
-/usr/local/bin/src version
+/usr/local/bin/src -endpoint http://localhost:30080 version
 
 # run a validation script against it
 /usr/local/bin/src -endpoint http://localhost:30080 validate -context github_token=$GH_TOKEN validate.json
