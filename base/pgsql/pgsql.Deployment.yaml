@@ -27,7 +27,7 @@ spec:
     spec:
       initContainers:
       - name: correct-data-dir-permissions
-        image: index.docker.io/sourcegraph/alpine-3.14:insiders@sha256:c12d8679188e14a5e7d581aa5550ab411f2013fb0662a3f697d378460fe7b5f4
+        image: index.docker.io/sourcegraph/alpine-3.14:insiders@sha256:9c4a58065415570210e79ed346479f9e9c7f41a52e14b1968eb23b685da2fbcc
         command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
         volumeMounts:
         - mountPath: /data
@@ -54,6 +54,12 @@ spec:
           exec:
             command:
               - /liveness.sh
+        startupProbe:
+          exec:
+            command:
+              - /liveness.sh
+          failureThreshold: 360
+          periodSeconds: 10
         name: pgsql
         ports:
         - containerPort: 5432
@@ -77,7 +83,7 @@ spec:
           value: postgres://sg:@localhost:5432/?sslmode=disable
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
           value: /config/queries.yaml
-        image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:058803235a9deca67412edb01ec6fe22f58a7326c2f565281f7e745701df3080
+        image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:7f90d9301c6f7edb167b7b7821a872640eab098c3edb849350206324d709fb87
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
         resources:
@@ -98,7 +104,7 @@ spec:
         configMap:
           defaultMode: 0777
           name: pgsql-conf
-      - name: dshm # Allocate shared memory to match the shared_buffers value  
+      - name: dshm # Allocate shared memory to match the shared_buffers value
         emptyDir:
           medium: Memory
           sizeLimit: 1G

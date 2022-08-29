@@ -44,51 +44,60 @@ kubectl apply -f sourcegraph.StorageClass.yaml
 
 kubectl apply -f nonroot-policy.yaml
 
-kubectl create namespace ns-sourcegraph
+export NAMESPACE=$CLUSTER_NAME
+
+kubectl create namespace $NAMESPACE
 
 # Deleting the namespace during cleanup is a cheap way to delete associated PVC's - see https://issuetracker.google.com/issues/121034250?pli=1
-CLEANUP="kubectl delete namespace ns-sourcegraph --timeout=180s; $CLEANUP"
+CLEANUP="kubectl delete namespace $NAMESPACE --timeout=180s; $CLEANUP"
 
-kubectl create serviceaccount -n ns-sourcegraph fake-user
+kubectl create serviceaccount -n $NAMESPACE fake-user
 
-kubectl create rolebinding -n ns-sourcegraph fake-admin --clusterrole=admin --serviceaccount=ns-sourcegraph:fake-user
+kubectl create rolebinding -n $NAMESPACE fake-admin --clusterrole=admin --serviceaccount=$NAMESPACE:fake-user
 
 # Kubernetes < 1.16 change to '--resource=podsecuritypolicies.extensions'
-kubectl create role -n ns-sourcegraph nonroot:unprivileged --verb=use --resource=podsecuritypolicies.extensions --resource-name=nonroot-policy
+kubectl create role -n $NAMESPACE nonroot:unprivileged --verb=use --resource=podsecuritypolicies.extensions --resource-name=nonroot-policy
 
-kubectl create rolebinding -n ns-sourcegraph fake-user:nonroot:unprivileged --role=nonroot:unprivileged --serviceaccount=ns-sourcegraph:fake-user
+kubectl create rolebinding -n $NAMESPACE fake-user:nonroot:unprivileged --role=nonroot:unprivileged --serviceaccount=$NAMESPACE:fake-user
 
 /bin/cat <<EOM >deploy_sourcegraph_git_ssh_config
 Host *
     StrictHostKeyChecking no
 EOM
 
-kubectl create secret -n ns-sourcegraph generic gitserver-ssh --from-literal=rsa=supersecret --from-literal=config=topsecret
+kubectl create secret -n $NAMESPACE generic gitserver-ssh --from-literal=rsa=supersecret --from-literal=config=topsecret
 
 mkdir generated-cluster
 CLEANUP="rm -rf generated-cluster; $CLEANUP"
+sed -i "s/ns-sourcegraph/$NAMESPACE/" "${DEPLOY_SOURCEGRAPH_ROOT}/overlays/non-privileged-create-cluster/kustomization.yaml"
+
 "${DEPLOY_SOURCEGRAPH_ROOT}"/overlay-generate-cluster.sh non-privileged-create-cluster ${CURRENT_DIR}/generated-cluster
+
+# TODO There must be a better way to do this
+sed -i "s/ns-sourcegraph/$NAMESPACE/" "${CURRENT_DIR}/generated-cluster/rbac.authorization.k8s.io_v1_rolebinding_sourcegraph-frontend-nonprivileged.yaml"
+sed -i "s/ns-sourcegraph/$NAMESPACE/" "${CURRENT_DIR}/generated-cluster/v1_configmap_prometheus.yaml"
+sed -i "s/ns-sourcegraph/$NAMESPACE/" "${CURRENT_DIR}/generated-cluster/rbac.authorization.k8s.io_v1_rolebinding_prometheus-nonprivileged.yaml"
 
 GS=${CURRENT_DIR}/generated-cluster/apps_v1_statefulset_gitserver.yaml
 cat $GS | yj | jq '.spec.template.spec.containers[].volumeMounts += [{mountPath: "/home/sourcegraph/.ssh", name: "ssh"}]' | jy -o $GS
 cat $GS | yj | jq '.spec.template.spec.volumes += [{name: "ssh", secret: {defaultMode: 384, secretName:"gitserver-ssh"}}]' | jy -o $GS
 
-kubectl --as=system:serviceaccount:ns-sourcegraph:fake-user -n ns-sourcegraph apply -f ${CURRENT_DIR}/generated-cluster --recursive
+kubectl --as=system:serviceaccount:$NAMESPACE:fake-user -n $NAMESPACE apply -f ${CURRENT_DIR}/generated-cluster --recursive
 
-# kubectl -n ns-sourcegraph expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph --type=LoadBalancer --port=3080 --target-port=3080
+# kubectl -n $NAMESPACE expose deployment sourcegraph-frontend --type=NodePort --name sourcegraph --type=LoadBalancer --port=3080 --target-port=3080
 
 # wait for it all to finish (we list out the ones with persistent volume claim because they take longer)
 
-timeout 10m kubectl -n ns-sourcegraph rollout status -w statefulset/indexed-search
-timeout 10m kubectl -n ns-sourcegraph rollout status -w deployment/prometheus
-timeout 10m kubectl -n ns-sourcegraph rollout status -w deployment/redis-cache
-timeout 10m kubectl -n ns-sourcegraph rollout status -w deployment/redis-store
-timeout 10m kubectl -n ns-sourcegraph rollout status -w statefulset/gitserver
-timeout 10m kubectl -n ns-sourcegraph rollout status -w deployment/sourcegraph-frontend
+timeout 10m kubectl -n $NAMESPACE rollout status -w statefulset/indexed-search
+timeout 10m kubectl -n $NAMESPACE rollout status -w deployment/prometheus
+timeout 10m kubectl -n $NAMESPACE rollout status -w deployment/redis-cache
+timeout 10m kubectl -n $NAMESPACE rollout status -w deployment/redis-store
+timeout 10m kubectl -n $NAMESPACE rollout status -w statefulset/gitserver
+timeout 10m kubectl -n $NAMESPACE rollout status -w deployment/sourcegraph-frontend
 
 # hit it with one request
 
-kubectl -n ns-sourcegraph port-forward svc/sourcegraph-frontend 30080 &
+kubectl -n $NAMESPACE port-forward svc/sourcegraph-frontend 30080 &
 CLEANUP="kill $!; $CLEANUP"
 sleep 2 # (initial delay in port-forward activating)
 curl --retry-connrefused --retry 2 --retry-delay 10 -m 30 http://localhost:30080

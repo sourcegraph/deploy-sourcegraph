@@ -33,16 +33,18 @@ steps:
 
   - wait
 
-  - label: ":pulumi: :k8s:"
-    concurrency: 6
-    concurrency_group: deploy-sourcegraph/integration
-    command: .buildkite/integration-test.sh 1.19
-    env:
-      VERBOSE: "true"
-      # Can be set to true to help debug test results, but ensure that created resources
-      # are removed manually
-      NOCLEANUP: "false"
-    agents: { queue: standard }
+  # GKE already drops support for 1.19 hence this test will not run
+  # https://cloud.google.com/kubernetes-engine/docs/release-notes#June_30_2022
+  # - label: ":pulumi: :k8s:"
+  #   concurrency: 6
+  #   concurrency_group: deploy-sourcegraph/integration
+  #   command: .buildkite/integration-test.sh 1.19
+  #   env:
+  #     VERBOSE: "true"
+  #     # Can be set to true to help debug test results, but ensure that created resources
+  #     # are removed manually
+  #     NOCLEANUP: "false"
+  #   agents: { queue: standard }
 
   - label: ":pulumi: :k8s:"
     concurrency: 6
