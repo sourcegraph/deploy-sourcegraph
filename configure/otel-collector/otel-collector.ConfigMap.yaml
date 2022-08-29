@@ -8,16 +8,19 @@ metadata:
     sourcegraph-resource-requires: no-cluster-admin
 data:
   config.yaml: |
+    # Do not modify the receivers block, as this is configured to accept data from the OpenTelemetry agents
     receivers:
       otlp:
         protocols:
-          grpc: # port 4317
-          http: # port 4318
+          # Leaving these empty maps to port 4317 and 4318 respectively
+          grpc:
+          http:
     
     exporters:
       # Add your exporter(s) configuration here.
       # Refer to <link to otel config docs> for information on how to achieve different exporters. 
     
+    # Do not remove these extensions
     extensions:
       health_check:
         port: 13133
@@ -25,13 +28,15 @@ data:
         endpoint: "localhost:55679"
     
     service:
+      # Do not remove these extensions
       extensions:
         - health_check
         - zpages
       pipelines:
         traces:
           receivers:
-            - otlp
+            - otlp # Do not remove this receiver
           exporters:
             # Add the name of your exporter(s) here, e.g.:
             # - logging
+          
