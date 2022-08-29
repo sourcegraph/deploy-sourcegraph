@@ -12,9 +12,8 @@ require (
 	github.com/sourcegraph/sourcegraph/enterprise/dev/ci/images v0.0.0-20220415005223-782c819e0d4d
 	github.com/sourcegraph/update-docker-tags v0.10.0
 	github.com/spf13/cobra v1.1.3 // indirect
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.8.0
 	golang.org/x/sys v0.0.0-20210510120138-977fb7262007 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b // indirect
 )
 
 replace github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.4.3+incompatible
