@@ -32,8 +32,13 @@ spec:
       - name: repo-updater
         image: index.docker.io/sourcegraph/repo-updater:insiders@sha256:778e7cf40b237c546258f30ebe964d434d1e27426ff653bfcdb96c52c281976b
         env:
-          - name: OTEL_EXPORTER_OTLP_ENDPOINT
-            value: http://otel-collector:4317
+        # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 3182

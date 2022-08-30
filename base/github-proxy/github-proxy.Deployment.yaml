@@ -31,8 +31,13 @@ spec:
       - name: github-proxy
         image: index.docker.io/sourcegraph/github-proxy:insiders@sha256:357e0bdc939edbfd5b494ec7e4785d2ace66b09853e1d97a34f9ba3cc29a61a4
         env:
-          - name: OTEL_EXPORTER_OTLP_ENDPOINT
-            value: http://otel-collector:4317
+        # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 3180
