@@ -11,3 +11,13 @@ resources:
 patchesStrategicMerge:
   - otel-collector.Deployment.yaml
   - grafana.ConfigMap.yaml
+patches:
+  - patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: JAEGER_SERVER_URL
+          value: http://jaeger-query:16686
+    target:
+      kind: Deployment
+      name: sourcegraph-frontend
