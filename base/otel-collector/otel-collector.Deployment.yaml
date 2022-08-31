@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Receives, processes, and exports telemetry data.
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: otel-collector
+    sourcegraph-resource-requires: no-cluster-admin
+  name: otel-collector
+spec:
+  selector:
+    matchLabels:
+      app: otel-collector
+  minReadySeconds: 5
+  progressDeadlineSeconds: 120
+  replicas: 1
+  revisionHistoryLimit: 10
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: otel-collector
+      labels:
+        deploy: sourcegraph
+        app: otel-collector
+    spec:
+      containers:
+        - name: otel-collector
+          image: index.docker.io/sourcegraph/opentelemetry-collector:insiders@sha256:7f9a4e54e2a35d8f760467cc7ad89766f6039a773887f351b2f4aa80e9cddc93
+          command:
+            - "/bin/otelcol-sourcegraph"
+            - "--config=/etc/otel-collector/configs/logging.yaml"
+          terminationMessagePolicy: FallbackToLogsOnError
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: "0.5"
+              memory: 512Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          ports:
+            - containerPort: 55679
+              name: zpages
+            - containerPort: 4317
+              name: otlp-grpc
+            - containerPort: 4318
+              name: otlp-http
+            - containerPort: 8888
+              name: metrics
+      terminationGracePeriodSeconds: 120

@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    description: Forwards telemetry data to the OpenTelemetry Collector Deployment.
+    prometheus.io/port: "8888"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: otel-collector
+  name: otel-agent
+spec:
+  selector:
+    matchLabels:
+      app: otel-agent
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: otel-agent
+      labels:
+        deploy: sourcegraph
+        app: otel-agent
+    spec:
+      containers:
+        - name: otel-agent
+          image: index.docker.io/sourcegraph/opentelemetry-collector:insiders@sha256:f301f4b1aee0e6b733019717e156f5aa3177cf6ec727100df3bedde834928864
+          command:
+            - "/bin/otelcol-sourcegraph"
+            - "--config=/etc/otel-agent/config.yaml"
+          terminationMessagePolicy: FallbackToLogsOnError
+          resources:
+            limits:
+              cpu: "500m"
+              memory: 500Mi
+            requests:
+              cpu: "100m"
+              memory: 100Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          ports:
+            - containerPort: 55679
+              name: zpages
+            - containerPort: 4317
+              hostPort: 4317
+              name: otlp-grpc
+            - containerPort: 4318
+              hostPort: 4318
+              name: otlp-http
+            - containerPort: 8888
+              name: metrics
+          volumeMounts:
+            - name: config
+              mountPath: /etc/otel-agent
+      terminationGracePeriodSeconds: 120
+      volumes:
+        - name: config
+          configMap:
+            name: otel-agent
+            items:
+              - key: config.yaml
+                path: config.yaml

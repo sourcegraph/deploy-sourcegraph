@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+spec:
+  template:
+    spec:
+      containers:
+        - name: otel-collector
+          command:
+            - "/bin/otelcol-sourcegraph"
+            - "--config=/etc/otel-collector/configs/jaeger.yaml"
+          env:
+            - name: JAEGER_HOST
+              value: jaeger-collector
