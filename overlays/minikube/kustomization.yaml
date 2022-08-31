@@ -125,8 +125,9 @@ patches:
         # This is the default storage class for minikube
         value: standard
   - target:
-      kind: PersistentVolumeClaim
+      kind: StatefulSet
+      name: gitserver
     patch: |-
       - op: replace 
-        path: /spec/resources/requests/storage
+        path: /spec/volumeClaimTemplates/0/spec/resources/requests/storage
         value: 10Gi
