@@ -31,6 +31,8 @@ spec:
               fieldPath: status.hostIP
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://$(OTEL_AGENT_HOST):4317
+        - name: OPENTELEMETRY_DISABLED
+          value: "false"
         image: index.docker.io/sourcegraph/indexed-searcher:insiders@sha256:6bff1cb93d9be8dbe55bbdde30d39a4e9ecd28032046401fcad45bb305cc1d51
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
@@ -63,6 +65,8 @@ spec:
               fieldPath: status.hostIP
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://$(OTEL_AGENT_HOST):4317
+        - name: OPENTELEMETRY_DISABLED
+          value: "false"
         image: index.docker.io/sourcegraph/search-indexer:insiders@sha256:11daea37bdd626d90dd69abf1cc612ddb7d5621c6c738fc39545b870062807b6
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
