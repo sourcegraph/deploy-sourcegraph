@@ -1,6 +1,16 @@
 This kustomization deletes resource declarations and storage classnames to enable runnning Sourcegraph on minikube.
 
-Starting Sourcegraph:
+## Prerequisite
+
+- [minikube](https://minikube.sigs.k8s.io/docs/start/)
+
+## Configuration
+
+The Sourcegraph minikube instance requires ~100Gi of free disk space by default (10Gi for each persistentvolumeclaim, 47Gi for all statefulsets etc).
+
+If you wish to lower the disk space requirement, you may adjust the storage values for the PersistentVolumeClaim, gitserver StatefulSet, and indexed-search StatefulSet in the `kustomization.yaml` file accordingly.
+
+## Starting Sourcegraph
 
 To use it, execute the following command from the root directory of this repository:
 
@@ -18,7 +28,7 @@ kubectl -n ns-sourcegraph expose deployment sourcegraph-frontend --type=NodePort
 minikube service list
 ``` 
 
-Tearing it down:
+## Tearing it down
 
 ```shell script
 kubectl delete namespaces ns-sourcegraph

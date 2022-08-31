@@ -125,9 +125,24 @@ patches:
         # This is the default storage class for minikube
         value: standard
   - target:
+      kind: PersistentVolumeClaim
+    patch: |-
+      - op: replace 
+        path: /spec/resources/requests/storage
+        value: 10Gi
+  - target:
       kind: StatefulSet
       name: gitserver
     patch: |-
       - op: replace 
         path: /spec/volumeClaimTemplates/0/spec/resources/requests/storage
-        value: 10Gi
+        # This is where repositories are cloned and stored
+        value: 30Gi
+  - target:
+      kind: StatefulSet
+      name: indexed-search
+    patch: |-
+      - op: replace 
+        path: /spec/volumeClaimTemplates/0/spec/resources/requests/storage
+        # This should be 50% of the storage value assigned to gitserver above
+        value: 15Gi
