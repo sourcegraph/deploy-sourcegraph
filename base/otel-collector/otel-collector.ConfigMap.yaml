@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: otel-collector
+    sourcegraph-resource-requires: no-cluster-admin
+data:
+  config.yaml: |
+    # Do not modify the receivers block, as this is configured to accept data from the OpenTelemetry agents
+    receivers:
+      otlp:
+        protocols:
+          # Leaving these empty maps to port 4317 and 4318 respectively
+          grpc:
+          http:
+    
+    exporters:
+      # Add your exporter(s) configuration here.
+      # Refer to <link to otel config docs> for information on how to achieve different exporters. 
+    
+    # Do not remove these extensions
+    extensions:
+      health_check:
+        port: 13133
+      zpages:
+        endpoint: "localhost:55679"
+    
+    service:
+      # Do not remove these extensions
+      extensions:
+        - health_check
+        - zpages
+      pipelines:
+        traces:
+          receivers:
+            - otlp # Do not remove this receiver
+          exporters:
+            # Add the name of your exporter(s) here, e.g.:
+            # - logging
+          

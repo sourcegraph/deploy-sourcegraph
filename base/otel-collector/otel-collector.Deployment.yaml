@@ -29,15 +29,18 @@ spec:
           image: index.docker.io/sourcegraph/opentelemetry-collector:insiders@sha256:7f9a4e54e2a35d8f760467cc7ad89766f6039a773887f351b2f4aa80e9cddc93
           command:
             - "/bin/otelcol-sourcegraph"
+            # To use a custom configuration, edit otel-collector.ConfigMap.yaml
+            # and change this flag to
+            # "--config=/etc/otel-collector/config.yaml"
             - "--config=/etc/otel-collector/configs/logging.yaml"
           terminationMessagePolicy: FallbackToLogsOnError
           resources:
             limits:
-              cpu: "1"
-              memory: 2Gi
+              cpu: "2"
+              memory: 3Gi
             requests:
               cpu: "0.5"
-              memory: 512Mi
+              memory: 1Gi
           readinessProbe:
             httpGet:
               path: /
@@ -55,4 +58,18 @@ spec:
               name: otlp-http
             - containerPort: 8888
               name: metrics
+          volumeMounts:
+            - name: config
+              mountPath: /etc/otel-collector
       terminationGracePeriodSeconds: 120
+      volumes:
+        # Not used by default.
+        # Edit the ConfigMap in otel-collector.ConfigMap.yaml:
+        # add your custom configuration, then update the command
+        # of the otel-collector container
+        - name: config
+          configMap:
+            name: otel-collector
+            items:
+              - key: config.yaml
+                path: config.yaml
