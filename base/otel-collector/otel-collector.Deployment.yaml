@@ -31,7 +31,7 @@ spec:
             - "/bin/otelcol-sourcegraph"
             # To use a custom configuration, edit otel-collector.ConfigMap.yaml
             # and change this flag to
-            # "--config=/etc/otel-collector/config.yaml"
+            # "--config=/etc/otel-collector/conf/config.yaml"
             - "--config=/etc/otel-collector/configs/logging.yaml"
           terminationMessagePolicy: FallbackToLogsOnError
           resources:
@@ -60,7 +60,7 @@ spec:
               name: metrics
           volumeMounts:
             - name: config
-              mountPath: /etc/otel-collector
+              mountPath: /etc/otel-collector/conf
       terminationGracePeriodSeconds: 120
       volumes:
         # Not used by default.
