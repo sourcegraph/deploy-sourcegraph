@@ -6,6 +6,9 @@ metadata:
 # If the pod already has a Pod scheduled, another one won't be scheduled and the pod status will be Pending
 spec:
   template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
     spec:
       affinity:
         podAffinity:
