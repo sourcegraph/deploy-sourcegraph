@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: otel-agent
+# The podAffinity here ensures that a otel-agent is only scheduled on a Pod with the label deploy=sourcegraph.
+# If the pod already has a Pod scheduled, another one won't be scheduled and the pod status will be Pending
+spec:
+  template:
+    metadata:
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: deploy
+                operator: In
+                values:
+                - sourcegraph
+            topologyKey: kubernetes.io/hostname

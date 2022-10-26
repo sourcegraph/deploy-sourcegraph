@@ -5,7 +5,7 @@ kind: Kustomization
 resources:
 - ../bases/deployments
 - ../bases/rbac-roles
-              
+
 patches:
 
 - target:
@@ -103,13 +103,13 @@ patches:
     name: codeintel-db
     group: apps
     version: v1
-  path: delete-resources-4.yaml    
+  path: delete-resources-4.yaml
 - target:
     kind: Deployment
     name: codeinsights-db
     group: apps
     version: v1
-  path: delete-resources-4.yaml  
+  path: delete-resources-4.yaml
 - target:
     kind: Deployment
     name: minio
@@ -147,6 +147,10 @@ patches:
   target:
     kind: StatefulSet
     name: grafana
+- path: otel-agent-patch.yaml
+  target:
+    kind: DaemonSet
+    name: otel-agent
 - patch: |-
     apiVersion: apps/v1
     kind: Deployment
@@ -244,7 +248,7 @@ patches:
             hostPath:
               path: /mnt/disks/ssd0/buildkite/cluster-deployments/
               type: DirectoryOrCreate
-            persistentVolumeClaim: null              
+            persistentVolumeClaim: null
           - name: codeinsights-conf
             configMap:
               defaultMode: 0777
@@ -294,7 +298,7 @@ patches:
         spec:
           containers:
           - name: minio
-            args: 
+            args:
             - minio
             - server
             - /data-minio
@@ -308,7 +312,7 @@ patches:
             - mountPath: /data-minio
               name: minio-data
               subPathExpr: $(POD_NAME)
-          
+
           volumes:
             - name: minio-data
               hostPath:
@@ -374,7 +378,7 @@ patches:
               # directory location on host
               path: /mnt/disks/ssd0/buildkite/cluster-deployments/
               type: DirectoryOrCreate
-            persistentVolumeClaim: null            
+            persistentVolumeClaim: null
   target:
     kind: Deployment
     name: redis-cache
@@ -393,7 +397,7 @@ patches:
                 value: "true"
   target:
     kind: Deployment
-    name: sourcegraph-frontend  
+    name: sourcegraph-frontend
 - patch: |-
     apiVersion: apps/v1
     kind: Deployment
@@ -419,13 +423,13 @@ patches:
       template:
         spec:
           containers:
-            - name: precise-code-intel-worker 
+            - name: precise-code-intel-worker
               env:
               - name: NEW_MIGRATIONS
                 value: "true"
   target:
     kind: Deployment
-    name: precise-code-intel-worker    
+    name: precise-code-intel-worker
 - patch: |-
     apiVersion: apps/v1
     kind: Deployment
@@ -441,8 +445,8 @@ patches:
                 value: "true"
   target:
     kind: Deployment
-    name: repo-updater                          
-    
+    name: repo-updater
+
 patchesStrategicMerge:
 - cadvisor/delete-Daemonset.yaml
 - cadvisor/delete-ClusterRole.yaml
