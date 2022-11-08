@@ -12,4 +12,7 @@
 #
 # Apply the base Soucegraph deployment
 # shellcheck disable=SC2068
-kubectl apply --prune -l deploy=sourcegraph -k base --recursive $@
+echo "Printing diff"
+kustomize build ./base/. | kubectl diff --prune -l deploy=sourcegraph -f -
+echo "Applying manifests"
+kustomize build ./base/. | kubectl apply --prune -l deploy=sourcegraph -f -
