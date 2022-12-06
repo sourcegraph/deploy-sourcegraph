@@ -398,6 +398,8 @@ export const nonRoot = (): Transform => async (c: Cluster) => {
       }
     },
     "sourcegraph-frontend": {},
+    "github-proxy": {},
+    "gitserver": {},
     grafana: {
       containers: {
         grafana: {
@@ -406,9 +408,32 @@ export const nonRoot = (): Transform => async (c: Cluster) => {
         },
       },
     },
+    "indexed-search": {},
+    "minio": {},
+    "otel-agent": {},
+    "otel-collector": {}, // TODO: otel-collector DaemonSet
     pgsql: {
-      runAsGroup: 999,
+      initContainers: {
+        'correct-data-dir-permissions': {
+          runAsGroup: 999,
+          runAsUser: 999,
+        },
+      },
+      containers: {
+        pgsql: {
+          runAsGroup: 999,
+          runAsUser: 999,
+        }
+      },
       runAsUser: 999,
+    },
+    prometheus: { // rolebinding and configmap
+      containers: {
+        prometheus: {
+          runAsGroup: 100,
+          runAsUser: 100,
+        }
+      }
     },
     "redis-cache": {
       runAsUser: 999,
@@ -418,16 +443,21 @@ export const nonRoot = (): Transform => async (c: Cluster) => {
       runAsUser: 999,
       runAsGroup: 1000,
     },
+    "repo-updater": {},
+    "searcher": {},
+    "symbols": {},
+    "syntect-server": {},
+    "worker": {},
   };
-  const update = (deployOrSS: k8s.V1Deployment | k8s.V1StatefulSet) => {
-    if (!deployOrSS.metadata?.name) {
+  const update = (object: k8s.V1Deployment | k8s.V1StatefulSet | k8s.V1DaemonSet) => {
+    if (!object.metadata?.name) {
       return;
     }
-    const adjustment = runAsUserAndGroup[deployOrSS.metadata.name]
+    const adjustment = runAsUserAndGroup[object.metadata.name]
     if (!adjustment) {
       return
     }
-    _.merge(deployOrSS, {
+    _.merge(object, {
       spec: {
         template: {
           spec: {
@@ -448,11 +478,12 @@ export const nonRoot = (): Transform => async (c: Cluster) => {
         container.securityContext = _.merge({}, container.securityContext, defaultContainerSecurityContext, containerSecurityContext)
       }
     }
-    adjustContainers(deployOrSS.spec?.template.spec?.containers, adjustment.containers)
-    adjustContainers(deployOrSS.spec?.template.spec?.initContainers, adjustment.initContainers)
+    adjustContainers(object.spec?.template.spec?.containers, adjustment.containers)
+    adjustContainers(object.spec?.template.spec?.initContainers, adjustment.initContainers)
   };
-  c.Deployments.forEach(([, deployOrSS]) => update(deployOrSS));
-  c.StatefulSets.forEach(([, deployOrSS]) => update(deployOrSS));
+  c.Deployments.forEach(([, d]) => update(d));
+  c.StatefulSets.forEach(([, ss]) => update(ss));
+  c.DaemonSets.forEach(([, ds]) => update(ds));
 
   // TODO: supply separate role bindings, put these in a separate directory, `like non-privileged-roles`
   // and add an `include` function here to include them
