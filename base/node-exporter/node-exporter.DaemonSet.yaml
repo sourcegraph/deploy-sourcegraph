@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
       - name: node-exporter
-        image: index.docker.io/sourcegraph/node-exporter:179720_2022-10-25_4d925e87cfb8@sha256:2d9dcdf0b2226f0c3d550a64d2667710265462350a3ba9ebe37d0302bc64af0f
+        image: index.docker.io/sourcegraph/node-exporter:187572_2022-12-06_cbecc5321c7d@sha256:2d9dcdf0b2226f0c3d550a64d2667710265462350a3ba9ebe37d0302bc64af0f
         imagePullPolicy: IfNotPresent
         resources:
           limits:
@@ -34,15 +34,15 @@ spec:
             cpu: 200m
             memory: 100Mi
         args:
-          - --web.listen-address=:9100
-          - --path.sysfs=/host/sys
-          - --path.rootfs=/host/root
-          - --path.procfs=/host/proc
-          - --no-collector.wifi
-          - --no-collector.hwmon
-          - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
-          - --collector.netclass.ignored-devices=^(veth.*)$
-          - --collector.netdev.device-exclude=^(veth.*)$
+        - --web.listen-address=:9100
+        - --path.sysfs=/host/sys
+        - --path.rootfs=/host/root
+        - --path.procfs=/host/proc
+        - --no-collector.wifi
+        - --no-collector.hwmon
+        - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
+        - --collector.netclass.ignored-devices=^(veth.*)$
+        - --collector.netdev.device-exclude=^(veth.*)$
         env:
         securityContext:
           allowPrivilegeEscalation: false
