@@ -7,7 +7,7 @@
         "initialize": "cp config.default.ts config.ts",
         "generate": "([ -f config.ts ] || yarn initialize) && [ -z \"${EXAMPLE}\" ] && tsc && rm -rf rendered && node bin/index.js",
         "generate-example": "[ ! -z \"${EXAMPLE}\" ] && tsc && rm -rf examples/${EXAMPLE}/rendered && node bin/index.js",
-        "generate-compare": "[ ! -z \"${EXAMPLE}\" ] && yarn run generate-example && rm -rf /tmp/base /tmp/rendered && NORMALIZE=../base OUTDIR=/tmp/base yarn run normalize && NORMALIZE=examples/${EXAMPLE}/rendered OUTDIR=/tmp/rendered yarn run normalize && diff -ru100 /tmp/base /tmp/rendered | colordiff | less -R",
+        "generate-compare": "[ ! -z \"${EXAMPLE}\" ] && yarn run generate-example && rm -rf /tmp/base /tmp/rendered && NORMALIZE=../base OUTDIR=/tmp/base yarn run normalize && NORMALIZE=examples/${EXAMPLE}/rendered OUTDIR=/tmp/rendered yarn run normalize && diff -ru50 /tmp/base /tmp/rendered | colordiff | less -R",
         "normalize": "[ ! -z \"${NORMALIZE}\" ] && tsc && node bin/index.js"
     },
     "dependencies": {
