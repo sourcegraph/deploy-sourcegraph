@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as YAML from "yaml";
 import * as path from "path";
 import * as mkdirp from "mkdirp";
-import { Cluster, Config } from "./common";
+import { Cluster, Config, defaultFilenameMapper, MustConfig } from "./common";
 import { normalizeOptions, normalizeYAMLRecursive } from './utils/normalize'
 
 (async function () {
@@ -13,7 +13,17 @@ import { normalizeOptions, normalizeYAMLRecursive } from './utils/normalize'
   }
 
   const configImportPath = process.env.EXAMPLE ? `./examples/${process.env.EXAMPLE}/config` : './config'
-  const config: Config = await (await import(configImportPath)).configuration()
+  const defaultConfig: MustConfig = {
+      sourceDirectory: '../base',
+      outputDirectory: '../rendered',
+      filenameMapper: defaultFilenameMapper,
+      transformations: [],
+  }
+  const userConfig: Config = (await import(configImportPath)).configuration
+  const config = {
+    ...defaultConfig,
+    ...userConfig,
+  }
   const cluster: Cluster = {
     Deployments: [],
     PersistentVolumeClaims: [],

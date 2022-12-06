@@ -7,13 +7,15 @@ import * as request from "request";
 import { flatten } from "lodash";
 import { V1ConfigMap, V1Deployment, V1Ingress, V1ObjectMeta, V1PersistentVolumeClaim, V1Service, V1StatefulSet } from "@kubernetes/client-node";
 
-export interface Config {
+export interface MustConfig {
   sourceDirectory: string
   additionalManifestDirectories?: string[]
   outputDirectory: string
   transformations: Transform[]
   filenameMapper: (sourceDir: string, filename: string) => string
 }
+
+export type Config = Partial<MustConfig> & Pick<MustConfig, 'transformations'>
 
 export const clusterObjectKeys =  [
   'Deployments',
