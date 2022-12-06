@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as YAML from "yaml";
 import * as path from "path";
 import * as mkdirp from "mkdirp";
-import { Cluster, Config, defaultFilenameMapper, MustConfig } from "./common";
+import { Cluster, Config, defaultFilenameMapper, MustConfig, addToCluster, newCluster } from "./common";
 import { normalizeOptions, normalizeYAMLRecursive } from './utils/normalize'
 
 (async function () {
@@ -24,126 +24,16 @@ import { normalizeOptions, normalizeYAMLRecursive } from './utils/normalize'
     ...defaultConfig,
     ...userConfig,
   }
-  const cluster: Cluster = {
-    Deployments: [],
-    PersistentVolumeClaims: [],
-    PersistentVolumes: [],
-    Services: [],
-    ClusterRoles: [],
-    ClusterRoleBindings: [],
-    ConfigMaps: [],
-    DaemonSets: [],
-    Ingresss: [],
-    PodSecurityPolicys: [],
-    Roles: [],
-    RoleBindings: [],
-    Secrets: [],
-    ServiceAccounts: [],
-    StatefulSets: [],
-    StorageClasses: [],
-    RawFiles: [],
-    Unrecognized: [],
-    ManualInstructions: [],
-  };
 
-function readCluster(root: string) {
-  const contents = readdirSync(root, { withFileTypes: true });
-  for (const entry of contents) {
-    if (entry.isFile()) {
-      if (entry.name.endsWith(".yaml")) {
-        const k8sType = path.extname(
-          entry.name.substring(0, entry.name.length - ".yaml".length)
-          );
-          const filename = path.join(root, entry.name);
-          switch (k8sType) {
-            case ".Deployment":
-            cluster.Deployments.push([
-              config.filenameMapper(config.sourceDirectory, filename),
-              YAML.parse(readFileSync(filename).toString()),
-            ]);
-            break;
-            case ".PersistentVolumeClaim":
-            cluster.PersistentVolumeClaims.push([
-              config.filenameMapper(config.sourceDirectory, filename),
-              YAML.parse(readFileSync(filename).toString()),
-            ]);
-            break;
-            case ".PersistentVolume":
-            cluster.PersistentVolumes.push([
-              config.filenameMapper(config.sourceDirectory, filename),
-              YAML.parse(readFileSync(filename).toString()),
-            ]);
-            break;
-            case ".Service":
-            case ".IndexerService":
-            cluster.Services.push([
-              config.filenameMapper(config.sourceDirectory, filename),
-              YAML.parse(readFileSync(filename).toString()),
-            ]);
-            break;
-            case ".ClusterRole":
-            cluster.ClusterRoles.push([
-              config.filenameMapper(config.sourceDirectory, filename),
-              YAML.parse(readFileSync(filename).toString()),
-            ]);
-            break;
-            case ".ClusterRoleBinding":
-            cluster.ClusterRoleBindings.push([
-              config.filenameMapper(config.sourceDirectory, filename),
-              YAML.parse(readFileSync(filename).toString()),
-            ]);
-            break;
-            case ".ConfigMap":
-            cluster.ConfigMaps.push([
-              config.filenameMapper(config.sourceDirectory, filename),
-              YAML.parse(readFileSync(filename).toString()),
-            ]);
-            break;
-            case ".DaemonSet":
-            cluster.DaemonSets.push([
-              config.filenameMapper(config.sourceDirectory, filename),
-              YAML.parse(readFileSync(filename).toString()),
-            ]);
-            break;
-            case ".Ingress":
-            cluster.Ingresss.push([
-              config.filenameMapper(config.sourceDirectory, filename),
-              YAML.parse(readFileSync(filename).toString()),
-            ]);
-            break;
-            case ".PodSecurityPolicy":
-            cluster.PodSecurityPolicys.push([
-              config.filenameMapper(config.sourceDirectory, filename),
-              YAML.parse(readFileSync(filename).toString()),
-            ]);
-            break;
-            case ".Role":
-            cluster.Roles.push([
-              config.filenameMapper(config.sourceDirectory, filename),
-              YAML.parse(readFileSync(filename).toString()),
-            ]);
-            break;
-            case ".RoleBinding":
-            cluster.RoleBindings.push([
-              config.filenameMapper(config.sourceDirectory, filename),
-              YAML.parse(readFileSync(filename).toString()),
-            ]);
-            break;
-            case ".ServiceAccount":
-            cluster.ServiceAccounts.push([
-              config.filenameMapper(config.sourceDirectory, filename),
-              YAML.parse(readFileSync(filename).toString()),
-            ]);
-            break;
-            case ".StatefulSet":
-            cluster.StatefulSets.push([
-              config.filenameMapper(config.sourceDirectory, filename),
-              YAML.parse(readFileSync(filename).toString()),
-            ]);
-            break;
-            default:
-            cluster.Unrecognized.push(entry.name);
-          }
+
+  const cluster: Cluster = newCluster();
+
+  function readCluster(root: string) {
+    const contents = readdirSync(root, { withFileTypes: true });
+    for (const entry of contents) {
+      if (entry.isFile()) {
+        if (entry.name.endsWith(".yaml")) {
+          addToCluster(config, cluster, path.join(root, entry.name));
         }
       } else if (entry.isDirectory()) {
         readCluster(path.join(root, entry.name));
