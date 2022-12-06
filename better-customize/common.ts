@@ -453,6 +453,11 @@ export const nonRoot = (): Transform => async (c: Cluster) => {
   };
   c.Deployments.forEach(([, deployOrSS]) => update(deployOrSS));
   c.StatefulSets.forEach(([, deployOrSS]) => update(deployOrSS));
+
+  // TODO: supply separate role bindings, put these in a separate directory, `like non-privileged-roles`
+  // and add an `include` function here to include them
+  c.ClusterRoleBindings = []
+  c.ClusterRoles = []
   return Promise.resolve();
 };
 
