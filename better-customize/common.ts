@@ -489,6 +489,14 @@ export const nonRoot = (): Transform => async (c: Cluster) => {
   // and add an `include` function here to include them
   c.ClusterRoleBindings = []
   c.ClusterRoles = []
+  c.RoleBindings.push([
+    "prometheus/prometheus.RoleBinding.yaml",
+    YAML.parse(readFileSync("./roles/prometheus/prometheus.RoleBinding.yaml").toString()),
+  ])
+  c.RoleBindings.push([
+    "frontend/sourcegraph-frontend.RoleBinding.yaml",
+    YAML.parse(readFileSync("./roles/frontend/sourcegraph-frontend.RoleBinding.yaml").toString()),
+  ])
   return Promise.resolve();
 };
 

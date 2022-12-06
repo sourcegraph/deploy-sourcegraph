@@ -25,7 +25,6 @@ import { normalizeOptions, normalizeYAMLRecursive } from './utils/normalize'
     ...userConfig,
   }
 
-
   const cluster: Cluster = newCluster();
 
   function readCluster(root: string) {
