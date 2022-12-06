@@ -8,7 +8,7 @@ import { normalizeOptions, normalizeYAMLRecursive } from './utils/normalize'
 
 (async function () {
   if (process.env.NORMALIZE) {
-    await normalizeYAMLRecursive(process.env.NORMALIZE)
+    await normalizeYAMLRecursive(process.env.NORMALIZE, process.env.OUTDIR)
     return
   }
 
@@ -216,15 +216,15 @@ function readCluster(root: string) {
       copy(manifestDir, config.outputDirectory);
     }
 
-    if (c.ManualInstructions.length > 0) {
-      console.log(
-        "####################\n# Additional steps #\n####################\n"
-      );
+    // if (c.ManualInstructions.length > 0) {
+    //   console.log(
+    //     "####################\n# Additional steps #\n####################\n"
+    //   );
 
-      for (const instruction of c.ManualInstructions) {
-        console.log(instruction + "\n\n\n");
-      }
-    }
+    //   for (const instruction of c.ManualInstructions) {
+    //     console.log(instruction + "\n\n\n");
+    //   }
+    // }
   }
 
   await writeCluster(cluster);
