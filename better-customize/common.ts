@@ -340,33 +340,64 @@ export const sshCloning =
     });
   };
 
+type NonRootAdjustments = {
+  [name: string]: {
+    runAsUser?: number;
+    runAsGroup?: number;
+    containers?: {
+      [containerName: string]: NonRootContainerAdjustment
+    },
+    initContainers?: {
+      [containerName: string]: NonRootContainerAdjustment
+    },
+  };
+};
+
+type NonRootContainerAdjustment = {
+  runAsUser?: number;
+  runAsGroup?: number;
+  allowPrivilegeEscalation?: boolean;
+}
+
 // TODO: change non-root to be the default, and runAsRoot to be an option
 export const nonRoot = (): Transform => async (c: Cluster) => {
-  const runAsUserAndGroup: {
-    [name: string]: {
-      runAsUser?: number;
-      runAsGroup?: number;
-      containers?: {
-        [containerName: string]: {
-          runAsUser?: number;
-          runAsGroup?: number;
-        };
-      };
-    };
-  } = {
+  const defaultContainerSecurityContext = {
+      allowPrivilegeEscalation: false,
+      runAsUser: 100,
+      runAsGroup: 101,
+  };
+  const runAsUserAndGroup: NonRootAdjustments = {
     "codeinsights-db": {
       runAsUser: 70,
+      initContainers: {
+        'correct-data-dir-permissions': {
+          runAsUser: 70,
+          runAsGroup: 70,
+        },
+      },
       containers: {
-        timescaledb: {
+        codeinsights: {
           runAsGroup: 70,
           runAsUser: 70,
         },
       },
     },
     "codeintel-db": {
-      runAsGroup: 999,
       runAsUser: 999,
+      initContainers: {
+        'correct-data-dir-permissions': {
+          runAsGroup: 999,
+          runAsUser: 999,
+        },
+      },
+      containers: {
+        pgsql: {
+          runAsGroup: 999,
+          runAsUser: 999,
+        }
+      }
     },
+    "sourcegraph-frontend": {},
     grafana: {
       containers: {
         grafana: {
@@ -392,42 +423,33 @@ export const nonRoot = (): Transform => async (c: Cluster) => {
     if (!deployOrSS.metadata?.name) {
       return;
     }
-    if (runAsUserAndGroup[deployOrSS.metadata.name]) {
-      _.merge(deployOrSS, {
-        spec: {
-          template: {
-            spec: {
-              securityContext: _.omitBy(
-                {
-                  runAsUser:
-                    runAsUserAndGroup[deployOrSS.metadata.name].runAsUser,
-                  runAsGroup:
-                    runAsUserAndGroup[deployOrSS.metadata.name].runAsGroup,
-                },
-                _.isUndefined
-              ),
-            },
+    const adjustment = runAsUserAndGroup[deployOrSS.metadata.name]
+    if (!adjustment) {
+      return
+    }
+    _.merge(deployOrSS, {
+      spec: {
+        template: {
+          spec: {
+            securityContext: _.omitBy(_.omit(adjustment, 'containers', 'initContainers'), _.isUndefined),
           },
         },
-      });
-    }
-    deployOrSS.spec?.template.spec?.containers.forEach((container) => {
-      const containerSecurityContext = {
-        allowPrivilegeEscalation: false,
-        runAsUser: 100,
-        runAsGroup: 101,
-      };
-      if (deployOrSS.metadata?.name) {
-        const containers =
-          runAsUserAndGroup[deployOrSS.metadata.name]?.containers;
-        _.merge(
-          containerSecurityContext,
-          _.omit(runAsUserAndGroup[deployOrSS.metadata.name], "containers"),
-          containers && containers[container.name]
-        );
+      },
+    })
+    const adjustContainers = (containers?: k8s.V1Container[], containerAdjustments?: { [containerName: string]: NonRootContainerAdjustment}) => {
+      if (!containers) {
+        if (containerAdjustments) {
+          console.error(`encountered container adjustments for non-existent containers: ${containerAdjustments}`)
+        }
+        return
       }
-      container.securityContext = containerSecurityContext;
-    });
+      for (const container of containers) {
+        const containerSecurityContext = containerAdjustments && containerAdjustments[container.name]
+        container.securityContext = _.merge({}, container.securityContext, defaultContainerSecurityContext, containerSecurityContext)
+      }
+    }
+    adjustContainers(deployOrSS.spec?.template.spec?.containers, adjustment.containers)
+    adjustContainers(deployOrSS.spec?.template.spec?.initContainers, adjustment.initContainers)
   };
   c.Deployments.forEach(([, deployOrSS]) => update(deployOrSS));
   c.StatefulSets.forEach(([, deployOrSS]) => update(deployOrSS));
