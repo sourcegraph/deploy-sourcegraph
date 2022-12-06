@@ -29,7 +29,7 @@ spec:
     spec:
       initContainers:
       - name: migrator
-        image: index.docker.io/sourcegraph/migrator:insiders@sha256:b51b04d856359b708d453c81fbf105ec36801279eec96f51e8594619799ae20b
+        image: index.docker.io/sourcegraph/migrator:187572_2022-12-06_cbecc5321c7d@sha256:93fc175df594738a98a62f2057271824cdb674b0e63bedac9dc7cb0f04db76bb
         args: ["up"]
         resources:
           limits:
@@ -63,7 +63,7 @@ spec:
           value: sg
       containers:
       - name: frontend
-        image: index.docker.io/sourcegraph/frontend:insiders@sha256:31ed4a503368a3d80e70118199196f8180f1470c47968a23e9a0a38ebc55470c
+        image: index.docker.io/sourcegraph/frontend:187572_2022-12-06_cbecc5321c7d@sha256:73e64a8636e70ebbaf7f4a3300479529294f67e8cf644cdaea02435915aec869
         args:
         - serve
         env:
@@ -89,6 +89,10 @@ spec:
           value: disable
         - name: CODEINTEL_PGUSER
           value: sg
+        - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
+          value: blobstore
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
+          value: http://blobstore:9000
         - name: GRAFANA_SERVER_URL
           value: http://grafana:30070
         - name: PROMETHEUS_URL
