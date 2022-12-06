@@ -8,38 +8,4 @@ metadata:
     app.kubernetes.io/component: otel-collector
     sourcegraph-resource-requires: no-cluster-admin
 data:
-  config.yaml: |
-    receivers:
-      otlp:
-        protocols:
-          grpc: # port 4317
-          http: # port 4318
-    
-    exporters:
-      otlp:
-        endpoint: "otel-collector:4317"
-        tls:
-          insecure: true
-        sending_queue:
-          num_consumers: 4
-          queue_size: 100
-        retry_on_failure:
-          enabled: true
-    
-    extensions:
-      health_check:
-        port: 13133
-      zpages:
-        endpoint: "localhost:55679"
-    
-    service:
-      extensions:
-        - zpages
-        - health_check
-      pipelines:
-        traces:
-          receivers:
-            - otlp
-          exporters:
-            - otlp
-          
+  config.yaml: "receivers:\n  otlp:\n    protocols:\n      grpc: # port 4317\n      http: # port 4318\n\nexporters:\n  otlp:\n    endpoint: \"otel-collector:4317\"\n    tls:\n      insecure: true\n    sending_queue:\n      num_consumers: 4\n      queue_size: 100\n    retry_on_failure:\n      enabled: true\n\nextensions:\n  health_check:\n    port: 13133\n  zpages:\n    endpoint: \"localhost:55679\"\n\nservice:\n  extensions:\n    - zpages\n    - health_check\n  pipelines:\n    traces:\n      receivers:\n        - otlp\n      exporters:\n        - otlp\n      \n"
