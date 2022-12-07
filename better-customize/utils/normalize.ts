@@ -3,9 +3,15 @@ import { readdirSync, readFile, writeFile } from "fs";
 import * as path from "path";
 import mkdirp = require("mkdirp");
 
-export const normalizeOptions = {
+export const normalizeOptions: YAML.DocumentOptions & YAML.SchemaOptions & YAML.ParseOptions & YAML.CreateNodeOptions & YAML.ToStringOptions = {
     sortMapEntries: true,
-    lineWidth: 0,
+    lineWidth: 100,
+    indent: 2,
+    indentSeq: false,
+    minContentWidth: 0,
+    blockQuote: 'literal',
+    // defaultKeyType: 'PLAIN',
+    // defaultStringType: 'BLOCK_LITERAL',
 }
 
 export async function normalizeYAMLRecursive(root: string, outRoot?: string) {
@@ -19,7 +25,7 @@ export async function normalizeYAMLRecursive(root: string, outRoot?: string) {
                 await mkdirp(path.dirname(outFilename))
                 await new Promise<void>((resolve, reject) => writeFile(
                     outFilename,
-                    YAML.stringify(YAML.parse(contents.toString()), { sortMapEntries: true, lineWidth: 0 }),
+                    YAML.stringify(YAML.parse(contents.toString()), normalizeOptions),
                     {},
                     err => err ? reject(err) : resolve()
                 ))

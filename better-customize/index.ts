@@ -45,7 +45,7 @@ import { normalizeOptions, normalizeYAMLRecursive } from './utils/normalize'
 
   try {
     for (const t of config.transformations) {
-      await t(cluster);
+      await t(cluster, config);
     }
   } catch (error) {
       console.error("Failed to generate manifest: ", error)
