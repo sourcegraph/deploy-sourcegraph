@@ -6,7 +6,7 @@ import * as path from "path";
 import * as request from "request";
 import { flatten } from "lodash";
 import { V1ConfigMap, V1Deployment, V1Ingress, V1ObjectMeta, V1PersistentVolumeClaim, V1Service, V1StatefulSet } from "@kubernetes/client-node";
-import { Cluster, MustConfig, overlay, Transform } from "./common";
+import { Cluster, MustConfig, overlay, removeComponent, Transform } from "./common";
 
 type NonRootAdjustments = {
     [name: string]: {
@@ -162,14 +162,17 @@ type NonRootAdjustments = {
             'prometheus.yml': getPrometheusYml(),
         },
     }})(c)
+    
+    removeComponent('sourcegraph-frontend', 'RoleBinding')(c)
+    removeComponent('sourcegraph-frontend', 'Role')(c)
 
     c.RoleBindings.push([
-      "prometheus/prometheus.RoleBinding.yaml",
-      YAML.parse(readFileSync("./roles/prometheus/prometheus.RoleBinding.yaml").toString()),
+      config!.filenameMapper("./roles", "./roles/prometheus/prometheus-nonprivileged.RoleBinding.yaml"),
+      YAML.parse(readFileSync("./roles/prometheus/prometheus-nonprivileged.RoleBinding.yaml").toString()),
     ])
     c.RoleBindings.push([
-      "frontend/sourcegraph-frontend.RoleBinding.yaml",
-      YAML.parse(readFileSync("./roles/frontend/sourcegraph-frontend.RoleBinding.yaml").toString()),
+      config!.filenameMapper("./roles", "./roles/frontend/sourcegraph-frontend-nonprivileged.RoleBinding.yaml"),
+      YAML.parse(readFileSync("./roles/frontend/sourcegraph-frontend-nonprivileged.RoleBinding.yaml").toString()),
     ])
 
     return Promise.resolve();

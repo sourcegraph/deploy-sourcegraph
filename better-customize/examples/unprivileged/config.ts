@@ -37,7 +37,7 @@ function customFilenameMapper(sourceDir: string, filename: string): string {
     // Adjustments
     if (dirParts.length > 0) {
       const dirName = dirParts[dirParts.length-1]
-      if ([name, 'frontend', 'redis', 'jaeger', '.'].indexOf(dirName) === -1) {
+      if ([name, 'otel-collector', 'frontend', 'redis', 'jaeger', '.'].indexOf(dirName) === -1 && name.indexOf(`${dirName}-`) !== 0) {
         name = dirName + '-' + name
       }
     }
