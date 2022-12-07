@@ -71,7 +71,8 @@ import { normalizeOptions, normalizeYAMLRecursive } from './utils/normalize'
       ...c.ServiceAccounts,
       ...c.StatefulSets,
       ...c.StorageClasses,
-      ...c.Secrets
+      ...c.Secrets,
+      ...c.Unrecognized,
     );
 
     // TODO: do the rm -rf ouptputDirectory in TypeScript

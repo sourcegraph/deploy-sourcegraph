@@ -17,7 +17,7 @@ export interface MustConfig {
 
 export type Config = Partial<MustConfig> & Pick<MustConfig, 'transformations'>
 
-export const clusterObjectKeys =  [
+export const clusterObjectKeys = [
   'Deployments',
   'PersistentVolumeClaims',
   'PersistentVolumes',
@@ -33,7 +33,7 @@ export const clusterObjectKeys =  [
   'ServiceAccounts',
   'Secrets',
   'StatefulSets',
-'StorageClasses',
+  'StorageClasses',
 ] as const
 
 export interface Cluster {
@@ -55,7 +55,8 @@ export interface Cluster {
   StorageClasses: [string, k8s.V1StorageClass][];
 
   RawFiles: [string, string][];
-  Unrecognized: string[];
+  // Unrecognized: string[];
+  Unrecognized: [string, any][];
   ManualInstructions: string[];
 }
 
@@ -66,41 +67,41 @@ export const removeComponent = (name: string, kind: string): Transform => async 
     removeAllComponentsOfKind(kind, c)
     return
   }
-  c.Deployments = c.Deployments.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.PersistentVolumes = c.PersistentVolumes.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.Services = c.Services.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.ClusterRoles = c.ClusterRoles.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.ClusterRoleBindings = c.ClusterRoleBindings.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.ConfigMaps = c.ConfigMaps.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.DaemonSets = c.DaemonSets.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.Ingresss = c.Ingresss.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.PodSecurityPolicys = c.PodSecurityPolicys.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.Roles = c.Roles.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.RoleBindings = c.RoleBindings.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.ServiceAccounts = c.ServiceAccounts.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.Secrets = c.Secrets.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.StatefulSets = c.StatefulSets.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
-  c.StorageClasses = c.StorageClasses.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.Deployments = c.Deployments.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.PersistentVolumes = c.PersistentVolumes.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.Services = c.Services.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.ClusterRoles = c.ClusterRoles.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.ClusterRoleBindings = c.ClusterRoleBindings.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.ConfigMaps = c.ConfigMaps.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.DaemonSets = c.DaemonSets.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.Ingresss = c.Ingresss.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.PodSecurityPolicys = c.PodSecurityPolicys.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.Roles = c.Roles.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.RoleBindings = c.RoleBindings.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.ServiceAccounts = c.ServiceAccounts.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.Secrets = c.Secrets.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.StatefulSets = c.StatefulSets.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.StorageClasses = c.StorageClasses.filter(([, obj]) => obj.metadata?.name !== name || obj.kind !== kind)
 }
 
 const removeAllComponentsOfKind = (kind: string, c: Cluster): void => {
-  c.Deployments = c.Deployments.filter(([,obj]) => obj.kind !== kind)
-  c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([,obj]) => obj.kind !== kind)
-  c.PersistentVolumes = c.PersistentVolumes.filter(([,obj]) => obj.kind !== kind)
-  c.Services = c.Services.filter(([,obj]) => obj.kind !== kind)
-  c.ClusterRoles = c.ClusterRoles.filter(([,obj]) => obj.kind !== kind)
-  c.ClusterRoleBindings = c.ClusterRoleBindings.filter(([,obj]) => obj.kind !== kind)
-  c.ConfigMaps = c.ConfigMaps.filter(([,obj]) => obj.kind !== kind)
-  c.DaemonSets = c.DaemonSets.filter(([,obj]) => obj.kind !== kind)
-  c.Ingresss = c.Ingresss.filter(([,obj]) => obj.kind !== kind)
-  c.PodSecurityPolicys = c.PodSecurityPolicys.filter(([,obj]) => obj.kind !== kind)
-  c.Roles = c.Roles.filter(([,obj]) => obj.kind !== kind)
-  c.RoleBindings = c.RoleBindings.filter(([,obj]) => obj.kind !== kind)
-  c.ServiceAccounts = c.ServiceAccounts.filter(([,obj]) => obj.kind !== kind)
-  c.Secrets = c.Secrets.filter(([,obj]) => obj.kind !== kind)
-  c.StatefulSets = c.StatefulSets.filter(([,obj]) => obj.kind !== kind)
-  c.StorageClasses = c.StorageClasses.filter(([,obj]) => obj.kind !== kind)
+  c.Deployments = c.Deployments.filter(([, obj]) => obj.kind !== kind)
+  c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([, obj]) => obj.kind !== kind)
+  c.PersistentVolumes = c.PersistentVolumes.filter(([, obj]) => obj.kind !== kind)
+  c.Services = c.Services.filter(([, obj]) => obj.kind !== kind)
+  c.ClusterRoles = c.ClusterRoles.filter(([, obj]) => obj.kind !== kind)
+  c.ClusterRoleBindings = c.ClusterRoleBindings.filter(([, obj]) => obj.kind !== kind)
+  c.ConfigMaps = c.ConfigMaps.filter(([, obj]) => obj.kind !== kind)
+  c.DaemonSets = c.DaemonSets.filter(([, obj]) => obj.kind !== kind)
+  c.Ingresss = c.Ingresss.filter(([, obj]) => obj.kind !== kind)
+  c.PodSecurityPolicys = c.PodSecurityPolicys.filter(([, obj]) => obj.kind !== kind)
+  c.Roles = c.Roles.filter(([, obj]) => obj.kind !== kind)
+  c.RoleBindings = c.RoleBindings.filter(([, obj]) => obj.kind !== kind)
+  c.ServiceAccounts = c.ServiceAccounts.filter(([, obj]) => obj.kind !== kind)
+  c.Secrets = c.Secrets.filter(([, obj]) => obj.kind !== kind)
+  c.StatefulSets = c.StatefulSets.filter(([, obj]) => obj.kind !== kind)
+  c.StorageClasses = c.StorageClasses.filter(([, obj]) => obj.kind !== kind)
 }
 
 export const platform =
@@ -108,50 +109,50 @@ export const platform =
     base: "gcp" | "aws" | "azure" | "minikube" | "generic",
     customizeStorageClass?: (sc: k8s.V1StorageClass) => void
   ): Transform =>
-  (c: Cluster) => {
-    const obj = YAML.parse(
-      readFileSync(path.join("custom", `${base}.StorageClass.yaml`)).toString()
-    );
-    if (customizeStorageClass) {
-      customizeStorageClass(obj);
-    }
-    c.StorageClasses.push(["sourcegraph.StorageClass.yaml", obj]);
+    (c: Cluster) => {
+      const obj = YAML.parse(
+        readFileSync(path.join("custom", `${base}.StorageClass.yaml`)).toString()
+      );
+      if (customizeStorageClass) {
+        customizeStorageClass(obj);
+      }
+      c.StorageClasses.push(["sourcegraph.StorageClass.yaml", obj]);
 
-    if (base === "minikube") {
-      const removeResources = (
-        deployOrSS: k8s.V1Deployment | k8s.V1StatefulSet
-      ) => {
-        deployOrSS.spec?.template.spec?.containers.forEach(
-          (container) => delete container["resources"]
-        );
-      };
-      c.Deployments.forEach(([, deployment]) => removeResources(deployment));
-      c.StatefulSets.forEach(([, ss]) => removeResources(ss));
-    }
+      if (base === "minikube") {
+        const removeResources = (
+          deployOrSS: k8s.V1Deployment | k8s.V1StatefulSet
+        ) => {
+          deployOrSS.spec?.template.spec?.containers.forEach(
+            (container) => delete container["resources"]
+          );
+        };
+        c.Deployments.forEach(([, deployment]) => removeResources(deployment));
+        c.StatefulSets.forEach(([, ss]) => removeResources(ss));
+      }
 
-    return Promise.resolve();
-  };
+      return Promise.resolve();
+    };
 
 export const ingress = (
   params:
     | {
-        ingressType: "NginxIngressController";
-        tls?: {
-          certFile: string;
-          keyFile: string;
-          hostname: string;
-        };
-      }
+      ingressType: "NginxIngressController";
+      tls?: {
+        certFile: string;
+        keyFile: string;
+        hostname: string;
+      };
+    }
     | {
-        ingressType: "NginxNodePortService";
-        tls: {
-          certFile: string;
-          keyFile: string;
-        };
-      }
+      ingressType: "NginxNodePortService";
+      tls: {
+        certFile: string;
+        keyFile: string;
+      };
+    }
     | {
-        ingressType: "NodePort";
-      }
+      ingressType: "NodePort";
+    }
 ): Transform => {
   switch (params.ingressType) {
     case "NginxIngressController":
@@ -161,114 +162,114 @@ export const ingress = (
     case "NodePort":
       return nodePort();
     default:
-        throw new Error('Unrecognized ingress type: ' + (params as any).ingressType)
+      throw new Error('Unrecognized ingress type: ' + (params as any).ingressType)
   }
 };
 
 const ingressNginx =
   (tls?: { certFile: string; keyFile: string; hostname: string }): Transform =>
-  async (c: Cluster) => {
-    const body = await new Promise<any>((resolve) =>
-      request(
-        "https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/cloud/deploy.yaml",
-        (err, res, body) => {
-          resolve(body);
-        }
-      )
-    );
+    async (c: Cluster) => {
+      const body = await new Promise<any>((resolve) =>
+        request(
+          "https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/cloud/deploy.yaml",
+          (err, res, body) => {
+            resolve(body);
+          }
+        )
+      );
 
-    // Add `deploy: sourcegraph` label
-    const docs = YAML.parseAllDocuments(body);
-    for (const doc of docs) {
-      doc.setIn(["metadata", "labels", "deploy"], "sourcegraph");
-    }
+      // Add `deploy: sourcegraph` label
+      const docs = YAML.parseAllDocuments(body);
+      for (const doc of docs) {
+        doc.setIn(["metadata", "labels", "deploy"], "sourcegraph");
+      }
 
-    if (tls) {
-      c.Ingresss.forEach(([filepath, data]) => {
-        data.spec!.tls = [
-          {
-            hosts: [tls.hostname],
-            secretName: "sourcegraph-tls",
-          },
-        ];
-        data.spec!.rules = [
-          {
-            http: {
-              paths: [
-                {
-                  path: "/",
-                  backend: {
-                    service: {
-                      name: "sourcegraph-frontend",
-                      port: {
-                        number: 300080,
+      if (tls) {
+        c.Ingresss.forEach(([filepath, data]) => {
+          data.spec!.tls = [
+            {
+              hosts: [tls.hostname],
+              secretName: "sourcegraph-tls",
+            },
+          ];
+          data.spec!.rules = [
+            {
+              http: {
+                paths: [
+                  {
+                    path: "/",
+                    backend: {
+                      service: {
+                        name: "sourcegraph-frontend",
+                        port: {
+                          number: 300080,
+                        },
                       },
                     },
                   },
-                },
-              ],
+                ],
+              },
+              host: tls.hostname,
             },
-            host: tls.hostname,
-          },
-        ];
-      });
+          ];
+        });
 
-      const cert = readFileSync(tls.certFile).toString("base64");
-      const key = readFileSync(tls.keyFile).toString("base64");
-      c.Secrets.push([
-        "sourcegraph-tls.Secret.yaml",
-        {
-          apiVersion: "v1",
-          kind: "Secret",
-          metadata: { name: "sourcegraph-tls" },
-          type: "kubernetes.io/tls",
-          data: {
-            "tls.crt": cert,
-            "tls.key": key,
+        const cert = readFileSync(tls.certFile).toString("base64");
+        const key = readFileSync(tls.keyFile).toString("base64");
+        c.Secrets.push([
+          "sourcegraph-tls.Secret.yaml",
+          {
+            apiVersion: "v1",
+            kind: "Secret",
+            metadata: { name: "sourcegraph-tls" },
+            type: "kubernetes.io/tls",
+            data: {
+              "tls.crt": cert,
+              "tls.key": key,
+            },
           },
-        },
+        ]);
+
+        c.ManualInstructions.push(
+          `Update your [site configuration](https://docs.sourcegraph.com/admin/config/site_config) to set \`externalURL\` to ${tls.hostname}`
+        );
+      }
+
+      c.RawFiles.push([
+        "ingress-nginx.yaml",
+        docs.map((doc) => doc.toString()).join("\n"),
       ]);
-
-      c.ManualInstructions.push(
-        `Update your [site configuration](https://docs.sourcegraph.com/admin/config/site_config) to set \`externalURL\` to ${tls.hostname}`
-      );
-    }
-
-    c.RawFiles.push([
-      "ingress-nginx.yaml",
-      docs.map((doc) => doc.toString()).join("\n"),
-    ]);
-  };
+    };
 
 const serviceNginx =
   (tlsCertFile: string, tlsKeyFile: string): Transform =>
-  async (c: Cluster) => {
-    const s = readFileSync(
-      path.join("custom", "nginx-svc", "nginx.ConfigMap.yaml")
-    ).toString();
-    const y = YAML.parse(s) as k8s.V1ConfigMap;
-    const tlsCert = readFileSync(tlsCertFile).toString();
-    const tlsKey = readFileSync(tlsKeyFile).toString();
-    y.data!["tls.crt"] = tlsCert;
-    y.data!["tls.key"] = tlsKey;
-    c.ConfigMaps.push(["nginx.ConfigMap.yaml", y]);
-    c.Deployments.push([
-      "nginx.Deployment.yaml",
-      YAML.parse(
-        readFileSync(
-          path.join("custom", "nginx-svc", "nginx.Deployment.yaml")
-        ).toString()
-      ),
-    ]);
-    c.Services.push([
-      "nginx.Service.yaml",
-      YAML.parse(
-        readFileSync(
-          path.join("custom", "nginx-svc", "nginx.Service.yaml")
-        ).toString()
-      ),
-    ]);
-  };
+    async (c: Cluster) => {
+      const s = readFileSync(
+        path.join("custom", "nginx-svc", "nginx.ConfigMap.yaml")
+      ).toString();
+      const y = YAML.parse(s) as k8s.V1ConfigMap;
+      const tlsCert = readFileSync(tlsCertFile).toString();
+      const tlsKey = readFileSync(tlsKeyFile).toString();
+      y.data!["tls.crt"] = tlsCert;
+      y.data!["tls.key"] = tlsKey;
+      c.ConfigMaps.push(["nginx.ConfigMap.yaml", y]);
+      c.Deployments.push([
+        "nginx.Deployment.yaml",
+        YAML.parse(
+          readFileSync(
+            path.join("custom", "nginx-svc", "nginx.Deployment.yaml")
+          ).toString()
+        ),
+      ]);
+      c.Services.push([
+        "nginx.Service.yaml",
+        YAML.parse(
+          readFileSync(
+            path.join("custom", "nginx-svc", "nginx.Service.yaml")
+          ).toString()
+        ),
+      ]);
+    };
 
 const nodePort = (): Transform => async (c: Cluster) => {
   c.Services.forEach(([filename, service]) => {
@@ -322,73 +323,73 @@ export const sshCloning =
     knownHostsFile: string,
     root: boolean = true
   ): Transform =>
-  async (c: Cluster) => {
-    const sshKey = readFileSync(sshKeyFile).toString("base64");
-    const knownHosts = readFileSync(knownHostsFile).toString("base64");
-    const sshDir = root ? "/root" : "/home/sourcegraph";
-    c.Secrets.push([
-      "gitserver-ssh.Secret.yaml",
-      {
-        apiVersion: "v1",
-        kind: "Secret",
-        metadata: { name: "gitserver-ssh" },
-        type: "Opaque",
-        data: {
-          id_rsa: sshKey,
-          known_hosts: knownHosts,
+    async (c: Cluster) => {
+      const sshKey = readFileSync(sshKeyFile).toString("base64");
+      const knownHosts = readFileSync(knownHostsFile).toString("base64");
+      const sshDir = root ? "/root" : "/home/sourcegraph";
+      c.Secrets.push([
+        "gitserver-ssh.Secret.yaml",
+        {
+          apiVersion: "v1",
+          kind: "Secret",
+          metadata: { name: "gitserver-ssh" },
+          type: "Opaque",
+          data: {
+            id_rsa: sshKey,
+            known_hosts: knownHosts,
+          },
         },
-      },
-    ]);
-    c.StatefulSets.filter(([filename]) =>
-      filename.endsWith("gitserver.StatefulSet.yaml")
-    ).forEach(([, data]) => {
-      data.spec!.template.spec!.containers.forEach((container) => {
-        if (container.name === "gitserver") {
-          if (!container.volumeMounts) {
-            container.volumeMounts = [];
+      ]);
+      c.StatefulSets.filter(([filename]) =>
+        filename.endsWith("gitserver.StatefulSet.yaml")
+      ).forEach(([, data]) => {
+        data.spec!.template.spec!.containers.forEach((container) => {
+          if (container.name === "gitserver") {
+            if (!container.volumeMounts) {
+              container.volumeMounts = [];
+            }
+            container.volumeMounts.push({
+              mountPath: `${sshDir}/.ssh`,
+              name: "ssh",
+            });
           }
-          container.volumeMounts.push({
-            mountPath: `${sshDir}/.ssh`,
-            name: "ssh",
-          });
+        });
+        if (!data.spec!.template.spec!.volumes) {
+          data.spec!.template.spec!.volumes = [];
         }
+        !data.spec!.template.spec!.volumes!.push({
+          name: "ssh",
+          secret: { defaultMode: 0o644, secretName: "gitserver-ssh" },
+        });
       });
-      if (!data.spec!.template.spec!.volumes) {
-        data.spec!.template.spec!.volumes = [];
-      }
-      !data.spec!.template.spec!.volumes!.push({
-        name: "ssh",
-        secret: { defaultMode: 0o644, secretName: "gitserver-ssh" },
-      });
-    });
-  };
+    };
 
 export const redis =
   (redisCacheEndpoint: string, redisStoreEndpoint: string): Transform =>
-  (c: Cluster) => {
-    c.Deployments.filter(([, deployment]) =>
-      _.includes(
-        ["sourcegraph-frontend", "repo-updater"],
-        deployment.metadata?.name
-      )
-    ).forEach(([, deployment]) => {
-      deployment.spec?.template.spec?.containers
-        .filter((container) =>
-          _.includes(["frontend", "repo-updater"], container.name)
+    (c: Cluster) => {
+      c.Deployments.filter(([, deployment]) =>
+        _.includes(
+          ["sourcegraph-frontend", "repo-updater"],
+          deployment.metadata?.name
         )
-        .forEach((container) => {
-          if (!container.env) {
-            container.env = [];
-          }
-          updateEnvironment(container.env, {
-            REDIS_CACHE_ENDPOINT: redisCacheEndpoint,
-            REDIS_STORE_ENDPOINT: redisStoreEndpoint,
+      ).forEach(([, deployment]) => {
+        deployment.spec?.template.spec?.containers
+          .filter((container) =>
+            _.includes(["frontend", "repo-updater"], container.name)
+          )
+          .forEach((container) => {
+            if (!container.env) {
+              container.env = [];
+            }
+            updateEnvironment(container.env, {
+              REDIS_CACHE_ENDPOINT: redisCacheEndpoint,
+              REDIS_STORE_ENDPOINT: redisStoreEndpoint,
+            });
           });
-        });
-    });
-    removeComponentRegexp(/^redis\-/, c)
-    return Promise.resolve();
-  };
+      });
+      removeComponentRegexp(/^redis\-/, c)
+      return Promise.resolve();
+    };
 
 export const postgres =
   (postgresEndpoint: {
@@ -399,35 +400,35 @@ export const postgres =
     PGDATABASE?: string;
     PGSSLMODE?: string;
   }): Transform =>
-  (c: Cluster) => {
-    c.Deployments.filter(([, deployment]) =>
-      _.includes(
-        ["sourcegraph-frontend", "repo-updater"],
-        deployment.metadata?.name
-      )
-    ).forEach(([, deployment]) => {
-      deployment.spec?.template.spec?.containers
-        .filter((container) =>
-          _.includes(["frontend", "repo-updater"], container.name)
+    (c: Cluster) => {
+      c.Deployments.filter(([, deployment]) =>
+        _.includes(
+          ["sourcegraph-frontend", "repo-updater"],
+          deployment.metadata?.name
         )
-        .forEach((container) => {
-          if (!container.env) {
-            container.env = [];
-          }
-          updateEnvironment(container.env, postgresEndpoint);
-        });
-    });
-    removeComponentRegexp(/^pgsql/, c)
-    return Promise.resolve();
-  };
+      ).forEach(([, deployment]) => {
+        deployment.spec?.template.spec?.containers
+          .filter((container) =>
+            _.includes(["frontend", "repo-updater"], container.name)
+          )
+          .forEach((container) => {
+            if (!container.env) {
+              container.env = [];
+            }
+            updateEnvironment(container.env, postgresEndpoint);
+          });
+      });
+      removeComponentRegexp(/^pgsql/, c)
+      return Promise.resolve();
+    };
 
 interface NameAndKindOptions {
   omit: [string, string][]
 }
 
-export const setNamespace = (name: string, kind: string, namespace: string, options?: NameAndKindOptions) => setMetadata(name, kind, {namespace}, options)
+export const setNamespace = (name: string, kind: string, namespace: string, options?: NameAndKindOptions) => setMetadata(name, kind, { namespace }, options)
 
-export const setMetadata = (name: string, kind: string, toMerge: DeepPartial<V1ObjectMeta>, options?: NameAndKindOptions ): Transform => async (c: Cluster) => {
+export const setMetadata = (name: string, kind: string, toMerge: DeepPartial<V1ObjectMeta>, options?: NameAndKindOptions): Transform => async (c: Cluster) => {
   flatten<[string, { metadata?: V1ObjectMeta, kind?: string }]>([
     c.Deployments,
     c.PersistentVolumeClaims,
@@ -448,7 +449,7 @@ export const setMetadata = (name: string, kind: string, toMerge: DeepPartial<V1O
   ]).map(([, obj]) => obj)
     .filter(obj => (name === '*' || obj.metadata?.name === name) && (kind === '*' || obj.kind === kind))
     .filter(obj => !(options?.omit && _.some(options.omit.map(([omitName, omitKind]) => obj.metadata?.name === omitName && obj.kind === omitKind))))
-    .forEach(obj=> {
+    .forEach(obj => {
       if (['ClusterRole', 'ClusterRoleBinding'].indexOf(obj.kind || '') !== -1) {
         _.merge(obj.metadata, _.omit(toMerge, 'namespace'))
       } else {
@@ -460,13 +461,13 @@ export const setMetadata = (name: string, kind: string, toMerge: DeepPartial<V1O
         _.concat(
           c.ClusterRoleBindings,
           c.RoleBindings,
-        ).forEach(([,roleBinding]) => {
-        roleBinding.subjects?.
-          filter(subject => (name === '*' || subject.name === name) && (kind === '*' || subject.kind === kind)).
-          forEach(subject => _.merge(subject, {namespace: toMerge.namespace}))
+        ).forEach(([, roleBinding]) => {
+          roleBinding.subjects?.
+            filter(subject => (name === '*' || subject.name === name) && (kind === '*' || subject.kind === kind)).
+            forEach(subject => _.merge(subject, { namespace: toMerge.namespace }))
         })
       }
-  })
+    })
 }
 
 type DeepPartial<T> = T extends object ? {
@@ -487,7 +488,7 @@ function mergeArrayCustomizer<T>(objValue: T, srcValue: T): any | undefined {
     _.fromPairs(srcValue.map(elem => [elemKey(elem), elem])),
     mergeArrayCustomizer,
   )
-  return _.toPairs(mergedElemsObj).map(([,elem]) => elem)
+  return _.toPairs(mergedElemsObj).map(([, elem]) => elem)
 }
 
 export const overlay = (
@@ -508,8 +509,8 @@ export const overlay = (
     persistentVolumeClaim?: string[],
     service?: string[],
   },
-): Transform => async (c: Cluster) => {    
-  const mergeObjs = <T extends { metadata?: { name?: string }}>(namedObjs: [string, T][], toMerge?: DeepPartial<T>, toUnset?: string[]) => {
+): Transform => async (c: Cluster) => {
+  const mergeObjs = <T extends { metadata?: { name?: string } }>(namedObjs: [string, T][], toMerge?: DeepPartial<T>, toUnset?: string[]) => {
     if (!toMerge && !unsetPaths) {
       return
     }
@@ -537,18 +538,18 @@ export const normalize = (): Transform => async (c: Cluster) => {
   _.concat(
     c.Deployments || [],
     c.StatefulSets || [],
-    ).forEach(([, deploymentOrStatefulSet]) => {
-      _.concat(
-        deploymentOrStatefulSet.spec?.template.spec?.containers || [],
-        deploymentOrStatefulSet.spec?.template.spec?.initContainers || [],
-        ).forEach(c => {
-          if (c.env === null) {
-            delete c.env
-          }
-        })
-      })
+  ).forEach(([, deploymentOrStatefulSet]) => {
+    _.concat(
+      deploymentOrStatefulSet.spec?.template.spec?.containers || [],
+      deploymentOrStatefulSet.spec?.template.spec?.initContainers || [],
+    ).forEach(c => {
+      if (c.env === null) {
+        delete c.env
+      }
+    })
+  })
 }
-  
+
 export function defaultFilenameMapper(sourceDir: string, filename: string): string {
   return path.relative(sourceDir, filename)
 }
@@ -557,6 +558,10 @@ export function kustomizeFilenameMapper(sourceDir: string, filename: string): st
   const rel = path.relative(sourceDir, filename);
 
   const yaml = YAML.parse(readFileSync(filename).toString())
+  if (yaml.metadata?.name === "enable-trailers") {
+    // Special case, for backcompat
+    return "networking.istio.io_v1alpha3_envoyfilter_enable-trailers.yaml" 
+  }
   const dirParts = path.dirname(rel).split(path.sep)
   const baseParts = path.basename(filename).split('.')
   if (baseParts.length < 3) {
@@ -569,7 +574,7 @@ export function kustomizeFilenameMapper(sourceDir: string, filename: string): st
   {
     // Adjustments
     if (dirParts.length > 0) {
-      const dirName = dirParts[dirParts.length-1]
+      const dirName = dirParts[dirParts.length - 1]
       if ([name, 'otel-collector', 'frontend', 'redis', 'jaeger', '.'].indexOf(dirName) === -1 && name.indexOf(`${dirName}-`) !== 0) {
         name = dirName + '-' + name
       }
@@ -583,15 +588,15 @@ export function kustomizeFilenameMapper(sourceDir: string, filename: string): st
       name = mappings[name]
     }
   }
-  
+
   if (typeof yaml.apiVersion === 'string' || yaml.apiVersion instanceof String) {
     prefix = (yaml.apiVersion as string).replace('/', '_')
   }
-  
+
   if (kind === 'IndexerService' && name === 'indexed-search') {
     return 'v1_service_indexed-search-indexer.yaml'
   }
-  
+
   return prefix + '_' + kind.toLowerCase() + '_' + name.toLowerCase() + '.' + ext
 }
 
@@ -674,91 +679,101 @@ export function addToCluster(cluster: Cluster, filename: string, name: string) {
   const k8sType = path.extname(baseName.substring(0, baseName.length - ".yaml".length));
   switch (k8sType) {
     case ".Deployment":
-    cluster.Deployments.push([
-      name,
-      YAML.parse(readFileSync(filename).toString()),
-    ]);
-    break;
+      cluster.Deployments.push([
+        name,
+        YAML.parse(readFileSync(filename).toString()),
+      ]);
+      break;
     case ".PersistentVolumeClaim":
-    cluster.PersistentVolumeClaims.push([
-      name,
-      YAML.parse(readFileSync(filename).toString()),
-    ]);
-    break;
+      cluster.PersistentVolumeClaims.push([
+        name,
+        YAML.parse(readFileSync(filename).toString()),
+      ]);
+      break;
     case ".PersistentVolume":
-    cluster.PersistentVolumes.push([
-      name,
-      YAML.parse(readFileSync(filename).toString()),
-    ]);
-    break;
+      cluster.PersistentVolumes.push([
+        name,
+        YAML.parse(readFileSync(filename).toString()),
+      ]);
+      break;
     case ".Service":
     case ".IndexerService":
-    cluster.Services.push([
-      name,
-      YAML.parse(readFileSync(filename).toString()),
-    ]);
-    break;
+      cluster.Services.push([
+        name,
+        YAML.parse(readFileSync(filename).toString()),
+      ]);
+      break;
     case ".ClusterRole":
-    cluster.ClusterRoles.push([
-      name,
-      YAML.parse(readFileSync(filename).toString()),
-    ]);
-    break;
+      cluster.ClusterRoles.push([
+        name,
+        YAML.parse(readFileSync(filename).toString()),
+      ]);
+      break;
     case ".ClusterRoleBinding":
-    cluster.ClusterRoleBindings.push([
-      name,
-      YAML.parse(readFileSync(filename).toString()),
-    ]);
-    break;
+      cluster.ClusterRoleBindings.push([
+        name,
+        YAML.parse(readFileSync(filename).toString()),
+      ]);
+      break;
     case ".ConfigMap":
-    cluster.ConfigMaps.push([
-      name,
-      YAML.parse(readFileSync(filename).toString()),
-    ]);
-    break;
+      cluster.ConfigMaps.push([
+        name,
+        YAML.parse(readFileSync(filename).toString()),
+      ]);
+      break;
     case ".DaemonSet":
-    cluster.DaemonSets.push([
-      name,
-      YAML.parse(readFileSync(filename).toString()),
-    ]);
-    break;
+      cluster.DaemonSets.push([
+        name,
+        YAML.parse(readFileSync(filename).toString()),
+      ]);
+      break;
     case ".Ingress":
-    cluster.Ingresss.push([
-      name,
-      YAML.parse(readFileSync(filename).toString()),
-    ]);
-    break;
+      cluster.Ingresss.push([
+        name,
+        YAML.parse(readFileSync(filename).toString()),
+      ]);
+      break;
     case ".PodSecurityPolicy":
-    cluster.PodSecurityPolicys.push([
-      name,
-      YAML.parse(readFileSync(filename).toString()),
-    ]);
-    break;
+      cluster.PodSecurityPolicys.push([
+        name,
+        YAML.parse(readFileSync(filename).toString()),
+      ]);
+      break;
     case ".Role":
-    cluster.Roles.push([
-      name,
-      YAML.parse(readFileSync(filename).toString()),
-    ]);
-    break;
+      cluster.Roles.push([
+        name,
+        YAML.parse(readFileSync(filename).toString()),
+      ]);
+      break;
     case ".RoleBinding":
-    cluster.RoleBindings.push([
-      name,
-      YAML.parse(readFileSync(filename).toString()),
-    ]);
-    break;
+      cluster.RoleBindings.push([
+        name,
+        YAML.parse(readFileSync(filename).toString()),
+      ]);
+      break;
     case ".ServiceAccount":
-    cluster.ServiceAccounts.push([
-      name,
-      YAML.parse(readFileSync(filename).toString()),
-    ]);
-    break;
+      cluster.ServiceAccounts.push([
+        name,
+        YAML.parse(readFileSync(filename).toString()),
+      ]);
+      break;
     case ".StatefulSet":
-    cluster.StatefulSets.push([
-      name,
-      YAML.parse(readFileSync(filename).toString()),
-    ]);
-    break;
+      cluster.StatefulSets.push([
+        name,
+        YAML.parse(readFileSync(filename).toString()),
+      ]);
+      break;
     default:
-    cluster.Unrecognized.push(path.basename(filename));
+      try {
+        const obj = YAML.parse(readFileSync(filename).toString())
+        if (obj.kind && obj.apiVersion) {
+          cluster.Unrecognized.push([
+            name,
+            obj
+          ])
+        }
+      } catch (e) {
+        console.error("Could not parse file:", filename);
+      }
   }
 }
