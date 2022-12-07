@@ -162,9 +162,11 @@ type NonRootAdjustments = {
             'prometheus.yml': getPrometheusYml(),
         },
     }})(c)
-    
-    removeComponent('sourcegraph-frontend', 'RoleBinding')(c)
-    removeComponent('sourcegraph-frontend', 'Role')(c)
+
+    removeComponent('*', 'RoleBinding')(c)
+    removeComponent('*', 'Role')(c)
+    removeComponent('cadvisor', 'ServiceAccount')(c)
+    removeComponent('worker-executors', 'Service')(c) // TODO: why??
 
     c.RoleBindings.push([
       config!.filenameMapper("./roles", "./roles/prometheus/prometheus-nonprivileged.RoleBinding.yaml"),

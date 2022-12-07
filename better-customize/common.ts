@@ -62,22 +62,45 @@ export interface Cluster {
 export type Transform = (c: Cluster, config?: MustConfig) => Promise<void>;
 
 export const removeComponent = (name: string, kind: string): Transform => async (c: Cluster) => {
-  c.Deployments = c.Deployments.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.PersistentVolumes = c.PersistentVolumes.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.Services = c.Services.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.ClusterRoles = c.ClusterRoles.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.ClusterRoleBindings = c.ClusterRoleBindings.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.ConfigMaps = c.ConfigMaps.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.DaemonSets = c.DaemonSets.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.Ingresss = c.Ingresss.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.PodSecurityPolicys = c.PodSecurityPolicys.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.Roles = c.Roles.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.RoleBindings = c.RoleBindings.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.ServiceAccounts = c.ServiceAccounts.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.Secrets = c.Secrets.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.StatefulSets = c.StatefulSets.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
-  c.StorageClasses = c.StorageClasses.filter(([,obj]) => obj.metadata?.name !== name && obj.kind !== kind)
+  if (name === '*') {
+    removeAllComponentsOfKind(kind, c)
+    return
+  }
+  c.Deployments = c.Deployments.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.PersistentVolumes = c.PersistentVolumes.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.Services = c.Services.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.ClusterRoles = c.ClusterRoles.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.ClusterRoleBindings = c.ClusterRoleBindings.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.ConfigMaps = c.ConfigMaps.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.DaemonSets = c.DaemonSets.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.Ingresss = c.Ingresss.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.PodSecurityPolicys = c.PodSecurityPolicys.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.Roles = c.Roles.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.RoleBindings = c.RoleBindings.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.ServiceAccounts = c.ServiceAccounts.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.Secrets = c.Secrets.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.StatefulSets = c.StatefulSets.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+  c.StorageClasses = c.StorageClasses.filter(([,obj]) => obj.metadata?.name !== name || obj.kind !== kind)
+}
+
+const removeAllComponentsOfKind = (kind: string, c: Cluster): void => {
+  c.Deployments = c.Deployments.filter(([,obj]) => obj.kind !== kind)
+  c.PersistentVolumeClaims = c.PersistentVolumeClaims.filter(([,obj]) => obj.kind !== kind)
+  c.PersistentVolumes = c.PersistentVolumes.filter(([,obj]) => obj.kind !== kind)
+  c.Services = c.Services.filter(([,obj]) => obj.kind !== kind)
+  c.ClusterRoles = c.ClusterRoles.filter(([,obj]) => obj.kind !== kind)
+  c.ClusterRoleBindings = c.ClusterRoleBindings.filter(([,obj]) => obj.kind !== kind)
+  c.ConfigMaps = c.ConfigMaps.filter(([,obj]) => obj.kind !== kind)
+  c.DaemonSets = c.DaemonSets.filter(([,obj]) => obj.kind !== kind)
+  c.Ingresss = c.Ingresss.filter(([,obj]) => obj.kind !== kind)
+  c.PodSecurityPolicys = c.PodSecurityPolicys.filter(([,obj]) => obj.kind !== kind)
+  c.Roles = c.Roles.filter(([,obj]) => obj.kind !== kind)
+  c.RoleBindings = c.RoleBindings.filter(([,obj]) => obj.kind !== kind)
+  c.ServiceAccounts = c.ServiceAccounts.filter(([,obj]) => obj.kind !== kind)
+  c.Secrets = c.Secrets.filter(([,obj]) => obj.kind !== kind)
+  c.StatefulSets = c.StatefulSets.filter(([,obj]) => obj.kind !== kind)
+  c.StorageClasses = c.StorageClasses.filter(([,obj]) => obj.kind !== kind)
 }
 
 export const platform =
