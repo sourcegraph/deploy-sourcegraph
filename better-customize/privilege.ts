@@ -6,7 +6,7 @@ import * as path from "path";
 import * as request from "request";
 import { flatten } from "lodash";
 import { V1ConfigMap, V1Deployment, V1Ingress, V1ObjectMeta, V1PersistentVolumeClaim, V1Service, V1StatefulSet } from "@kubernetes/client-node";
-import { Cluster, MustConfig, overlay, removeComponent, Transform } from "./common";
+import { Cluster, includeSupplemental, MustConfig, overlay, removeComponent, Transform } from "./common";
 
 type NonRootAdjustments = {
     [name: string]: {
@@ -167,14 +167,8 @@ type NonRootAdjustments = {
     removeComponent('cadvisor', 'ServiceAccount')(c)
     removeComponent('worker-executors', 'Service')(c) // TODO: why??
 
-    c.RoleBindings.push([
-      config!.filenameMapper("./supplemental", "./supplemental/prometheus/prometheus-nonprivileged.RoleBinding.yaml"),
-      YAML.parse(readFileSync("./supplemental/prometheus/prometheus-nonprivileged.RoleBinding.yaml").toString()),
-    ])
-    c.RoleBindings.push([
-      config!.filenameMapper("./supplemental", "./supplemental/frontend/sourcegraph-frontend-nonprivileged.RoleBinding.yaml"),
-      YAML.parse(readFileSync("./supplemental/frontend/sourcegraph-frontend-nonprivileged.RoleBinding.yaml").toString()),
-    ])
+    includeSupplemental("./supplemental/prometheus/prometheus-nonprivileged.RoleBinding.yaml")(c, config)
+    includeSupplemental("./supplemental/frontend/sourcegraph-frontend-nonprivileged.RoleBinding.yaml")(c, config)
 
     return Promise.resolve();
   };

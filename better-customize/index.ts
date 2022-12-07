@@ -32,7 +32,8 @@ import { normalizeOptions, normalizeYAMLRecursive } from './utils/normalize'
     for (const entry of contents) {
       if (entry.isFile()) {
         if (entry.name.endsWith(".yaml")) {
-          addToCluster(config, cluster, path.join(root, entry.name));
+          const filename = path.join(root, entry.name)
+          addToCluster(cluster, filename, config.filenameMapper(config.sourceDirectory, filename));
         }
       } else if (entry.isDirectory()) {
         readCluster(path.join(root, entry.name));

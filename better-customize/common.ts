@@ -449,19 +449,23 @@ export const setMetadata = (name: string, kind: string, toMerge: DeepPartial<V1O
     .filter(obj => (name === '*' || obj.metadata?.name === name) && (kind === '*' || obj.kind === kind))
     .filter(obj => !(options?.omit && _.some(options.omit.map(([omitName, omitKind]) => obj.metadata?.name === omitName && obj.kind === omitKind))))
     .forEach(obj=> {
-    _.merge(obj.metadata, toMerge)
+      if (['ClusterRole', 'ClusterRoleBinding'].indexOf(obj.kind || '') !== -1) {
+        _.merge(obj.metadata, _.omit(toMerge, 'namespace'))
+      } else {
+        _.merge(obj.metadata, toMerge)
+      }
 
-    // If we're updating a namespace, also update namespace references
-    if (toMerge.namespace) {
-      _.concat(
-        c.ClusterRoleBindings,
-        c.RoleBindings,
-      ).forEach(([,roleBinding]) => {
-      roleBinding.subjects?.
-        filter(subject => (name === '*' || subject.name === name) && (kind === '*' || subject.kind === kind)).
-        forEach(subject => _.merge(subject, {namespace: toMerge.namespace}))
-      })
-    }
+      // If we're updating a namespace, also update namespace references
+      if (toMerge.namespace) {
+        _.concat(
+          c.ClusterRoleBindings,
+          c.RoleBindings,
+        ).forEach(([,roleBinding]) => {
+        roleBinding.subjects?.
+          filter(subject => (name === '*' || subject.name === name) && (kind === '*' || subject.kind === kind)).
+          forEach(subject => _.merge(subject, {namespace: toMerge.namespace}))
+        })
+      }
   })
 }
 
@@ -660,92 +664,97 @@ export function newCluster(): Cluster {
   };
 }
 
-export function addToCluster(config: MustConfig, cluster: Cluster, filename: string) {
+export const includeSupplemental = (relativeFilename: string): Transform => async (c: Cluster, config?: MustConfig) => {
+  const filename = path.join("./supplemental", relativeFilename)
+  addToCluster(c, filename, config!.filenameMapper("./supplemental", filename))
+}
+
+export function addToCluster(cluster: Cluster, filename: string, name: string) {
   const baseName = path.basename(filename)
   const k8sType = path.extname(baseName.substring(0, baseName.length - ".yaml".length));
   switch (k8sType) {
     case ".Deployment":
     cluster.Deployments.push([
-      config.filenameMapper(config.sourceDirectory, filename),
+      name,
       YAML.parse(readFileSync(filename).toString()),
     ]);
     break;
     case ".PersistentVolumeClaim":
     cluster.PersistentVolumeClaims.push([
-      config.filenameMapper(config.sourceDirectory, filename),
+      name,
       YAML.parse(readFileSync(filename).toString()),
     ]);
     break;
     case ".PersistentVolume":
     cluster.PersistentVolumes.push([
-      config.filenameMapper(config.sourceDirectory, filename),
+      name,
       YAML.parse(readFileSync(filename).toString()),
     ]);
     break;
     case ".Service":
     case ".IndexerService":
     cluster.Services.push([
-      config.filenameMapper(config.sourceDirectory, filename),
+      name,
       YAML.parse(readFileSync(filename).toString()),
     ]);
     break;
     case ".ClusterRole":
     cluster.ClusterRoles.push([
-      config.filenameMapper(config.sourceDirectory, filename),
+      name,
       YAML.parse(readFileSync(filename).toString()),
     ]);
     break;
     case ".ClusterRoleBinding":
     cluster.ClusterRoleBindings.push([
-      config.filenameMapper(config.sourceDirectory, filename),
+      name,
       YAML.parse(readFileSync(filename).toString()),
     ]);
     break;
     case ".ConfigMap":
     cluster.ConfigMaps.push([
-      config.filenameMapper(config.sourceDirectory, filename),
+      name,
       YAML.parse(readFileSync(filename).toString()),
     ]);
     break;
     case ".DaemonSet":
     cluster.DaemonSets.push([
-      config.filenameMapper(config.sourceDirectory, filename),
+      name,
       YAML.parse(readFileSync(filename).toString()),
     ]);
     break;
     case ".Ingress":
     cluster.Ingresss.push([
-      config.filenameMapper(config.sourceDirectory, filename),
+      name,
       YAML.parse(readFileSync(filename).toString()),
     ]);
     break;
     case ".PodSecurityPolicy":
     cluster.PodSecurityPolicys.push([
-      config.filenameMapper(config.sourceDirectory, filename),
+      name,
       YAML.parse(readFileSync(filename).toString()),
     ]);
     break;
     case ".Role":
     cluster.Roles.push([
-      config.filenameMapper(config.sourceDirectory, filename),
+      name,
       YAML.parse(readFileSync(filename).toString()),
     ]);
     break;
     case ".RoleBinding":
     cluster.RoleBindings.push([
-      config.filenameMapper(config.sourceDirectory, filename),
+      name,
       YAML.parse(readFileSync(filename).toString()),
     ]);
     break;
     case ".ServiceAccount":
     cluster.ServiceAccounts.push([
-      config.filenameMapper(config.sourceDirectory, filename),
+      name,
       YAML.parse(readFileSync(filename).toString()),
     ]);
     break;
     case ".StatefulSet":
     cluster.StatefulSets.push([
-      config.filenameMapper(config.sourceDirectory, filename),
+      name,
       YAML.parse(readFileSync(filename).toString()),
     ]);
     break;
