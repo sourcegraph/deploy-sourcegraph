@@ -168,12 +168,12 @@ type NonRootAdjustments = {
     removeComponent('worker-executors', 'Service')(c) // TODO: why??
 
     c.RoleBindings.push([
-      config!.filenameMapper("./roles", "./roles/prometheus/prometheus-nonprivileged.RoleBinding.yaml"),
-      YAML.parse(readFileSync("./roles/prometheus/prometheus-nonprivileged.RoleBinding.yaml").toString()),
+      config!.filenameMapper("./supplemental", "./supplemental/prometheus/prometheus-nonprivileged.RoleBinding.yaml"),
+      YAML.parse(readFileSync("./supplemental/prometheus/prometheus-nonprivileged.RoleBinding.yaml").toString()),
     ])
     c.RoleBindings.push([
-      config!.filenameMapper("./roles", "./roles/frontend/sourcegraph-frontend-nonprivileged.RoleBinding.yaml"),
-      YAML.parse(readFileSync("./roles/frontend/sourcegraph-frontend-nonprivileged.RoleBinding.yaml").toString()),
+      config!.filenameMapper("./supplemental", "./supplemental/frontend/sourcegraph-frontend-nonprivileged.RoleBinding.yaml"),
+      YAML.parse(readFileSync("./supplemental/frontend/sourcegraph-frontend-nonprivileged.RoleBinding.yaml").toString()),
     ])
 
     return Promise.resolve();
