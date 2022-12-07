@@ -27,7 +27,6 @@ type NonRootAdjustments = {
     allowPrivilegeEscalation?: boolean;
   }
   
-  // TODO: change non-root to be the default, and runAsRoot to be an option
   export const nonRoot = (): Transform => async (c: Cluster, config?: MustConfig) => {
     const defaultContainerSecurityContext = {
         allowPrivilegeEscalation: false,
