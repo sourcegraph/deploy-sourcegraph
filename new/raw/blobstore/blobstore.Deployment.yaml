@@ -5,14 +5,11 @@ metadata:
     description: generic S3-like blobstore for storing LSIF uploads.
     kubectl.kubernetes.io/default-container: blobstore
   labels:
-    deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: blobstore
+    sourcegraph-resource-requires: asdf
   name: blobstore
 spec:
-  minReadySeconds: 10
   replicas: 1
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: blobstore
@@ -21,7 +18,6 @@ spec:
   template:
     metadata:
       labels:
-        deploy: sourcegraph
         app: blobstore
     spec:
       containers:
@@ -55,8 +51,6 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: blobstore-data
-      securityContext:
-        runAsUser: 0
       volumes:
       - name: blobstore-data
         persistentVolumeClaim:

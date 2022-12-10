@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ns-sourcegraph
+resources:
+  - ../raw
+# patches:
+#   - target:
+#       name: .*
+#       kind: Deployment
+patchesStrategicMerge:
+- |-
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: blobstore
+    labels:
+      deploy: sourcegraph
+      sourcegraph-resource-requires: no-cluster-admin
+  spec:
+    minReadySeconds: 10
+    revisionHistorylimit: 10
+    securityContext:
+      runAsUser: 1234
+  template:
+    metadata:
+      labels:
+        deploy: sourcegraph
