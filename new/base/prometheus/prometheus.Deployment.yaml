@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Collects metrics and aggregates them into graphs.
+  labels:
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: prometheus
+  name: prometheus
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: prometheus
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        deploy: sourcegraph
+        app: prometheus
+    spec:
+      containers:
+      - name: prometheus
+        image: index.docker.io/sourcegraph/prometheus:187572_2022-12-06_cbecc5321c7d@sha256:2113ccab80409e995ee7ed9a3d386051f4ca73186375a3a0d7e3d55c90fa2007
+        terminationMessagePolicy: FallbackToLogsOnError
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9090
+          timeoutSeconds: 3
+          failureThreshold: 120
+          periodSeconds: 5
+        ports:
+        - containerPort: 9090
+          name: http
+        volumeMounts:
+        - mountPath: /prometheus
+          name: data
+        - mountPath: /sg_prometheus_add_ons
+          name: config
+        # Prometheus is relied upon to monitor services for sending alerts to site admins when
+        # something is wrong with Sourcegraph, thus its memory requests and limits are the same to
+        # guarantee it has enough memory to perform its job reliably and prevent conflicts with
+        # other pods on the same host node.
+        #
+        # The limit chosen here is based on what works reliably on Sourcegraph.com with lots
+        # of traffic.
+        resources:
+          limits:
+            cpu: "2"
+            memory: 6G
+          requests:
+            cpu: 500m
+            memory: 6G
+      terminationGracePeriodSeconds: 120
+      securityContext:
+        runAsUser: 0
+      serviceAccountName: prometheus
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: prometheus
+      - configMap:
+          defaultMode: 0777
+          name: prometheus
+        name: config

@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Receives, processes, and exports telemetry data.
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: otel-collector
+    sourcegraph-resource-requires: no-cluster-admin
+  name: otel-collector
+spec:
+  selector:
+    matchLabels:
+      app: otel-collector
+  minReadySeconds: 5
+  progressDeadlineSeconds: 120
+  replicas: 1
+  revisionHistoryLimit: 10
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: otel-collector
+      labels:
+        deploy: sourcegraph
+        app: otel-collector
+    spec:
+      containers:
+        - name: otel-collector
+          image: index.docker.io/sourcegraph/opentelemetry-collector:187572_2022-12-06_cbecc5321c7d@sha256:113a84fcef33f06f7e529961d5eb64400488953b23ac07ea8a3d628db6789ef0
+          command:
+            - "/bin/otelcol-sourcegraph"
+            # To use a custom configuration, edit otel-collector.ConfigMap.yaml
+            # and change this flag to
+            # "--config=/etc/otel-collector/conf/config.yaml"
+            - "--config=/etc/otel-collector/configs/logging.yaml"
+          terminationMessagePolicy: FallbackToLogsOnError
+          resources:
+            limits:
+              cpu: "2"
+              memory: 3Gi
+            requests:
+              cpu: "0.5"
+              memory: 1Gi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 13133
+          ports:
+            - containerPort: 55679
+              name: zpages
+            - containerPort: 4317
+              name: otlp-grpc
+            - containerPort: 4318
+              name: otlp-http
+            - containerPort: 8888
+              name: metrics
+          volumeMounts:
+            - name: config
+              mountPath: /etc/otel-collector/conf
+      terminationGracePeriodSeconds: 120
+      volumes:
+        # Not used by default.
+        # Edit the ConfigMap in otel-collector.ConfigMap.yaml:
+        # add your custom configuration, then update the command
+        # of the otel-collector container
+        - name: config
+          configMap:
+            name: otel-collector
+            items:
+              - key: config.yaml
+                path: config.yaml

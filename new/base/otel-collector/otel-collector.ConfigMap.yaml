@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: otel-collector
+    sourcegraph-resource-requires: no-cluster-admin
+data:
+  config.yaml: |
+    # This is the template configuration for OpenTelemetry collector, and is not used by default.
+    # It is mounted to '/etc/otel-collector/config.yaml' in the otel-collector container.
+    #
+    # To learn more, see https://docs.sourcegraph.com/admin/deploy/kubernetes/configure#configure-a-tracing-backend
+
+    exporters:
+      # Add your exporter(s) configuration here. For each exporter, make sure it is enabled
+      # in the service configuration below.
+      # Refer to our OpenTelemetry docs for information on how to configure different exporters:
+      # https://docs.sourcegraph.com/admin/observability/opentelemetry
+
+    service:
+      pipelines:
+        traces:
+          exporters:
+            # Add the name of your exporter(s) here, e.g.:
+            # - logging
+          receivers:
+            - otlp # Do not remove this receiver
+      extensions:
+        # Do not remove these extensions
+        - health_check
+        - zpages
+
+    receivers:
+      # Do not modify this receiver, as it is configured to accept data from OpenTelemetry agents.
+      otlp:
+        protocols:
+          grpc: # port 4317
+          http: # port 4318
+
+    extensions:
+      health_check:
+        port: 13133
+      zpages:
+        endpoint: "localhost:55679"
+
