@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Redis for storing short-lived caches.
+    kubectl.kubernetes.io/default-container: redis-cache
+  labels:
+    app.kubernetes.io/component: redis
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: redis-cache
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: redis-cache
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: redis-cache
+        deploy: sourcegraph
+    spec:
+      containers:
+      - image: index.docker.io/sourcegraph/redis-cache:187572_2022-12-06_cbecc5321c7d@sha256:bb62b6d761513b1651e8499532570068a4509d5d0cf5131f0dd8b8e2ef74c72d
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: redis
+        name: redis-cache
+        ports:
+        - containerPort: 6379
+          name: redis
+        readinessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: redis
+        resources:
+          limits:
+            cpu: "1"
+            memory: 7Gi
+          requests:
+            cpu: "1"
+            memory: 7Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 1000
+          runAsUser: 999
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /redis-data
+          name: redis-data
+      # - image: index.docker.io/sourcegraph/redis_exporter:187572_2022-12-06_cbecc5321c7d@sha256:edb0c9b19cacd90acc78f13f0908a7e6efd1df704e401805c24bffd241285f70
+      #   name: redis-exporter
+      #   ports:
+      #   - containerPort: 9121
+      #     name: redisexp
+      #   resources:
+      #     limits:
+      #       cpu: 10m
+      #       memory: 100Mi
+      #     requests:
+      #       cpu: 10m
+      #       memory: 100Mi
+      #   securityContext:
+      #     allowPrivilegeEscalation: false
+      #     runAsGroup: 1000
+      #     runAsUser: 999
+      #   terminationMessagePolicy: FallbackToLogsOnError
+      securityContext:
+        fsGroup: 1000
+        # runAsUser: 0
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-cache
