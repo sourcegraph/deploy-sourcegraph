@@ -1,23 +1,27 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - cadvisor
-  - codeinsights-db
-  - codeintel-db
-  - frontend
-  - github-proxy
-  - gitserver
-  - grafana
-  - indexed-search
-  - otel-collector
-  - minio
-  - node-exporter
-  - pgsql
-  - precise-code-intel
-  - prometheus
-  - redis
-  - repo-updater
-  - searcher
-  - symbols
-  - syntect-server
-  - worker
+- blobstore
+- blobstore/blobstore.Deployment.yaml
+- blobstore/blobstore.PersistentVolumeClaim.yaml
+- blobstore/blobstore.Service.yaml
+- blobstore/kustomization.yaml
+- cadvisor
+- codeinsights-db
+- codeintel-db
+- frontend
+- github-proxy
+- gitserver
+- grafana
+- indexed-search
+- node-exporter
+- otel-collector
+- pgsql
+- precise-code-intel
+- prometheus
+- redis
+- repo-updater
+- searcher
+- symbols
+- syntect-server
+- worker
