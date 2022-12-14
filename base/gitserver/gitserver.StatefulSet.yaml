@@ -35,7 +35,7 @@ spec:
               fieldPath: status.hostIP
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://$(OTEL_AGENT_HOST):4317
-        image: index.docker.io/sourcegraph/gitserver:insiders@sha256:314fd5270d42623ffa2d65cac5702332480b64886c66d58d456ff0fb167d5897
+        image: index.docker.io/sourcegraph/gitserver:187572_2022-12-06_cbecc5321c7d@sha256:87642b2f0cccbdcd661e470c8f7aa6c022ab03065a2c8ab565afc4b8829a4531
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 5
@@ -51,25 +51,25 @@ spec:
             cpu: "4"
             memory: 8G
           requests:
-            cpu: "4" 
+            cpu: "4"
             memory: 8G
         volumeMounts:
         - mountPath: /data/repos
           name: repos
-        # See the customization guide (../../../docs/configure.md) for information
-        # about configuring gitserver to use an SSH key
-        # - mountPath: /root/.ssh
-        #   name: ssh
+          # See the customization guide (../../../docs/configure.md) for information
+          # about configuring gitserver to use an SSH key
+          # - mountPath: /root/.ssh
+          #   name: ssh
       securityContext:
         runAsUser: 0
       volumes:
       - name: repos
-      # See the customization guide (../../../docs/configure.md) for information
-      # about configuring gitserver to use an SSH key
-      # - name: ssh
-      #   secret:
-      #     defaultMode: 384
-      #     secretName: gitserver-ssh
+        # See the customization guide (../../../docs/configure.md) for information
+        # about configuring gitserver to use an SSH key
+        # - name: ssh
+        #   secret:
+        #     defaultMode: 384
+        #     secretName: gitserver-ssh
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
