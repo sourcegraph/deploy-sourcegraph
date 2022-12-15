@@ -1,0 +1,435 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cadvisor
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: cadvisor
+#         resources:
+#           limits:
+#             cpu: 300m
+#             memory: 200Mi
+#           requests:
+#             cpu: 100m
+#             memory: 200Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codeinsights-db
+# spec:
+#   template:
+#     spec:
+#       containers:
+#         - name: codeinsights
+#           resources:
+#             limits:
+#               cpu: "4"
+#               memory: "2Gi"
+#             requests:
+#               cpu: "4"
+#               memory: "2Gi"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+  name: codeinsights-db
+# spec:
+#   resources:
+#     requests:
+#       storage: 200Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codeintel-db
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: pgsql
+#         resources:
+#           limits:
+#             cpu: "16"
+#             memory: 16G
+#           requests:
+#             cpu: "8"
+#             memory: 8G
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: codeintel-db
+# spec:
+#   resources:
+#     requests:
+#       storage: 500Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sourcegraph-frontend
+# spec:
+#   replicas: 2
+#   template:
+#     spec:
+#       containers:
+#       - name: frontend
+#         resources:
+#           limits:
+#             cpu: "2"
+#             ephemeral-storage: "8Gi"
+#             memory: 4G
+#           requests:
+#             cpu: "2"
+#             ephemeral-storage: "4Gi"
+#             memory: 2G
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gitserver
+# spec:
+#   replicas: 1
+#   template:
+#     spec:
+#       containers:
+#       - name: gitserver
+#         resources:
+#           limits:
+#             cpu: "4"
+#             memory: 8G
+#           requests:
+#             cpu: "4"
+#             memory: 8G
+#       - metadata:
+#           name: repos
+#         spec:
+#           resources:
+#             requests:
+#               storage: 200Gi # If you change this, also change indexed-search's disk size.
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: grafana
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: grafana
+#         resources:
+#           limits:
+#             cpu: "1"
+#             memory: 512Mi
+#           requests:
+#             cpu: 100m
+#             memory: 512Mi
+#   volumeClaimTemplates:
+#   - metadata:
+#       name: grafana-data
+#     spec:
+#       resources:
+#         requests:
+#           storage: 2Gi
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: indexed-search
+# spec:
+#   replicas: 1
+#   template:
+#     spec:
+#       containers:
+#       - name: zoekt-webserver
+#         resources:
+#           limits:
+#             cpu: "16"
+#             memory: 16G
+#           requests:
+#             cpu: "8"
+#             memory: 8G
+#       - name: zoekt-indexserver
+#         resources:
+#           limits:
+#             cpu: "16"
+#             memory: 16G
+#           requests:
+#             cpu: "8"
+#             memory: 8G
+#   volumeClaimTemplates:
+#   - metadata:
+#       spec:
+#         resources:
+#           requests:
+#             storage: 200Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: minio
+#         resources:
+#           limits:
+#             cpu: "1"
+#             memory: 500M
+#           requests:
+#             cpu: "1"
+#             memory: 500M
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio
+# spec:
+#   resources:
+#     requests:
+#       storage: 100Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgsql
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: pgsql
+#         resources:
+#           limits:
+#             cpu: "4"
+#             memory: 4Gi
+#           requests:
+#             cpu: "4"
+#             memory: 4Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pgsql
+# spec:
+#   resources:
+#     requests:
+#       storage: 200Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: precise-code-intel-worker
+# spec:
+#   replicas: 2
+#   template:
+#     spec:
+#       containers:
+#       - name: precise-code-intel-worker
+#         resources:
+#           limits:
+#             cpu: "2"
+#             memory: 4G
+#           requests:
+#             cpu: 500m
+#             memory: 2G
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: prometheus
+#         resources:
+#           limits:
+#             cpu: "2"
+#             memory: 6G
+#           requests:
+#             cpu: 500m
+#             memory: 6G
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-cache
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: redis-cache
+#         resources:
+#           limits:
+#             cpu: "1"
+#             memory: 7Gi
+#           requests:
+#             cpu: "1"
+#             memory: 7Gi
+#       - name: redis-exporter
+#         resources:
+#           limits:
+#             cpu: 10m
+#             memory: 100Mi
+#           requests:
+#             cpu: 10m
+#             memory: 100Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-store
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: redis-store
+#         resources:
+#           limits:
+#             cpu: "1"
+#             memory: 7Gi
+#           requests:
+#             cpu: "1"
+#             memory: 7Gi
+#       - name: redis-exporter
+#         resources:
+#           limits:
+#             cpu: 10m
+#             memory: 100Mi
+#           requests:
+#             cpu: 10m
+#             memory: 100Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repo-updater
+# spec:
+#   replicas: 1 # IMPORTANT: Singleton service. Do NOT add more replica.
+#   template:
+#     spec:
+#       containers:
+#       - name: repo-updater
+#         resources:
+#           limits:
+#             cpu: "1"
+#             memory: 2Gi
+#           requests:
+#             cpu: "1"
+#             memory: 500Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: searcher
+# spec:
+#   replicas: 2
+#   template:
+#     spec:
+#       containers:
+#       - name: searcher
+#         resources:
+#           limits:
+#             cpu: "2"
+#             ephemeral-storage: "26G"
+#             memory: 2G
+#           requests:
+#             cpu: 500m
+#             ephemeral-storage: "25G"
+#             memory: 500M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: symbols
+# spec:
+#   replicas: 1
+#   template:
+#     spec:
+#       containers:
+#       - name: symbols
+#         resources:
+#           limits:
+#             cpu: "2"
+#             ephemeral-storage: "12G"
+#             memory: 2G
+#           requests:
+#             cpu: 500m
+#             ephemeral-storage: "10G"
+#             memory: 500M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: syntect-server
+# spec:
+#   replicas: 1
+#   template:
+#     spec:
+#       containers:
+#       - name: syntect-server
+#         resources:
+#           limits:
+#             cpu: "4"
+#             memory: 6G
+#           requests:
+#             cpu: 250m
+#             memory: 2G
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+# spec:
+#   replicas: 1
+#   template:
+#     spec:
+#       containers:
+#       - name: worker
+#         resources:
+#           limits:
+#             cpu: "2"
+#             memory: 4G
+#           requests:
+#             cpu: 500m
+#             memory: 2G
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: otel-agent
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: otel-agent
+#         resources:
+#           limits:
+#             cpu: "500m"
+#             memory: 500Mi
+#           requests:
+#             cpu: "100m"
+#             memory: 100Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+# spec:
+#   replicas: 1
+#   template:
+#     spec:
+#       containers:
+#       - name: otel-collector
+#         resources:
+#           limits:
+#             cpu: "1"
+#             memory: 2Gi
+#           requests:
+#             cpu: "0.5"
+#             memory: 512Mi
