@@ -5,6 +5,11 @@ metadata:
 spec:
   template:
     spec:
+      securityContext:
+        fsGroupChangePolicy: OnRootMismatch
+        fsGroup: 70
+        # Required to prevent escalations to root, postgres runs as this user
+        runAsUser: 70
       initContainers:
         - name: correct-data-dir-permissions
           securityContext:
@@ -19,6 +24,3 @@ spec:
             allowPrivilegeEscalation: false
             runAsUser: 70
             runAsGroup: 70
-      securityContext:
-        # Required to prevent escalations to root, postgres runs as this user
-        runAsUser: 70
