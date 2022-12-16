@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+# spec:
+#   template:
+#     spec:
+#       containers:
+      # - name: otel-collector
+      #   resources:
+      #     limits:
+      #       cpu: "2"
+      #       memory: 3Gi
+      #     requests:
+      #       cpu: 100m
+      #       memory: 250M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: prometheus
+#         resources:
+#           limits:
+#             cpu: "4"
+#             memory: 8G
+#           requests:
+#             cpu: 100m
+#             memory: 250M
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: grafana
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - name: grafana
+#         resources:
+#           limits:
+#             cpu: "1"
+#             memory: 1G
+#           requests:
+#             cpu: 100m
+#             memory: 250M
