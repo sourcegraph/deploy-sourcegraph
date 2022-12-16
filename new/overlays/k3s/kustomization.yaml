@@ -1,0 +1,12 @@
+# [EXAMPLE] An example overlay file using local build
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ns-sourcegraph
+resources:
+  - ../../base/sourcegraph             # Sourcegraph Main Stacks
+  - ../../base/monitoring              # Sourcegraph Monitoring Stacks
+
+components:
+  - ../components/k3s
+  - ../components/sizes/xs/sourcegraph
+  - ../components/sizes/xs/monitoring
