@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+patchesJson6902:
+  - target:
+      kind: StatefulSet
+      name: .*
+      group: apps
+      version: v1
+    path: patches/replace-storageclass-name-sts.yaml
+  - target:
+      kind: PersistentVolumeClaim
+      name: .*
+      version: v1
+    path: patches/replace-storageclass-name-pvc.yaml
+patchesStrategicMerge:
+  - patches/prometheus.ConfigMap.yaml
+  - patches/sourcegraph-frontend.Ingress.yaml

@@ -1,0 +1,31 @@
+# [EXAMPLE] An example overlay file using remote build
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: sourcegraph-kustomize-example
+resources:
+  - https://github.com/sourcegraph/deploy-sourcegraph/new/base/sourcegraph?ref=v4.3.0                          # Sourcegraph Main Stacks
+  - https://github.com/sourcegraph/deploy-sourcegraph/new/base/monitoring?ref=v4.3.0                           # Sourcegraph Monitoring Stacks
+
+# Add components here
+components:
+  - https://github.com/sourcegraph/deploy-sourcegraph/new/kustomize/components/StorageClass/aws?ref=v4.3.0          # Create a StorageClass resource for aws
+
+# Update env listed in frontend to use external database
+patchesStrategicMerge:
+- frontend-env.yaml                     # ACTION REQUIRED: Update the new values in this file
+
+# Update replica number here
+replicas:
+  - name: sourcegraph-frontend
+    count: 3
+  - name: searcher
+    count: 2
+  - name: symbols
+    count: 2
+  # IMPORTANT: You must add the 'sourcegraph-replicas.yaml' file under the 'replacements' field when updating gitserver replica number 
+  - name: gitserver
+    count: 5
+
+replacements:
+  # IMPORTANT: Must be included when changing replica numbers for gitserver
+  - path: sourcegraph-replicas.yaml     # IMPORTANT: No changes required for this file

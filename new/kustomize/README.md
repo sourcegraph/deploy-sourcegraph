@@ -86,7 +86,7 @@ resources:
   - https://github.com/sourcegraph/deploy-sourcegraph/base?ref=v9.9.9
 components:
   # local path to the new component you created within the ./components folder
-  - ../../components/your-new-component
+  - new/kustomize/components/your-new-component
   #   You can also refer to other sourcegraph component that is hosted in other remote repository
   - https://github.com/org/repo/path/to/new/component
 ```
@@ -101,10 +101,10 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: ns-sourcegraph-example
 resources:
-  - ../../../resources/sourcegraph
-  - ../../../resources/monitoring
+  - new/base/sourcegraph
+  - new/base/monitoring
 components:
-  - ../../components/minikube
+  - new/kustomize/components/minikube
 ```
 
 This example overlay that has the following features:

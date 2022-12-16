@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Rate-limiting proxy for the GitHub API.
+    kubectl.kubernetes.io/default-container: github-proxy
+  labels:
+    app.kubernetes.io/component: github-proxy
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: github-proxy
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: github-proxy
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: github-proxy
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        # - name: OTEL_AGENT_HOST
+        #   valueFrom:
+        #     fieldRef:
+        #       fieldPath: status.hostIP
+        # - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        #   value: http://$(OTEL_AGENT_HOST):4317
+        image: index.docker.io/sourcegraph/github-proxy:187572_2022-12-06_cbecc5321c7d@sha256:b4739adfced18f2a8883da931da681f444b489f6606052246f7c8d536f22e425
+        name: github-proxy
+        ports:
+        - containerPort: 3180
+          name: http
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1G
+          requests:
+            cpu: 100m
+            memory: 250M
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 101
+          runAsUser: 100
+        terminationMessagePolicy: FallbackToLogsOnError
+      # securityContext:
+      #   runAsUser: 0

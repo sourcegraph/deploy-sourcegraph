@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    description: DaemonSet to ensure all nodes run a node-exporter pod.
+    seccomp.security.alpha.kubernetes.io/pod: docker/default
+  labels:
+    app: node-exporter
+    app.kubernetes.io/component: node-exporter
+    deploy: sourcegraph
+  name: node-exporter
+spec:
+  selector:
+    matchLabels:
+      app: node-exporter
+  template:
+    metadata:
+      annotations:
+        description: Collects and exports machine metrics.
+        kubectl.kubernetes.io/default-container: node-exporter
+      labels:
+        app: node-exporter
+        deploy: sourcegraph
+    spec:
+      affinity: null
+      automountServiceAccountToken: false
+      containers:
+        - args:
+            - --web.listen-address=:9100
+            - --path.sysfs=/host/sys
+            - --path.rootfs=/host/root
+            - --path.procfs=/host/proc
+            - --no-collector.wifi
+            - --no-collector.hwmon
+            - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
+            - --collector.netclass.ignored-devices=^(veth.*)$
+            - --collector.netdev.device-exclude=^(veth.*)$
+          env: null
+          image: index.docker.io/sourcegraph/node-exporter:187572_2022-12-06_cbecc5321c7d@sha256:2d9dcdf0b2226f0c3d550a64d2667710265462350a3ba9ebe37d0302bc64af0f
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              port: metrics
+              scheme: HTTP
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: node-exporter
+          ports:
+            - containerPort: 9100
+              name: metrics
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              port: metrics
+              scheme: HTTP
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: 200m
+              memory: 100Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 65534
+            runAsUser: 65534
+          terminationMessagePolicy: FallbackToLogsOnError
+          volumeMounts:
+            - mountPath: /host/root
+              mountPropagation: HostToContainer
+              name: rootfs
+              readOnly: true
+            - mountPath: /host/sys
+              mountPropagation: HostToContainer
+              name: sys
+              readOnly: true
+            - mountPath: /host/proc
+              mountPropagation: HostToContainer
+              name: proc
+              readOnly: true
+      hostPID: true
+      nodeSelector: null
+      securityContext:
+        fsGroup: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+      terminationGracePeriodSeconds: 30
+      tolerations: null
+      volumes:
+        - hostPath:
+            path: /
+          name: rootfs
+        - hostPath:
+            path: /sys
+          name: sys
+        - hostPath:
+            path: /proc
+          name: proc
