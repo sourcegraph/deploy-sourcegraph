@@ -69,23 +69,6 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: otel-collector
-spec:
-  template:
-    spec:
-      containers:
-      - name: otel-collector
-        resources:
-          limits:
-            cpu: "2"
-            memory: 3Gi
-          requests:
-            cpu: 100m
-            memory: 250M
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
   name: pgsql
 spec:
   template:
@@ -105,6 +88,7 @@ kind: Deployment
 metadata:
   name: precise-code-intel-worker
 spec:
+  replicas: 1
   template:
     spec:
       containers:
@@ -113,23 +97,6 @@ spec:
           limits:
             cpu: "2"
             memory: 4G
-          requests:
-            cpu: 100m
-            memory: 250M
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: prometheus
-spec:
-  template:
-    spec:
-      containers:
-      - name: prometheus
-        resources:
-          limits:
-            cpu: "4"
-            memory: 8G
           requests:
             cpu: 100m
             memory: 250M
@@ -190,6 +157,7 @@ kind: Deployment
 metadata:
   name: searcher
 spec:
+  replicas: 1
   template:
     spec:
       containers:
@@ -209,6 +177,8 @@ kind: Deployment
 metadata:
   name: sourcegraph-frontend
 spec:
+  replicas: 2
+  template:
     spec:
       containers:
       - name: frontend
@@ -227,6 +197,7 @@ kind: Deployment
 metadata:
   name: symbols
 spec:
+  replicas: 1
   template:
     spec:
       containers:
@@ -246,6 +217,7 @@ kind: Deployment
 metadata:
   name: syntect-server
 spec:
+  replicas: 1
   template:
     spec:
       containers:
@@ -263,6 +235,7 @@ kind: Deployment
 metadata:
   name: worker
 spec:
+  replicas: 1
   template:
     spec:
       containers:
@@ -280,6 +253,7 @@ kind: StatefulSet
 metadata:
   name: gitserver
 spec:
+  replicas: 1
   template:
     spec:
       containers:
@@ -295,25 +269,9 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: grafana
-spec:
-  template:
-    spec:
-      containers:
-      - name: grafana
-        resources:
-          limits:
-            cpu: "1"
-            memory: 1G
-          requests:
-            cpu: 100m
-            memory: 250M
----
-apiVersion: apps/v1
-kind: StatefulSet
-metadata:
   name: indexed-search
 spec:
+  replicas: 1
   template:
     spec:
       containers:
