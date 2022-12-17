@@ -4,11 +4,11 @@ kind: Kustomization
 namespace: sourcegraph-kustomize-example
 resources:
   - ../../../base/sourcegraph            # Sourcegraph Main Stacks
-  - ../../../base/monitoring             # Sourcegraph Monitoring Stacks
+  - ../../../base/monitoring             # Sourcegraph Monitoring Stacks - RBACs required
 
 # Add components here
 components:
-  - ../../components/StorageClass/aws          # Create a StorageClass resource for aws
+  - ../../../components/StorageClass/aws          # Create a StorageClass resource for aws
 
 # Update env listed in frontend to use external database
 patchesStrategicMerge:

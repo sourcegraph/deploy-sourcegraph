@@ -102,9 +102,10 @@ spec:
         - mountPath: /data
           name: disk
       securityContext:
-        fsGroup: 999
-        fsGroupChangePolicy: "OnRootMismatch"
+        # Required to prevent escalations to root.
         runAsUser: 999
+        fsGroup: 999
+        fsGroupChangePolicy: OnRootMismatch
       terminationGracePeriodSeconds: 120
       volumes:
       - name: disk
