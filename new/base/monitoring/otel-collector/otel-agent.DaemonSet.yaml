@@ -6,34 +6,46 @@ metadata:
     prometheus.io/port: "8888"
     sourcegraph.prometheus/scrape: "true"
   labels:
-    app.kubernetes.io/component: otel-collector
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: otel-collector
   name: otel-agent
 spec:
-  minReadySeconds: 5
-  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: otel-agent
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
   template:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: otel-agent
       labels:
-        app: otel-agent
         deploy: sourcegraph
+        app: otel-agent
     spec:
       containers:
-        - command:
-            - /bin/otelcol-sourcegraph
-            - --config=/etc/otel-agent/config.yaml
+        - name: otel-agent
           image: index.docker.io/sourcegraph/opentelemetry-collector:187572_2022-12-06_cbecc5321c7d@sha256:113a84fcef33f06f7e529961d5eb64400488953b23ac07ea8a3d628db6789ef0
+          command:
+            - "/bin/otelcol-sourcegraph"
+            - "--config=/etc/otel-agent/config.yaml"
+          terminationMessagePolicy: FallbackToLogsOnError
+          resources:
+            limits:
+              cpu: "500m"
+              memory: 500Mi
+            requests:
+              cpu: "100m"
+              memory: 100Mi
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 13133
           livenessProbe:
             httpGet:
               path: /
               port: 13133
-          name: otel-agent
           ports:
             - containerPort: 55679
               name: zpages
@@ -45,26 +57,14 @@ spec:
               name: otlp-http
             - containerPort: 8888
               name: metrics
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 13133
-          resources:
-            limits:
-              cpu: 500m
-              memory: 500Mi
-            requests:
-              cpu: 100m
-              memory: 100Mi
-          terminationMessagePolicy: FallbackToLogsOnError
           volumeMounts:
-            - mountPath: /etc/otel-agent
-              name: config
+            - name: config
+              mountPath: /etc/otel-agent
       terminationGracePeriodSeconds: 120
       volumes:
-        - configMap:
+        - name: config
+          configMap:
+            name: otel-agent
             items:
               - key: config.yaml
                 path: config.yaml
-            name: otel-agent
-          name: config

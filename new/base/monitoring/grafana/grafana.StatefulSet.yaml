@@ -5,9 +5,9 @@ metadata:
     description: Metrics/monitoring dashboards and alerts.
     kubectl.kubernetes.io/default-container: grafana
   labels:
-    app.kubernetes.io/component: grafana
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: grafana
   name: grafana
 spec:
   replicas: 1
@@ -16,6 +16,8 @@ spec:
     matchLabels:
       app: grafana
   serviceName: grafana
+  updateStrategy:
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -23,46 +25,48 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-        - image: index.docker.io/sourcegraph/grafana:187572_2022-12-06_cbecc5321c7d@sha256:cf295a1dada50607a364390a54744dbc9142aa99b42c07f1bb623ca251639d2c
-          name: grafana
-          ports:
-            - containerPort: 3370
-              name: http
-          resources:
-            limits:
-              cpu: "1"
-              memory: 512Mi
-            requests:
-              cpu: 100m
-              memory: 512Mi
-          securityContext:
-            allowPrivilegeEscalation: false
-            runAsGroup: 472
-            runAsUser: 472
-          terminationMessagePolicy: FallbackToLogsOnError
-          volumeMounts:
-            - mountPath: /var/lib/grafana
-              name: grafana-data
-            - mountPath: /sg_config_grafana/provisioning/datasources
-              name: config
+      - name: grafana
+        image: index.docker.io/sourcegraph/grafana:187572_2022-12-06_cbecc5321c7d@sha256:cf295a1dada50607a364390a54744dbc9142aa99b42c07f1bb623ca251639d2c
+        terminationMessagePolicy: FallbackToLogsOnError
+        ports:
+        - containerPort: 3370
+          name: http
+        volumeMounts:
+        - mountPath: /var/lib/grafana
+          name: grafana-data
+        - mountPath: /sg_config_grafana/provisioning/datasources
+          name: config
+        # Grafana is relied upon to send alerts to site admins when something is wrong with
+        # Sourcegraph, thus its memory requests and limits are the same to guarantee it has enough
+        # memory to perform its job reliably and prevent conflicts with other pods on the same
+        # host node.
+        resources:
+          limits:
+            cpu: "1"
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 512Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 472
+          runAsUser: 472
       serviceAccountName: grafana
       securityContext:
+        runAsUser: 0
         fsGroup: 472
         fsGroupChangePolicy: OnRootMismatch
       volumes:
-        - configMap:
-            defaultMode: 511
-            name: grafana
-          name: config
-  updateStrategy:
-    type: RollingUpdate
+      - name: config
+        configMap:
+          defaultMode: 0777
+          name: grafana
   volumeClaimTemplates:
-    - metadata:
-        name: grafana-data
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            storage: 2Gi
-        storageClassName: sourcegraph
+  - metadata:
+      name: grafana-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi
+      storageClassName: sourcegraph

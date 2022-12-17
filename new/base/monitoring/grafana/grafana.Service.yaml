@@ -3,15 +3,15 @@ kind: Service
 metadata:
   labels:
     app: grafana
-    app.kubernetes.io/component: grafana
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: grafana
   name: grafana
 spec:
   ports:
-    - name: http
-      port: 30070
-      targetPort: http
+  - name: http
+    port: 30070
+    targetPort: http
   selector:
     app: grafana
   type: ClusterIP
