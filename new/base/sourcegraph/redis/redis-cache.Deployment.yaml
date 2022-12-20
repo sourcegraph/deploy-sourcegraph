@@ -5,9 +5,9 @@ metadata:
     description: Redis for storing short-lived caches.
     kubectl.kubernetes.io/default-container: redis-cache
   labels:
-    app.kubernetes.io/component: redis
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: redis
   name: redis-cache
 spec:
   minReadySeconds: 10
@@ -21,8 +21,8 @@ spec:
   template:
     metadata:
       labels:
-        app: redis-cache
         deploy: sourcegraph
+        app: redis-cache
     spec:
       containers:
       - image: index.docker.io/sourcegraph/redis-cache:187572_2022-12-06_cbecc5321c7d@sha256:bb62b6d761513b1651e8499532570068a4509d5d0cf5131f0dd8b8e2ef74c72d
@@ -53,23 +53,23 @@ spec:
         volumeMounts:
         - mountPath: /redis-data
           name: redis-data
-      # - image: index.docker.io/sourcegraph/redis_exporter:187572_2022-12-06_cbecc5321c7d@sha256:edb0c9b19cacd90acc78f13f0908a7e6efd1df704e401805c24bffd241285f70
-      #   name: redis-exporter
-      #   ports:
-      #   - containerPort: 9121
-      #     name: redisexp
-      #   resources:
-      #     limits:
-      #       cpu: 10m
-      #       memory: 100Mi
-      #     requests:
-      #       cpu: 10m
-      #       memory: 100Mi
-      #   securityContext:
-      #     allowPrivilegeEscalation: false
-      #     runAsGroup: 1000
-      #     runAsUser: 999
-      #   terminationMessagePolicy: FallbackToLogsOnError
+      - image: index.docker.io/sourcegraph/redis_exporter:187572_2022-12-06_cbecc5321c7d@sha256:edb0c9b19cacd90acc78f13f0908a7e6efd1df704e401805c24bffd241285f70
+        name: redis-exporter
+        ports:
+        - containerPort: 9121
+          name: redisexp
+        resources:
+          limits:
+            cpu: 10m
+            memory: 100Mi
+          requests:
+            cpu: 10m
+            memory: 100Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 1000
+          runAsUser: 999
+        terminationMessagePolicy: FallbackToLogsOnError
       securityContext:
         fsGroup: 1000
         fsGroupChangePolicy: "OnRootMismatch"

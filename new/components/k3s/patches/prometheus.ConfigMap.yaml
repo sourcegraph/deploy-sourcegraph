@@ -7,28 +7,69 @@ data:
     global:
       scrape_interval:     30s
       evaluation_interval: 30s
-
     alerting:
       alertmanagers:
-        # Bundled Alertmanager, started by prom-wrapper
         - static_configs:
             - targets: ['127.0.0.1:9093']
           path_prefix: /alertmanager
-
     rule_files:
       - '*_rules.yml'
       - "/sg_config_prometheus/*_rules.yml"
       - "/sg_prometheus_add_ons/*_rules.yml"
-
     scrape_configs:
-    - job_name: 'kubernetes-service-endpoints'
-
+    - job_name: 'kubernetes-apiservers'
       kubernetes_sd_configs:
       - role: endpoints
-        # namespaces:
-        #   names:
-        #    - ns-sourcegraph
-
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name, __meta_kubernetes_pod_node_name]
+        action: keep
+        regex: default;kubernetes;https
+    - job_name: 'kubernetes-nodes'
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: true
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      kubernetes_sd_configs:
+      - role: node
+      relabel_configs:
+      - action: labelmap
+        regex: __meta_kubernetes_node_label_(.+)
+      - target_label: __address__
+        replacement: kubernetes.default.svc:443
+      
+      ############################################################################################################
+      # k3s and cAdvisor-specific customization
+      # name container metrics after their container name labels
+      # Note that 'io.kubernetes.container.name' and 'io.kubernetes.pod.name' must be provided in cAdvisor
+      ############################################################################################################
+      - source_labels: [__meta_kubernetes_node_name]
+        regex: (.+)
+        target_label: __metrics_path__
+        replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
+      metric_relabel_configs:
+      - source_labels: [container, pod]
+        regex: (.+)
+        action: replace
+        target_label: name
+        separator: '-'
+      - source_labels: [container]
+        regex: (.+)
+        action: replace
+        target_label: container_label_io_kubernetes_container_name
+      - source_labels: [pod]
+        regex: (.+)
+        action: replace
+        target_label: container_label_io_kubernetes_pod_name
+    ############################################################################################################
+    
+    - job_name: 'kubernetes-service-endpoints'
+      kubernetes_sd_configs:
+      - role: endpoints
       relabel_configs:
       - source_labels: [__meta_kubernetes_service_annotation_sourcegraph_prometheus_scrape]
         action: keep
@@ -50,8 +91,6 @@ data:
         regex: __meta_kubernetes_service_label_(.+)
       - source_labels: [__meta_kubernetes_namespace]
         action: replace
-        # Sourcegraph specific customization. We want a more convenient to type label.
-        # target_label: kubernetes_namespace
         target_label: ns
       - source_labels: [__meta_kubernetes_service_name]
         action: replace
@@ -64,3 +103,74 @@ data:
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: instance
+      
+    - job_name: 'kubernetes-services'
+      metrics_path: /probe
+      params:
+        module: [http_2xx]
+      kubernetes_sd_configs:
+      - role: service
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_probe]
+        action: keep
+        regex: true
+      - source_labels: [__address__]
+        target_label: __param_target
+      - target_label: __address__
+        replacement: blackbox
+      - source_labels: [__param_target]
+        target_label: instance
+      - action: labelmap
+        regex: __meta_kubernetes_service_label_(.+)
+      - source_labels: [__meta_kubernetes_service_namespace]
+        target_label: ns
+      - source_labels: [__meta_kubernetes_service_name]
+        target_label: kubernetes_name
+    - job_name: 'kubernetes-pods'
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+        # Sourcegraph specific customization, only scrape pods with our annotation
+      - source_labels: [__meta_kubernetes_pod_annotation_sourcegraph_prometheus_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: (.+):(?:\d+);(\d+)
+        replacement: ${1}:${2}
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+      ############################################################################################################
+      # k3s and cAdvisor-specific customization
+      ############################################################################################################
+      - source_labels: [namespace]
+        action: replace
+        target_label: ns
+      metric_relabel_configs:
+      - source_labels: [kubernetes_io_hostname]
+        regex: sourcegraph-0
+        action: keep
+      - source_labels: [namespace]
+        regex: default
+        action: keep
+      ############################################################################################################
+    # Scrape prometheus itself for metrics.
+    - job_name: 'builtin-prometheus'
+      static_configs:
+        - targets: ['127.0.0.1:9092']
+          labels:
+            app: prometheus
+    - job_name: 'builtin-alertmanager'
+      metrics_path: /alertmanager/metrics
+      static_configs:
+        - targets: ['127.0.0.1:9093']
+          labels:
+            app: alertmanager
