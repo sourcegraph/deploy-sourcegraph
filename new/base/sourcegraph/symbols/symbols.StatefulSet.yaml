@@ -26,7 +26,7 @@ spec:
       containers:
       - env:
         - name: SYMBOLS_CACHE_SIZE_MB
-          value: "50G"
+          value: "500000"
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -63,11 +63,9 @@ spec:
         resources:
           limits:
             cpu: "2"
-            ephemeral-storage: 12G
             memory: 2G
           requests:
             cpu: 500m
-            ephemeral-storage: 10G
             memory: 500M
         securityContext:
           allowPrivilegeEscalation: false
@@ -82,6 +80,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       volumes:
       - name: cache-ssd
+        emptyDir: {}
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:

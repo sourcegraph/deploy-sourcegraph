@@ -57,13 +57,19 @@ spec:
           value: blobstore
         - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
           value: http://blobstore:9000
-        - name: GRAFANA_SERVER_URL
-          value: http://grafana:30070
-        - name: PROMETHEUS_URL
-          value: http://prometheus:30090
         - name: SRC_GIT_SERVERS
           value: gitserver-0.gitserver:3178
-        - name: GITSERVER_REPLICAS_NUMBER
+        - name: SEARCHER_URL
+          value: http://searcher-0.searcher:3181
+        - name: SYMBOLS_URL
+          value: http://symbols-0.symbols:3184
+        - name: INDEXED_SEARCH_SERVERS
+          value: indexed-search-0.indexed-search:6070
+        - name: GITSERVER_REPLICA_NUMBER
+          value: "1"
+        - name: SEARCHER_REPLICA_NUMBER
+          value: "1"
+        - name: SYMBOLS_REPLICA_NUMBER
           value: "1"
         # - name: OTEL_AGENT_HOST
         #   valueFrom:
@@ -136,6 +142,18 @@ spec:
           value: sg
         - name: SRC_GIT_SERVERS
           value: gitserver-0.gitserver:3178
+        - name: SEARCHER_URL
+          value: http://searcher-0.searcher:3181
+        - name: SYMBOLS_URL
+          value: http://symbols-0.symbols:3184
+        - name: INDEXED_SEARCH_SERVERS
+          value: indexed-search-0.indexed-search:6070
+        - name: GITSERVER_REPLICA_NUMBER
+          value: "1"
+        - name: SEARCHER_REPLICA_NUMBER
+          value: "1"
+        - name: SYMBOLS_REPLICA_NUMBER
+          value: "1"
         image: index.docker.io/sourcegraph/migrator:187572_2022-12-06_cbecc5321c7d@sha256:93fc175df594738a98a62f2057271824cdb674b0e63bedac9dc7cb0f04db76bb
         name: migrator
         resources:
@@ -153,4 +171,4 @@ spec:
         runAsUser: 100
         fsGroup: 101
         fsGroupChangePolicy: "OnRootMismatch"
-      serviceAccountName: sourcegraph-frontend
+      # serviceAccountName: sourcegraph-frontend

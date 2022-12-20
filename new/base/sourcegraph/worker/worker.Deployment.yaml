@@ -32,6 +32,20 @@ spec:
           value: blobstore
         - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
           value: http://blobstore:9000
+        - name: SRC_GIT_SERVERS
+          value: gitserver-0.gitserver:3178
+        - name: SEARCHER_URL
+          value: http://searcher-0.searcher:3181
+        - name: SYMBOLS_URL
+          value: http://symbols-0.symbols:3184
+        - name: INDEXED_SEARCH_SERVERS
+          value: indexed-search-0.indexed-search:6070
+        - name: GITSERVER_REPLICA_NUMBER
+          value: "1"
+        - name: SEARCHER_REPLICA_NUMBER
+          value: "1"
+        - name: SYMBOLS_REPLICA_NUMBER
+          value: "1"
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -77,5 +91,6 @@ spec:
           runAsGroup: 101
           runAsUser: 100
         terminationMessagePolicy: FallbackToLogsOnError
-      # securityContext:
-      #   runAsUser: 0
+      securityContext:
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch

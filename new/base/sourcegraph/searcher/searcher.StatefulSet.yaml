@@ -26,7 +26,7 @@ spec:
       containers:
       - env:
         - name: SEARCHER_CACHE_SIZE_MB
-          value: 50G
+          value: "500000"
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -74,6 +74,7 @@ spec:
         fsGroupChangePolicy: OnRootMismatch
       volumes:
       - name: cache-ssd
+        emptyDir: {}
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
