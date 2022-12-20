@@ -200,6 +200,13 @@ spec:
     spec:
       containers:
       - name: symbols
+        env:
+        # Enables Rockskip
+        - name: USE_ROCKSKIP
+          value: "true"
+        # Uses Rockskip for all repositories over 1GB
+        - name: ROCKSKIP_MIN_REPO_SIZE_MB
+          value: "1000"
         resources:
           limits:
             cpu: "6"

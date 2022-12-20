@@ -151,26 +151,6 @@ spec:
           requests:
             cpu: 100m
             memory: 250M
-# ---
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: searcher
-# spec:
-#   replicas: 1
-#   template:
-#     spec:
-#       containers:
-#       - name: searcher
-#         resources:
-#           limits:
-#             cpu: "2"
-#             memory: 2G
-#             ephemeral-storage: 26G
-#           requests:
-#             cpu: 100m
-#             memory: 250M
-#             ephemeral-storage: 25G
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -209,26 +189,6 @@ spec:
             cpu: 100m
             memory: 250M
             ephemeral-storage: 4Gi
-# ---
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: symbols
-# spec:
-#   replicas: 1
-#   template:
-#     spec:
-#       containers:
-#       - name: symbols
-#         resources:
-#           limits:
-#             cpu: "4"
-#             memory: 4G
-#             ephemeral-storage: 12G
-#           requests:
-#             cpu: 100m
-#             memory: 250M
-#             ephemeral-storage: 10G
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -240,6 +200,13 @@ spec:
     spec:
       containers:
       - name: symbols
+        env:
+        # Enables Rockskip
+        - name: USE_ROCKSKIP
+          value: "true"
+        # Uses Rockskip for all repositories over 1GB
+        - name: ROCKSKIP_MIN_REPO_SIZE_MB
+          value: "1000"
         resources:
           limits:
             cpu: "4"
