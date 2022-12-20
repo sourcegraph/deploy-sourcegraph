@@ -1,1 +1,1 @@
-TODO: Update configMap for pgsql
+# Resources component for Size XL instance
