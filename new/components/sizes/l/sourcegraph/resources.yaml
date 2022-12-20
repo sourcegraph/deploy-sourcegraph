@@ -1,0 +1,329 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blobstore
+spec:
+  template:
+    spec:
+      containers:
+      - name: blobstore
+        resources:
+          limits:
+            cpu: "2"
+            memory: 2Gi
+          requests:
+            cpu: 100m
+            memory: 250M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codeinsights-db
+spec:
+  template:
+    spec:
+      containers:
+      - name: codeinsights
+        resources:
+          limits:
+            cpu: "4"
+            memory: 2Gi
+          requests:
+            cpu: 100m
+            memory: 250M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codeintel-db
+spec:
+  template:
+    spec:
+      containers:
+      - name: pgsql
+        resources:
+          limits:
+            cpu: "4"
+            memory: 4Gi
+          requests:
+            cpu: 100m
+            memory: 250M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: github-proxy
+spec:
+  template:
+    spec:
+      containers:
+      - name: github-proxy
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1G
+          requests:
+            cpu: 100m
+            memory: 250M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgsql
+spec:
+  template:
+    spec:
+      containers:
+      - name: pgsql
+        resources:
+          limits:
+            cpu: "4"
+            memory: 6Gi
+          requests:
+            cpu: 100m
+            memory: 250M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: precise-code-intel-worker
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: precise-code-intel-worker
+        resources:
+          limits:
+            cpu: "2"
+            memory: 50G
+          requests:
+            cpu: 100m
+            memory: 250M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-cache
+spec:
+  template:
+    spec:
+      containers:
+      - name: redis-cache
+        resources:
+          limits:
+            cpu: "1"
+            memory: 5Gi
+          requests:
+            cpu: 100m
+            memory: 250M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-store
+spec:
+  template:
+    spec:
+      containers:
+      - name: redis-store
+        resources:
+          limits:
+            cpu: "1"
+            memory: 6Gi
+          requests:
+            cpu: 100m
+            memory: 250M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repo-updater
+spec:
+  template:
+    spec:
+      containers:
+      - name: repo-updater
+        resources:
+          limits:
+            cpu: "4"
+            memory: 4Gi
+          requests:
+            cpu: 100m
+            memory: 250M
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: searcher
+# spec:
+#   replicas: 1
+#   template:
+#     spec:
+#       containers:
+#       - name: searcher
+#         resources:
+#           limits:
+#             cpu: "6"
+#             memory: 12G
+#             ephemeral-storage: 26G
+#           requests:
+#             cpu: 100m
+#             memory: 250M
+#             ephemeral-storage: 25G
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: searcher
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: searcher
+        resources:
+          limits:
+            cpu: "5"
+            memory: 12G
+          requests:
+            cpu: 100m
+            memory: 250M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sourcegraph-frontend
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: frontend
+        resources:
+          limits:
+            cpu: "6"
+            memory: 6G
+            ephemeral-storage: 8Gi
+          requests:
+            cpu: 100m
+            memory: 250M
+            ephemeral-storage: 4Gi
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: symbols
+# spec:
+#   replicas: 1
+#   template:
+#     spec:
+#       containers:
+#       - name: symbols
+#         resources:
+#           limits:
+#             cpu: "4"
+#             memory: 4G
+#             ephemeral-storage: 12G
+#           requests:
+#             cpu: 100m
+#             memory: 250M
+#             ephemeral-storage: 10G
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: symbols
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: symbols
+        resources:
+          limits:
+            cpu: "4"
+            memory: 4G
+          requests:
+            cpu: 100m
+            memory: 250M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: syntect-server
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: syntect-server
+        resources:
+          limits:
+            cpu: "4"
+            memory: 6G
+          requests:
+            cpu: 100m
+            memory: 250M
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: worker
+        resources:
+          limits:
+            cpu: "4"
+            memory: 4G
+          requests:
+            cpu: 100m
+            memory: 250M
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gitserver
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: gitserver
+        resources:
+          limits:
+            cpu: "8"
+            memory: 26G
+          requests:
+            cpu: 100m
+            memory: 250M
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: indexed-search
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - name: zoekt-webserver
+        resources:
+          limits:
+            cpu: "8"
+            memory: 16G
+          requests:
+            cpu: 100m
+            memory: 250M
+      - name: zoekt-indexserver
+        resources:
+          limits:
+            cpu: "4"
+            memory: 16G
+          requests:
+            cpu: 100m
+            memory: 250M
