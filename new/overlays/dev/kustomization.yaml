@@ -1,4 +1,3 @@
-# [EXAMPLE] An example overlay file using local build
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: sourcegraph-kustomize-example
@@ -7,8 +6,6 @@ resources:
 
 # Add components here
 components:
-  - ../../components/monitoring           # Sourcegraph Monitoring Stacks - RBACs required
-  - ../../components/otel-collector
-  - ../../components/sizes/xs
-  - ../../components/k3s
-  - ../../components/multi-version-upgrade
+  - ../../components/internal/ci-volume
+  - ../../components/resources/delete-resources
+  - ../../components/resources/delete-pvcs

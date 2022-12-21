@@ -4,27 +4,33 @@ kind: Kustomization
 namespace: sourcegraph-kustomize-example
 resources:
   # Full Sourcegraph app - RBACs required
-  - ../../../base/sourcegraph
+  - ../../../base
 
 # Add components here
 components:
-  - ../../../components/StorageClass/aws          # Create a StorageClass resource for aws
+  - ../../../components/monitoring            # Sourcegraph Monitoring Stacks - RBACs required
+  - ../../../components/sizes/xs              # Use resources for size XS instance
+  - ../../../components/StorageClass/aws      # Create a StorageClass resource for aws
 
 # Update env listed in frontend to use external database
 patchesStrategicMerge:
 - frontend-env.yaml
 
 # Update replica number here
+# IMPORTANT: You must add the 'sourcegraph-replicas.yaml' file under the 'replacements' field when updating gitserver replica number 
 replicas:
   - name: sourcegraph-frontend
-    count: 3
+    count: 1
   - name: searcher
-    count: 2
+    count: 1
   - name: symbols
-    count: 2
-  # IMPORTANT: You must add the 'sourcegraph-replicas.yaml' file under the 'replacements' field when updating gitserver replica number 
+    count: 1
   - name: gitserver
-    count: 5
+    count: 1
+  - name: codeintel-db
+    count: 0
+  - name: codeinsights-db
+    count: 0
 
 replacements:
   # IMPORTANT: Must be included when changing replica numbers for gitserver, searcher, symbols and indexer

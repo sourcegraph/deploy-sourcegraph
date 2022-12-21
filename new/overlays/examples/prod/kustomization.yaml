@@ -1,19 +1,20 @@
-# [EXAMPLE] An example overlay file using remote build
+# [EXAMPLE] An example overlay file using local build
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: sourcegraph-kustomize-example
 resources:
-  - https://github.com/sourcegraph/deploy-sourcegraph/new/base/sourcegraph?ref=v4.3.0                       # Sourcegraph Main Stacks
+  # Full Sourcegraph app - RBACs required
+  - ../../../base
 
 # Add components here
 components:
-  - https://github.com/sourcegraph/deploy-sourcegraph/new/components/monitoring?ref=v4.3.0                  # Sourcegraph Monitoring Stacks - RBACs required
-  - https://github.com/sourcegraph/deploy-sourcegraph/new/components/StorageClass/aws?ref=v4.3.0            # Create a StorageClass resource for aws
-  # - ../../../components/StorageClass/aws                                                                  # You can also add local components for remote build
+  - ../../../components/monitoring            # Sourcegraph Monitoring Stacks - RBACs required
+  - ../../../components/sizes/m               # Use resources for size M instance
+  - ../../../components/otel-collector        # Add OpenTelemetry to enable tracing
+  - ../../../components/StorageClass/aws      # Create a StorageClass resource for aws
 
 # Update env listed in frontend to use external database
 patchesStrategicMerge:
-# ACTION REQUIRED: Update the new values in this file
 - frontend-env.yaml
 
 # Update replica number here

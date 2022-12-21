@@ -2,9 +2,47 @@ apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
 patchesJson6902:
   - target:
-      kind: PersistentVolumeClaim
-      name: .*
+      kind: Deployment
+      name: blobstore|codeinsights-db|codeintel-db|pgsql|redis-cache|redis-store
       version: v1
     patch: |-
-      - op: remove
-        path: /spec
+      - op: replace
+        path: /spec/template/spec/volumes/0/persistentVolumeClaim
+        value: null
+patchesStrategicMerge:
+- |-
+  $patch: delete
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: blobstore
+- |-
+  $patch: delete
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: codeinsights-db
+- |-
+  $patch: delete
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: codeintel-db
+- |-
+  $patch: delete
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: pgsql
+- |-
+  $patch: delete
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: redis-cache
+- |-
+  $patch: delete
+  apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: redis-store
