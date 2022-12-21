@@ -11,9 +11,6 @@ spec:
           limits:
             cpu: "2"
             memory: 2Gi
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -28,9 +25,6 @@ spec:
           limits:
             cpu: "4"
             memory: 2Gi
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -45,9 +39,6 @@ spec:
           limits:
             cpu: "4"
             memory: 4Gi
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -62,9 +53,6 @@ spec:
           limits:
             cpu: "1"
             memory: 1G
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -77,11 +65,8 @@ spec:
       - name: pgsql
         resources:
           limits:
-            cpu: "4"
-            memory: 6Gi
-          requests:
-            cpu: 100m
-            memory: 250M
+            cpu: "8"
+            memory: 32Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -97,9 +82,6 @@ spec:
           limits:
             cpu: "2"
             memory: 50G
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -114,9 +96,6 @@ spec:
           limits:
             cpu: "1"
             memory: 5Gi
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -130,10 +109,7 @@ spec:
         resources:
           limits:
             cpu: "1"
-            memory: 5Gi
-          requests:
-            cpu: 100m
-            memory: 250M
+            memory: 8Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -148,27 +124,21 @@ spec:
           limits:
             cpu: "4"
             memory: 4Gi
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: searcher
 spec:
-  replicas: 1
+  replicas: 2
   template:
     spec:
       containers:
       - name: searcher
         resources:
           limits:
-            cpu: "6"
-            memory: 12G
-          requests:
-            cpu: 100m
-            memory: 250M
+            cpu: "10"
+            memory: 16G
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -182,13 +152,9 @@ spec:
       - name: frontend
         resources:
           limits:
-            cpu: "4"
-            memory: 8G
-            ephemeral-storage: 8Gi
-          requests:
-            cpu: 100m
-            memory: 250M
-            ephemeral-storage: 4Gi
+            cpu: "9"
+            memory: 24G
+            ephemeral-storage: 12Gi
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -209,11 +175,8 @@ spec:
           value: "1000"
         resources:
           limits:
-            cpu: "4"
-            memory: 4G
-          requests:
-            cpu: 100m
-            memory: 250M
+            cpu: "6"
+            memory: 12G
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -229,9 +192,6 @@ spec:
           limits:
             cpu: "4"
             memory: 6G
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -247,50 +207,38 @@ spec:
           limits:
             cpu: "4"
             memory: 4G
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: gitserver
 spec:
-  replicas: 1
+  replicas: 2
   template:
     spec:
       containers:
       - name: gitserver
         resources:
           limits:
-            cpu: "6"
-            memory: 26G
-          requests:
-            cpu: 100m
-            memory: 250M
+            cpu: "12"
+            memory: 20G
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: indexed-search
 spec:
-  replicas: 1
+  replicas: 3
   template:
     spec:
       containers:
       - name: zoekt-webserver
         resources:
           limits:
-            cpu: "6"
-            memory: 12G
-          requests:
-            cpu: 100m
-            memory: 250M
+            cpu: "12"
+            memory: 16G
       - name: zoekt-indexserver
         resources:
           limits:
-            cpu: "4"
-            memory: 12G
-          requests:
-            cpu: 100m
-            memory: 250M
+            cpu: "5"
+            memory: 10G

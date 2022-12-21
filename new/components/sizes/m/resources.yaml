@@ -11,9 +11,6 @@ spec:
           limits:
             cpu: "2"
             memory: 2Gi
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -28,9 +25,6 @@ spec:
           limits:
             cpu: "4"
             memory: 2Gi
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -45,9 +39,6 @@ spec:
           limits:
             cpu: "4"
             memory: 4Gi
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -62,9 +53,6 @@ spec:
           limits:
             cpu: "1"
             memory: 1G
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -79,9 +67,6 @@ spec:
           limits:
             cpu: "4"
             memory: 6Gi
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -97,9 +82,6 @@ spec:
           limits:
             cpu: "2"
             memory: 50G
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -113,10 +95,7 @@ spec:
         resources:
           limits:
             cpu: "1"
-            memory: 2Gi
-          requests:
-            cpu: 100m
-            memory: 250M
+            memory: 5Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -130,10 +109,7 @@ spec:
         resources:
           limits:
             cpu: "1"
-            memory: 4Gi
-          requests:
-            cpu: 100m
-            memory: 250M
+            memory: 5Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -148,29 +124,6 @@ spec:
           limits:
             cpu: "4"
             memory: 4Gi
-          requests:
-            cpu: 100m
-            memory: 250M
-# ---
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: searcher
-# spec:
-#   replicas: 1
-#   template:
-#     spec:
-#       containers:
-#       - name: searcher
-#         resources:
-#           limits:
-#             cpu: "2"
-#             memory: 2G
-#             ephemeral-storage: 26G
-#           requests:
-#             cpu: 100m
-#             memory: 250M
-#             ephemeral-storage: 25G
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -186,9 +139,6 @@ spec:
           limits:
             cpu: "6"
             memory: 12G
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -205,30 +155,6 @@ spec:
             cpu: "4"
             memory: 8G
             ephemeral-storage: 8Gi
-          requests:
-            cpu: 100m
-            memory: 250M
-            ephemeral-storage: 4Gi
-# ---
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: symbols
-# spec:
-#   replicas: 1
-#   template:
-#     spec:
-#       containers:
-#       - name: symbols
-#         resources:
-#           limits:
-#             cpu: "4"
-#             memory: 4G
-#             ephemeral-storage: 12G
-#           requests:
-#             cpu: 100m
-#             memory: 250M
-#             ephemeral-storage: 10G
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -251,9 +177,6 @@ spec:
           limits:
             cpu: "4"
             memory: 4G
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -269,9 +192,6 @@ spec:
           limits:
             cpu: "4"
             memory: 6G
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -287,9 +207,6 @@ spec:
           limits:
             cpu: "4"
             memory: 4G
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -305,9 +222,6 @@ spec:
           limits:
             cpu: "6"
             memory: 26G
-          requests:
-            cpu: 100m
-            memory: 250M
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -321,16 +235,10 @@ spec:
       - name: zoekt-webserver
         resources:
           limits:
-            cpu: "4"
+            cpu: "6"
             memory: 12G
-          requests:
-            cpu: 100m
-            memory: 250M
       - name: zoekt-indexserver
         resources:
           limits:
             cpu: "4"
             memory: 12G
-          requests:
-            cpu: 100m
-            memory: 250M

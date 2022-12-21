@@ -4,11 +4,11 @@ kind: Kustomization
 namespace: sourcegraph-kustomize-example
 resources:
   - https://github.com/sourcegraph/deploy-sourcegraph/new/base/sourcegraph?ref=v4.3.0                       # Sourcegraph Main Stacks
-  - https://github.com/sourcegraph/deploy-sourcegraph/new/base/monitoring?ref=v4.3.0                        # Sourcegraph Monitoring Stacks - RBACs required
 
 # Add components here
 components:
-  - https://github.com/sourcegraph/deploy-sourcegraph/new/kustomize/components/StorageClass/aws?ref=v4.3.0  # Create a StorageClass resource for aws
+  - https://github.com/sourcegraph/deploy-sourcegraph/new/components/monitoring?ref=v4.3.0                  # Sourcegraph Monitoring Stacks - RBACs required
+  - https://github.com/sourcegraph/deploy-sourcegraph/new/components/StorageClass/aws?ref=v4.3.0            # Create a StorageClass resource for aws
   # - ../../../components/StorageClass/aws                                                                  # You can also add local components for remote build
 
 # Update env listed in frontend to use external database

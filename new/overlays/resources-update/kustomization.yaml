@@ -3,8 +3,9 @@ kind: Kustomization
 # update namespace value if needed
 namespace: ns-sourcegraph
 resources:
-  - ../../base/monitoring
   - ../../base/sourcegraph
+components:
+  - ../../components/monitoring
 replacements:
   # IMPORTANT: This file is required when changing replica numbers for gitserver, searcher, symbols and indexer
   - path: sourcegraph-replicas.yaml

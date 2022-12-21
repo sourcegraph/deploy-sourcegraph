@@ -3,15 +3,15 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: sourcegraph-kustomize-example
 resources:
-  - ../../base/sourcegraph             # Sourcegraph Main Stacks
-  - ../../base/monitoring              # Sourcegraph Monitoring Stacks - RBACs required
+  - ../../base/sourcegraph                # Sourcegraph Main Stacks
 
 # Add components here
 components:
-  - ../../components/sizes/xs/sourcegraph # Use resources for a size-XS instance
-  - ../../components/sizes/xs/monitoring  # Use resources for a size-XS instance
-  - ../../components/StorageClass/aws     # Create a StorageClass resource for aws
+  - ../../components/monitoring           # Sourcegraph Monitoring Stacks - RBACs required
   - ../../components/otel-collector       # Deploy OpenTelemetry to enable tracing service
+  - ../../components/sizes/xs             # Use resources for a size-XS instance
+  - ../../components/StorageClass/aws     # Create a StorageClass resource for aws
+  - ../../components/rockskip/disable     # Disable rockskip
 
 # Update env listed in frontend to use external database
 patchesStrategicMerge:

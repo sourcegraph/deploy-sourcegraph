@@ -52,7 +52,7 @@ $ kubectl apply -k $REMOTE_OVERLAY_URL > $PATH_TO_DIRECTORY
 To remote build Sourcegraph release v9.9.9 using the aws storage class overlay using kustomize, and send the output files to the `$HOME/generated-cluster/` directory on your local machine:
 
 ```bash
-kustomize build https://github.com/sourcegraph/deploy-sourcegraph/new/kustomize/overlays/storage-class/aws?ref=v4.5.6 -o $HOME/generated-cluster/
+kustomize build https://github.com/sourcegraph/deploy-sourcegraph/new/overlays/storage-class/aws?ref=v4.5.6 -o $HOME/generated-cluster/
 ```
 
 ## Apply an overlay

@@ -6,14 +6,13 @@ resources:
 # This includes both Sourcegraph Main Stacks and Monitoring Stacks
   - ../../base
 
-# Or you can choose to deploy the Sourcegraph Main Stacks or Monitoring Stacks seperately or individually
+# Or you can choose to deploy the Sourcegraph Main Stacks only
 # Sourcegraph Main Stacks
   - ../../base/sourcegraph
-# Sourcegraph Monitoring Stacks - RBACs required
-  - ../../base/monitoring
 
+# Add components here
 components:
+  - ../../components/monitoring           # Sourcegraph Monitoring Stacks - RBACs required
   - ../../components/otel-collector
-  - ../../components/sizes/xs/sourcegraph
-  - ../../components/sizes/xs/monitoring
+  - ../../components/sizes/xs
   - ../../components/k3s
