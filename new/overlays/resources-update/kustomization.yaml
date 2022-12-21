@@ -5,6 +5,9 @@ namespace: ns-sourcegraph
 resources:
   - ../../base/monitoring
   - ../../base/sourcegraph
+replacements:
+  # IMPORTANT: This file is required when changing replica numbers for gitserver, searcher, symbols and indexer
+  - path: sourcegraph-replicas.yaml
 patchesStrategicMerge:
   # Update the resources listed in the file(s) listed below
   - resources-monitoring.yaml

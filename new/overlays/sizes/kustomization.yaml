@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: sourcegraph-kustomize-example
+resources:
+  # Sourcegraph Main Stacks
+  - ../../base/sourcegraph
+  # Sourcegraph Monitoring Stacks - RBACs required
+  - ../../base/monitoring
+components:
+  # Use resources for a size-XS instance
+  - ../../components/sizes/xs/sourcegraph
+  - ../../components/sizes/xs/monitoring
+  # Use resources for a size-S instance
+  - ../../components/sizes/s/sourcegraph
+  - ../../components/sizes/s/monitoring
+  # Use resources for a size-M instance
+  - ../../components/sizes/m/sourcegraph
+  - ../../components/sizes/m/monitoring
+  # Use resources for a size-L instance
+  - ../../components/sizes/l/sourcegraph
+  - ../../components/sizes/l/monitoring
+  # Use resources for a size-XL instance
+  - ../../components/sizes/xl/sourcegraph
+  - ../../components/sizes/xl/monitoring

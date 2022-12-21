@@ -5,3 +5,26 @@ patchesStrategicMerge:
   - resources.yaml
 replacements:
   - path: sourcegraph-replicas.yaml
+patchesJson6902:
+  - target:
+      kind: Deployment|StatefulSet
+      name: .*
+      version: v1
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 100m
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/memory
+        value: 250M
+  - target:
+      kind: StatefulSet
+      name: indexed-search
+      version: v1
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/1/resources/requests/cpu
+        value: 100m
+      - op: replace
+        path: /spec/template/spec/containers/1/resources/requests/memory
+        value: 250M
