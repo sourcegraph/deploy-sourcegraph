@@ -2,8 +2,18 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: default
 resources:
-  # Sourcegraph Main Stacks with Monitoring Stacks - RBACs required
-  - ../../base
+  # Sourcegraph Main Stacks
+  - ../../base/sourcegraph
 components:
-  - ../../components/sizes/xs
+  # This configures the main stacks and networking to work on a k3s cluster
   - ../../components/k3s
+  # This configures the instance to use resources for the specified instance size
+  - ../../components/sizes/xs
+
+  # # This adds the monitoring stacks to your deployment - RBACs required
+  # - ../../components/monitoring
+
+  # # Add the k3s/monitoring component when adding the monitoring stack
+  # # This configures Promethesus to work on a k3s cluster
+  # - ../../components/k3s/monitoring
+  
