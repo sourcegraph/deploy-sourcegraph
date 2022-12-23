@@ -1,0 +1,10 @@
+- source:
+    kind: ConfigMap
+    name: sourcegraph-frontend-env
+    fieldPath: data.SSD_NODE_PATH
+  targets:
+  - select:
+      kind: DaemonSet
+      name: pod-tmp-gc
+    fieldPaths:
+    - spec.template.spec.containers.[name=pod-tmp-gc].volumeMounts.[name=pod-tmp].mountPath

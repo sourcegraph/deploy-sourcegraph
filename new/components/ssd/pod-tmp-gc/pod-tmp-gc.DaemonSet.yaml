@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    deploy: pod-tmp-gc
+  name: pod-tmp-gc
+spec:
+  selector:
+    matchLabels:
+      app: pod-tmp-gc
+  template:
+    metadata:
+      labels:
+        app: pod-tmp-gc
+      name: pod-tmp-gc
+    spec:
+      containers:
+      - args:
+        - $(NODE_NAME)
+        - /pod-tmp
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        image: index.docker.io/sourcegraph/pod-tmp-gc:latest@sha256:5ebd7c84d4571d0efb2b04cadb0be702ae90c7edce5463a0fa2e3215f7b4b1e3
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: pod-tmp-gc
+        resources:
+          limits:
+            cpu: 10m
+            memory: 20M
+        # Replace ${SSD_NODE_PATH} with the absolute directory path 
+        # on the node where the local SSD is mounted.
+        # See ../README.md for more information.
+        volumeMounts:
+        - name: pod-tmp
+          mountPath: placeholder
+          subPathExpr: pod-tmp
+      serviceAccountName: pod-tmp-gc
+  updateStrategy: {}

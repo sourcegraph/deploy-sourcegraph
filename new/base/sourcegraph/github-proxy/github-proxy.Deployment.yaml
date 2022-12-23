@@ -29,12 +29,12 @@ spec:
     spec:
       containers:
       - env:
-        # - name: OTEL_AGENT_HOST
-        #   valueFrom:
-        #     fieldRef:
-        #       fieldPath: status.hostIP
-        # - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        #   value: http://$(OTEL_AGENT_HOST):4317
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
         image: index.docker.io/sourcegraph/github-proxy:187572_2022-12-06_cbecc5321c7d@sha256:b4739adfced18f2a8883da931da681f444b489f6606052246f7c8d536f22e425
         name: github-proxy
         ports:
@@ -52,5 +52,6 @@ spec:
           runAsGroup: 101
           runAsUser: 100
         terminationMessagePolicy: FallbackToLogsOnError
-      # securityContext:
-      #   runAsUser: 0
+      securityContext:
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
