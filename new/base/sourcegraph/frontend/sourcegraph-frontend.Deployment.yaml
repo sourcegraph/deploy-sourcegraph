@@ -44,7 +44,7 @@ spec:
             memory: 50M
         envFrom:
         - configMapRef:
-            name: frontend-env
+            name: sourcegraph-frontend-env
       containers:
       - name: frontend
         image: index.docker.io/sourcegraph/frontend:187572_2022-12-06_cbecc5321c7d@sha256:73e64a8636e70ebbaf7f4a3300479529294f67e8cf644cdaea02435915aec869
@@ -65,7 +65,7 @@ spec:
           runAsUser: 100
         envFrom:
         - configMapRef:
-            name: frontend-env
+            name: sourcegraph-frontend-env
         env:
         # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
         - name: OTEL_AGENT_HOST

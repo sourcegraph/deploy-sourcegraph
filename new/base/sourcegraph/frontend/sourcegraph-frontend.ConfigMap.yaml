@@ -1,7 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: frontend-env
+  labels:
+    app: sourcegraph-frontend
+    app.kubernetes.io/component: frontend
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: sourcegraph-frontend-env
 data:
   PGDATABASE: sg
   PGHOST: pgsql
@@ -19,4 +24,8 @@ data:
   SRC_GIT_SERVERS: gitserver:3178
   SEARCHER_URL: http://searcher:3181
   SYMBOLS_URL: http://symbols:3184
-  INDEXED_SEARCH_SERVERS: indexed-search-0.indexed-search:6070 indexed-search-1.indexed-search:6070 indexed-search-3.indexed-search:6070 indexed-search-4.indexed-search:6070 indexed-search-5.indexed-search:6070 indexed-search-6.indexed-search:6070 indexed-search-7.indexed-search:6070 indexed-search-8.indexed-search:6070 
+  INDEXED_SEARCH_SERVERS: indexed-search-0.indexed-search:6070 indexed-search-1.indexed-search:6070 indexed-search-3.indexed-search:6070 indexed-search-4.indexed-search:6070 indexed-search-5.indexed-search:6070 indexed-search-6.indexed-search:6070 indexed-search-7.indexed-search:6070 indexed-search-8.indexed-search:6070
+  SYMBOLS_REPLICA_COUNT: "1"
+  SEARCHER_REPLICA_COUNT: "1"
+  GITSERVER_REPLICA_COUNT: "1"
+  INDEXED_SEARCH_REPLICA_COUNT: "1"

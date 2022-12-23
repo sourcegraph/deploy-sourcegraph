@@ -4,42 +4,37 @@
     fieldPath: spec.replicas
   targets:
     - select:
-        kind: Deployment
-        name: sourcegraph-frontend
+        kind: ConfigMap
+        name: sourcegraph-frontend-env
       fieldPaths:
-      - spec.template.spec.containers.[args=serve].env.[name=GITSERVER_REPLICA_NUMBER].value
-    - select:
-        kind: Deployment
-        name: sourcegraph-frontend
-      fieldPaths:
-      - spec.template.spec.initContainers.[args=up].env.[name=GITSERVER_REPLICA_NUMBER].value
+      - data.GITSERVER_REPLICA_COUNT
 - source:
     kind: StatefulSet
     name: searcher
     fieldPath: spec.replicas
   targets:
     - select:
-        kind: Deployment
-        name: sourcegraph-frontend
+        kind: ConfigMap
+        name: sourcegraph-frontend-env
       fieldPaths:
-      - spec.template.spec.containers.[args=serve].env.[name=SEARCHER_REPLICA_NUMBER].value
-    - select:
-        kind: Deployment
-        name: sourcegraph-frontend
-      fieldPaths:
-      - spec.template.spec.initContainers.[args=up].env.[name=SEARCHER_REPLICA_NUMBER].value
+      - data.SEARCHER_REPLICA_COUNT
 - source:
     kind: StatefulSet
     name: symbols
     fieldPath: spec.replicas
   targets:
     - select:
-        kind: Deployment
-        name: sourcegraph-frontend
+        kind: ConfigMap
+        name: sourcegraph-frontend-env
       fieldPaths:
-      - spec.template.spec.containers.[args=serve].env.[name=SYMBOLS_REPLICA_NUMBER].value
+      - data.SYMBOLS_REPLICA_COUNT
+- source:
+    kind: StatefulSet
+    name: indexed-search
+    fieldPath: spec.replicas
+  targets:
     - select:
-        kind: Deployment
-        name: sourcegraph-frontend
+        kind: ConfigMap
+        name: sourcegraph-frontend-env
       fieldPaths:
-      - spec.template.spec.initContainers.[args=up].env.[name=SYMBOLS_REPLICA_NUMBER].value
+      - data.INDEXED_SEARCH_REPLICA_COUNT

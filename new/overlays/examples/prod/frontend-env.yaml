@@ -1,20 +1,10 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: ConfigMap
 metadata:
-  name: sourcegraph-frontend
-spec:
-  template:
-    spec:
-      containers:
-      - name: frontend
-        env:
-        - name: PGDATABASE
-          value: $PROD_PGDATABASE
-        - name: PGHOST
-          value: $PROD_PGHOST
-        - name: PGPORT
-          value: $PROD_PGPORT
-        - name: PGSSLMODE
-          value: disable
-        - name: PGUSER
-          value: $PROD_PGUSER
+  name: sourcegraph-frontend-env
+data:
+  PGDATABASE: $PROD_PGDATABASE
+  PGHOST: $PROD_PGHOST
+  PGPORT: $PROD_PGPORT
+  PGSSLMODE: disable
+  PGUSER: $PROD_PGUSER
