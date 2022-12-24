@@ -2,3 +2,18 @@ apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
 components:
 - pod-tmp-gc
+configMapGenerator:
+  - name: sourcegraph-frontend-env
+    behavior: merge
+    literals:
+      - SSD_NODE_PATH=SOURCEGRAPH_OVERLAY_PLACEHOLDER
+configurations:
+- patches/transformer.yaml
+vars:
+  - name: SSD_NODE_PATH
+    objref:
+      apiVersion: v1
+      kind: ConfigMap
+      name: sourcegraph-frontend-env
+    fieldref:
+      fieldpath: data.SSD_NODE_PATH

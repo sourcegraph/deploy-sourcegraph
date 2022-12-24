@@ -10,29 +10,21 @@ Using local SSDs dramatically speeds up many of Sourcegraph's services. Even if 
 If you mount local SSDs on your nodes, you can refer to this overlay that that includes:
 
 1. A component `ssd` that create resources to use the SSDs
-2. A configMapGenerator where you will need to provide the mount path for the SSD volume, which is an absolute path of the SSD on each node.
-3. A replacement patch `ssd-mount-path.yaml` for updating the SSD Damonset we created in step 1 with the value you provided in step 2
+2. A configMapGenerator where you will need to provide the mount path for the SSD volume, which is an absolute path of the SSD on each node, using the [.sourcegraph_config.env](.sourcegraph_config.env) file.
+3. A transformer is used to update the SSD Damonset we created in step 1 with the value you provided in step 2
 
 # How to use
 
-Update the SSD_NODE_PATH value in the [overlays/ssd/kustomization.yaml](kustomization.yaml) file under the configMapGenerator section with the absolute path to your SSD on each node.
+Update the SSD_NODE_PATH value in the [.sourcegraph_config.env](.sourcegraph_config.env) file under the configMapGenerator section with the absolute path to your SSD on each node.
 
 ## Example
 
-For example, GCP mounts the first SSD disk to `/mnt/disks/ssd0`, so we would need to update the mountPath value to `/mnt/disks/ssd0` in our SSD Damonset. To do that in this overlay, update the SSD_NODE_PATH value in the overlays/ssd/kustomization.yaml file under the configMapGenerator section:
+For example, GCP mounts the first SSD disk to `/mnt/disks/ssd0`, so we would need to update the mountPath value to `/mnt/disks/ssd0` in our SSD Damonset.
 
-```yaml
-# Example of the overlays/ssd/kustomization.yaml
-# ...
-components:
-  - ../../components/ssd
-replacements:
-  - path: patches/ssd-mount-path.yaml
-configMapGenerator:
-  - name: sourcegraph-frontend-env
-    behavior: merge
-    literals:
-      - SSD_NODE_PATH=/mnt/disks/ssd0
+To do that in this overlay, update the SSD_NODE_PATH value inside the .sourcegraph_config.env file:
+
+```
+SSD_NODE_PATH=/mnt/disks/ssd0
 ```
 
-The `components/ssd` and `patches/ssd-mount-path.yaml` must be included in your `kustomization.yaml` to work properly.
+The `components/ssd` must be included in your `kustomization.yaml` to work properly.

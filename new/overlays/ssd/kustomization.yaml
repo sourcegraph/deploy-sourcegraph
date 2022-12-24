@@ -7,15 +7,14 @@ resources:
 components:
 # Create resources for using local SSDs - RBACs required
 - ../../components/ssd
-replacements:
-# This patch will update the mount path with the SSD_NODE_PATH value
-- path: patches/ssd-mount-path.yaml
+
 ####################################################################
-# ACTOPM REQIORED: Update the $SSD_NODE_PATH value below
+# ACTOPM REQUIRED: 
+# Update the $SSD_NODE_PATH value in .sourcegraph_config.env
 # $SSD_NODE_PATH = absolute path where SSDs are mounted on each node
 ####################################################################
 configMapGenerator:
-- name: sourcegraph-frontend-env
-  behavior: merge
-  literals:
-  - SSD_NODE_PATH=/update/me # <---UPDATE VALUE HERE
+  - name: sourcegraph-frontend-env
+    behavior: merge
+    # update the value inside the .sourcegraph_config.env file
+    env: .sourcegraph_config.env

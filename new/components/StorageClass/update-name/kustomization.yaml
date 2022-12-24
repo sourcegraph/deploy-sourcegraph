@@ -1,9 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
 configMapGenerator:
-  - name: environment-variables
-    # A placeholder file
-    env: patches/.sourcegraph_config.env
+  - name: sourcegraph-frontend-env
+    behavior: merge
+    literals:
+      - DEPLOY_SOURCEGRAPH_STORAGECLASS_NAME=SOURCEGRAPH_OVERLAY_PLACEHOLDER
 patchesJson6902:
   - target:
       kind: StatefulSet
@@ -16,3 +17,13 @@ patchesJson6902:
       name: .*
       version: v1
     path: patches/replace-storageclass-name-pvc.yaml
+configurations:
+- patches/storageclass-transformer.yaml
+vars:
+  - name: DEPLOY_SOURCEGRAPH_STORAGECLASS_NAME
+    objref:
+      apiVersion: v1
+      kind: ConfigMap
+      name: sourcegraph-frontend-env
+    fieldref:
+      fieldpath: data.DEPLOY_SOURCEGRAPH_STORAGECLASS_NAME
