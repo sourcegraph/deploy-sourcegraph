@@ -4,9 +4,9 @@ metadata:
   annotations:
     description: Handles conversion of uploaded precise code intelligence bundles.
   labels:
-    app.kubernetes.io/component: precise-code-intel
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: precise-code-intel
   name: precise-code-intel-worker
 spec:
   minReadySeconds: 10
@@ -23,28 +23,31 @@ spec:
   template:
     metadata:
       labels:
-        app: precise-code-intel-worker
         deploy: sourcegraph
+        app: precise-code-intel-worker
     spec:
       containers:
-      - env:
+      - name: precise-code-intel-worker
+        env:
         - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
           value: blobstore
         - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
           value: http://blobstore:9000
         - name: NUM_WORKERS
-          value: "4"
+          value: '4'
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        # - name: OTEL_AGENT_HOST
-        #   valueFrom:
-        #     fieldRef:
-        #       fieldPath: status.hostIP
-        # - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        #   value: http://$(OTEL_AGENT_HOST):4317
+        # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
         image: index.docker.io/sourcegraph/precise-code-intel-worker:187572_2022-12-06_cbecc5321c7d@sha256:d1b1546d784fec8c90928a40e1b7eafc33202a53e4fcd501001d3f4a73e5c8ce
+        terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
             path: /healthz
@@ -52,12 +55,6 @@ spec:
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
-        name: precise-code-intel-worker
-        ports:
-        - containerPort: 3188
-          name: http
-        - containerPort: 6060
-          name: debug
         readinessProbe:
           httpGet:
             path: /ready
@@ -65,6 +62,11 @@ spec:
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
+        ports:
+        - containerPort: 3188
+          name: http
+        - containerPort: 6060
+          name: debug
         resources:
           limits:
             cpu: "2"
@@ -76,7 +78,7 @@ spec:
           allowPrivilegeEscalation: false
           runAsGroup: 101
           runAsUser: 100
-        terminationMessagePolicy: FallbackToLogsOnError
       securityContext:
         fsGroup: 101
+        runAsUser: 100
         fsGroupChangePolicy: OnRootMismatch

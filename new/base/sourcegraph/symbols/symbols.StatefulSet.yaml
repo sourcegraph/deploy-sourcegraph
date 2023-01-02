@@ -23,10 +23,15 @@ spec:
         app: symbols
         deploy: sourcegraph
     spec:
+      securityContext:
+        runAsUser: 100
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
       containers:
-      - env:
-        - name: SYMBOLS_CACHE_SIZE_MB
-          value: "500000"
+      - name: symbols
+        env:
+        # - name: SYMBOLS_CACHE_SIZE_MB
+        #   value: "500000"
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -47,7 +52,6 @@ spec:
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
-        name: symbols
         ports:
         - containerPort: 3184
           name: http
@@ -75,9 +79,6 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      securityContext:
-        fsGroup: 101
-        fsGroupChangePolicy: OnRootMismatch
       volumes:
       - name: cache-ssd
         emptyDir: {}

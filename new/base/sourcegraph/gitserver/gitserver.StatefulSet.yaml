@@ -5,9 +5,9 @@ metadata:
     description: Stores clones of repositories to perform Git operations.
     kubectl.kubernetes.io/default-container: gitserver
   labels:
-    app.kubernetes.io/component: gitserver
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: gitserver
   name: gitserver
 spec:
   replicas: 1
@@ -20,14 +20,15 @@ spec:
     metadata:
       labels:
         app: gitserver
-        deploy: sourcegraph
         group: backend
         type: gitserver
+        deploy: sourcegraph
     spec:
       containers:
-      - args:
-        - run
+      - name: gitserver
+        args: ["run"]
         env:
+        # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
         - name: OTEL_AGENT_HOST
           valueFrom:
             fieldRef:
@@ -35,16 +36,16 @@ spec:
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://$(OTEL_AGENT_HOST):4317
         image: index.docker.io/sourcegraph/gitserver:187572_2022-12-06_cbecc5321c7d@sha256:87642b2f0cccbdcd661e470c8f7aa6c022ab03065a2c8ab565afc4b8829a4531
+        terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 5
           tcpSocket:
             port: rpc
           timeoutSeconds: 5
-        name: gitserver
         ports:
         - containerPort: 3178
-          name: rpc
           protocol: TCP
+          name: rpc
         resources:
           limits:
             cpu: "4"
@@ -53,18 +54,29 @@ spec:
             cpu: "4"
             memory: 8G
         securityContext:
+          # Required to prevent escalations to root.
           allowPrivilegeEscalation: false
           runAsGroup: 101
           runAsUser: 100
-        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /data/repos
           name: repos
+          # See the customization guide (../../../docs/configure.md) for information
+          # about configuring gitserver to use an SSH key
+          # - mountPath: /root/.ssh
+          #   name: ssh
       securityContext:
+        runAsUser: 100
         fsGroup: 101
         fsGroupChangePolicy: OnRootMismatch
       volumes:
       - name: repos
+        # See the customization guide (../../../docs/configure.md) for information
+        # about configuring gitserver to use an SSH key
+        # - name: ssh
+        #   secret:
+        #     defaultMode: 384
+        #     secretName: gitserver-ssh
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
@@ -75,5 +87,7 @@ spec:
       - ReadWriteOnce
       resources:
         requests:
+          # The size of disk used to mirror your git repositories.
+          # If you change this, also change indexed-search's disk size.
           storage: 200Gi
       storageClassName: sourcegraph

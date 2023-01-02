@@ -2,16 +2,16 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: Serves the frontend of Sourcegraph via HTTP(S).
     kubectl.kubernetes.io/default-container: frontend
+    description: Serves the frontend of Sourcegraph via HTTP(S).
   labels:
-    app.kubernetes.io/component: frontend
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: frontend
   name: sourcegraph-frontend
 spec:
   minReadySeconds: 10
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 10
   selector:
     matchLabels:
@@ -31,10 +31,6 @@ spec:
       - name: migrator
         image: index.docker.io/sourcegraph/migrator:187572_2022-12-06_cbecc5321c7d@sha256:93fc175df594738a98a62f2057271824cdb674b0e63bedac9dc7cb0f04db76bb
         args: ["up"]
-        securityContext:
-          allowPrivilegeEscalation: false
-          runAsGroup: 101
-          runAsUser: 100
         resources:
           limits:
             cpu: 500m
@@ -42,6 +38,11 @@ spec:
           requests:
             cpu: 100m
             memory: 50M
+        securityContext:
+          # Required to prevent escalations to root.
+          allowPrivilegeEscalation: false
+          runAsGroup: 101
+          runAsUser: 100
         envFrom:
         - configMapRef:
             name: sourcegraph-frontend-env
@@ -50,6 +51,39 @@ spec:
         image: index.docker.io/sourcegraph/frontend:187572_2022-12-06_cbecc5321c7d@sha256:73e64a8636e70ebbaf7f4a3300479529294f67e8cf644cdaea02435915aec869
         args:
         - serve
+        envFrom:
+        - configMapRef:
+            name: sourcegraph-frontend-env
+        env:
+        # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        terminationMessagePolicy: FallbackToLogsOnError
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: debug
+            scheme: HTTP
+          initialDelaySeconds: 300
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 3080
+          name: http
+        - containerPort: 3090
+          name: http-internal
+        - containerPort: 6060
+          name: debug
         resources:
           limits:
             cpu: "2"
@@ -63,41 +97,7 @@ spec:
           allowPrivilegeEscalation: false
           runAsGroup: 101
           runAsUser: 100
-        envFrom:
-        - configMapRef:
-            name: sourcegraph-frontend-env
-        env:
-        # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
-        - name: OTEL_AGENT_HOST
-          valueFrom:
-            fieldRef:
-              fieldPath: status.hostIP
-        - name: OTEL_EXPORTER_OTLP_ENDPOINT
-          value: http://$(OTEL_AGENT_HOST):4317
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: debug
-            scheme: HTTP
-          initialDelaySeconds: 300
-          timeoutSeconds: 5
-        ports:
-        - containerPort: 3080
-          name: http
-        - containerPort: 3090
-          name: http-internal
-        - containerPort: 6060
-          name: debug
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: debug
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
-        terminationMessagePolicy: FallbackToLogsOnError
       securityContext:
         runAsUser: 100
         fsGroup: 101
         fsGroupChangePolicy: "OnRootMismatch"
-        

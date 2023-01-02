@@ -3,11 +3,10 @@ kind: Deployment
 metadata:
   annotations:
     description: Redis for storing semi-persistent data like user sessions.
-    kubectl.kubernetes.io/default-container: redis-store
   labels:
-    app.kubernetes.io/component: redis
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: redis
   name: redis-store
 spec:
   minReadySeconds: 10
@@ -21,16 +20,17 @@ spec:
   template:
     metadata:
       labels:
-        app: redis-store
         deploy: sourcegraph
+        app: redis-store
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/redis-store:187572_2022-12-06_cbecc5321c7d@sha256:a3e4f611bcf1fe6f256a54b81f6ddb9fc2e45d7a038fa276b800b895eca09fe5
+      - name: redis-store
+        image: index.docker.io/sourcegraph/redis-store:187572_2022-12-06_cbecc5321c7d@sha256:a3e4f611bcf1fe6f256a54b81f6ddb9fc2e45d7a038fa276b800b895eca09fe5
+        terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 30
           tcpSocket:
             port: redis
-        name: redis-store
         ports:
         - containerPort: 6379
           name: redis
@@ -49,12 +49,12 @@ spec:
           allowPrivilegeEscalation: false
           runAsGroup: 1000
           runAsUser: 999
-        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /redis-data
           name: redis-data
-      - image: index.docker.io/sourcegraph/redis_exporter:187572_2022-12-06_cbecc5321c7d@sha256:edb0c9b19cacd90acc78f13f0908a7e6efd1df704e401805c24bffd241285f70
-        name: redis-exporter
+      - name: redis-exporter
+        image: index.docker.io/sourcegraph/redis_exporter:187572_2022-12-06_cbecc5321c7d@sha256:edb0c9b19cacd90acc78f13f0908a7e6efd1df704e401805c24bffd241285f70
+        terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 9121
           name: redisexp
@@ -69,8 +69,8 @@ spec:
           allowPrivilegeEscalation: false
           runAsGroup: 1000
           runAsUser: 999
-        terminationMessagePolicy: FallbackToLogsOnError
       securityContext:
+        runAsUser: 999
         fsGroup: 1000
         fsGroupChangePolicy: "OnRootMismatch"
       volumes:

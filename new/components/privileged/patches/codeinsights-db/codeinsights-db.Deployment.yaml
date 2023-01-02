@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codeinsights-db
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: correct-data-dir-permissions
+        securityContext:
+          allowPrivilegeEscalation: true
+          runAsGroup: 0
+          runAsUser: 0
+      containers:
+      - name: codeinsights
+        securityContext:
+          allowPrivilegeEscalation: true
+          runAsGroup: 0
+          runAsUser: 0
+      securityContext:
+        runAsUser: 0
+        fsGroup: 0
+      volumes:
+      - name: codeinsights-conf
+        configMap:
+          defaultMode: 0777
+          name: codeinsights-db-conf

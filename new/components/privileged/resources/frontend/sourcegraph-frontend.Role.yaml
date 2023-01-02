@@ -1,0 +1,31 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    category: rbac
+    deploy: sourcegraph
+    sourcegraph-resource-requires: cluster-admin
+    app.kubernetes.io/component: frontend
+  name: sourcegraph-frontend
+rules:
+- apiGroups:
+  - ""
+  resources:
+  # necessary for resolving k8s+http://fooservice URLs (see for example searcher URL)
+  - endpoints
+  # necessary to populate Site Admin/Instrumentation page (/-/debug) in the cluster deployment
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+
+- apiGroups:
+  - "apps"
+  resources:
+    # necessary for resolving k8s+http://indexed-search?kind=sts URLs
+    - statefulsets
+  verbs:
+    - get
+    - list
+    - watch

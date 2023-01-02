@@ -5,42 +5,50 @@ metadata:
     description: Backend for text search operations.
     kubectl.kubernetes.io/default-container: searcher
   labels:
-    app.kubernetes.io/component: searcher
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: searcher
   name: searcher
 spec:
+  serviceName: searcher
   minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: searcher
-  serviceName: searcher
+  updateStrategy:
+    type: RollingUpdate
   template:
     metadata:
       labels:
-        app: searcher
         deploy: sourcegraph
+        app: searcher
     spec:
+      securityContext:
+        runAsUser: 100
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
       containers:
-      - env:
-        - name: SEARCHER_CACHE_SIZE_MB
-          value: "500000"
+      - name: searcher
+        env:
+        # - name: SEARCHER_CACHE_SIZE_MB
+        #   value: "500000"
         - name: POD_NAME
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        # - name: OTEL_AGENT_HOST
-        #   valueFrom:
-        #     fieldRef:
-        #       fieldPath: status.hostIP
-        # - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        #   value: http://$(OTEL_AGENT_HOST):4317
+        # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
         image: index.docker.io/sourcegraph/searcher:187572_2022-12-06_cbecc5321c7d@sha256:c0d7b580c31e956dc586e3947edd2afb850cf5954e83010236294c57478256da
-        name: searcher
+        terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 3181
           name: http
@@ -65,18 +73,12 @@ spec:
           allowPrivilegeEscalation: false
           runAsGroup: 101
           runAsUser: 100
-        terminationMessagePolicy: FallbackToLogsOnError
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
-      securityContext:
-        fsGroup: 101
-        fsGroupChangePolicy: OnRootMismatch
       volumes:
-      - name: cache-ssd
-        emptyDir: {}
-  updateStrategy:
-    type: RollingUpdate
+      - emptyDir: {}
+        name: cache-ssd
   volumeClaimTemplates:
   - metadata:
       name: cache-ssd

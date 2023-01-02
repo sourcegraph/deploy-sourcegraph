@@ -5,9 +5,9 @@ metadata:
     description: Rate-limiting proxy for the GitHub API.
     kubectl.kubernetes.io/default-container: github-proxy
   labels:
-    app.kubernetes.io/component: github-proxy
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: github-proxy
   name: github-proxy
 spec:
   minReadySeconds: 10
@@ -28,15 +28,17 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-      - env:
+      - name: github-proxy
+        image: index.docker.io/sourcegraph/github-proxy:187572_2022-12-06_cbecc5321c7d@sha256:b4739adfced18f2a8883da931da681f444b489f6606052246f7c8d536f22e425
+        env:
+        # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
         - name: OTEL_AGENT_HOST
           valueFrom:
             fieldRef:
               fieldPath: status.hostIP
         - name: OTEL_EXPORTER_OTLP_ENDPOINT
           value: http://$(OTEL_AGENT_HOST):4317
-        image: index.docker.io/sourcegraph/github-proxy:187572_2022-12-06_cbecc5321c7d@sha256:b4739adfced18f2a8883da931da681f444b489f6606052246f7c8d536f22e425
-        name: github-proxy
+        terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 3180
           name: http
@@ -48,10 +50,11 @@ spec:
             cpu: 100m
             memory: 250M
         securityContext:
+          # Required to prevent escalations to root.
           allowPrivilegeEscalation: false
           runAsGroup: 101
           runAsUser: 100
-        terminationMessagePolicy: FallbackToLogsOnError
       securityContext:
         fsGroup: 101
+        runAsUser: 100
         fsGroupChangePolicy: OnRootMismatch

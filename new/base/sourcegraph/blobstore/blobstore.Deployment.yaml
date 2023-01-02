@@ -52,6 +52,7 @@ spec:
             cpu: "1"
             memory: 500M
         securityContext:
+          # Required to prevent escalations to root.
           allowPrivilegeEscalation: false
           runAsGroup: 101
           runAsUser: 100
@@ -62,7 +63,7 @@ spec:
       securityContext:
         fsGroup: 101
         fsGroupChangePolicy: "OnRootMismatch"
-      #   runAsUser: 0
+        runAsUser: 100
       volumes:
       - name: blobstore-data
         persistentVolumeClaim:

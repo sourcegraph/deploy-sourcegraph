@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: github-proxy
+spec:
+  template:
+    spec:
+      containers:
+      - name: github-proxy
+        securityContext:
+          allowPrivilegeEscalation: true
+          runAsGroup: 0
+          runAsUser: 0
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0

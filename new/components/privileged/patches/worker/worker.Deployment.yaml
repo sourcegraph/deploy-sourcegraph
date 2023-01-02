@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+spec:
+  template:
+    spec:
+      containers:
+      - name: worker
+        envFrom: null
+        env:
+        - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
+          value: blobstore
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
+          value: http://blobstore:9000
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        securityContext:
+          allowPrivilegeEscalation: true
+          runAsUser: 0
+          runAsGroup: 0
+      securityContext:
+        runAsUser: 0
+        fsGroup: 0
+        fsGroupChangePolicy: OnRootMismatch
