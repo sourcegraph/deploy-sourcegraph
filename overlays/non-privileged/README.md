@@ -1,7 +1,9 @@
+> IMPORTANT: You can now use this overlay directory to create the cluster.
+
 This kustomization is for creating fresh Sourcegraph installations that want to run containers as non-root users in clusters with security restrictions.
 It avoids creating Roles and does all the rolebinding in a namespace. It configures Prometheus to work in the namespace and not require ClusterRole wide privileges when doing service discovery for scraping targets. It also disables cAdvisor.
 
-> Note: To create a fresh installation use [`non-privileged-create-cluster`](../non-privileged-create-cluster/) first and then use this overlay.
+> Note: You will no longer need to create a fresh installation using the [`non-privileged-create-cluster`](../non-privileged-create-cluster/) overlay first before using this overlay.
 
 To use it, execute the following command from the root directory of this repository:
 
