@@ -24,7 +24,7 @@ You should replace `xs` with your instance size.
 
 ```bash
 # You can replace `new/generated-cluster.yaml` to any file path.
-kustomize build new/overlays/quick-start/basic/xs > new/generated-cluster.yaml
+kubectl kustomize new/overlays/quick-start/basic/xs -o generated-cluster.yaml
 ```
 
 You can then deploy using the newly generated manifests in the `new/generated-cluster.yaml` file by running:
@@ -43,7 +43,7 @@ You should replace `xs` with your instance size.
 
 ```bash
 # You can replace `new/generated-cluster.yaml` to any file path.
-kustomize build new/overlays/quick-start/full/xs > new/generated-cluster.yaml
+kubectl kustomize new/overlays/quick-start/full/xs -o generated-cluster.yaml
 ```
 
 You can then deploy using the newly generated manifests in the `new/generated-cluster.yaml` file by running:

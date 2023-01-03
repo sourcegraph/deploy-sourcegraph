@@ -6,20 +6,17 @@ Each overlay is created with different kustomize components that are located ins
 
 ## How to use
 
-### Build an overlay
+### Generate manifests
 
-To build a new set of manifests using the overlay:
+To generate a new set of manifests from an overlay:
 
 1. Run the following command from the root of this repository:
 
 ```bash
-# OPTION 1 - When using kustomize:
-$ kustomize build new/kustomize/overlays/$OVERLAY_NAME -o generated-cluster/
-# Example: kustomize build new/kustomize/overlays/example -o generated-cluster/
-
-# OPTION 2 - When using kubectl:
-$ kubectl apply -k new/kustomize/overlays/$OVERLAY_NAME > generated-cluster/
-# Example: kubectl apply -k new/kustomize/overlays/example > generated-cluster/
+# Create a 'generated-cluster' directory
+$ mkdir generated-cluster
+# Example: kubectl kustomize new/kustomize/overlays/quick-start/basic/xs -o generated-cluster/
+$ kubectl kustomize $PATH_TO_OVERLAY -o generated-cluster/
 ```
 
 The new set of manifests will be output to the [generated-cluster](../../../generated-cluster/) directory.
@@ -28,12 +25,10 @@ The new set of manifests will be output to the [generated-cluster](../../../gene
 
 To apply the customiziation made with the overlay:
 
-1. Run the following command from the root of this repository:
+1. Follow the steps above to build manifests from an overlay
+2. Make sure the manifests in the output directory `generated-cluster/` are generated correctly
+3. Run the following command from the root of this repository to apply the manifests from the output directory `generated-cluster/`
 
-```bash
-# OPTION 1 - When using kustomize:
-$ kustomize build new/kustomize/overlays | kubectl apply -f -
-
-# OPTION 2 - When using kubectl:
-$ kubectl apply -k new/kustomize/overlays
-```
+   ```bash
+   $ kubectl apply -k generated-cluster/
+   ```

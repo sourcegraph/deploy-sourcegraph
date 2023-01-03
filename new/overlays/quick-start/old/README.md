@@ -19,7 +19,7 @@ If you have this repository cloned locally, check out a version branch that supp
 git checkout bee/newBase
 # Generate manifests with resources from the old base cluster
 # RBACs required
-kustomize build new/overlays/quick-start/old > new/generated-cluster.yaml
+kubectl kustomize new/overlays/quick-start/old -o generated-cluster.yaml
 ```
 
 The manifests will be grouped and exported to the generated-cluster.yaml file in the new directory.
@@ -30,7 +30,7 @@ You can generate the manifests without cloning the repository using the kustomiz
 
 ```sh
 # Replace bee/newBase to a version branch that support this overlay
-kustomize build https://github.com/sourcegraph/deploy-sourcegraph/new/overlays/quick-start/old?ref=bee/newBase > generated-cluster.yaml
+kubectl kustomize https://github.com/sourcegraph/deploy-sourcegraph/new/overlays/quick-start/old?ref=bee/newBase -o generated-cluster.yaml
 ```
 
 The manifests will be grouped and exported to the generated-cluster.yaml file in the directory where you run the command from.

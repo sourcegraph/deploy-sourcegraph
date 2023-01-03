@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# update namespace value if needed
+namespace: ns-sourcegraph
+resources:
+  - ../../../base/sourcegraph
+
+components:
+  - ../../../components/monitoring
+
+patchesStrategicMerge:
+# Update the external database info in this file:
+- frontend-env.yaml

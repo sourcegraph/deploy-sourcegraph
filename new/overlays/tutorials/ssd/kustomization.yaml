@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# update namespace value if needed
+namespace: ns-sourcegraph
+resources:
+- ../../../base
+components:
+# Create resources for using local SSDs - RBACs required
+- ../../../components/ssd
+
+####################################################################
+# ACTOPM REQUIRED: 
+# Update the $SSD_NODE_PATH value in .sourcegraph_config.env
+# $SSD_NODE_PATH = absolute path where SSDs are mounted on each node
+####################################################################
+configMapGenerator:
+  - name: sourcegraph-frontend-env
+    behavior: merge
+    # update the value inside the .sourcegraph_config.env file
+    env: .sourcegraph_config.env
