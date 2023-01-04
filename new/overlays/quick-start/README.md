@@ -23,14 +23,14 @@ Run the following command to build the manifests with the overlay of your choice
 You should replace `xs` with your instance size.
 
 ```bash
-# You can replace `new/generated-cluster.yaml` to any file path.
-kubectl kustomize new/overlays/quick-start/basic/xs -o generated-cluster.yaml
+# You can replace `new/preview-cluster` to any file path.
+kubectl kustomize new/overlays/quick-start/basic/xs -o new/preview-cluster
 ```
 
-You can then deploy using the newly generated manifests in the `new/generated-cluster.yaml` file by running:
+You can then deploy using the newly generated manifests in the `new/preview-cluster` file by running:
 
 ```bash
-kubectl apply -f new/generated-cluster.yaml
+kubectl apply -f new/preview-cluster
 ```
 
 ### Full
@@ -42,12 +42,12 @@ Run the following command to build the manifests with the overlay of your choice
 You should replace `xs` with your instance size.
 
 ```bash
-# You can replace `new/generated-cluster.yaml` to any file path.
-kubectl kustomize new/overlays/quick-start/full/xs -o generated-cluster.yaml
+# You can replace `new/preview-cluster` to any file path.
+kubectl kustomize new/overlays/quick-start/full/xs -o new/preview-cluster
 ```
 
-You can then deploy using the newly generated manifests in the `new/generated-cluster.yaml` file by running:
+You can then deploy using the newly generated manifests in the `new/preview-cluster` file by running:
 
 ```bash
-kubectl apply -f new/generated-cluster.yaml
+kubectl apply -f new/preview-cluster
 ```

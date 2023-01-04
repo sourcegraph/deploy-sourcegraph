@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: codeintel-db
+spec:
+  template:
+    spec:
+      initContainers:
+      - name: correct-data-dir-permissions
+        securityContext:
+          allowPrivilegeEscalation: true
+          runAsUser: 0
+          runAsGroup: 0
+      containers:
+      - name: pgsql
+        securityContext:
+          allowPrivilegeEscalation: true
+          runAsUser: 0
+          runAsGroup: 0
+      securityContext:
+        fsGroup: 0
+        runAsUser: 0
+      volumes:
+      - name: pgsql-conf
+        configMap:
+          defaultMode: 0777
+          name: codeintel-db-conf

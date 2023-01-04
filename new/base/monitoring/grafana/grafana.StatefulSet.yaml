@@ -50,17 +50,17 @@ spec:
         securityContext:
           allowPrivilegeEscalation: false
           runAsGroup: 472
-          runAsUser: 472
+          runAsUser: 0
       serviceAccountName: grafana
-      securityContext:
-        runAsUser: 0
-        fsGroup: 472
-        fsGroupChangePolicy: OnRootMismatch
       volumes:
       - name: config
         configMap:
           defaultMode: 0777
           name: grafana
+      securityContext:
+        runAsUser: 0
+        fsGroup: 472
+        fsGroupChangePolicy: OnRootMismatch
   volumeClaimTemplates:
   - metadata:
       name: grafana-data

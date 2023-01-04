@@ -1,0 +1,71 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+resources:
+- resources/frontend/sourcegraph-frontend.Role.yaml
+- resources/frontend/sourcegraph-frontend.RoleBinding.yaml
+- resources/frontend/sourcegraph-frontend.ServiceAccount.yaml
+- resources/symbols/symbols.Deployment.yaml
+- resources/searcher/searcher.Deployment.yaml
+components:
+- ../resources/delete-searcher-statefulset
+- ../resources/delete-symbols-statefulset
+patchesStrategicMerge:
+- patches/blobstore/blobstore.Deployment.yaml
+- patches/codeinsights-db/codeinsights-db.Deployment.yaml
+- patches/codeintel-db/codeintel-db.Deployment.yaml
+- patches/frontend/sourcegraph-frontend.ConfigMap.yaml
+- patches/frontend/sourcegraph-frontend.Deployment.yaml
+- patches/github-proxy/github-proxy.Deployment.yaml
+- patches/gitserver/gitserver.StatefulSet.yaml
+- patches/indexed-search/indexed-search.StatefulSet.yaml
+- patches/pgsql/pgsql.Deployment.yaml
+- patches/precise-code-intel/worker.Deployment.yaml
+- patches/redis/redis-cache.Deployment.yaml
+- patches/redis/redis-store.Deployment.yaml
+- patches/repo-updater/repo-updater.Deployment.yaml
+- patches/syntect-server/syntect-server.Deployment.yaml
+- patches/worker/worker.Deployment.yaml
+# To support searcher and symbols as both statefulset and deployment
+patchesJson6902:
+  - target:
+      kind: StatefulSet|Deployment
+      name: searcher
+      group: apps
+      version: v1
+    path: patches/searcher/searcher.patchesJson6902.yaml
+  - target:
+      kind: StatefulSet|Deployment
+      name: symbols
+      group: apps
+      version: v1
+    path: patches/symbols/symbols.patchesJson6902.yaml
+  - target:
+      kind: StatefulSet|Deployment
+      name: .*
+      group: apps
+      version: v1
+    path: patches/remove/securityContext-container-0.yaml
+  - target:
+      kind: DaemonSet
+      name: otel-agent
+      group: apps
+      version: v1
+    path: patches/remove/securityContext-daemonset.yaml
+  - target:
+      kind: Deployment
+      name: codeinsights-db|codeintel-db|pgsql|sourcegraph-frontend
+      group: apps
+      version: v1
+    path: patches/remove/securityContext-databases.yaml
+  - target:
+      kind: Deployment
+      name: sourcegraph-frontend
+      group: apps
+      version: v1
+    path: patches/remove/securityContext-initContainer.yaml
+  - target:
+      kind: Deployment|StatefulSet
+      name: redis-cache|redis-store|indexed-search
+      group: apps
+      version: v1
+    path: patches/remove/securityContext-container-1.yaml

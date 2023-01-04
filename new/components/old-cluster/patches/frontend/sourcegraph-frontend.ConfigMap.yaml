@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    kubectl.kubernetes.io/default-container: frontend-unused
+    description: An unused resource that acts as a placeholder to ensure components for the new cluster can be used with component that generate resources for the old cluster.
+  labels:
+    app: sourcegraph-frontend-unused
+    app.kubernetes.io/component: unused
+    deploy: sourcegraph
+    sourcegraph-resource-requires: can-be-removed
+  name: sourcegraph-frontend-env
+data:
+  $patch: delete

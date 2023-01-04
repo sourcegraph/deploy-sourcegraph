@@ -34,6 +34,11 @@ spec:
             # "--config=/etc/otel-collector/conf/config.yaml"
             - "--config=/etc/otel-collector/configs/logging.yaml"
           terminationMessagePolicy: FallbackToLogsOnError
+          securityContext:
+            # Required to prevent escalations to root.
+            allowPrivilegeEscalation: false
+            runAsUser: 100
+            runAsGroup: 101
           resources:
             limits:
               cpu: "2"
@@ -62,6 +67,10 @@ spec:
             - name: config
               mountPath: /etc/otel-collector/conf
       terminationGracePeriodSeconds: 120
+      securityContext:
+        runAsUser: 0
+        fsGroup: 
+        fsGroupChangePolicy: 
       volumes:
         # Not used by default.
         # Edit the ConfigMap in otel-collector.ConfigMap.yaml:

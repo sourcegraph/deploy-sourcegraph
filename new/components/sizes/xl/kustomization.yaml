@@ -3,8 +3,22 @@ kind: Component
 components:
   - ../../resources/lower-requests
 patchesStrategicMerge:
-  - resources.yaml
-  - pgsql-conf.yaml
-  - endpoints.yaml
+  - patches/resources.yaml
+  - patches/pgsql-conf.yaml
+  - patches/endpoints.yaml
+# To support searcher and symbols as both statefulset and deployment
+patchesJson6902:
+  - target:
+      kind: StatefulSet|Deployment
+      name: searcher
+      group: apps
+      version: v1
+    path: patches/searcher.yaml
+  - target:
+      kind: StatefulSet|Deployment
+      name: symbols
+      group: apps
+      version: v1
+    path: patches/symbols.yaml
 replacements:
-  - path: sourcegraph-replicas.yaml
+  - path: patches/sourcegraph-replicas.yaml

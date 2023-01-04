@@ -9,6 +9,6 @@ You will need to create a storageclass if it doesn't exist yet. See [these docs]
 1. cd into this directory [overlays/storageclass-name](./README.md)
 2. [OPTIONAL] Update the `namespace` value
 3. Update the variable `DEPLOY_SOURCEGRAPH_STORAGECLASS_NAME` inside the [.sourcegraph_config.env](.sourcegraph_config.env) file
-4. To generate the manifests with this overlay, run `kubectl kustomize . -o generated-cluster.yaml`
-5. Make sure the values in `generated-cluster.yaml` are generated correctly
-6. To apply, run `kubectl apply -f generated-cluster.yaml`
+4. To generate the manifests with this overlay, run `kubectl kustomize . -o new/preview-cluster`
+5. Make sure the values in `new/preview-cluster` are generated correctly
+6. To apply, run `kubectl apply -f new/preview-cluster`

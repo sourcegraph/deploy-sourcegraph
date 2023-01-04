@@ -46,6 +46,11 @@ spec:
             httpGet:
               path: /
               port: 13133
+          securityContext:
+            # Required to prevent escalations to root.
+            allowPrivilegeEscalation: false
+            runAsUser: 100
+            runAsGroup: 101
           ports:
             - containerPort: 55679
               name: zpages

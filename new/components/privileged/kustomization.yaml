@@ -17,7 +17,19 @@ patchesStrategicMerge:
 - patches/redis/redis-cache.Deployment.yaml
 - patches/redis/redis-store.Deployment.yaml
 - patches/repo-updater/repo-updater.Deployment.yaml
-- patches/searcher/searcher.StatefulSet.yaml
-- patches/symbols/symbols.StatefulSet.yaml
 - patches/syntect-server/syntect-server.Deployment.yaml
 - patches/worker/worker.Deployment.yaml
+# To support searcher and symbols as both statefulset and deployment
+patchesJson6902:
+  - target:
+      kind: StatefulSet|Deployment
+      name: searcher
+      group: apps
+      version: v1
+    path: patches/searcher/searcher.yaml
+  - target:
+      kind: StatefulSet|Deployment
+      name: symbols
+      group: apps
+      version: v1
+    path: patches/symbols/symbols.yaml

@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: repo-updater
+spec:
+  template:
+    spec:
+      securityContext:
+        runAsUser: 0
+        fsGroup: 0
+      containers:
+      - name: repo-updater
+        securityContext:
+          allowPrivilegeEscalation: true
+          runAsGroup: 0
+          runAsUser: 0

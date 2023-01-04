@@ -1,0 +1,5078 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: cadvisor
+    app.kubernetes.io/component: cadvisor
+    category: rbac
+    deploy: sourcegraph
+    sourcegraph-resource-requires: cluster-admin
+  name: cadvisor
+  namespace: default
+---
+apiVersion: v1
+imagePullSecrets:
+- name: docker-registry
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: grafana
+    category: rbac
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: grafana
+  namespace: default
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: prometheus
+    category: rbac
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: prometheus
+  namespace: default
+---
+apiVersion: v1
+imagePullSecrets:
+- name: docker-registry
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: frontend
+    category: rbac
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: sourcegraph-frontend
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: frontend
+    category: rbac
+    deploy: sourcegraph
+    sourcegraph-resource-requires: cluster-admin
+  name: sourcegraph-frontend
+  namespace: default
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: prometheus
+    category: rbac
+    deploy: sourcegraph
+    sourcegraph-resource-requires: cluster-admin
+  name: prometheus
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  - namespaces
+  - nodes
+  - nodes/metrics
+  - nodes/proxy
+  - pods
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: frontend
+    category: rbac
+    deploy: sourcegraph
+    sourcegraph-resource-requires: cluster-admin
+  name: sourcegraph-frontend
+  namespace: default
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: sourcegraph-frontend
+subjects:
+- kind: ServiceAccount
+  name: sourcegraph-frontend
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: prometheus
+    category: rbac
+    deploy: sourcegraph
+    sourcegraph-resource-requires: cluster-admin
+  name: prometheus
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prometheus
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: default
+---
+apiVersion: v1
+data:
+  postgresql.conf: |
+    # -----------------------------
+    # PostgreSQL configuration file
+    # -----------------------------
+    #
+    # This file consists of lines of the form:
+    #
+    #   name = value
+    #
+    # (The "=" is optional.)  Whitespace may be used.  Comments are introduced with
+    # "#" anywhere on a line.  The complete list of parameter names and allowed
+    # values can be found in the PostgreSQL documentation.
+    #
+    # The commented-out settings shown in this file represent the default values.
+    # Re-commenting a setting is NOT sufficient to revert it to the default value;
+    # you need to reload the server.
+    #
+    # This file is read on server startup and when the server receives a SIGHUP
+    # signal.  If you edit the file on a running system, you have to SIGHUP the
+    # server for the changes to take effect, run "pg_ctl reload", or execute
+    # "SELECT pg_reload_conf()".  Some parameters, which are marked below,
+    # require a server shutdown and restart to take effect.
+    #
+    # Any parameter can also be given as a command-line option to the server, e.g.,
+    # "postgres -c log_connections=on".  Some parameters can be changed at run time
+    # with the "SET" SQL command.
+    #
+    # Memory units:  kB = kilobytes        Time units:  ms  = milliseconds
+    #                MB = megabytes                     s   = seconds
+    #                GB = gigabytes                     min = minutes
+    #                TB = terabytes                     h   = hours
+    #                                                   d   = days
+
+
+    #------------------------------------------------------------------------------
+    # FILE LOCATIONS
+    #------------------------------------------------------------------------------
+
+    # The default values of these variables are driven from the -D command-line
+    # option or PGDATA environment variable, represented here as ConfigDir.
+
+    #data_directory = 'ConfigDir'                # use data in another directory
+              # (change requires restart)
+    #hba_file = 'ConfigDir/pg_hba.conf'        # host-based authentication file
+              # (change requires restart)
+    #ident_file = 'ConfigDir/pg_ident.conf'        # ident configuration file
+              # (change requires restart)
+
+    # If external_pid_file is not explicitly set, no extra PID file is written.
+    #external_pid_file = ''                        # write an extra PID file
+              # (change requires restart)
+
+
+    #------------------------------------------------------------------------------
+    # CONNECTIONS AND AUTHENTICATION
+    #------------------------------------------------------------------------------
+
+    # - Connection Settings -
+
+    listen_addresses = '*'
+              # comma-separated list of addresses;
+              # defaults to 'localhost'; use '*' for all
+              # (change requires restart)
+    #port = 5432                                # (change requires restart)
+    max_connections = 20                        # (change requires restart)
+    #superuser_reserved_connections = 3        # (change requires restart)
+    #unix_socket_directories = '/var/run/postgresql'        # comma-separated list of directories
+              # (change requires restart)
+    #unix_socket_group = ''                        # (change requires restart)
+    #unix_socket_permissions = 0777                # begin with 0 to use octal notation
+              # (change requires restart)
+    #bonjour = off                                # advertise server via Bonjour
+              # (change requires restart)
+    #bonjour_name = ''                        # defaults to the computer name
+              # (change requires restart)
+
+    # - TCP settings -
+    # see "man 7 tcp" for details
+
+    #tcp_keepalives_idle = 0                # TCP_KEEPIDLE, in seconds;
+              # 0 selects the system default
+    #tcp_keepalives_interval = 0                # TCP_KEEPINTVL, in seconds;
+              # 0 selects the system default
+    #tcp_keepalives_count = 0                # TCP_KEEPCNT;
+              # 0 selects the system default
+    #tcp_user_timeout = 0                        # TCP_USER_TIMEOUT, in milliseconds;
+              # 0 selects the system default
+
+    # - Authentication -
+
+    #authentication_timeout = 1min                # 1s-600s
+    #password_encryption = md5                # md5 or scram-sha-256
+    #db_user_namespace = off
+
+    # GSSAPI using Kerberos
+    #krb_server_keyfile = ''
+    #krb_caseins_users = off
+
+    # - SSL -
+
+    #ssl = off
+    #ssl_ca_file = ''
+    #ssl_cert_file = 'server.crt'
+    #ssl_crl_file = ''
+    #ssl_key_file = 'server.key'
+    #ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL' # allowed SSL ciphers
+    #ssl_prefer_server_ciphers = on
+    #ssl_ecdh_curve = 'prime256v1'
+    #ssl_min_protocol_version = 'TLSv1'
+    #ssl_max_protocol_version = ''
+    #ssl_dh_params_file = ''
+    #ssl_passphrase_command = ''
+    #ssl_passphrase_command_supports_reload = off
+
+
+    #------------------------------------------------------------------------------
+    # RESOURCE USAGE (except WAL)
+    #------------------------------------------------------------------------------
+
+    # - Memory -
+
+    shared_buffers = 509546kB                        # min 128kB
+              # (change requires restart)
+    #huge_pages = try                        # on, off, or try
+              # (change requires restart)
+    #temp_buffers = 8MB                        # min 800kB
+    #max_prepared_transactions = 0                # zero disables the feature
+              # (change requires restart)
+    # Caution: it is not advisable to set max_prepared_transactions nonzero unless
+    # you actively intend to use prepared transactions.
+    work_mem = 3184kB                                # min 64kB
+    maintenance_work_mem = 254773kB                # min 1MB
+    #autovacuum_work_mem = -1                # min 1MB, or -1 to use maintenance_work_mem
+    #max_stack_depth = 2MB                        # min 100kB
+    #shared_memory_type = mmap                # the default is the first option
+              # supported by the operating system:
+              #   mmap
+              #   sysv
+              #   windows
+              # (change requires restart)
+    dynamic_shared_memory_type = posix        # the default is the first option
+              # supported by the operating system:
+              #   posix
+              #   sysv
+              #   windows
+              #   mmap
+              # (change requires restart)
+
+    # - Disk -
+
+    #temp_file_limit = -1                        # limits per-process temp file space
+              # in kB, or -1 for no limit
+
+    # - Kernel Resources -
+
+    #max_files_per_process = 1000                # min 25
+              # (change requires restart)
+
+    # - Cost-Based Vacuum Delay -
+
+    #vacuum_cost_delay = 0                        # 0-100 milliseconds (0 disables)
+    #vacuum_cost_page_hit = 1                # 0-10000 credits
+    #vacuum_cost_page_miss = 10                # 0-10000 credits
+    #vacuum_cost_page_dirty = 20                # 0-10000 credits
+    #vacuum_cost_limit = 200                # 1-10000 credits
+
+    # - Background Writer -
+
+    #bgwriter_delay = 200ms                        # 10-10000ms between rounds
+    #bgwriter_lru_maxpages = 100                # max buffers written/round, 0 disables
+    #bgwriter_lru_multiplier = 2.0                # 0-10.0 multiplier on buffers scanned/round
+    #bgwriter_flush_after = 512kB                # measured in pages, 0 disables
+
+    # - Asynchronous Behavior -
+
+    effective_io_concurrency = 200                # 1-1000; 0 disables prefetching
+    max_worker_processes = 19                # (change requires restart)
+    #max_parallel_maintenance_workers = 2        # taken from max_parallel_workers
+    max_parallel_workers_per_gather = 4        # taken from max_parallel_workers
+    #parallel_leader_participation = on
+    max_parallel_workers = 8                # maximum number of max_worker_processes that
+              # can be used in parallel operations
+    #old_snapshot_threshold = -1                # 1min-60d; -1 disables; 0 is immediate
+              # (change requires restart)
+    #backend_flush_after = 0                # measured in pages, 0 disables
+
+
+    #------------------------------------------------------------------------------
+    # WRITE-AHEAD LOG
+    #------------------------------------------------------------------------------
+
+    # - Settings -
+
+    #wal_level = replica                        # minimal, replica, or logical
+              # (change requires restart)
+    #fsync = on                                # flush data to disk for crash safety
+              # (turning this off can cause
+              # unrecoverable data corruption)
+    #synchronous_commit = on                # synchronization level;
+              # off, local, remote_write, remote_apply, or on
+    #wal_sync_method = fsync                # the default is the first option
+              # supported by the operating system:
+              #   open_datasync
+              #   fdatasync (default on Linux)
+              #   fsync
+              #   fsync_writethrough
+              #   open_sync
+    #full_page_writes = on                        # recover from partial page writes
+    #wal_compression = off                        # enable compression of full-page writes
+    #wal_log_hints = off                        # also do full page writes of non-critical updates
+              # (change requires restart)
+    #wal_init_zero = on                        # zero-fill new WAL files
+    #wal_recycle = on                        # recycle WAL files
+    wal_buffers = 15285kB                        # min 32kB, -1 sets based on shared_buffers
+              # (change requires restart)
+    #wal_writer_delay = 200ms                # 1-10000 milliseconds
+    #wal_writer_flush_after = 1MB                # measured in pages, 0 disables
+
+    #commit_delay = 0                        # range 0-100000, in microseconds
+    #commit_siblings = 5                        # range 1-1000
+
+    # - Checkpoints -
+
+    #checkpoint_timeout = 5min                # range 30s-1d
+    max_wal_size = 1GB
+    min_wal_size = 512MB
+    checkpoint_completion_target = 0.9        # checkpoint target duration, 0.0 - 1.0
+    #checkpoint_flush_after = 256kB                # measured in pages, 0 disables
+    #checkpoint_warning = 30s                # 0 disables
+
+    # - Archiving -
+
+    #archive_mode = off                # enables archiving; off, on, or always
+            # (change requires restart)
+    #archive_command = ''                # command to use to archive a logfile segment
+            # placeholders: %p = path of file to archive
+            #               %f = file name only
+            # e.g. 'test ! -f /mnt/server/archivedir/%f && cp %p /mnt/server/archivedir/%f'
+    #archive_timeout = 0                # force a logfile segment switch after this
+            # number of seconds; 0 disables
+
+    # - Archive Recovery -
+
+    # These are only used in recovery mode.
+
+    #restore_command = ''                # command to use to restore an archived logfile segment
+            # placeholders: %p = path of file to restore
+            #               %f = file name only
+            # e.g. 'cp /mnt/server/archivedir/%f %p'
+            # (change requires restart)
+    #archive_cleanup_command = ''        # command to execute at every restartpoint
+    #recovery_end_command = ''        # command to execute at completion of recovery
+
+    # - Recovery Target -
+
+    # Set these only when performing a targeted recovery.
+
+    #recovery_target = ''                # 'immediate' to end recovery as soon as a
+                                    # consistent state is reached
+            # (change requires restart)
+    #recovery_target_name = ''        # the named restore point to which recovery will proceed
+            # (change requires restart)
+    #recovery_target_time = ''        # the time stamp up to which recovery will proceed
+            # (change requires restart)
+    #recovery_target_xid = ''        # the transaction ID up to which recovery will proceed
+            # (change requires restart)
+    #recovery_target_lsn = ''        # the WAL LSN up to which recovery will proceed
+            # (change requires restart)
+    #recovery_target_inclusive = on # Specifies whether to stop:
+            # just after the specified recovery target (on)
+            # just before the recovery target (off)
+            # (change requires restart)
+    #recovery_target_timeline = 'latest'        # 'current', 'latest', or timeline ID
+            # (change requires restart)
+    #recovery_target_action = 'pause'        # 'pause', 'promote', 'shutdown'
+            # (change requires restart)
+
+
+    #------------------------------------------------------------------------------
+    # REPLICATION
+    #------------------------------------------------------------------------------
+
+    # - Sending Servers -
+
+    # Set these on the master and on any standby that will send replication data.
+
+    #max_wal_senders = 10                # max number of walsender processes
+            # (change requires restart)
+    #wal_keep_segments = 0                # in logfile segments; 0 disables
+    #wal_sender_timeout = 60s        # in milliseconds; 0 disables
+
+    #max_replication_slots = 10        # max number of replication slots
+            # (change requires restart)
+    #track_commit_timestamp = off        # collect timestamp of transaction commit
+            # (change requires restart)
+
+    # - Master Server -
+
+    # These settings are ignored on a standby server.
+
+    #synchronous_standby_names = ''        # standby servers that provide sync rep
+            # method to choose sync standbys, number of sync standbys,
+            # and comma-separated list of application_name
+            # from standby(s); '*' = all
+    #vacuum_defer_cleanup_age = 0        # number of xacts by which cleanup is delayed
+
+    # - Standby Servers -
+
+    # These settings are ignored on a master server.
+
+    #primary_conninfo = ''                        # connection string to sending server
+              # (change requires restart)
+    #primary_slot_name = ''                        # replication slot on sending server
+              # (change requires restart)
+    #promote_trigger_file = ''                # file name whose presence ends recovery
+    #hot_standby = on                        # "off" disallows queries during recovery
+              # (change requires restart)
+    #max_standby_archive_delay = 30s        # max delay before canceling queries
+              # when reading WAL from archive;
+              # -1 allows indefinite delay
+    #max_standby_streaming_delay = 30s        # max delay before canceling queries
+              # when reading streaming WAL;
+              # -1 allows indefinite delay
+    #wal_receiver_status_interval = 10s        # send replies at least this often
+              # 0 disables
+    #hot_standby_feedback = off                # send info from standby to prevent
+              # query conflicts
+    #wal_receiver_timeout = 60s                # time that receiver waits for
+              # communication from master
+              # in milliseconds; 0 disables
+    #wal_retrieve_retry_interval = 5s        # time to wait before retrying to
+              # retrieve WAL after a failed attempt
+    #recovery_min_apply_delay = 0                # minimum delay for applying changes during recovery
+
+    # - Subscribers -
+
+    # These settings are ignored on a publisher.
+
+    #max_logical_replication_workers = 4        # taken from max_worker_processes
+              # (change requires restart)
+    #max_sync_workers_per_subscription = 2        # taken from max_logical_replication_workers
+
+
+    #------------------------------------------------------------------------------
+    # QUERY TUNING
+    #------------------------------------------------------------------------------
+
+    # - Planner Method Configuration -
+
+    #enable_bitmapscan = on
+    #enable_hashagg = on
+    #enable_hashjoin = on
+    #enable_indexscan = on
+    #enable_indexonlyscan = on
+    #enable_material = on
+    #enable_mergejoin = on
+    #enable_nestloop = on
+    #enable_parallel_append = on
+    #enable_seqscan = on
+    #enable_sort = on
+    #enable_tidscan = on
+    #enable_partitionwise_join = off
+    #enable_partitionwise_aggregate = off
+    #enable_parallel_hash = on
+    #enable_partition_pruning = on
+
+    # - Planner Cost Constants -
+
+    #seq_page_cost = 1.0                        # measured on an arbitrary scale
+    random_page_cost = 1.1                        # same scale as above
+    #cpu_tuple_cost = 0.01                        # same scale as above
+    #cpu_index_tuple_cost = 0.005                # same scale as above
+    #cpu_operator_cost = 0.0025                # same scale as above
+    #parallel_tuple_cost = 0.1                # same scale as above
+    #parallel_setup_cost = 1000.0        # same scale as above
+
+    #jit_above_cost = 100000                # perform JIT compilation if available
+              # and query more expensive than this;
+              # -1 disables
+    #jit_inline_above_cost = 500000                # inline small functions if query is
+              # more expensive than this; -1 disables
+    #jit_optimize_above_cost = 500000        # use expensive JIT optimizations if
+              # query is more expensive than this;
+              # -1 disables
+
+    #min_parallel_table_scan_size = 8MB
+    #min_parallel_index_scan_size = 512kB
+    effective_cache_size = 1492MB
+
+    # - Genetic Query Optimizer -
+
+    #geqo = on
+    #geqo_threshold = 12
+    #geqo_effort = 5                        # range 1-10
+    #geqo_pool_size = 0                        # selects default based on effort
+    #geqo_generations = 0                        # selects default based on effort
+    #geqo_selection_bias = 2.0                # range 1.5-2.0
+    #geqo_seed = 0.0                        # range 0.0-1.0
+
+    # - Other Planner Options -
+
+    default_statistics_target = 500        # range 1-10000
+    #constraint_exclusion = partition        # on, off, or partition
+    #cursor_tuple_fraction = 0.1                # range 0.0-1.0
+    #from_collapse_limit = 8
+    #join_collapse_limit = 8                # 1 disables collapsing of explicit
+              # JOIN clauses
+    #force_parallel_mode = off
+    #jit = on                                # allow JIT compilation
+    #plan_cache_mode = auto                        # auto, force_generic_plan or
+              # force_custom_plan
+
+
+    #------------------------------------------------------------------------------
+    # REPORTING AND LOGGING
+    #------------------------------------------------------------------------------
+
+    # - Where to Log -
+
+    #log_destination = 'stderr'                # Valid values are combinations of
+              # stderr, csvlog, syslog, and eventlog,
+              # depending on platform.  csvlog
+              # requires logging_collector to be on.
+
+    # This is used when logging to stderr:
+    #logging_collector = off                # Enable capturing of stderr and csvlog
+              # into log files. Required to be on for
+              # csvlogs.
+              # (change requires restart)
+
+    # These are only used if logging_collector is on:
+    #log_directory = 'log'                        # directory where log files are written,
+              # can be absolute or relative to PGDATA
+    #log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'        # log file name pattern,
+              # can include strftime() escapes
+    #log_file_mode = 0600                        # creation mode for log files,
+              # begin with 0 to use octal notation
+    #log_truncate_on_rotation = off                # If on, an existing log file with the
+              # same name as the new log file will be
+              # truncated rather than appended to.
+              # But such truncation only occurs on
+              # time-driven rotation, not on restarts
+              # or size-driven rotation.  Default is
+              # off, meaning append to existing files
+              # in all cases.
+    #log_rotation_age = 1d                        # Automatic rotation of logfiles will
+              # happen after that time.  0 disables.
+    #log_rotation_size = 10MB                # Automatic rotation of logfiles will
+              # happen after that much log output.
+              # 0 disables.
+
+    # These are relevant when logging to syslog:
+    #syslog_facility = 'LOCAL0'
+    #syslog_ident = 'postgres'
+    #syslog_sequence_numbers = on
+    #syslog_split_messages = on
+
+    # This is only relevant when logging to eventlog (win32):
+    # (change requires restart)
+    #event_source = 'PostgreSQL'
+
+    # - When to Log -
+
+    #log_min_messages = warning                # values in order of decreasing detail:
+              #   debug5
+              #   debug4
+              #   debug3
+              #   debug2
+              #   debug1
+              #   info
+              #   notice
+              #   warning
+              #   error
+              #   log
+              #   fatal
+              #   panic
+
+    #log_min_error_statement = error        # values in order of decreasing detail:
+              #   debug5
+              #   debug4
+              #   debug3
+              #   debug2
+              #   debug1
+              #   info
+              #   notice
+              #   warning
+              #   error
+              #   log
+              #   fatal
+              #   panic (effectively off)
+
+    #log_min_duration_statement = -1        # -1 is disabled, 0 logs all statements
+              # and their durations, > 0 logs only
+              # statements running at least this number
+              # of milliseconds
+
+    #log_transaction_sample_rate = 0.0        # Fraction of transactions whose statements
+              # are logged regardless of their duration. 1.0 logs all
+              # statements from all transactions, 0.0 never logs.
+
+    # - What to Log -
+
+    #debug_print_parse = off
+    #debug_print_rewritten = off
+    #debug_print_plan = off
+    #debug_pretty_print = on
+    #log_checkpoints = off
+    #log_connections = off
+    #log_disconnections = off
+    #log_duration = off
+    #log_error_verbosity = default                # terse, default, or verbose messages
+    #log_hostname = off
+    #log_line_prefix = '%m [%p] '                # special values:
+              #   %a = application name
+              #   %u = user name
+              #   %d = database name
+              #   %r = remote host and port
+              #   %h = remote host
+              #   %p = process ID
+              #   %t = timestamp without milliseconds
+              #   %m = timestamp with milliseconds
+              #   %n = timestamp with milliseconds (as a Unix epoch)
+              #   %i = command tag
+              #   %e = SQL state
+              #   %c = session ID
+              #   %l = session line number
+              #   %s = session start timestamp
+              #   %v = virtual transaction ID
+              #   %x = transaction ID (0 if none)
+              #   %q = stop here in non-session
+              #        processes
+              #   %% = '%'
+              # e.g. '<%u%%%d> '
+    #log_lock_waits = off                        # log lock waits >= deadlock_timeout
+    #log_statement = 'none'                        # none, ddl, mod, all
+    #log_replication_commands = off
+    #log_temp_files = -1                        # log temporary files equal or larger
+              # than the specified size in kilobytes;
+              # -1 disables, 0 logs all temp files
+    log_timezone = 'UTC'
+
+    #------------------------------------------------------------------------------
+    # PROCESS TITLE
+    #------------------------------------------------------------------------------
+
+    #cluster_name = ''                        # added to process titles if nonempty
+              # (change requires restart)
+    #update_process_title = on
+
+
+    #------------------------------------------------------------------------------
+    # STATISTICS
+    #------------------------------------------------------------------------------
+
+    # - Query and Index Statistics Collector -
+
+    #track_activities = on
+    #track_counts = on
+    #track_io_timing = off
+    #track_functions = none                        # none, pl, all
+    #track_activity_query_size = 1024        # (change requires restart)
+    #stats_temp_directory = 'pg_stat_tmp'
+
+
+    # - Monitoring -
+
+    #log_parser_stats = off
+    #log_planner_stats = off
+    #log_executor_stats = off
+    #log_statement_stats = off
+
+
+    #------------------------------------------------------------------------------
+    # AUTOVACUUM
+    #------------------------------------------------------------------------------
+
+    #autovacuum = on                        # Enable autovacuum subprocess?  'on'
+              # requires track_counts to also be on.
+    #log_autovacuum_min_duration = -1        # -1 disables, 0 logs all actions and
+              # their durations, > 0 logs only
+              # actions running at least this number
+              # of milliseconds.
+    autovacuum_max_workers = 10                # max number of autovacuum subprocesses
+              # (change requires restart)
+    autovacuum_naptime = 10                # time between autovacuum runs
+    #autovacuum_vacuum_threshold = 50        # min number of row updates before
+              # vacuum
+    #autovacuum_analyze_threshold = 50        # min number of row updates before
+              # analyze
+    #autovacuum_vacuum_scale_factor = 0.2        # fraction of table size before vacuum
+    #autovacuum_analyze_scale_factor = 0.1        # fraction of table size before analyze
+    #autovacuum_freeze_max_age = 200000000        # maximum XID age before forced vacuum
+              # (change requires restart)
+    #autovacuum_multixact_freeze_max_age = 400000000        # maximum multixact age
+              # before forced vacuum
+              # (change requires restart)
+    #autovacuum_vacuum_cost_delay = 2ms        # default vacuum cost delay for
+              # autovacuum, in milliseconds;
+              # -1 means use vacuum_cost_delay
+    #autovacuum_vacuum_cost_limit = -1        # default vacuum cost limit for
+              # autovacuum, -1 means use
+              # vacuum_cost_limit
+
+
+    #------------------------------------------------------------------------------
+    # CLIENT CONNECTION DEFAULTS
+    #------------------------------------------------------------------------------
+
+    # - Statement Behavior -
+
+    #client_min_messages = notice                # values in order of decreasing detail:
+              #   debug5
+              #   debug4
+              #   debug3
+              #   debug2
+              #   debug1
+              #   log
+              #   notice
+              #   warning
+              #   error
+    #search_path = '"$user", public'        # schema names
+    #row_security = on
+    #default_tablespace = ''                # a tablespace name, '' uses the default
+    #temp_tablespaces = ''                        # a list of tablespace names, '' uses
+              # only default tablespace
+    #default_table_access_method = 'heap'
+    #check_function_bodies = on
+    #default_transaction_isolation = 'read committed'
+    #default_transaction_read_only = off
+    #default_transaction_deferrable = off
+    #session_replication_role = 'origin'
+    #statement_timeout = 0                        # in milliseconds, 0 is disabled
+    #lock_timeout = 0                        # in milliseconds, 0 is disabled
+    #idle_in_transaction_session_timeout = 0        # in milliseconds, 0 is disabled
+    #vacuum_freeze_min_age = 50000000
+    #vacuum_freeze_table_age = 150000000
+    #vacuum_multixact_freeze_min_age = 5000000
+    #vacuum_multixact_freeze_table_age = 150000000
+    #vacuum_cleanup_index_scale_factor = 0.1        # fraction of total number of tuples
+                # before index cleanup, 0 always performs
+                # index cleanup
+    #bytea_output = 'hex'                        # hex, escape
+    #xmlbinary = 'base64'
+    #xmloption = 'content'
+    #gin_fuzzy_search_limit = 0
+    #gin_pending_list_limit = 4MB
+
+    # - Locale and Formatting -
+
+    datestyle = 'iso, mdy'
+    #intervalstyle = 'postgres'
+    timezone = 'UTC'
+    #timezone_abbreviations = 'Default'     # Select the set of available time zone
+              # abbreviations.  Currently, there are
+              #   Default
+              #   Australia (historical usage)
+              #   India
+              # You can create your own file in
+              # share/timezonesets/.
+    #extra_float_digits = 1                        # min -15, max 3; any value >0 actually
+              # selects precise output mode
+    #client_encoding = sql_ascii                # actually, defaults to database
+              # encoding
+
+    # These settings are initialized by initdb, but they can be changed.
+    lc_messages = 'en_US.utf8'                        # locale for system error message
+              # strings
+    lc_monetary = 'en_US.utf8'                        # locale for monetary formatting
+    lc_numeric = 'en_US.utf8'                        # locale for number formatting
+    lc_time = 'en_US.utf8'                                # locale for time formatting
+
+    # default configuration for text search
+    default_text_search_config = 'pg_catalog.english'
+
+    # - Shared Library Preloading -
+
+    shared_preload_libraries = ''        # (change requires restart)
+    #local_preload_libraries = ''
+    #session_preload_libraries = ''
+    #jit_provider = 'llvmjit'                # JIT library to use
+
+    # - Other Defaults -
+
+    #dynamic_library_path = '$libdir'
+
+
+    #------------------------------------------------------------------------------
+    # LOCK MANAGEMENT
+    #------------------------------------------------------------------------------
+
+    #deadlock_timeout = 1s
+    max_locks_per_transaction = 64                # min 10
+              # (change requires restart)
+    #max_pred_locks_per_transaction = 64        # min 10
+              # (change requires restart)
+    #max_pred_locks_per_relation = -2        # negative values mean
+              # (max_pred_locks_per_transaction
+              #  / -max_pred_locks_per_relation) - 1
+    #max_pred_locks_per_page = 2            # min 0
+
+
+    #------------------------------------------------------------------------------
+    # VERSION AND PLATFORM COMPATIBILITY
+    #------------------------------------------------------------------------------
+
+    # - Previous PostgreSQL Versions -
+
+    #array_nulls = on
+    #backslash_quote = safe_encoding        # on, off, or safe_encoding
+    #escape_string_warning = on
+    #lo_compat_privileges = off
+    #operator_precedence_warning = off
+    #quote_all_identifiers = off
+    #standard_conforming_strings = on
+    #synchronize_seqscans = on
+
+    # - Other Platforms and Clients -
+
+    #transform_null_equals = off
+
+
+    #------------------------------------------------------------------------------
+    # ERROR HANDLING
+    #------------------------------------------------------------------------------
+
+    #exit_on_error = off                        # terminate session on any error?
+    #restart_after_crash = on                # reinitialize after backend crash?
+    #data_sync_retry = off                        # retry or panic on failure to fsync
+              # data?
+              # (change requires restart)
+
+
+    #------------------------------------------------------------------------------
+    # CONFIG FILE INCLUDES
+    #------------------------------------------------------------------------------
+
+    # These options allow settings to be loaded from files other than the
+    # default postgresql.conf.  Note that these are directives, not variable
+    # assignments, so they can usefully be given more than once.
+
+    #include_dir = '...'                        # include files ending in '.conf' from
+              # a directory, e.g., 'conf.d'
+    #include_if_exists = '...'                # include file only if it exists
+    #include = '...'                        # include file
+
+
+    #------------------------------------------------------------------------------
+    # CUSTOMIZED OPTIONS
+    #------------------------------------------------------------------------------
+
+    # Add settings for extensions here
+kind: ConfigMap
+metadata:
+  annotations:
+    description: Configuration for CodeInsightsDB
+  labels:
+    app.kubernetes.io/component: codeinsights-db
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: codeinsights-db-conf
+  namespace: default
+---
+apiVersion: v1
+data:
+  postgresql.conf: |
+    # -----------------------------
+    # PostgreSQL configuration file
+    # -----------------------------
+    # SOURCEGRAPH CUSTOMIZATIONS CONTAIN "# SG CUSTOM" in the comment
+    #
+    # This file consists of lines of the form:
+    #
+    #   name = value
+    #
+    # (The "=" is optional.)  Whitespace may be used.  Comments are introduced with
+    # "#" anywhere on a line.  The complete list of parameter names and allowed
+    # values can be found in the PostgreSQL documentation.
+    #
+    # The commented-out settings shown in this file represent the default values.
+    # Re-commenting a setting is NOT sufficient to revert it to the default value;
+    # you need to reload the server.
+    #
+    # This file is read on server startup and when the server receives a SIGHUP
+    # signal.  If you edit the file on a running system, you have to SIGHUP the
+    # server for the changes to take effect, run "pg_ctl reload", or execute
+    # "SELECT pg_reload_conf()".  Some parameters, which are marked below,
+    # require a server shutdown and restart to take effect.
+    #
+    # Any parameter can also be given as a command-line option to the server, e.g.,
+    # "postgres -c log_connections=on".  Some parameters can be changed at run time
+    # with the "SET" SQL command.
+    #
+    # Memory units:  kB = kilobytes        Time units:  ms  = milliseconds
+    #                MB = megabytes                     s   = seconds
+    #                GB = gigabytes                     min = minutes
+    #                TB = terabytes                     h   = hours
+    #                                                   d   = days
+
+
+    #------------------------------------------------------------------------------
+    # FILE LOCATIONS
+    #------------------------------------------------------------------------------
+
+    # The default values of these variables are driven from the -D command-line
+    # option or PGDATA environment variable, represented here as ConfigDir.
+
+    #data_directory = 'ConfigDir'                # use data in another directory
+                                            # (change requires restart)
+    #hba_file = 'ConfigDir/pg_hba.conf'        # host-based authentication file
+                                            # (change requires restart)
+    #ident_file = 'ConfigDir/pg_ident.conf'        # ident configuration file
+                                            # (change requires restart)
+
+    # If external_pid_file is not explicitly set, no extra PID file is written.
+    #external_pid_file = ''                        # write an extra PID file
+                                            # (change requires restart)
+
+
+    #------------------------------------------------------------------------------
+    # CONNECTIONS AND AUTHENTICATION
+    #------------------------------------------------------------------------------
+
+    # - Connection Settings -
+
+    listen_addresses = '*'
+                                            # comma-separated list of addresses;
+                                            # defaults to 'localhost'; use '*' for all
+                                            # (change requires restart)
+    #port = 5432                                # (change requires restart)
+    max_connections = 100                        # (change requires restart)
+    #superuser_reserved_connections = 3        # (change requires restart)
+    #unix_socket_directories = '/var/run/postgresql'        # comma-separated list of directories
+                                            # (change requires restart)
+    #unix_socket_group = ''                        # (change requires restart)
+    #unix_socket_permissions = 0777                # begin with 0 to use octal notation
+                                            # (change requires restart)
+    #bonjour = off                                # advertise server via Bonjour
+                                            # (change requires restart)
+    #bonjour_name = ''                        # defaults to the computer name
+                                            # (change requires restart)
+
+    # - TCP Keepalives -
+    # see "man 7 tcp" for details
+
+    #tcp_keepalives_idle = 0                # TCP_KEEPIDLE, in seconds;
+                                            # 0 selects the system default
+    #tcp_keepalives_interval = 0                # TCP_KEEPINTVL, in seconds;
+                                            # 0 selects the system default
+    #tcp_keepalives_count = 0                # TCP_KEEPCNT;
+                                            # 0 selects the system default
+
+    # - Authentication -
+
+    #authentication_timeout = 1min                # 1s-600s
+    #password_encryption = md5                # md5 or scram-sha-256
+    #db_user_namespace = off
+
+    # GSSAPI using Kerberos
+    #krb_server_keyfile = ''
+    #krb_caseins_users = off
+
+    # - SSL -
+
+    #ssl = off
+    #ssl_ca_file = ''
+    #ssl_cert_file = 'server.crt'
+    #ssl_crl_file = ''
+    #ssl_key_file = 'server.key'
+    #ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL' # allowed SSL ciphers
+    #ssl_prefer_server_ciphers = on
+    #ssl_ecdh_curve = 'prime256v1'
+    #ssl_dh_params_file = ''
+    #ssl_passphrase_command = ''
+    #ssl_passphrase_command_supports_reload = off
+
+
+    #------------------------------------------------------------------------------
+    # RESOURCE USAGE (except WAL)
+    #------------------------------------------------------------------------------
+
+    # - Memory -
+
+    shared_buffers = 1GB # SG CUSTOM min 128kB
+                                            # (change requires restart)
+    #huge_pages = try                        # on, off, or try
+                                            # (change requires restart)
+    #temp_buffers = 8MB                        # min 800kB
+    #max_prepared_transactions = 0                # zero disables the feature
+                                            # (change requires restart)
+    # Caution: it is not advisable to set max_prepared_transactions nonzero unless
+    # you actively intend to use prepared transactions.
+    work_mem = 5MB                                # SG CUSTOM min 64kB
+    maintenance_work_mem = 250MB                # SG CUSTOM min 1MB
+    #autovacuum_work_mem = -1                # min 1MB, or -1 to use maintenance_work_mem
+    #max_stack_depth = 2MB                        # min 100kB
+    dynamic_shared_memory_type = posix        # the default is the first option
+                                            # supported by the operating system:
+                                            #   posix
+                                            #   sysv
+                                            #   windows
+                                            #   mmap
+                                            # use none to disable dynamic shared memory
+                                            # (change requires restart)
+
+    # - Disk -
+
+    temp_file_limit = 20GB                # SG CUSTOM limits per-process temp file space
+                                            # in kB, or -1 for no limit
+
+    # - Kernel Resources -
+
+    #max_files_per_process = 1000                # min 25
+                                            # (change requires restart)
+
+    # - Cost-Based Vacuum Delay -
+
+    #vacuum_cost_delay = 0                        # 0-100 milliseconds
+    #vacuum_cost_page_hit = 1                # 0-10000 credits
+    #vacuum_cost_page_miss = 10                # 0-10000 credits
+    #vacuum_cost_page_dirty = 20                # 0-10000 credits
+    #vacuum_cost_limit = 200                # 1-10000 credits
+
+    # - Background Writer -
+
+    bgwriter_delay = 50ms # SG CUSTOM 10-10000ms between rounds
+    bgwriter_lru_maxpages = 200                # SG CUSTOM max buffers written/round, 0 disables
+
+    #bgwriter_lru_multiplier = 2.0                # 0-10.0 multiplier on buffers scanned/round
+    #bgwriter_flush_after = 512kB                # measured in pages, 0 disables
+
+    # - Asynchronous Behavior -
+
+    effective_io_concurrency = 200                # 1-1000; 0 disables prefetching
+    max_worker_processes = 4                # SG CUSTOM (change requires restart)
+    max_parallel_maintenance_workers = 4        # SG CUSTOM taken from max_parallel_workers
+    max_parallel_workers_per_gather = 2        # SG CUSTOM taken from max_parallel_workers
+    #parallel_leader_participation = on
+    max_parallel_workers = 4                # SG CUSTOM maximum number of max_worker_processes that
+                                            # can be used in parallel operations
+    #old_snapshot_threshold = -1                # 1min-60d; -1 disables; 0 is immediate
+                                            # (change requires restart)
+    #backend_flush_after = 0                # measured in pages, 0 disables
+
+
+    #------------------------------------------------------------------------------
+    # WRITE-AHEAD LOG
+    #------------------------------------------------------------------------------
+
+    # - Settings -
+
+    #wal_level = replica                        # minimal, replica, or logical
+                                            # (change requires restart)
+    #fsync = on                                # flush data to disk for crash safety
+                                            # (turning this off can cause
+                                            # unrecoverable data corruption)
+    #synchronous_commit = on                # synchronization level;
+                                            # off, local, remote_write, remote_apply, or on
+    #wal_sync_method = fsync                # the default is the first option
+                                            # supported by the operating system:
+                                            #   open_datasync
+                                            #   fdatasync (default on Linux)
+                                            #   fsync
+                                            #   fsync_writethrough
+                                            #   open_sync
+    #full_page_writes = on                        # recover from partial page writes
+    #wal_compression = off                        # enable compression of full-page writes
+    #wal_log_hints = off                        # also do full page writes of non-critical updates
+                                            # (change requires restart)
+    wal_buffers = 16MB                # SG CUSTOM min 32kB, -1 sets based on shared_buffers
+                                            # (change requires restart)
+    #wal_writer_delay = 200ms                # 1-10000 milliseconds
+    #wal_writer_flush_after = 1MB                # measured in pages, 0 disables
+
+    #commit_delay = 0                        # range 0-100000, in microseconds
+    #commit_siblings = 5                        # range 1-1000
+
+    # - Checkpoints -
+
+    #checkpoint_timeout = 5min                # range 30s-1d
+    max_wal_size = 8GB      # SG CUSTOM
+    min_wal_size = 2GB      # SG CUSTOM
+    #checkpoint_completion_target = 0.5        # checkpoint target duration, 0.0 - 1.0
+    #checkpoint_flush_after = 256kB                # measured in pages, 0 disables
+    #checkpoint_warning = 30s                # 0 disables
+
+    # - Archiving -
+
+    #archive_mode = off                # enables archiving; off, on, or always
+                                    # (change requires restart)
+    #archive_command = ''                # command to use to archive a logfile segment
+                                    # placeholders: %p = path of file to archive
+                                    #               %f = file name only
+                                    # e.g. 'test ! -f /mnt/server/archivedir/%f && cp %p /mnt/server/archivedir/%f'
+    #archive_timeout = 0                # force a logfile segment switch after this
+                                    # number of seconds; 0 disables
+
+
+    #------------------------------------------------------------------------------
+    # REPLICATION
+    #------------------------------------------------------------------------------
+
+    # - Sending Servers -
+
+    # Set these on the master and on any standby that will send replication data.
+
+    #max_wal_senders = 10                # max number of walsender processes
+                                    # (change requires restart)
+    #wal_keep_segments = 0                # in logfile segments; 0 disables
+    #wal_sender_timeout = 60s        # in milliseconds; 0 disables
+
+    #max_replication_slots = 10        # max number of replication slots
+                                    # (change requires restart)
+    #track_commit_timestamp = off        # collect timestamp of transaction commit
+                                    # (change requires restart)
+
+    # - Master Server -
+
+    # These settings are ignored on a standby server.
+
+    #synchronous_standby_names = ''        # standby servers that provide sync rep
+                                    # method to choose sync standbys, number of sync standbys,
+                                    # and comma-separated list of application_name
+                                    # from standby(s); '*' = all
+    #vacuum_defer_cleanup_age = 0        # number of xacts by which cleanup is delayed
+
+    # - Standby Servers -
+
+    # These settings are ignored on a master server.
+
+    #hot_standby = on                        # "off" disallows queries during recovery
+                                            # (change requires restart)
+    #max_standby_archive_delay = 30s        # max delay before canceling queries
+                                            # when reading WAL from archive;
+                                            # -1 allows indefinite delay
+    #max_standby_streaming_delay = 30s        # max delay before canceling queries
+                                            # when reading streaming WAL;
+                                            # -1 allows indefinite delay
+    #wal_receiver_status_interval = 10s        # send replies at least this often
+                                            # 0 disables
+    #hot_standby_feedback = off                # send info from standby to prevent
+                                            # query conflicts
+    #wal_receiver_timeout = 60s                # time that receiver waits for
+                                            # communication from master
+                                            # in milliseconds; 0 disables
+    #wal_retrieve_retry_interval = 5s        # time to wait before retrying to
+                                            # retrieve WAL after a failed attempt
+
+    # - Subscribers -
+
+    # These settings are ignored on a publisher.
+
+    #max_logical_replication_workers = 4        # taken from max_worker_processes
+                                            # (change requires restart)
+    #max_sync_workers_per_subscription = 2        # taken from max_logical_replication_workers
+
+
+    #------------------------------------------------------------------------------
+    # QUERY TUNING
+    #------------------------------------------------------------------------------
+
+    # - Planner Method Configuration -
+
+    #enable_bitmapscan = on
+    #enable_hashagg = on
+    #enable_hashjoin = on
+    #enable_indexscan = on
+    #enable_indexonlyscan = on
+    #enable_material = on
+    #enable_mergejoin = on
+    #enable_nestloop = on
+    #enable_parallel_append = on
+    #enable_seqscan = on
+    #enable_sort = on
+    #enable_tidscan = on
+    #enable_partitionwise_join = off
+    #enable_partitionwise_aggregate = off
+    #enable_parallel_hash = on
+    #enable_partition_pruning = on
+
+    # - Planner Cost Constants -
+
+    #seq_page_cost = 1.0                        # measured on an arbitrary scale
+    random_page_cost = 1.1                        # SG CUSTOM same scale as above
+    #cpu_tuple_cost = 0.01                        # same scale as above
+    #cpu_index_tuple_cost = 0.005                # same scale as above
+    #cpu_operator_cost = 0.0025                # same scale as above
+    #parallel_tuple_cost = 0.1                # same scale as above
+    #parallel_setup_cost = 1000.0        # same scale as above
+
+    #jit_above_cost = 100000                # perform JIT compilation if available
+                                            # and query more expensive than this;
+                                            # -1 disables
+    #jit_inline_above_cost = 500000                # inline small functions if query is
+                                            # more expensive than this; -1 disables
+    #jit_optimize_above_cost = 500000        # use expensive JIT optimizations if
+                                            # query is more expensive than this;
+                                            # -1 disables
+
+    #min_parallel_table_scan_size = 8MB
+    #min_parallel_index_scan_size = 512kB
+    effective_cache_size = 3GB # SG CUSTOM
+
+    # - Genetic Query Optimizer -
+
+    #geqo = on
+    #geqo_threshold = 12
+    #geqo_effort = 5                        # range 1-10
+    #geqo_pool_size = 0                        # selects default based on effort
+    #geqo_generations = 0                        # selects default based on effort
+    #geqo_selection_bias = 2.0                # range 1.5-2.0
+    #geqo_seed = 0.0                        # range 0.0-1.0
+
+    # - Other Planner Options -
+
+    #default_statistics_target = 100        # range 1-10000
+    #constraint_exclusion = partition        # on, off, or partition
+    #cursor_tuple_fraction = 0.1                # range 0.0-1.0
+    #from_collapse_limit = 8
+    #join_collapse_limit = 8                # 1 disables collapsing of explicit
+                                            # JOIN clauses
+    #force_parallel_mode = off
+    #jit = off                                # allow JIT compilation
+
+
+    #------------------------------------------------------------------------------
+    # REPORTING AND LOGGING
+    #------------------------------------------------------------------------------
+
+    # - Where to Log -
+
+    #log_destination = 'stderr'                # Valid values are combinations of
+                                            # stderr, csvlog, syslog, and eventlog,
+                                            # depending on platform.  csvlog
+                                            # requires logging_collector to be on.
+
+    # This is used when logging to stderr:
+    #logging_collector = off                # Enable capturing of stderr and csvlog
+                                            # into log files. Required to be on for
+                                            # csvlogs.
+                                            # (change requires restart)
+
+    # These are only used if logging_collector is on:
+    #log_directory = 'log'                        # directory where log files are written,
+                                            # can be absolute or relative to PGDATA
+    #log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'        # log file name pattern,
+                                            # can include strftime() escapes
+    #log_file_mode = 0600                        # creation mode for log files,
+                                            # begin with 0 to use octal notation
+    #log_truncate_on_rotation = off                # If on, an existing log file with the
+                                            # same name as the new log file will be
+                                            # truncated rather than appended to.
+                                            # But such truncation only occurs on
+                                            # time-driven rotation, not on restarts
+                                            # or size-driven rotation.  Default is
+                                            # off, meaning append to existing files
+                                            # in all cases.
+    #log_rotation_age = 1d                        # Automatic rotation of logfiles will
+                                            # happen after that time.  0 disables.
+    #log_rotation_size = 10MB                # Automatic rotation of logfiles will
+                                            # happen after that much log output.
+                                            # 0 disables.
+
+    # These are relevant when logging to syslog:
+    #syslog_facility = 'LOCAL0'
+    #syslog_ident = 'postgres'
+    #syslog_sequence_numbers = on
+    #syslog_split_messages = on
+
+    # This is only relevant when logging to eventlog (win32):
+    # (change requires restart)
+    #event_source = 'PostgreSQL'
+
+    # - When to Log -
+
+    #log_min_messages = warning                # values in order of decreasing detail:
+                                            #   debug5
+                                            #   debug4
+                                            #   debug3
+                                            #   debug2
+                                            #   debug1
+                                            #   info
+                                            #   notice
+                                            #   warning
+                                            #   error
+                                            #   log
+                                            #   fatal
+                                            #   panic
+
+    #log_min_error_statement = error        # values in order of decreasing detail:
+                                            #   debug5
+                                            #   debug4
+                                            #   debug3
+                                            #   debug2
+                                            #   debug1
+                                            #   info
+                                            #   notice
+                                            #   warning
+                                            #   error
+                                            #   log
+                                            #   fatal
+                                            #   panic (effectively off)
+
+    #log_min_duration_statement = -1        # -1 is disabled, 0 logs all statements
+                                            # and their durations, > 0 logs only
+                                            # statements running at least this number
+                                            # of milliseconds
+
+
+    # - What to Log -
+
+    #debug_print_parse = off
+    #debug_print_rewritten = off
+    #debug_print_plan = off
+    #debug_pretty_print = on
+    #log_checkpoints = off
+    #log_connections = off
+    #log_disconnections = off
+    #log_duration = off
+    #log_error_verbosity = default                # terse, default, or verbose messages
+    #log_hostname = off
+    #log_line_prefix = '%m [%p] '                # special values:
+                                            #   %a = application name
+                                            #   %u = user name
+                                            #   %d = database name
+                                            #   %r = remote host and port
+                                            #   %h = remote host
+                                            #   %p = process ID
+                                            #   %t = timestamp without milliseconds
+                                            #   %m = timestamp with milliseconds
+                                            #   %n = timestamp with milliseconds (as a Unix epoch)
+                                            #   %i = command tag
+                                            #   %e = SQL state
+                                            #   %c = session ID
+                                            #   %l = session line number
+                                            #   %s = session start timestamp
+                                            #   %v = virtual transaction ID
+                                            #   %x = transaction ID (0 if none)
+                                            #   %q = stop here in non-session
+                                            #        processes
+                                            #   %% = '%'
+                                            # e.g. '<%u%%%d> '
+    #log_lock_waits = off                        # log lock waits >= deadlock_timeout
+    #log_statement = 'none'                        # none, ddl, mod, all
+    #log_replication_commands = off
+    #log_temp_files = -1                        # log temporary files equal or larger
+                                            # than the specified size in kilobytes;
+                                            # -1 disables, 0 logs all temp files
+    log_timezone = 'Etc/UTC'
+
+    #------------------------------------------------------------------------------
+    # PROCESS TITLE
+    #------------------------------------------------------------------------------
+
+    #cluster_name = ''                        # added to process titles if nonempty
+                                            # (change requires restart)
+    #update_process_title = on
+
+
+    #------------------------------------------------------------------------------
+    # STATISTICS
+    #------------------------------------------------------------------------------
+
+    # - Query and Index Statistics Collector -
+
+    #track_activities = on
+    #track_counts = on
+    #track_io_timing = off
+    #track_functions = none                        # none, pl, all
+    #track_activity_query_size = 1024        # (change requires restart)
+    #stats_temp_directory = 'pg_stat_tmp'
+
+
+    # - Monitoring -
+
+    #log_parser_stats = off
+    #log_planner_stats = off
+    #log_executor_stats = off
+    #log_statement_stats = off
+
+
+    #------------------------------------------------------------------------------
+    # AUTOVACUUM
+    #------------------------------------------------------------------------------
+
+    #autovacuum = on                        # Enable autovacuum subprocess?  'on'
+                                            # requires track_counts to also be on.
+    #log_autovacuum_min_duration = -1        # -1 disables, 0 logs all actions and
+                                            # their durations, > 0 logs only
+                                            # actions running at least this number
+                                            # of milliseconds.
+    #autovacuum_max_workers = 3                # max number of autovacuum subprocesses
+                                            # (change requires restart)
+    #autovacuum_naptime = 1min                # time between autovacuum runs
+    #autovacuum_vacuum_threshold = 50        # min number of row updates before
+                                            # vacuum
+    #autovacuum_analyze_threshold = 50        # min number of row updates before
+                                            # analyze
+    #autovacuum_vacuum_scale_factor = 0.2        # fraction of table size before vacuum
+    #autovacuum_analyze_scale_factor = 0.1        # fraction of table size before analyze
+    #autovacuum_freeze_max_age = 200000000        # maximum XID age before forced vacuum
+                                            # (change requires restart)
+    #autovacuum_multixact_freeze_max_age = 400000000        # maximum multixact age
+                                            # before forced vacuum
+                                            # (change requires restart)
+    #autovacuum_vacuum_cost_delay = 20ms        # default vacuum cost delay for
+                                            # autovacuum, in milliseconds;
+                                            # -1 means use vacuum_cost_delay
+    #autovacuum_vacuum_cost_limit = -1        # default vacuum cost limit for
+                                            # autovacuum, -1 means use
+                                            # vacuum_cost_limit
+
+
+    #------------------------------------------------------------------------------
+    # CLIENT CONNECTION DEFAULTS
+    #------------------------------------------------------------------------------
+
+    # - Statement Behavior -
+
+    #client_min_messages = notice                # values in order of decreasing detail:
+                                            #   debug5
+                                            #   debug4
+                                            #   debug3
+                                            #   debug2
+                                            #   debug1
+                                            #   log
+                                            #   notice
+                                            #   warning
+                                            #   error
+    #search_path = '"$user", public'        # schema names
+    #row_security = on
+    #default_tablespace = ''                # a tablespace name, '' uses the default
+    #temp_tablespaces = ''                        # a list of tablespace names, '' uses
+                                            # only default tablespace
+    #check_function_bodies = on
+    #default_transaction_isolation = 'read committed'
+    #default_transaction_read_only = off
+    #default_transaction_deferrable = off
+    #session_replication_role = 'origin'
+    #statement_timeout = 0                        # in milliseconds, 0 is disabled
+    #lock_timeout = 0                        # in milliseconds, 0 is disabled
+    #idle_in_transaction_session_timeout = 0        # in milliseconds, 0 is disabled
+    #vacuum_freeze_min_age = 50000000
+    #vacuum_freeze_table_age = 150000000
+    #vacuum_multixact_freeze_min_age = 5000000
+    #vacuum_multixact_freeze_table_age = 150000000
+    #vacuum_cleanup_index_scale_factor = 0.1        # fraction of total number of tuples
+                                                    # before index cleanup, 0 always performs
+                                                    # index cleanup
+    #bytea_output = 'hex'                        # hex, escape
+    #xmlbinary = 'base64'
+    #xmloption = 'content'
+    #gin_fuzzy_search_limit = 0
+    #gin_pending_list_limit = 4MB
+
+    # - Locale and Formatting -
+
+    datestyle = 'iso, mdy'
+    #intervalstyle = 'postgres'
+    timezone = 'Etc/UTC'
+    #timezone_abbreviations = 'Default'     # Select the set of available time zone
+                                            # abbreviations.  Currently, there are
+                                            #   Default
+                                            #   Australia (historical usage)
+                                            #   India
+                                            # You can create your own file in
+                                            # share/timezonesets/.
+    #extra_float_digits = 0                        # min -15, max 3
+    #client_encoding = sql_ascii                # actually, defaults to database
+                                            # encoding
+
+    # These settings are initialized by initdb, but they can be changed.
+    lc_messages = 'en_US.utf8'                        # locale for system error message
+                                            # strings
+    lc_monetary = 'en_US.utf8'                        # locale for monetary formatting
+    lc_numeric = 'en_US.utf8'                        # locale for number formatting
+    lc_time = 'en_US.utf8'                                # locale for time formatting
+
+    # default configuration for text search
+    default_text_search_config = 'pg_catalog.english'
+
+    # - Shared Library Preloading -
+
+    #shared_preload_libraries = ''        # (change requires restart)
+    #local_preload_libraries = ''
+    #session_preload_libraries = ''
+    #jit_provider = 'llvmjit'                # JIT library to use
+
+    # - Other Defaults -
+
+    #dynamic_library_path = '$libdir'
+
+
+    #------------------------------------------------------------------------------
+    # LOCK MANAGEMENT
+    #------------------------------------------------------------------------------
+
+    #deadlock_timeout = 1s
+    #max_locks_per_transaction = 64                # min 10
+                                            # (change requires restart)
+    #max_pred_locks_per_transaction = 64        # min 10
+                                            # (change requires restart)
+    #max_pred_locks_per_relation = -2        # negative values mean
+                                            # (max_pred_locks_per_transaction
+                                            #  / -max_pred_locks_per_relation) - 1
+    #max_pred_locks_per_page = 2            # min 0
+
+
+    #------------------------------------------------------------------------------
+    # VERSION AND PLATFORM COMPATIBILITY
+    #------------------------------------------------------------------------------
+
+    # - Previous PostgreSQL Versions -
+
+    #array_nulls = on
+    #backslash_quote = safe_encoding        # on, off, or safe_encoding
+    #default_with_oids = off
+    #escape_string_warning = on
+    #lo_compat_privileges = off
+    #operator_precedence_warning = off
+    #quote_all_identifiers = off
+    #standard_conforming_strings = on
+    #synchronize_seqscans = on
+
+    # - Other Platforms and Clients -
+
+    #transform_null_equals = off
+
+
+    #------------------------------------------------------------------------------
+    # ERROR HANDLING
+    #------------------------------------------------------------------------------
+
+    #exit_on_error = off                        # terminate session on any error?
+    #restart_after_crash = on                # reinitialize after backend crash?
+    #data_sync_retry = off                        # retry or panic on failure to fsync
+                                            # data?
+                                            # (change requires restart)
+
+
+    #------------------------------------------------------------------------------
+    # CONFIG FILE INCLUDES
+    #------------------------------------------------------------------------------
+
+    # These options allow settings to be loaded from files other than the
+    # default postgresql.conf.
+
+    #include_dir = ''                        # include files ending in '.conf' from
+                                            # a directory, e.g., 'conf.d'
+    #include_if_exists = ''                        # include file only if it exists
+    #include = ''                                # include file
+
+
+    #------------------------------------------------------------------------------
+    # CUSTOMIZED OPTIONS
+    #------------------------------------------------------------------------------
+
+    # Add settings for extensions here
+kind: ConfigMap
+metadata:
+  annotations:
+    description: Configuration for PostgreSQL
+  labels:
+    app.kubernetes.io/component: codeintel-db
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: codeintel-db-conf
+  namespace: default
+---
+apiVersion: v1
+data:
+  datasources.yml: |
+    apiVersion: 1
+
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus:30090
+        isDefault: true
+        editable: false
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: grafana
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: grafana
+  namespace: default
+---
+apiVersion: v1
+data:
+  config.yaml: "receivers:\n  otlp:\n    protocols:\n      grpc: # port 4317\n      http:
+    # port 4318\n\nexporters:\n  otlp:\n    endpoint: \"otel-collector:4317\"\n    tls:\n
+    \     insecure: true\n    sending_queue:\n      num_consumers: 4\n      queue_size:
+    100\n    retry_on_failure:\n      enabled: true\n\nextensions:\n  health_check:\n
+    \   endpoint: \":13133\"\n  zpages:\n    endpoint: \"localhost:55679\"\n\nservice:\n
+    \ extensions:\n    - zpages\n    - health_check\n  pipelines:\n    traces:\n      receivers:\n
+    \       - otlp\n      exporters:\n        - otlp\n      \n"
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: otel-collector
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: otel-agent
+  namespace: default
+---
+apiVersion: v1
+data:
+  config.yaml: |
+    # This is the template configuration for OpenTelemetry collector, and is not used by default.
+    # It is mounted to '/etc/otel-collector/config.yaml' in the otel-collector container.
+    #
+    # To learn more, see https://docs.sourcegraph.com/admin/deploy/kubernetes/configure#configure-a-tracing-backend
+
+    exporters:
+      # Add your exporter(s) configuration here. For each exporter, make sure it is enabled
+      # in the service configuration below.
+      # Refer to our OpenTelemetry docs for information on how to configure different exporters:
+      # https://docs.sourcegraph.com/admin/observability/opentelemetry
+
+    service:
+      pipelines:
+        traces:
+          exporters:
+            # Add the name of your exporter(s) here, e.g.:
+            # - logging
+          receivers:
+            - otlp # Do not remove this receiver
+      extensions:
+        # Do not remove these extensions
+        - health_check
+        - zpages
+
+    receivers:
+      # Do not modify this receiver, as it is configured to accept data from OpenTelemetry agents.
+      otlp:
+        protocols:
+          grpc: # port 4317
+          http: # port 4318
+
+    extensions:
+      health_check:
+        port: 13133
+      zpages:
+        endpoint: "localhost:55679"
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: otel-collector
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: otel-collector
+  namespace: default
+---
+apiVersion: v1
+data:
+  postgresql.conf: |
+    # -----------------------------
+    # PostgreSQL configuration file
+    # -----------------------------
+    # SOURCEGRAPH CUSTOMIZATIONS CONTAIN "# SG CUSTOM" in the comment
+    #
+    # This file consists of lines of the form:
+    #
+    #   name = value
+    #
+    # (The "=" is optional.)  Whitespace may be used.  Comments are introduced with
+    # "#" anywhere on a line.  The complete list of parameter names and allowed
+    # values can be found in the PostgreSQL documentation.
+    #
+    # The commented-out settings shown in this file represent the default values.
+    # Re-commenting a setting is NOT sufficient to revert it to the default value;
+    # you need to reload the server.
+    #
+    # This file is read on server startup and when the server receives a SIGHUP
+    # signal.  If you edit the file on a running system, you have to SIGHUP the
+    # server for the changes to take effect, run "pg_ctl reload", or execute
+    # "SELECT pg_reload_conf()".  Some parameters, which are marked below,
+    # require a server shutdown and restart to take effect.
+    #
+    # Any parameter can also be given as a command-line option to the server, e.g.,
+    # "postgres -c log_connections=on".  Some parameters can be changed at run time
+    # with the "SET" SQL command.
+    #
+    # Memory units:  kB = kilobytes        Time units:  ms  = milliseconds
+    #                MB = megabytes                     s   = seconds
+    #                GB = gigabytes                     min = minutes
+    #                TB = terabytes                     h   = hours
+    #                                                   d   = days
+
+
+    #------------------------------------------------------------------------------
+    # FILE LOCATIONS
+    #------------------------------------------------------------------------------
+
+    # The default values of these variables are driven from the -D command-line
+    # option or PGDATA environment variable, represented here as ConfigDir.
+
+    #data_directory = 'ConfigDir'        # use data in another directory
+                        # (change requires restart)
+    #hba_file = 'ConfigDir/pg_hba.conf'    # host-based authentication file
+                        # (change requires restart)
+    #ident_file = 'ConfigDir/pg_ident.conf'    # ident configuration file
+                        # (change requires restart)
+
+    # If external_pid_file is not explicitly set, no extra PID file is written.
+    #external_pid_file = ''            # write an extra PID file
+                        # (change requires restart)
+
+
+    #------------------------------------------------------------------------------
+    # CONNECTIONS AND AUTHENTICATION
+    #------------------------------------------------------------------------------
+
+    # - Connection Settings -
+
+    listen_addresses = '*'
+                        # comma-separated list of addresses;
+                        # defaults to 'localhost'; use '*' for all
+                        # (change requires restart)
+    #port = 5432                # (change requires restart)
+    max_connections = 100            # (change requires restart)
+    #superuser_reserved_connections = 3    # (change requires restart)
+    #unix_socket_directories = '/var/run/postgresql'    # comma-separated list of directories
+                        # (change requires restart)
+    #unix_socket_group = ''            # (change requires restart)
+    #unix_socket_permissions = 0777        # begin with 0 to use octal notation
+                        # (change requires restart)
+    #bonjour = off                # advertise server via Bonjour
+                        # (change requires restart)
+    #bonjour_name = ''            # defaults to the computer name
+                        # (change requires restart)
+
+    # - TCP Keepalives -
+    # see "man 7 tcp" for details
+
+    #tcp_keepalives_idle = 0        # TCP_KEEPIDLE, in seconds;
+                        # 0 selects the system default
+    #tcp_keepalives_interval = 0        # TCP_KEEPINTVL, in seconds;
+                        # 0 selects the system default
+    #tcp_keepalives_count = 0        # TCP_KEEPCNT;
+                        # 0 selects the system default
+
+    # - Authentication -
+
+    #authentication_timeout = 1min        # 1s-600s
+    #password_encryption = md5        # md5 or scram-sha-256
+    #db_user_namespace = off
+
+    # GSSAPI using Kerberos
+    #krb_server_keyfile = ''
+    #krb_caseins_users = off
+
+    # - SSL -
+
+    #ssl = off
+    #ssl_ca_file = ''
+    #ssl_cert_file = 'server.crt'
+    #ssl_crl_file = ''
+    #ssl_key_file = 'server.key'
+    #ssl_ciphers = 'HIGH:MEDIUM:+3DES:!aNULL' # allowed SSL ciphers
+    #ssl_prefer_server_ciphers = on
+    #ssl_ecdh_curve = 'prime256v1'
+    #ssl_dh_params_file = ''
+    #ssl_passphrase_command = ''
+    #ssl_passphrase_command_supports_reload = off
+
+
+    #------------------------------------------------------------------------------
+    # RESOURCE USAGE (except WAL)
+    #------------------------------------------------------------------------------
+
+    # - Memory -
+
+    shared_buffers = 1GB # SG CUSTOM min 128kB
+                        # (change requires restart)
+    #huge_pages = try            # on, off, or try
+                        # (change requires restart)
+    #temp_buffers = 8MB            # min 800kB
+    #max_prepared_transactions = 0        # zero disables the feature
+                        # (change requires restart)
+    # Caution: it is not advisable to set max_prepared_transactions nonzero unless
+    # you actively intend to use prepared transactions.
+    work_mem = 5MB                # SG CUSTOM min 64kB
+    maintenance_work_mem = 250MB        # SG CUSTOM min 1MB
+    #autovacuum_work_mem = -1        # min 1MB, or -1 to use maintenance_work_mem
+    #max_stack_depth = 2MB            # min 100kB
+    dynamic_shared_memory_type = posix    # the default is the first option
+                        # supported by the operating system:
+                        #   posix
+                        #   sysv
+                        #   windows
+                        #   mmap
+                        # use none to disable dynamic shared memory
+                        # (change requires restart)
+
+    # - Disk -
+
+    temp_file_limit = 20GB        # SG CUSTOM limits per-process temp file space
+                        # in kB, or -1 for no limit
+
+    # - Kernel Resources -
+
+    #max_files_per_process = 1000        # min 25
+                        # (change requires restart)
+
+    # - Cost-Based Vacuum Delay -
+
+    #vacuum_cost_delay = 0            # 0-100 milliseconds
+    #vacuum_cost_page_hit = 1        # 0-10000 credits
+    #vacuum_cost_page_miss = 10        # 0-10000 credits
+    #vacuum_cost_page_dirty = 20        # 0-10000 credits
+    #vacuum_cost_limit = 200        # 1-10000 credits
+
+    # - Background Writer -
+
+    bgwriter_delay = 50ms # SG CUSTOM 10-10000ms between rounds
+    bgwriter_lru_maxpages = 200        # SG CUSTOM max buffers written/round, 0 disables
+
+    #bgwriter_lru_multiplier = 2.0        # 0-10.0 multiplier on buffers scanned/round
+    #bgwriter_flush_after = 512kB        # measured in pages, 0 disables
+
+    # - Asynchronous Behavior -
+
+    effective_io_concurrency = 200        # 1-1000; 0 disables prefetching
+    max_worker_processes = 4        # SG CUSTOM (change requires restart)
+    max_parallel_maintenance_workers = 4    # SG CUSTOM taken from max_parallel_workers
+    max_parallel_workers_per_gather = 2    # SG CUSTOM taken from max_parallel_workers
+    #parallel_leader_participation = on
+    max_parallel_workers = 4        # SG CUSTOM maximum number of max_worker_processes that
+                        # can be used in parallel operations
+    #old_snapshot_threshold = -1        # 1min-60d; -1 disables; 0 is immediate
+                        # (change requires restart)
+    #backend_flush_after = 0        # measured in pages, 0 disables
+
+
+    #------------------------------------------------------------------------------
+    # WRITE-AHEAD LOG
+    #------------------------------------------------------------------------------
+
+    # - Settings -
+
+    #wal_level = replica            # minimal, replica, or logical
+                        # (change requires restart)
+    #fsync = on                # flush data to disk for crash safety
+                        # (turning this off can cause
+                        # unrecoverable data corruption)
+    #synchronous_commit = on        # synchronization level;
+                        # off, local, remote_write, remote_apply, or on
+    #wal_sync_method = fsync        # the default is the first option
+                        # supported by the operating system:
+                        #   open_datasync
+                        #   fdatasync (default on Linux)
+                        #   fsync
+                        #   fsync_writethrough
+                        #   open_sync
+    #full_page_writes = on            # recover from partial page writes
+    #wal_compression = off            # enable compression of full-page writes
+    #wal_log_hints = off            # also do full page writes of non-critical updates
+                        # (change requires restart)
+    wal_buffers = 16MB        # SG CUSTOM min 32kB, -1 sets based on shared_buffers
+                        # (change requires restart)
+    #wal_writer_delay = 200ms        # 1-10000 milliseconds
+    #wal_writer_flush_after = 1MB        # measured in pages, 0 disables
+
+    #commit_delay = 0            # range 0-100000, in microseconds
+    #commit_siblings = 5            # range 1-1000
+
+    # - Checkpoints -
+
+    #checkpoint_timeout = 5min        # range 30s-1d
+    max_wal_size = 8GB      # SG CUSTOM
+    min_wal_size = 2GB      # SG CUSTOM
+    #checkpoint_completion_target = 0.5    # checkpoint target duration, 0.0 - 1.0
+    #checkpoint_flush_after = 256kB        # measured in pages, 0 disables
+    #checkpoint_warning = 30s        # 0 disables
+
+    # - Archiving -
+
+    #archive_mode = off        # enables archiving; off, on, or always
+                    # (change requires restart)
+    #archive_command = ''        # command to use to archive a logfile segment
+                    # placeholders: %p = path of file to archive
+                    #               %f = file name only
+                    # e.g. 'test ! -f /mnt/server/archivedir/%f && cp %p /mnt/server/archivedir/%f'
+    #archive_timeout = 0        # force a logfile segment switch after this
+                    # number of seconds; 0 disables
+
+
+    #------------------------------------------------------------------------------
+    # REPLICATION
+    #------------------------------------------------------------------------------
+
+    # - Sending Servers -
+
+    # Set these on the master and on any standby that will send replication data.
+
+    #max_wal_senders = 10        # max number of walsender processes
+                    # (change requires restart)
+    #wal_keep_segments = 0        # in logfile segments; 0 disables
+    #wal_sender_timeout = 60s    # in milliseconds; 0 disables
+
+    #max_replication_slots = 10    # max number of replication slots
+                    # (change requires restart)
+    #track_commit_timestamp = off    # collect timestamp of transaction commit
+                    # (change requires restart)
+
+    # - Master Server -
+
+    # These settings are ignored on a standby server.
+
+    #synchronous_standby_names = ''    # standby servers that provide sync rep
+                    # method to choose sync standbys, number of sync standbys,
+                    # and comma-separated list of application_name
+                    # from standby(s); '*' = all
+    #vacuum_defer_cleanup_age = 0    # number of xacts by which cleanup is delayed
+
+    # - Standby Servers -
+
+    # These settings are ignored on a master server.
+
+    #hot_standby = on            # "off" disallows queries during recovery
+                        # (change requires restart)
+    #max_standby_archive_delay = 30s    # max delay before canceling queries
+                        # when reading WAL from archive;
+                        # -1 allows indefinite delay
+    #max_standby_streaming_delay = 30s    # max delay before canceling queries
+                        # when reading streaming WAL;
+                        # -1 allows indefinite delay
+    #wal_receiver_status_interval = 10s    # send replies at least this often
+                        # 0 disables
+    #hot_standby_feedback = off        # send info from standby to prevent
+                        # query conflicts
+    #wal_receiver_timeout = 60s        # time that receiver waits for
+                        # communication from master
+                        # in milliseconds; 0 disables
+    #wal_retrieve_retry_interval = 5s    # time to wait before retrying to
+                        # retrieve WAL after a failed attempt
+
+    # - Subscribers -
+
+    # These settings are ignored on a publisher.
+
+    #max_logical_replication_workers = 4    # taken from max_worker_processes
+                        # (change requires restart)
+    #max_sync_workers_per_subscription = 2    # taken from max_logical_replication_workers
+
+
+    #------------------------------------------------------------------------------
+    # QUERY TUNING
+    #------------------------------------------------------------------------------
+
+    # - Planner Method Configuration -
+
+    #enable_bitmapscan = on
+    #enable_hashagg = on
+    #enable_hashjoin = on
+    #enable_indexscan = on
+    #enable_indexonlyscan = on
+    #enable_material = on
+    #enable_mergejoin = on
+    #enable_nestloop = on
+    #enable_parallel_append = on
+    #enable_seqscan = on
+    #enable_sort = on
+    #enable_tidscan = on
+    #enable_partitionwise_join = off
+    #enable_partitionwise_aggregate = off
+    #enable_parallel_hash = on
+    #enable_partition_pruning = on
+
+    # - Planner Cost Constants -
+
+    #seq_page_cost = 1.0            # measured on an arbitrary scale
+    random_page_cost = 1.1            # SG CUSTOM same scale as above
+    #cpu_tuple_cost = 0.01            # same scale as above
+    #cpu_index_tuple_cost = 0.005        # same scale as above
+    #cpu_operator_cost = 0.0025        # same scale as above
+    #parallel_tuple_cost = 0.1        # same scale as above
+    #parallel_setup_cost = 1000.0    # same scale as above
+
+    #jit_above_cost = 100000        # perform JIT compilation if available
+                        # and query more expensive than this;
+                        # -1 disables
+    #jit_inline_above_cost = 500000        # inline small functions if query is
+                        # more expensive than this; -1 disables
+    #jit_optimize_above_cost = 500000    # use expensive JIT optimizations if
+                        # query is more expensive than this;
+                        # -1 disables
+
+    #min_parallel_table_scan_size = 8MB
+    #min_parallel_index_scan_size = 512kB
+    effective_cache_size = 3GB # SG CUSTOM
+
+    # - Genetic Query Optimizer -
+
+    #geqo = on
+    #geqo_threshold = 12
+    #geqo_effort = 5            # range 1-10
+    #geqo_pool_size = 0            # selects default based on effort
+    #geqo_generations = 0            # selects default based on effort
+    #geqo_selection_bias = 2.0        # range 1.5-2.0
+    #geqo_seed = 0.0            # range 0.0-1.0
+
+    # - Other Planner Options -
+
+    #default_statistics_target = 100    # range 1-10000
+    #constraint_exclusion = partition    # on, off, or partition
+    #cursor_tuple_fraction = 0.1        # range 0.0-1.0
+    #from_collapse_limit = 8
+    #join_collapse_limit = 8        # 1 disables collapsing of explicit
+                        # JOIN clauses
+    #force_parallel_mode = off
+    #jit = off                # allow JIT compilation
+
+
+    #------------------------------------------------------------------------------
+    # REPORTING AND LOGGING
+    #------------------------------------------------------------------------------
+
+    # - Where to Log -
+
+    #log_destination = 'stderr'        # Valid values are combinations of
+                        # stderr, csvlog, syslog, and eventlog,
+                        # depending on platform.  csvlog
+                        # requires logging_collector to be on.
+
+    # This is used when logging to stderr:
+    #logging_collector = off        # Enable capturing of stderr and csvlog
+                        # into log files. Required to be on for
+                        # csvlogs.
+                        # (change requires restart)
+
+    # These are only used if logging_collector is on:
+    #log_directory = 'log'            # directory where log files are written,
+                        # can be absolute or relative to PGDATA
+    #log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'    # log file name pattern,
+                        # can include strftime() escapes
+    #log_file_mode = 0600            # creation mode for log files,
+                        # begin with 0 to use octal notation
+    #log_truncate_on_rotation = off        # If on, an existing log file with the
+                        # same name as the new log file will be
+                        # truncated rather than appended to.
+                        # But such truncation only occurs on
+                        # time-driven rotation, not on restarts
+                        # or size-driven rotation.  Default is
+                        # off, meaning append to existing files
+                        # in all cases.
+    #log_rotation_age = 1d            # Automatic rotation of logfiles will
+                        # happen after that time.  0 disables.
+    #log_rotation_size = 10MB        # Automatic rotation of logfiles will
+                        # happen after that much log output.
+                        # 0 disables.
+
+    # These are relevant when logging to syslog:
+    #syslog_facility = 'LOCAL0'
+    #syslog_ident = 'postgres'
+    #syslog_sequence_numbers = on
+    #syslog_split_messages = on
+
+    # This is only relevant when logging to eventlog (win32):
+    # (change requires restart)
+    #event_source = 'PostgreSQL'
+
+    # - When to Log -
+
+    #log_min_messages = warning        # values in order of decreasing detail:
+                        #   debug5
+                        #   debug4
+                        #   debug3
+                        #   debug2
+                        #   debug1
+                        #   info
+                        #   notice
+                        #   warning
+                        #   error
+                        #   log
+                        #   fatal
+                        #   panic
+
+    #log_min_error_statement = error    # values in order of decreasing detail:
+                        #   debug5
+                        #   debug4
+                        #   debug3
+                        #   debug2
+                        #   debug1
+                        #   info
+                        #   notice
+                        #   warning
+                        #   error
+                        #   log
+                        #   fatal
+                        #   panic (effectively off)
+
+    #log_min_duration_statement = -1    # -1 is disabled, 0 logs all statements
+                        # and their durations, > 0 logs only
+                        # statements running at least this number
+                        # of milliseconds
+
+
+    # - What to Log -
+
+    #debug_print_parse = off
+    #debug_print_rewritten = off
+    #debug_print_plan = off
+    #debug_pretty_print = on
+    #log_checkpoints = off
+    #log_connections = off
+    #log_disconnections = off
+    #log_duration = off
+    #log_error_verbosity = default        # terse, default, or verbose messages
+    #log_hostname = off
+    #log_line_prefix = '%m [%p] '        # special values:
+                        #   %a = application name
+                        #   %u = user name
+                        #   %d = database name
+                        #   %r = remote host and port
+                        #   %h = remote host
+                        #   %p = process ID
+                        #   %t = timestamp without milliseconds
+                        #   %m = timestamp with milliseconds
+                        #   %n = timestamp with milliseconds (as a Unix epoch)
+                        #   %i = command tag
+                        #   %e = SQL state
+                        #   %c = session ID
+                        #   %l = session line number
+                        #   %s = session start timestamp
+                        #   %v = virtual transaction ID
+                        #   %x = transaction ID (0 if none)
+                        #   %q = stop here in non-session
+                        #        processes
+                        #   %% = '%'
+                        # e.g. '<%u%%%d> '
+    #log_lock_waits = off            # log lock waits >= deadlock_timeout
+    #log_statement = 'none'            # none, ddl, mod, all
+    #log_replication_commands = off
+    #log_temp_files = -1            # log temporary files equal or larger
+                        # than the specified size in kilobytes;
+                        # -1 disables, 0 logs all temp files
+    log_timezone = 'Etc/UTC'
+
+    #------------------------------------------------------------------------------
+    # PROCESS TITLE
+    #------------------------------------------------------------------------------
+
+    #cluster_name = ''            # added to process titles if nonempty
+                        # (change requires restart)
+    #update_process_title = on
+
+
+    #------------------------------------------------------------------------------
+    # STATISTICS
+    #------------------------------------------------------------------------------
+
+    # - Query and Index Statistics Collector -
+
+    #track_activities = on
+    #track_counts = on
+    #track_io_timing = off
+    #track_functions = none            # none, pl, all
+    #track_activity_query_size = 1024    # (change requires restart)
+    #stats_temp_directory = 'pg_stat_tmp'
+
+
+    # - Monitoring -
+
+    #log_parser_stats = off
+    #log_planner_stats = off
+    #log_executor_stats = off
+    #log_statement_stats = off
+
+
+    #------------------------------------------------------------------------------
+    # AUTOVACUUM
+    #------------------------------------------------------------------------------
+
+    #autovacuum = on            # Enable autovacuum subprocess?  'on'
+                        # requires track_counts to also be on.
+    #log_autovacuum_min_duration = -1    # -1 disables, 0 logs all actions and
+                        # their durations, > 0 logs only
+                        # actions running at least this number
+                        # of milliseconds.
+    #autovacuum_max_workers = 3        # max number of autovacuum subprocesses
+                        # (change requires restart)
+    #autovacuum_naptime = 1min        # time between autovacuum runs
+    #autovacuum_vacuum_threshold = 50    # min number of row updates before
+                        # vacuum
+    #autovacuum_analyze_threshold = 50    # min number of row updates before
+                        # analyze
+    #autovacuum_vacuum_scale_factor = 0.2    # fraction of table size before vacuum
+    #autovacuum_analyze_scale_factor = 0.1    # fraction of table size before analyze
+    #autovacuum_freeze_max_age = 200000000    # maximum XID age before forced vacuum
+                        # (change requires restart)
+    #autovacuum_multixact_freeze_max_age = 400000000    # maximum multixact age
+                        # before forced vacuum
+                        # (change requires restart)
+    #autovacuum_vacuum_cost_delay = 20ms    # default vacuum cost delay for
+                        # autovacuum, in milliseconds;
+                        # -1 means use vacuum_cost_delay
+    #autovacuum_vacuum_cost_limit = -1    # default vacuum cost limit for
+                        # autovacuum, -1 means use
+                        # vacuum_cost_limit
+
+
+    #------------------------------------------------------------------------------
+    # CLIENT CONNECTION DEFAULTS
+    #------------------------------------------------------------------------------
+
+    # - Statement Behavior -
+
+    #client_min_messages = notice        # values in order of decreasing detail:
+                        #   debug5
+                        #   debug4
+                        #   debug3
+                        #   debug2
+                        #   debug1
+                        #   log
+                        #   notice
+                        #   warning
+                        #   error
+    #search_path = '"$user", public'    # schema names
+    #row_security = on
+    #default_tablespace = ''        # a tablespace name, '' uses the default
+    #temp_tablespaces = ''            # a list of tablespace names, '' uses
+                        # only default tablespace
+    #check_function_bodies = on
+    #default_transaction_isolation = 'read committed'
+    #default_transaction_read_only = off
+    #default_transaction_deferrable = off
+    #session_replication_role = 'origin'
+    #statement_timeout = 0            # in milliseconds, 0 is disabled
+    #lock_timeout = 0            # in milliseconds, 0 is disabled
+    #idle_in_transaction_session_timeout = 0    # in milliseconds, 0 is disabled
+    #vacuum_freeze_min_age = 50000000
+    #vacuum_freeze_table_age = 150000000
+    #vacuum_multixact_freeze_min_age = 5000000
+    #vacuum_multixact_freeze_table_age = 150000000
+    #vacuum_cleanup_index_scale_factor = 0.1    # fraction of total number of tuples
+                            # before index cleanup, 0 always performs
+                            # index cleanup
+    #bytea_output = 'hex'            # hex, escape
+    #xmlbinary = 'base64'
+    #xmloption = 'content'
+    #gin_fuzzy_search_limit = 0
+    #gin_pending_list_limit = 4MB
+
+    # - Locale and Formatting -
+
+    datestyle = 'iso, mdy'
+    #intervalstyle = 'postgres'
+    timezone = 'Etc/UTC'
+    #timezone_abbreviations = 'Default'     # Select the set of available time zone
+                        # abbreviations.  Currently, there are
+                        #   Default
+                        #   Australia (historical usage)
+                        #   India
+                        # You can create your own file in
+                        # share/timezonesets/.
+    #extra_float_digits = 0            # min -15, max 3
+    #client_encoding = sql_ascii        # actually, defaults to database
+                        # encoding
+
+    # These settings are initialized by initdb, but they can be changed.
+    lc_messages = 'en_US.utf8'            # locale for system error message
+                        # strings
+    lc_monetary = 'en_US.utf8'            # locale for monetary formatting
+    lc_numeric = 'en_US.utf8'            # locale for number formatting
+    lc_time = 'en_US.utf8'                # locale for time formatting
+
+    # default configuration for text search
+    default_text_search_config = 'pg_catalog.english'
+
+    # - Shared Library Preloading -
+
+    #shared_preload_libraries = ''    # (change requires restart)
+    #local_preload_libraries = ''
+    #session_preload_libraries = ''
+    #jit_provider = 'llvmjit'        # JIT library to use
+
+    # - Other Defaults -
+
+    #dynamic_library_path = '$libdir'
+
+
+    #------------------------------------------------------------------------------
+    # LOCK MANAGEMENT
+    #------------------------------------------------------------------------------
+
+    #deadlock_timeout = 1s
+    #max_locks_per_transaction = 64        # min 10
+                        # (change requires restart)
+    #max_pred_locks_per_transaction = 64    # min 10
+                        # (change requires restart)
+    #max_pred_locks_per_relation = -2    # negative values mean
+                        # (max_pred_locks_per_transaction
+                        #  / -max_pred_locks_per_relation) - 1
+    #max_pred_locks_per_page = 2            # min 0
+
+
+    #------------------------------------------------------------------------------
+    # VERSION AND PLATFORM COMPATIBILITY
+    #------------------------------------------------------------------------------
+
+    # - Previous PostgreSQL Versions -
+
+    #array_nulls = on
+    #backslash_quote = safe_encoding    # on, off, or safe_encoding
+    #default_with_oids = off
+    #escape_string_warning = on
+    #lo_compat_privileges = off
+    #operator_precedence_warning = off
+    #quote_all_identifiers = off
+    #standard_conforming_strings = on
+    #synchronize_seqscans = on
+
+    # - Other Platforms and Clients -
+
+    #transform_null_equals = off
+
+
+    #------------------------------------------------------------------------------
+    # ERROR HANDLING
+    #------------------------------------------------------------------------------
+
+    #exit_on_error = off            # terminate session on any error?
+    #restart_after_crash = on        # reinitialize after backend crash?
+    #data_sync_retry = off            # retry or panic on failure to fsync
+                        # data?
+                        # (change requires restart)
+
+
+    #------------------------------------------------------------------------------
+    # CONFIG FILE INCLUDES
+    #------------------------------------------------------------------------------
+
+    # These options allow settings to be loaded from files other than the
+    # default postgresql.conf.
+
+    #include_dir = ''            # include files ending in '.conf' from
+                        # a directory, e.g., 'conf.d'
+    #include_if_exists = ''            # include file only if it exists
+    #include = ''                # include file
+
+
+    #------------------------------------------------------------------------------
+    # CUSTOMIZED OPTIONS
+    #------------------------------------------------------------------------------
+
+    # Add settings for extensions here
+kind: ConfigMap
+metadata:
+  annotations:
+    description: Configuration for PostgreSQL
+  labels:
+    app.kubernetes.io/component: pgsql
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: pgsql-conf
+  namespace: default
+---
+apiVersion: v1
+data:
+  extra_rules.yml: ""
+  prometheus.yml: "global:\n  scrape_interval:     30s\n  evaluation_interval: 30s\n\nalerting:\n
+    \ alertmanagers:\n    # Bundled Alertmanager, started by prom-wrapper\n    - static_configs:\n
+    \       - targets: ['127.0.0.1:9093']\n      path_prefix: /alertmanager\n    #
+    Uncomment the following to have alerts delivered to additional Alertmanagers discovered\n
+    \   # in the cluster. This configuration is not required if you use Sourcegraph's
+    built-in alerting:\n    # https://docs.sourcegraph.com/admin/observability/alerting\n
+    \   # - kubernetes_sd_configs:\n    #  - role: endpoints\n    #  relabel_configs:\n
+    \   #    - source_labels: [__meta_kubernetes_service_name]\n    #      regex:
+    alertmanager\n    #      action: keep\n\nrule_files:\n  - '*_rules.yml'\n  - \"/sg_config_prometheus/*_rules.yml\"\n
+    \ - \"/sg_prometheus_add_ons/*_rules.yml\"\n\n# A scrape configuration for running
+    Prometheus on a Kubernetes cluster.\n# This uses separate scrape configs for cluster
+    components (i.e. API server, node)\n# and services to allow each to use different
+    authentication configs.\n#\n# Kubernetes labels will be added as Prometheus labels
+    on metrics via the\n# `labelmap` relabeling action.\n\n# Scrape config for API
+    servers.\n#\n# Kubernetes exposes API servers as endpoints to the default/kubernetes\n#
+    service so this uses `endpoints` role and uses relabelling to only keep\n# the
+    endpoints associated with the default/kubernetes service using the\n# default
+    named port `https`. This works for single API server deployments as\n# well as
+    HA API server deployments.\nscrape_configs:\n- job_name: 'kubernetes-apiservers'\n\n
+    \ kubernetes_sd_configs:\n  - role: endpoints\n\n  # Default to scraping over
+    https. If required, just disable this or change to\n  # `http`.\n  scheme: https\n\n
+    \ # This TLS & bearer token file config is used to connect to the actual scrape\n
+    \ # endpoints for cluster components. This is separate to discovery auth\n  #
+    configuration because discovery & scraping are two separate concerns in\n  # Prometheus.
+    The discovery auth config is automatic if Prometheus runs inside\n  # the cluster.
+    Otherwise, more config options have to be provided within the\n  # <kubernetes_sd_config>.\n
+    \ tls_config:\n    ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n
+    \   # If your node certificates are self-signed or use a different CA to the\n
+    \   # master CA, then disable certificate verification below. Note that\n    #
+    certificate verification is an integral part of a secure infrastructure\n    #
+    so this should only be disabled in a controlled environment. You can\n    # disable
+    certificate verification by uncommenting the line below.\n    #\n    # insecure_skip_verify:
+    true\n  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token\n\n
+    \ # Keep only the default/kubernetes service endpoints for the https port. This\n
+    \ # will add targets for each API server which Kubernetes adds an endpoint to\n
+    \ # the default/kubernetes service.\n  relabel_configs:\n  - source_labels: [__meta_kubernetes_namespace,
+    __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]\n    action:
+    keep\n    regex: default;kubernetes;https\n\n- job_name: 'kubernetes-nodes'\n\n
+    \ # Default to scraping over https. If required, just disable this or change to\n
+    \ # `http`.\n  scheme: https\n\n  # This TLS & bearer token file config is used
+    to connect to the actual scrape\n  # endpoints for cluster components. This is
+    separate to discovery auth\n  # configuration because discovery & scraping are
+    two separate concerns in\n  # Prometheus. The discovery auth config is automatic
+    if Prometheus runs inside\n  # the cluster. Otherwise, more config options have
+    to be provided within the\n  # <kubernetes_sd_config>.\n  tls_config:\n    ca_file:
+    /var/run/secrets/kubernetes.io/serviceaccount/ca.crt\n    # If your node certificates
+    are self-signed or use a different CA to the\n    # master CA, then disable certificate
+    verification below. Note that\n    # certificate verification is an integral part
+    of a secure infrastructure\n    # so this should only be disabled in a controlled
+    environment. You can\n    # disable certificate verification by uncommenting the
+    line below.\n    #\n    insecure_skip_verify: true\n  bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token\n\n
+    \ kubernetes_sd_configs:\n  - role: node\n\n  relabel_configs:\n  - action: labelmap\n
+    \   regex: __meta_kubernetes_node_label_(.+)\n  - target_label: __address__\n
+    \   replacement: kubernetes.default.svc:443\n  - source_labels: [__meta_kubernetes_node_name]\n
+    \   regex: (.+)\n    target_label: __metrics_path__\n    replacement: /api/v1/nodes/${1}/proxy/metrics\n\n#
+    Scrape config for service endpoints.\n#\n# The relabeling allows the actual service
+    scrape endpoint to be configured\n# via the following annotations:\n#\n# * `sourcegraph.prometheus/scrape`:
+    Only scrape services that have a value of `true`\n# * `prometheus.io/scheme`:
+    If the metrics endpoint is secured then you will need\n# to set this to `https`
+    & most likely set the `tls_config` of the scrape config.\n# * `prometheus.io/path`:
+    If the metrics path is not `/metrics` override this.\n# * `prometheus.io/port`:
+    If the metrics are exposed on a different port to the\n# service then set this
+    appropriately.\n- job_name: 'kubernetes-service-endpoints'\n\n  kubernetes_sd_configs:\n
+    \ - role: endpoints\n\n  relabel_configs:\n    # Sourcegraph specific customization,
+    only scrape pods with our annotation\n  - source_labels: [__meta_kubernetes_service_annotation_sourcegraph_prometheus_scrape]\n
+    \   action: keep\n    regex: true\n  - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]\n
+    \   action: replace\n    target_label: __scheme__\n    regex: (https?)\n  - source_labels:
+    [__meta_kubernetes_service_annotation_prometheus_io_path]\n    action: replace\n
+    \   target_label: __metrics_path__\n    regex: (.+)\n  - source_labels: [__address__,
+    __meta_kubernetes_service_annotation_prometheus_io_port]\n    action: replace\n
+    \   target_label: __address__\n    regex: (.+)(?::\\d+);(\\d+)\n    replacement:
+    $1:$2\n  - action: labelmap\n    regex: __meta_kubernetes_service_label_(.+)\n
+    \ - source_labels: [__meta_kubernetes_namespace]\n    action: replace\n    # Sourcegraph
+    specific customization. We want a more convenient to type label.\n    # target_label:
+    kubernetes_namespace\n    target_label: ns\n  - source_labels: [__meta_kubernetes_service_name]\n
+    \   action: replace\n    target_label: kubernetes_name\n  # Sourcegraph specific
+    customization. We want a nicer name for job\n  - source_labels: [app]\n    action:
+    replace\n    target_label: job\n  # Sourcegraph specific customization. We want
+    a nicer name for instance\n  - source_labels: [__meta_kubernetes_pod_name]\n    action:
+    replace\n    target_label: instance\n  # Sourcegraph specific customization. We
+    want to add a label to every \n  # metric that indicates the node it came from.\n
+    \ - source_labels: [__meta_kubernetes_endpoint_node_name]\n    action: replace\n
+    \   target_label: nodename\n  metric_relabel_configs:\n  # Sourcegraph specific
+    customization. Drop metrics with empty nodename responses from the k8s API\n  -
+    source_labels: [nodename]\n    regex: ^$\n    action: drop\n\n# Example scrape
+    config for probing services via the Blackbox Exporter.\n#\n# The relabeling allows
+    the actual service scrape endpoint to be configured\n# via the following annotations:\n#\n#
+    * `prometheus.io/probe`: Only probe services that have a value of `true`\n- job_name:
+    'kubernetes-services'\n\n  metrics_path: /probe\n  params:\n    module: [http_2xx]\n\n
+    \ kubernetes_sd_configs:\n  - role: service\n\n  relabel_configs:\n  - source_labels:
+    [__meta_kubernetes_service_annotation_prometheus_io_probe]\n    action: keep\n
+    \   regex: true\n  - source_labels: [__address__]\n    target_label: __param_target\n
+    \ - target_label: __address__\n    replacement: blackbox\n  - source_labels: [__param_target]\n
+    \   target_label: instance\n  - action: labelmap\n    regex: __meta_kubernetes_service_label_(.+)\n
+    \ - source_labels: [__meta_kubernetes_service_namespace]\n    # Sourcegraph specific
+    customization. We want a more convenient to type label.\n    # target_label: kubernetes_namespace\n
+    \   target_label: ns\n  - source_labels: [__meta_kubernetes_service_name]\n    target_label:
+    kubernetes_name\n\n# Example scrape config for pods\n#\n# The relabeling allows
+    the actual pod scrape endpoint to be configured via the\n# following annotations:\n#\n#
+    * `sourcegraph.prometheus/scrape`: Only scrape pods that have a value of `true`\n#
+    * `prometheus.io/path`: If the metrics path is not `/metrics` override this.\n#
+    * `prometheus.io/port`: Scrape the pod on the indicated port instead of the default
+    of `9102`.\n- job_name: 'kubernetes-pods'\n\n  kubernetes_sd_configs:\n  - role:
+    pod\n\n  relabel_configs:\n    # Sourcegraph specific customization, only scrape
+    pods with our annotation\n  - source_labels: [__meta_kubernetes_pod_annotation_sourcegraph_prometheus_scrape]\n
+    \   action: keep\n    regex: true\n  - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]\n
+    \   action: replace\n    target_label: __metrics_path__\n    regex: (.+)\n  -
+    source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]\n
+    \   action: replace\n    regex: (.+):(?:\\d+);(\\d+)\n    replacement: ${1}:${2}\n
+    \   target_label: __address__\n  - action: labelmap\n    regex: __meta_kubernetes_pod_label_(.+)\n
+    \ - source_labels: [__meta_kubernetes_pod_name]\n    action: replace\n    target_label:
+    kubernetes_pod_name\n  # Sourcegraph specific customization. We want a more convenient
+    to type label.\n  # target_label: kubernetes_namespace\n  - source_labels: [__meta_kubernetes_namespace]\n
+    \   action: replace\n    target_label: ns\n  # Sourcegraph specific customization.
+    We want to add a label to every \n  # metric that indicates the node it came from.\n
+    \ - source_labels: [__meta_kubernetes_pod_node_name]\n    action: replace\n    target_label:
+    nodename\n\n  metric_relabel_configs:\n  # cAdvisor-specific customization. Drop
+    container metrics exported by cAdvisor\n  # not in the same namespace as Sourcegraph.\n
+    \ # Uncomment this if you have problems with certain dashboards or cAdvisor itself\n
+    \ # picking up non-Sourcegraph services. Ensure all Sourcegraph services are running\n
+    \ # within the Sourcegraph namespace you have defined.\n  # The regex must keep
+    matches on '^$' (empty string) to ensure other metrics do not\n  # get dropped.\n
+    \ # - source_labels: [container_label_io_kubernetes_pod_namespace]\n  #   regex:
+    ^$|ns-sourcegraph # ensure this matches with namespace declarations\n  #   action:
+    keep\n  # cAdvisor-specific customization. We want container metrics to be named
+    after their container name label.\n  # Note that 'io.kubernetes.container.name'
+    and 'io.kubernetes.pod.name' must be provided in cAdvisor\n  # '--whitelisted_container_labels'
+    (see cadvisor.DaemonSet.yaml)\n  - source_labels: [container_label_io_kubernetes_container_name,
+    container_label_io_kubernetes_pod_name]\n    regex: (.+)\n    action: replace\n
+    \   target_label: name\n    separator: '-'\n  # Sourcegraph specific customization.
+    Drop metrics with empty nodename responses from the k8s API\n  - source_labels:
+    [nodename]\n    regex: ^$\n    action: drop\n\n# Scrape prometheus itself for
+    metrics.\n- job_name: 'builtin-prometheus'\n  static_configs:\n    - targets:
+    ['127.0.0.1:9092']\n      labels:\n        app: prometheus\n- job_name: 'builtin-alertmanager'\n
+    \ metrics_path: /alertmanager/metrics\n  static_configs:\n    - targets: ['127.0.0.1:9093']\n
+    \     labels:\n        app: alertmanager\n"
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: prometheus
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: prometheus
+  namespace: default
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    description: An unused resource that acts as a placeholder to ensure components
+      for the new cluster can be used with component that generate resources for the
+      old cluster.
+    kubectl.kubernetes.io/default-container: frontend-unused
+  labels:
+    app: sourcegraph-frontend-unused
+    app.kubernetes.io/component: unused
+    deploy: sourcegraph
+    sourcegraph-resource-requires: can-be-removed
+  name: sourcegraph-frontend-env
+  namespace: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: blobstore
+    app.kubernetes.io/component: blobstore
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: blobstore
+  namespace: default
+spec:
+  ports:
+  - name: blobstore
+    port: 9000
+    targetPort: blobstore
+  selector:
+    app: blobstore
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9187"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: codeinsights-db
+    app.kubernetes.io/component: codeinsights-db
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: codeinsights-db
+  namespace: default
+spec:
+  ports:
+  - name: codeinsights-db
+    port: 5432
+    targetPort: codeinsights-db
+  selector:
+    app: codeinsights-db
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9187"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: codeintel-db
+    app.kubernetes.io/component: codeintel-db
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: codeintel-db
+  namespace: default
+spec:
+  ports:
+  - name: pgsql
+    port: 5432
+    targetPort: pgsql
+  selector:
+    app: codeintel-db
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: github-proxy
+    app.kubernetes.io/component: github-proxy
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: github-proxy
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  selector:
+    app: github-proxy
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    description: Headless service that provides a stable network identity for the
+      gitserver stateful set.
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: gitserver
+    app.kubernetes.io/component: gitserver
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    type: gitserver
+  name: gitserver
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+  - name: unused
+    port: 10811
+    targetPort: 10811
+  selector:
+    app: gitserver
+    type: gitserver
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: grafana
+    app.kubernetes.io/component: grafana
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: grafana
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 30070
+    targetPort: http
+  selector:
+    app: grafana
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    description: Headless service that provides a stable network identity for the
+      indexed-search stateful set.
+    prometheus.io/port: "6070"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: indexed-search
+    app.kubernetes.io/component: indexed-search
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: indexed-search
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+  - port: 6070
+  selector:
+    app: indexed-search
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    description: Headless service that provides a stable network identity for the
+      indexed-search stateful set.
+    prometheus.io/port: "6072"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: indexed-search-indexer
+    app.kubernetes.io/component: indexed-search
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: indexed-search-indexer
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+  - port: 6072
+    targetPort: 6072
+  selector:
+    app: indexed-search
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    description: Prometheus exporter for hardware and OS metrics.
+    prometheus.io/port: "9100"
+    sourcegraph.prometheus/scrape: "true"
+    url: https://github.com/prometheus/node_exporter
+  labels:
+    app: node-exporter
+    app.kubernetes.io/component: node-exporter
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: node-exporter
+  namespace: default
+spec:
+  ports:
+  - name: metrics
+    port: 9100
+    targetPort: metrics
+  selector:
+    app: node-exporter
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "8888"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: otel-collector
+    app.kubernetes.io/component: otel-collector
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: otel-collector
+  namespace: default
+spec:
+  ports:
+  - name: otlp-grpc
+    port: 4317
+    protocol: TCP
+    targetPort: 4317
+  - name: otlp-http
+    port: 4318
+    protocol: TCP
+    targetPort: 4318
+  - name: metrics
+    port: 8888
+  selector:
+    app: otel-collector
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9187"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: pgsql
+    app.kubernetes.io/component: pgsql
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: pgsql
+  namespace: default
+spec:
+  ports:
+  - name: pgsql
+    port: 5432
+    targetPort: pgsql
+  selector:
+    app: pgsql
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: precise-code-intel-worker
+    app.kubernetes.io/component: precise-code-intel
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: precise-code-intel-worker
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 3188
+    targetPort: http
+  - name: debug
+    port: 6060
+    targetPort: debug
+  selector:
+    app: precise-code-intel-worker
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: prometheus
+    app.kubernetes.io/component: prometheus
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: prometheus
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 30090
+    targetPort: http
+  selector:
+    app: prometheus
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9121"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: redis-cache
+    app.kubernetes.io/component: redis
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: redis-cache
+  namespace: default
+spec:
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: redis
+  selector:
+    app: redis-cache
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9121"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: redis-store
+    app.kubernetes.io/component: redis
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: redis-store
+  namespace: default
+spec:
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: redis
+  selector:
+    app: redis-store
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: repo-updater
+    app.kubernetes.io/component: repo-updater
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: repo-updater
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 3182
+    targetPort: http
+  selector:
+    app: repo-updater
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: searcher
+    app.kubernetes.io/component: searcher
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: searcher
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 3181
+    targetPort: http
+  - name: debug
+    port: 6060
+    targetPort: debug
+  selector:
+    app: searcher
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: sourcegraph-frontend
+    app.kubernetes.io/component: frontend
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: sourcegraph-frontend
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 30080
+    targetPort: http
+  selector:
+    app: sourcegraph-frontend
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sourcegraph-frontend
+    app.kubernetes.io/component: frontend
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: sourcegraph-frontend-internal
+  namespace: default
+spec:
+  ports:
+  - name: http-internal
+    port: 80
+    targetPort: http-internal
+  selector:
+    app: sourcegraph-frontend
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: symbols
+    app.kubernetes.io/component: symbols
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: symbols
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 3184
+    targetPort: http
+  - name: debug
+    port: 6060
+    targetPort: debug
+  selector:
+    app: symbols
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: syntect-server
+    app.kubernetes.io/component: syntect-server
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: syntect-server
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 9238
+    targetPort: http
+  selector:
+    app: syntect-server
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: worker
+    app.kubernetes.io/component: worker
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: worker
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 3189
+    targetPort: http
+  - name: debug
+    port: 6060
+    targetPort: debug
+  selector:
+    app: worker
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6996"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: worker
+    app.kubernetes.io/component: worker
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: worker-executors
+  namespace: default
+spec:
+  ports:
+  - name: prom
+    port: 6996
+    targetPort: prom
+  selector:
+    app: worker
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/component: blobstore
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: blobstore
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: sourcegraph
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/component: codeinsights-db
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: codeinsights-db
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: sourcegraph
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/component: codeintel-db
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: codeintel-db
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: sourcegraph
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/component: pgsql
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: pgsql
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: sourcegraph
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/component: prometheus
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: prometheus
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: sourcegraph
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/component: redis
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: redis-cache
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: sourcegraph
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/component: redis
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: redis-store
+  namespace: default
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: sourcegraph
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: generic S3-like blobstore for storing LSIF uploads.
+    kubectl.kubernetes.io/default-container: blobstore
+  labels:
+    app.kubernetes.io/component: blobstore
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: blobstore
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: blobstore
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: blobstore
+        deploy: sourcegraph
+    spec:
+      containers:
+      - image: index.docker.io/sourcegraph/blobstore:187572_2022-12-06_cbecc5321c7d@sha256:8e57384c78a3b31cbe31d41656dbcbb8ee7279d96630a33936a2098afabb1317
+        livenessProbe:
+          httpGet:
+            path: /
+            port: blobstore
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        name: blobstore
+        ports:
+        - containerPort: 9000
+          name: blobstore
+        readinessProbe:
+          httpGet:
+            path: /
+            port: blobstore
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "1"
+            memory: 500M
+          requests:
+            cpu: "1"
+            memory: 500M
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /data
+          name: blobstore-data
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: blobstore-data
+        persistentVolumeClaim:
+          claimName: blobstore
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Code Insights Postgres DB instance.
+  labels:
+    app.kubernetes.io/component: codeinsights-db
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: codeinsights-db
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: codeinsights-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: codeinsights-db
+        deploy: sourcegraph
+        group: backend
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_DB
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: password
+        - name: POSTGRES_USER
+          value: postgres
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        - name: POSTGRESQL_CONF_DIR
+          value: /conf
+        image: index.docker.io/sourcegraph/codeinsights-db:187572_2022-12-06_cbecc5321c7d@sha256:4dd89a1279e7d55ddcb5b570d0bb544422dd1ecb0e3662f23d22f9643837c2b5
+        name: codeinsights
+        ports:
+        - containerPort: 5432
+          name: codeinsights-db
+        resources:
+          limits:
+            cpu: "4"
+            memory: 2Gi
+          requests:
+            cpu: "4"
+            memory: 2Gi
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data/
+          name: disk
+        - mountPath: /conf
+          name: codeinsights-conf
+      - env:
+        - name: DATA_SOURCE_NAME
+          value: postgres://postgres:@localhost:5432/?sslmode=disable
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/code_insights_queries.yaml
+        image: index.docker.io/sourcegraph/postgres_exporter:187572_2022-12-06_cbecc5321c7d@sha256:85d9ca134db535f0482e6e5cacf194ea118bf24d0fd52e36ba6714802d59c30a
+        name: pgsql-exporter
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - if [ -d /var/lib/postgresql/data/pgdata ]; then chmod 750 /var/lib/postgresql/data/pgdata;
+          fi
+        image: index.docker.io/sourcegraph/alpine-3.14:187572_2022-12-06_cbecc5321c7d@sha256:4d8085acb2267d94c2099be8265352ceef7095b245482b603569ad8cd7563a90
+        name: correct-data-dir-permissions
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data/
+          name: disk
+      securityContext:
+        runAsUser: 0
+      terminationGracePeriodSeconds: 120
+      volumes:
+      - configMap:
+          defaultMode: 511
+          name: codeinsights-db-conf
+        name: codeinsights-conf
+      - name: disk
+        persistentVolumeClaim:
+          claimName: codeinsights-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Postgres database for various data.
+    kubectl.kubernetes.io/default-container: pgsql
+  labels:
+    app.kubernetes.io/component: codeintel-db
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: codeintel-db
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: codeintel-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: codeintel-db
+        deploy: sourcegraph
+        group: backend
+    spec:
+      containers:
+      - image: index.docker.io/sourcegraph/codeintel-db:187572_2022-12-06_cbecc5321c7d@sha256:7fb02a9392ce4dd3d4210dbd5792c09c4210a2dfc6dc389ed679137784359102
+        livenessProbe:
+          exec:
+            command:
+            - /liveness.sh
+          initialDelaySeconds: 15
+        name: pgsql
+        ports:
+        - containerPort: 5432
+          name: pgsql
+        readinessProbe:
+          exec:
+            command:
+            - /ready.sh
+        resources:
+          limits:
+            cpu: "4"
+            memory: 4Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
+        startupProbe:
+          exec:
+            command:
+            - /liveness.sh
+          failureThreshold: 360
+          periodSeconds: 10
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+        - mountPath: /conf
+          name: pgsql-conf
+      - env:
+        - name: DATA_SOURCE_NAME
+          value: postgres://sg:@localhost:5432/?sslmode=disable
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/code_intel_queries.yaml
+        image: index.docker.io/sourcegraph/postgres_exporter:187572_2022-12-06_cbecc5321c7d@sha256:85d9ca134db535f0482e6e5cacf194ea118bf24d0fd52e36ba6714802d59c30a
+        name: pgsql-exporter
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi
+        image: index.docker.io/sourcegraph/alpine-3.14:187572_2022-12-06_cbecc5321c7d@sha256:4d8085acb2267d94c2099be8265352ceef7095b245482b603569ad8cd7563a90
+        name: correct-data-dir-permissions
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+      securityContext:
+        runAsUser: 0
+      terminationGracePeriodSeconds: 120
+      volumes:
+      - configMap:
+          defaultMode: 511
+          name: codeintel-db-conf
+        name: pgsql-conf
+      - name: disk
+        persistentVolumeClaim:
+          claimName: codeintel-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Rate-limiting proxy for the GitHub API.
+    kubectl.kubernetes.io/default-container: github-proxy
+  labels:
+    app.kubernetes.io/component: github-proxy
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: github-proxy
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: github-proxy
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: github-proxy
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        image: index.docker.io/sourcegraph/github-proxy:187572_2022-12-06_cbecc5321c7d@sha256:b4739adfced18f2a8883da931da681f444b489f6606052246f7c8d536f22e425
+        name: github-proxy
+        ports:
+        - containerPort: 3180
+          name: http
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1G
+          requests:
+            cpu: 100m
+            memory: 250M
+        terminationMessagePolicy: FallbackToLogsOnError
+      securityContext:
+        runAsUser: 0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Receives, processes, and exports telemetry data.
+  labels:
+    app.kubernetes.io/component: otel-collector
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: otel-collector
+  namespace: default
+spec:
+  minReadySeconds: 5
+  progressDeadlineSeconds: 120
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: otel-collector
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: otel-collector
+      labels:
+        app: otel-collector
+        deploy: sourcegraph
+    spec:
+      containers:
+      - command:
+        - /bin/otelcol-sourcegraph
+        - --config=/etc/otel-collector/configs/logging.yaml
+        image: index.docker.io/sourcegraph/opentelemetry-collector:187572_2022-12-06_cbecc5321c7d@sha256:113a84fcef33f06f7e529961d5eb64400488953b23ac07ea8a3d628db6789ef0
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 13133
+        name: otel-collector
+        ports:
+        - containerPort: 55679
+          name: zpages
+        - containerPort: 4317
+          name: otlp-grpc
+        - containerPort: 4318
+          name: otlp-http
+        - containerPort: 8888
+          name: metrics
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 13133
+        resources:
+          limits:
+            cpu: "2"
+            memory: 3Gi
+          requests:
+            cpu: "0.5"
+            memory: 1Gi
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /etc/otel-collector/conf
+          name: config
+      securityContext:
+        runAsUser: 0
+      terminationGracePeriodSeconds: 120
+      volumes:
+      - configMap:
+          items:
+          - key: config.yaml
+            path: config.yaml
+          name: otel-collector
+        name: config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Postgres database for various data.
+    kubectl.kubernetes.io/default-container: pgsql
+  labels:
+    app.kubernetes.io/component: pgsql
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: pgsql
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: pgsql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: pgsql
+        deploy: sourcegraph
+        group: backend
+    spec:
+      containers:
+      - image: index.docker.io/sourcegraph/postgres-12-alpine:187572_2022-12-06_cbecc5321c7d@sha256:44f6e9a51fafb99573cbd767f20f68913db5a02920c5974e4fa560735d745328
+        livenessProbe:
+          exec:
+            command:
+            - /liveness.sh
+          initialDelaySeconds: 15
+        name: pgsql
+        ports:
+        - containerPort: 5432
+          name: pgsql
+        readinessProbe:
+          exec:
+            command:
+            - /ready.sh
+        resources:
+          limits:
+            cpu: "4"
+            memory: 4Gi
+          requests:
+            cpu: "4"
+            memory: 4Gi
+        startupProbe:
+          exec:
+            command:
+            - /liveness.sh
+          failureThreshold: 360
+          periodSeconds: 10
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+        - mountPath: /conf
+          name: pgsql-conf
+        - mountPath: /dev/shm
+          name: dshm
+      - env:
+        - name: DATA_SOURCE_NAME
+          value: postgres://sg:@localhost:5432/?sslmode=disable
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/queries.yaml
+        image: index.docker.io/sourcegraph/postgres_exporter:187572_2022-12-06_cbecc5321c7d@sha256:85d9ca134db535f0482e6e5cacf194ea118bf24d0fd52e36ba6714802d59c30a
+        name: pgsql-exporter
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi
+        image: index.docker.io/sourcegraph/alpine-3.14:187572_2022-12-06_cbecc5321c7d@sha256:4d8085acb2267d94c2099be8265352ceef7095b245482b603569ad8cd7563a90
+        name: correct-data-dir-permissions
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+      securityContext:
+        runAsUser: 0
+      terminationGracePeriodSeconds: 120
+      volumes:
+      - configMap:
+          defaultMode: 511
+          name: pgsql-conf
+        name: pgsql-conf
+      - name: disk
+        persistentVolumeClaim:
+          claimName: pgsql
+      - emptyDir:
+          medium: Memory
+          sizeLimit: 1G
+        name: dshm
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Handles conversion of uploaded precise code intelligence bundles.
+  labels:
+    app.kubernetes.io/component: precise-code-intel
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: precise-code-intel-worker
+  namespace: default
+replicas: 2
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: precise-code-intel-worker
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: precise-code-intel-worker
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
+          value: blobstore
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
+          value: http://blobstore:9000
+        - name: NUM_WORKERS
+          value: "4"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        image: index.docker.io/sourcegraph/precise-code-intel-worker:187572_2022-12-06_cbecc5321c7d@sha256:d1b1546d784fec8c90928a40e1b7eafc33202a53e4fcd501001d3f4a73e5c8ce
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: debug
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        name: precise-code-intel-worker
+        ports:
+        - containerPort: 3188
+          name: http
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4G
+          requests:
+            cpu: 500m
+            memory: 2G
+        terminationMessagePolicy: FallbackToLogsOnError
+      securityContext:
+        runAsUser: 0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Collects metrics and aggregates them into graphs.
+  labels:
+    app.kubernetes.io/component: prometheus
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: prometheus
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: prometheus
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        deploy: sourcegraph
+    spec:
+      containers:
+      - image: index.docker.io/sourcegraph/prometheus:187572_2022-12-06_cbecc5321c7d@sha256:2113ccab80409e995ee7ed9a3d386051f4ca73186375a3a0d7e3d55c90fa2007
+        name: prometheus
+        ports:
+        - containerPort: 9090
+          name: http
+        readinessProbe:
+          failureThreshold: 120
+          httpGet:
+            path: /-/ready
+            port: 9090
+          periodSeconds: 5
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: "2"
+            memory: 6G
+          requests:
+            cpu: 500m
+            memory: 6G
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /prometheus
+          name: data
+        - mountPath: /sg_prometheus_add_ons
+          name: config
+      securityContext:
+        runAsUser: 0
+      serviceAccountName: prometheus
+      terminationGracePeriodSeconds: 120
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: prometheus
+      - configMap:
+          defaultMode: 511
+          name: prometheus
+        name: config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Redis for storing short-lived caches.
+    kubectl.kubernetes.io/default-container: redis-cache
+  labels:
+    app.kubernetes.io/component: redis
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: redis-cache
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: redis-cache
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: redis-cache
+        deploy: sourcegraph
+    spec:
+      containers:
+      - image: index.docker.io/sourcegraph/redis-cache:187572_2022-12-06_cbecc5321c7d@sha256:bb62b6d761513b1651e8499532570068a4509d5d0cf5131f0dd8b8e2ef74c72d
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: redis
+        name: redis-cache
+        ports:
+        - containerPort: 6379
+          name: redis
+        readinessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: redis
+        resources:
+          limits:
+            cpu: "1"
+            memory: 7Gi
+          requests:
+            cpu: "1"
+            memory: 7Gi
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /redis-data
+          name: redis-data
+      - image: index.docker.io/sourcegraph/redis_exporter:187572_2022-12-06_cbecc5321c7d@sha256:edb0c9b19cacd90acc78f13f0908a7e6efd1df704e401805c24bffd241285f70
+        name: redis-exporter
+        ports:
+        - containerPort: 9121
+          name: redisexp
+        resources:
+          limits:
+            cpu: 10m
+            memory: 100Mi
+          requests:
+            cpu: 10m
+            memory: 100Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-cache
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Redis for storing semi-persistent data like user sessions.
+  labels:
+    app.kubernetes.io/component: redis
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: redis-store
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: redis-store
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: redis-store
+        deploy: sourcegraph
+    spec:
+      containers:
+      - image: index.docker.io/sourcegraph/redis-store:187572_2022-12-06_cbecc5321c7d@sha256:a3e4f611bcf1fe6f256a54b81f6ddb9fc2e45d7a038fa276b800b895eca09fe5
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: redis
+        name: redis-store
+        ports:
+        - containerPort: 6379
+          name: redis
+        readinessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: redis
+        resources:
+          limits:
+            cpu: "1"
+            memory: 7Gi
+          requests:
+            cpu: "1"
+            memory: 7Gi
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /redis-data
+          name: redis-data
+      - image: index.docker.io/sourcegraph/redis_exporter:187572_2022-12-06_cbecc5321c7d@sha256:edb0c9b19cacd90acc78f13f0908a7e6efd1df704e401805c24bffd241285f70
+        name: redis-exporter
+        ports:
+        - containerPort: 9121
+          name: redisexp
+        resources:
+          limits:
+            cpu: 10m
+            memory: 100Mi
+          requests:
+            cpu: 10m
+            memory: 100Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-store
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Handles repository metadata (not Git data) lookups and updates from
+      external code hosts and other similar services.
+    kubectl.kubernetes.io/default-container: repo-updater
+  labels:
+    app.kubernetes.io/component: repo-updater
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: repo-updater
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: repo-updater
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: repo-updater
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        - name: GITHUB_BASE_URL
+          value: http://github-proxy:80
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        image: index.docker.io/sourcegraph/repo-updater:187572_2022-12-06_cbecc5321c7d@sha256:0bf2b95c73bceff8c3edb96299175fe36a550f57fd3f5256d38fa2c42992655a
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: debug
+            scheme: HTTP
+          periodSeconds: 1
+          timeoutSeconds: 5
+        name: repo-updater
+        ports:
+        - containerPort: 3182
+          name: http
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 1
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: "1"
+            memory: 500Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+      securityContext:
+        runAsUser: 0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Backend for text search operations.
+    kubectl.kubernetes.io/default-container: searcher
+  labels:
+    app.kubernetes.io/component: searcher
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: searcher
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: searcher
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: searcher
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        - name: SEARCHER_CACHE_SIZE_MB
+          valueFrom:
+            resourceFieldRef:
+              containerName: searcher
+              divisor: 1M
+              resource: requests.ephemeral-storage
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        image: index.docker.io/sourcegraph/searcher:187572_2022-12-06_cbecc5321c7d@sha256:c0d7b580c31e956dc586e3947edd2afb850cf5954e83010236294c57478256da
+        name: searcher
+        ports:
+        - containerPort: 3181
+          name: http
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "2"
+            ephemeral-storage: 26G
+            memory: 2G
+          requests:
+            cpu: 500m
+            ephemeral-storage: 25G
+            memory: 500M
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /mnt/cache
+          name: cache-ssd
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - emptyDir: {}
+        name: cache-ssd
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Serves the frontend of Sourcegraph via HTTP(S).
+    kubectl.kubernetes.io/default-container: frontend
+  labels:
+    app.kubernetes.io/component: frontend
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: sourcegraph-frontend
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: sourcegraph-frontend
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: sourcegraph-frontend
+        deploy: sourcegraph
+    spec:
+      containers:
+      - args:
+        - serve
+        env:
+        - name: PGDATABASE
+          value: sg
+        - name: PGHOST
+          value: pgsql
+        - name: PGPORT
+          value: "5432"
+        - name: PGSSLMODE
+          value: disable
+        - name: PGUSER
+          value: sg
+        - name: CODEINSIGHTS_PGDATASOURCE
+          value: postgres://postgres:password@codeinsights-db:5432/postgres
+        - name: CODEINTEL_PGDATABASE
+          value: sg
+        - name: CODEINTEL_PGHOST
+          value: codeintel-db
+        - name: CODEINTEL_PGPORT
+          value: "5432"
+        - name: CODEINTEL_PGSSLMODE
+          value: disable
+        - name: CODEINTEL_PGUSER
+          value: sg
+        - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
+          value: blobstore
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
+          value: http://blobstore:9000
+        - name: GRAFANA_SERVER_URL
+          value: http://grafana:30070
+        - name: PROMETHEUS_URL
+          value: http://prometheus:30090
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        image: index.docker.io/sourcegraph/frontend:187572_2022-12-06_cbecc5321c7d@sha256:73e64a8636e70ebbaf7f4a3300479529294f67e8cf644cdaea02435915aec869
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: debug
+            scheme: HTTP
+          initialDelaySeconds: 300
+          timeoutSeconds: 5
+        name: frontend
+        ports:
+        - containerPort: 3080
+          name: http
+        - containerPort: 3090
+          name: http-internal
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "2"
+            ephemeral-storage: 8Gi
+            memory: 4G
+          requests:
+            cpu: "2"
+            ephemeral-storage: 4Gi
+            memory: 2G
+        terminationMessagePolicy: FallbackToLogsOnError
+      initContainers:
+      - args:
+        - up
+        env:
+        - name: PGDATABASE
+          value: sg
+        - name: PGHOST
+          value: pgsql
+        - name: PGPORT
+          value: "5432"
+        - name: PGSSLMODE
+          value: disable
+        - name: PGUSER
+          value: sg
+        - name: CODEINSIGHTS_PGDATASOURCE
+          value: postgres://postgres:password@codeinsights-db:5432/postgres
+        - name: CODEINTEL_PGDATABASE
+          value: sg
+        - name: CODEINTEL_PGHOST
+          value: codeintel-db
+        - name: CODEINTEL_PGPORT
+          value: "5432"
+        - name: CODEINTEL_PGSSLMODE
+          value: disable
+        - name: CODEINTEL_PGUSER
+          value: sg
+        image: index.docker.io/sourcegraph/migrator:187572_2022-12-06_cbecc5321c7d@sha256:93fc175df594738a98a62f2057271824cdb674b0e63bedac9dc7cb0f04db76bb
+        name: migrator
+        resources:
+          limits:
+            cpu: 500m
+            memory: 100M
+          requests:
+            cpu: 100m
+            memory: 50M
+      securityContext:
+        runAsUser: 0
+      serviceAccountName: sourcegraph-frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Backend for symbols operations.
+    kubectl.kubernetes.io/default-container: symbols
+  labels:
+    app.kubernetes.io/component: symbols
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: symbols
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: symbols
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: symbols
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        - name: SYMBOLS_CACHE_SIZE_MB
+          valueFrom:
+            resourceFieldRef:
+              containerName: symbols
+              divisor: 1M
+              resource: requests.ephemeral-storage
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        image: index.docker.io/sourcegraph/symbols:187572_2022-12-06_cbecc5321c7d@sha256:75615a60f318dc898eae2e5037efcd53e63cf28c2b8fca388b6923d215ff9db9
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        name: symbols
+        ports:
+        - containerPort: 3184
+          name: http
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "2"
+            ephemeral-storage: 12G
+            memory: 2G
+          requests:
+            cpu: 500m
+            ephemeral-storage: 10G
+            memory: 500M
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /mnt/cache
+          name: cache-ssd
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - emptyDir: {}
+        name: cache-ssd
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Backend for syntax highlighting operations.
+  labels:
+    app.kubernetes.io/component: syntect-server
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: syntect-server
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: syntect-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: syntect-server
+        deploy: sourcegraph
+    spec:
+      containers:
+      - image: index.docker.io/sourcegraph/syntax-highlighter:187572_2022-12-06_cbecc5321c7d@sha256:b88b20f56e942cc253109bb7f4b07746ebaecc2ff7393cdaf6415ffb8778fc45
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        name: syntect-server
+        ports:
+        - containerPort: 9238
+          name: http
+        readinessProbe:
+          tcpSocket:
+            port: http
+        resources:
+          limits:
+            cpu: "4"
+            memory: 6G
+          requests:
+            cpu: 250m
+            memory: 2G
+        terminationMessagePolicy: FallbackToLogsOnError
+      securityContext:
+        runAsUser: 0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Manages background processes.
+  labels:
+    app.kubernetes.io/component: worker
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: worker
+  namespace: default
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: worker
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: worker
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
+          value: blobstore
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
+          value: http://blobstore:9000
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        image: index.docker.io/sourcegraph/worker:187572_2022-12-06_cbecc5321c7d@sha256:0092211fee815b82d426ccf0a30999f8fb40749811e3a83c7570e576f028da74
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: debug
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        name: worker
+        ports:
+        - containerPort: 3189
+          name: http
+        - containerPort: 6060
+          name: debug
+        - containerPort: 6996
+          name: prom
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4G
+          requests:
+            cpu: 500m
+            memory: 2G
+        terminationMessagePolicy: FallbackToLogsOnError
+      securityContext:
+        runAsUser: 0
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Stores clones of repositories to perform Git operations.
+    kubectl.kubernetes.io/default-container: gitserver
+  labels:
+    app.kubernetes.io/component: gitserver
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: gitserver
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: gitserver
+  serviceName: gitserver
+  template:
+    metadata:
+      labels:
+        app: gitserver
+        deploy: sourcegraph
+        group: backend
+        type: gitserver
+    spec:
+      containers:
+      - args:
+        - run
+        env:
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        image: index.docker.io/sourcegraph/gitserver:187572_2022-12-06_cbecc5321c7d@sha256:87642b2f0cccbdcd661e470c8f7aa6c022ab03065a2c8ab565afc4b8829a4531
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: rpc
+          timeoutSeconds: 5
+        name: gitserver
+        ports:
+        - containerPort: 3178
+          name: rpc
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "4"
+            memory: 8G
+          requests:
+            cpu: "4"
+            memory: 8G
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /data/repos
+          name: repos
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: repos
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: repos
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 200Gi
+      storageClassName: sourcegraph
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Metrics/monitoring dashboards and alerts.
+    kubectl.kubernetes.io/default-container: grafana
+  labels:
+    app.kubernetes.io/component: grafana
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: grafana
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: grafana
+  serviceName: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+        deploy: sourcegraph
+    spec:
+      containers:
+      - image: index.docker.io/sourcegraph/grafana:187572_2022-12-06_cbecc5321c7d@sha256:cf295a1dada50607a364390a54744dbc9142aa99b42c07f1bb623ca251639d2c
+        name: grafana
+        ports:
+        - containerPort: 3370
+          name: http
+        resources:
+          limits:
+            cpu: "1"
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 512Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /var/lib/grafana
+          name: grafana-data
+        - mountPath: /sg_config_grafana/provisioning/datasources
+          name: config
+      securityContext:
+        runAsUser: 0
+      serviceAccountName: grafana
+      volumes:
+      - configMap:
+          defaultMode: 511
+          name: grafana
+        name: config
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: grafana-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi
+      storageClassName: sourcegraph
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Backend for indexed text search operations.
+  labels:
+    app.kubernetes.io/component: indexed-search
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: indexed-search
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: indexed-search
+  serviceName: indexed-search
+  template:
+    metadata:
+      labels:
+        app: indexed-search
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        - name: OPENTELEMETRY_DISABLED
+          value: "false"
+        image: index.docker.io/sourcegraph/indexed-searcher:187572_2022-12-06_cbecc5321c7d@sha256:79bec59c17482e4039931ed083113bd8723d74c42b96c3c489062f6b33b806f0
+        name: zoekt-webserver
+        ports:
+        - containerPort: 6070
+          name: http
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4G
+          requests:
+            cpu: 500m
+            memory: 2G
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      - env:
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        - name: OPENTELEMETRY_DISABLED
+          value: "false"
+        image: index.docker.io/sourcegraph/search-indexer:187572_2022-12-06_cbecc5321c7d@sha256:a3ae20e4130b4846e2c3078b9ba942854890348da37c8fa7ee385c081b7d1666
+        name: zoekt-indexserver
+        ports:
+        - containerPort: 6072
+          name: index-http
+        resources:
+          limits:
+            cpu: "8"
+            memory: 8G
+          requests:
+            cpu: "4"
+            memory: 4G
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: data
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      labels:
+        deploy: sourcegraph
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 200Gi
+      storageClassName: sourcegraph
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    description: DaemonSet to ensure all nodes run a cAdvisor pod.
+    seccomp.security.alpha.kubernetes.io/pod: docker/default
+  labels:
+    app.kubernetes.io/component: cadvisor
+    deploy: sourcegraph
+    sourcegraph-resource-requires: cluster-admin
+  name: cadvisor
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: cadvisor
+  template:
+    metadata:
+      annotations:
+        description: Collects and exports container metrics.
+        prometheus.io/port: "48080"
+        sourcegraph.prometheus/scrape: "true"
+      labels:
+        app: cadvisor
+        deploy: sourcegraph
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - args:
+        - --store_container_labels=false
+        - --whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name,io.kubernetes.pod.namespace,io.kubernetes.pod.uid
+        image: index.docker.io/sourcegraph/cadvisor:187572_2022-12-06_cbecc5321c7d@sha256:755748f2f9b00d8f70bd65349e85235585bdf1a663e26198c8eaf91dfd5636e1
+        name: cadvisor
+        ports:
+        - containerPort: 48080
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 300m
+            memory: 2000Mi
+          requests:
+            cpu: 150m
+            memory: 200Mi
+        securityContext:
+          privileged: null
+        volumeMounts:
+        - mountPath: /rootfs
+          name: rootfs
+          readOnly: true
+        - mountPath: /var/run
+          name: var-run
+          readOnly: true
+        - mountPath: /sys
+          name: sys
+          readOnly: true
+        - mountPath: /var/lib/docker
+          name: docker
+          readOnly: true
+        - mountPath: /dev/disk
+          name: disk
+          readOnly: true
+      serviceAccountName: cadvisor
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - hostPath:
+          path: /
+        name: rootfs
+      - hostPath:
+          path: /var/run
+        name: var-run
+      - hostPath:
+          path: /sys
+        name: sys
+      - hostPath:
+          path: /var/lib/docker
+        name: docker
+      - hostPath:
+          path: /dev/disk
+        name: disk
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    description: DaemonSet to ensure all nodes run a node-exporter pod.
+    seccomp.security.alpha.kubernetes.io/pod: docker/default
+  labels:
+    app: node-exporter
+    app.kubernetes.io/component: node-exporter
+    deploy: sourcegraph
+  name: node-exporter
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: node-exporter
+  template:
+    metadata:
+      annotations:
+        description: Collects and exports machine metrics.
+        kubectl.kubernetes.io/default-container: node-exporter
+      labels:
+        app: node-exporter
+        deploy: sourcegraph
+    spec:
+      affinity: null
+      automountServiceAccountToken: false
+      containers:
+      - args:
+        - --web.listen-address=:9100
+        - --path.sysfs=/host/sys
+        - --path.rootfs=/host/root
+        - --path.procfs=/host/proc
+        - --no-collector.wifi
+        - --no-collector.hwmon
+        - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
+        - --collector.netclass.ignored-devices=^(veth.*)$
+        - --collector.netdev.device-exclude=^(veth.*)$
+        env: null
+        image: index.docker.io/sourcegraph/node-exporter:187572_2022-12-06_cbecc5321c7d@sha256:2d9dcdf0b2226f0c3d550a64d2667710265462350a3ba9ebe37d0302bc64af0f
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            port: metrics
+            scheme: HTTP
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: node-exporter
+        ports:
+        - containerPort: 9100
+          name: metrics
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            port: metrics
+            scheme: HTTP
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: 200m
+            memory: 100Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 65534
+          runAsUser: 65534
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /host/root
+          mountPropagation: HostToContainer
+          name: rootfs
+          readOnly: true
+        - mountPath: /host/sys
+          mountPropagation: HostToContainer
+          name: sys
+          readOnly: true
+        - mountPath: /host/proc
+          mountPropagation: HostToContainer
+          name: proc
+          readOnly: true
+      hostPID: true
+      nodeSelector: null
+      securityContext:
+        fsGroup: 65534
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+      terminationGracePeriodSeconds: 30
+      tolerations: null
+      volumes:
+      - hostPath:
+          path: /
+        name: rootfs
+      - hostPath:
+          path: /sys
+        name: sys
+      - hostPath:
+          path: /proc
+        name: proc
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    description: Forwards telemetry data to the OpenTelemetry Collector Deployment.
+    prometheus.io/port: "8888"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app.kubernetes.io/component: otel-collector
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: otel-agent
+  namespace: default
+spec:
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: otel-agent
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: otel-agent
+      labels:
+        app: otel-agent
+        deploy: sourcegraph
+    spec:
+      containers:
+      - command:
+        - /bin/otelcol-sourcegraph
+        - --config=/etc/otel-agent/config.yaml
+        image: index.docker.io/sourcegraph/opentelemetry-collector:187572_2022-12-06_cbecc5321c7d@sha256:113a84fcef33f06f7e529961d5eb64400488953b23ac07ea8a3d628db6789ef0
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 13133
+        name: otel-agent
+        ports:
+        - containerPort: 55679
+          name: zpages
+        - containerPort: 4317
+          hostPort: 4317
+          name: otlp-grpc
+        - containerPort: 4318
+          hostPort: 4318
+          name: otlp-http
+        - containerPort: 8888
+          name: metrics
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 13133
+        resources:
+          limits:
+            cpu: 500m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /etc/otel-agent
+          name: config
+      terminationGracePeriodSeconds: 120
+      volumes:
+      - configMap:
+          items:
+          - key: config.yaml
+            path: config.yaml
+          name: otel-agent
+        name: config
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: 150m
+  labels:
+    app: sourcegraph-frontend
+    app.kubernetes.io/component: frontend
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: sourcegraph-frontend
+  namespace: default
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: sourcegraph-frontend
+            port:
+              number: 30080
+        path: /
+        pathType: Prefix

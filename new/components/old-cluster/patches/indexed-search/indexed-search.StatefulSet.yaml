@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: indexed-search
+spec:
+  template:
+    spec:
+      containers:
+      - name: zoekt-webserver
+        securityContext:
+          # Required to prevent escalations to root.
+          allowPrivilegeEscalation: true
+          runAsUser: 0
+          runAsGroup: 0
+      - name: zoekt-indexserver
+        securityContext:
+          # Required to prevent escalations to root.
+          allowPrivilegeEscalation: true
+          runAsUser: 0
+          runAsGroup: 0
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0

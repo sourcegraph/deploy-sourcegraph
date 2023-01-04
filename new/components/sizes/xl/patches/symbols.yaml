@@ -1,0 +1,19 @@
+- op: replace
+  path: /spec/replicas
+  value: 1
+- op: replace
+  path: /spec/template/spec/containers/0/resources/limits/cpu
+  value: "6"
+- op: replace
+  path: /spec/template/spec/containers/0/resources/limits/memory
+  value: 12G
+- op: add
+  path: /spec/template/spec/containers/0/env/-
+  value:
+    name: USE_ROCKSKIP
+    value: "true"
+- op: add
+  path: /spec/template/spec/containers/0/env/-
+  value:
+    name: ROCKSKIP_MIN_REPO_SIZE_MB
+    value: "1000"

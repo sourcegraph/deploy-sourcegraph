@@ -12,23 +12,23 @@ To generate a new set of manifests from an overlay:
 
 1. Run the following command from the root of this repository:
 
-```bash
-# Create a 'generated-cluster' directory
-$ mkdir generated-cluster
-# Example: kubectl kustomize new/kustomize/overlays/quick-start/basic/xs -o generated-cluster/
-$ kubectl kustomize $PATH_TO_OVERLAY -o generated-cluster/
-```
+   ```bash
+   # Create a 'generated-cluster' directory
+   $ mkdir generated-cluster
+   # Example: kubectl kustomize new/kustomize/overlays/quick-start/basic/xs -o generated-cluster/
+   $ kubectl kustomize $PATH_TO_OVERLAY -o generated-cluster/
+   ```
 
 The new set of manifests will be output to the [generated-cluster](../../../generated-cluster/) directory.
 
 ### Apply an overlay
 
-To apply the customiziation made with the overlay:
+To apply the customiziation made with an overlay:
 
 1. Follow the steps above to build manifests from an overlay
 2. Make sure the manifests in the output directory `generated-cluster/` are generated correctly
 3. Run the following command from the root of this repository to apply the manifests from the output directory `generated-cluster/`
 
    ```bash
-   $ kubectl apply -k generated-cluster/
+   $ kubectl apply -k --prune -l deploy=sourcegraph -f generated-cluster/
    ```

@@ -28,5 +28,5 @@ Our [ingress-nginx-controller for cloud component](../components/network/ingress
 Run the following command to see the manifests built with this overlay:
 
 ```bash
-kubectl kustomize new/overlays/ingress-nginx-controller -o generated-cluster.yaml
+kubectl kustomize new/overlays/ingress-nginx-controller -o new/preview-cluster
 ```
