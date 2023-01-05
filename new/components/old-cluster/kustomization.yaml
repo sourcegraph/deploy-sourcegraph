@@ -4,11 +4,9 @@ resources:
 - resources/frontend/sourcegraph-frontend.Role.yaml
 - resources/frontend/sourcegraph-frontend.RoleBinding.yaml
 - resources/frontend/sourcegraph-frontend.ServiceAccount.yaml
-- resources/symbols/symbols.Deployment.yaml
-- resources/searcher/searcher.Deployment.yaml
 components:
-- ../resources/delete-searcher-statefulset
-- ../resources/delete-symbols-statefulset
+- ../deployment-statefulset/searcher/deployment
+- ../deployment-statefulset/symbols/deployment
 patchesStrategicMerge:
 - patches/blobstore/blobstore.Deployment.yaml
 - patches/codeinsights-db/codeinsights-db.Deployment.yaml

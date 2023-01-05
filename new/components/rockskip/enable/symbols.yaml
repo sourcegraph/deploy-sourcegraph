@@ -1,10 +1,14 @@
-- op: add
-  path: /spec/template/spec/containers/0/env/-
-  value:
-    name: USE_ROCKSKIP
-    value: "true"
-- op: add
-  path: /spec/template/spec/containers/0/env/-
-  value:
-    name: ROCKSKIP_MIN_REPO_SIZE_MB
-    value: "1000"
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sourcegraph-frontend
+spec:
+  template:
+    spec:
+      containers:
+      - name: frontend
+        env:
+        - name: ROCKSKIP_MIN_REPO_SIZE_MB
+          value: "1000"
+        - name: USE_ROCKSKIP
+          value: "true"

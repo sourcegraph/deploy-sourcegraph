@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+#################################################################################
+# resources 
+# This is where you add the base manifests
+# IMPORTANT: DO NOT MAKE ANY CHANGES TO THE MANIFESTS INSIDE THE base DIRECTORY
+# All changes should be made using components by adding to the components section
+#################################################################################
+resources:
+# This is the resources for the Sourcegraph Main Stacks
+# It deploys Sourcegraph without the monitoring stacks
+- ../../base/sourcegraph
+
+namespace: default
+#################################################################################
+# components
+# This is where you add components to configure your cluster
+#################################################################################
+components:
+# Component to deploy the Sourcegraph Monitoring Stacks - RBACs required
+- ../../components/monitoring
+# Component to deploy and enable otel-collector
+- ../../components/otel-collector
+- ../../components/sizes/xs
+- ../../components/k3s

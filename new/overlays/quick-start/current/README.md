@@ -2,6 +2,8 @@
 
 An overlay to start a new cluster using the old cluster using the default configurations.
 
+This overlay does not support any components created for the new cluster. Use the `old-base` overlay instead.
+
 ## How to use
 
 **IMPORTANT:**
