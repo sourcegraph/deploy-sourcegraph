@@ -4,11 +4,23 @@ This repository contains a set of Kustomize components and overlays that are des
 
 The new set of Kustomize components and overlays provide more flexibility in creating an overlay that suits your deployments and eliminates the need to clone the deployment repository.
 
-IMPORTANT: Only works with Sourcegraph version TBA
+IMPORTANT: Only works with Sourcegraph version v4.4.0+ (TBC)
 
-## Kustomize
+## Overview
 
 [Kustomize](https://kustomize.io/) is built into `kubectl` in version >= 1.14.
+
+### File structure
+
+- base
+  - contains manifests with the default value for all Sourcegraph services
+- components
+  - contains preconfigured components that are created for different purposes, and are ready to be used in an overlay
+- config
+  - contains components that require additional configurations before they can be added to an overlay as a component
+- overlays
+  - deploy: the default directory for building a customized overlay for your Sourcegraph deployment
+  - quick-start: contains different ready-to-use overlays built for different situations and purposes
 
 ### Overlays
 
@@ -97,9 +109,9 @@ kind: Kustomization
 namespace: ns-sourcegraph-example
 resources:
   - new/base/sourcegraph
-  - new/base/monitoring
 components:
-  - new/kustomize/components/minikube
+  - new/components/monitoring
+  - new/components/minikube
 ```
 
 This example overlay that has the following features:

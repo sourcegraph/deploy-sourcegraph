@@ -10,5 +10,4 @@ The monitoring stacks include the following services:
 - grafana
 - node-exporter
 - prometheus
-
-To deploye otel-collector to trace data, please use the [otel-collector component](new/components/otel-collector).
+- otel-collector

@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1beta1
+kind: StorageClass
+metadata:
+  name: sourcegraph
+  labels:
+    deploy: sourcegraph
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+provisioner: netapp.io/trident
+# UPDATE FSTYPE: <ext4, ext3, xfs, etc.>
+fsType: ext4
