@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Backend for symbols operations.
+    kubectl.kubernetes.io/default-container: symbols
+  labels:
+    app.kubernetes.io/component: symbols
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: symbols
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: symbols
+  serviceName: symbols
+  template:
+    metadata:
+      labels:
+        app: symbols
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        image: index.docker.io/sourcegraph/symbols:187572_2022-12-06_cbecc5321c7d@sha256:75615a60f318dc898eae2e5037efcd53e63cf28c2b8fca388b6923d215ff9db9
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        name: symbols
+        ports:
+        - containerPort: 3184
+          name: http
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "2"
+            memory: 2G
+          requests:
+            cpu: 500m
+            memory: 500M
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 101
+          runAsUser: 100
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /mnt/cache
+          name: cache-ssd
+      securityContext:
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
+        runAsUser: 100
+      volumes:
+      - emptyDir: {}
+        name: cache-ssd
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: cache-ssd
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 50G
+      storageClassName: sourcegraph

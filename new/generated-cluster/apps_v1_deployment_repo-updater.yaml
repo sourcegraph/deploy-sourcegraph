@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Handles repository metadata (not Git data) lookups and updates from
+      external code hosts and other similar services.
+    kubectl.kubernetes.io/default-container: repo-updater
+  labels:
+    app.kubernetes.io/component: repo-updater
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: repo-updater
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: repo-updater
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: repo-updater
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        - name: GITHUB_BASE_URL
+          value: http://github-proxy:80
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        image: index.docker.io/sourcegraph/repo-updater:187572_2022-12-06_cbecc5321c7d@sha256:0bf2b95c73bceff8c3edb96299175fe36a550f57fd3f5256d38fa2c42992655a
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: debug
+            scheme: HTTP
+          periodSeconds: 1
+          timeoutSeconds: 5
+        name: repo-updater
+        ports:
+        - containerPort: 3182
+          name: http
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 1
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: "1"
+            memory: 500Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 101
+          runAsUser: 100
+        terminationMessagePolicy: FallbackToLogsOnError
+      securityContext:
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
+        runAsUser: 100
