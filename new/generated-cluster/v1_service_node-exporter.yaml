@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    description: Prometheus exporter for hardware and OS metrics.
+    prometheus.io/port: "9100"
+    sourcegraph.prometheus/scrape: "true"
+    url: https://github.com/prometheus/node_exporter
+  labels:
+    app: node-exporter
+    app.kubernetes.io/component: node-exporter
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: node-exporter
+  namespace: sourcegraph
+spec:
+  ports:
+  - name: metrics
+    port: 9100
+    targetPort: metrics
+  selector:
+    app: node-exporter
+  type: ClusterIP
