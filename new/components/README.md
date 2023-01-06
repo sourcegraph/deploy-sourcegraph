@@ -1,6 +1,6 @@
 # Component - ready to use
 
-All components in this directory are all functional as they are pre-configured for different purposes and do not require additional configurations to be used as a component.
+All components in this directory are all functional and do not require additional configurations as they were already pre-configured for different purposes.
 
 Do not make any custom changes to the components in this folder.
 

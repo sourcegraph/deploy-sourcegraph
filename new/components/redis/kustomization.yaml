@@ -1,0 +1,34 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+patchesJson6902:
+  - target:
+      kind: StatefulSet|Deployment
+      name: repo-updater|gitserver|searcher|symbols|worker
+      group: apps
+      version: v1
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: REDIS_CACHE_ENDPOINT
+          value: $(NEW_REDIS_CACHE_ENDPOINT)
+      - op: add
+        path: /spec/template/spec/containers/0/env/-
+        value:
+          name: REDIS_STORE_ENDPOINT
+          value: $(NEW_REDIS_STORE_ENDPOINT)
+vars:
+  - name: NEW_REDIS_CACHE_ENDPOINT
+    objref:
+      apiVersion: v1
+      kind: ConfigMap
+      name: sourcegraph-frontend-env
+    fieldref:
+      fieldpath: data.REDIS_CACHE_ENDPOINT
+  - name: NEW_REDIS_STORE_ENDPOINT
+    objref:
+      apiVersion: v1
+      kind: ConfigMap
+      name: sourcegraph-frontend-env
+    fieldref:
+      fieldpath: data.REDIS_STORE_ENDPOINT

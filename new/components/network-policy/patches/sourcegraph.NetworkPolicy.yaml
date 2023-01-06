@@ -1,0 +1,23 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: sourcegraph-prod
+spec:
+  # For all pods with the label "deploy: sourcegraph"
+  podSelector:
+    matchLabels:
+      deploy: sourcegraph
+  policyTypes:
+  - Ingress
+  - Egress
+  # Allow all traffic inside the ns-sourcegraph namespace
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: sourcegraph-prod
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: sourcegraph-prod

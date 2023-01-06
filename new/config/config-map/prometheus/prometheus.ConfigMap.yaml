@@ -1,0 +1,11 @@
+apiVersion: v1
+data:
+  extra_rules.yml: |
+      - job_name: 'kubernetes-pods'
+        metric_relabel_configs:
+        - source_labels: [container_label_io_kubernetes_pod_namespace]
+          regex: ^$|REPLACE_WITH_NAMESPACE
+          action: keep
+kind: ConfigMap
+metadata:
+  name: prometheus
