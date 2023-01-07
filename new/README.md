@@ -1,3 +1,42 @@
+# Beyang notes
+
+- `base` contains underlying resources, currently contains the following:
+  - `sourcegraph` (namespace: sourcegraph-core)
+  - `monitioring` (namespace: sourcegraph-monitoring)
+  - `ingress` (namespace: ingress-nginx)
+- `components` contains modifications. If any component introduces new
+  resources, they should be ones that assist with modifying, rather
+  than adding to, the cluster. And here we need to be careful to set
+  the appropriate namespace (which must be done through a targeted
+  transformation, because `namespace:` will overwrite the namespace
+  for *all* cluster resources.
+- Does `overlays` just contain examples? If so, we could just call this the `examples` directory
+- All of the above directories should never be modified by the user.
+- The user should provide the following files and directories
+  - A top-level `kustomization.yaml`. We will provide a
+    `kustomization.default.yaml` file that should serve as a starting
+    point. This file should contain commented-out components with
+    comments explaining what they do. Our docs should mostly direct
+    the user to comment out sections.
+  - A `userfiles` directory that contains additional user-provided
+    files to be referenced by the cluster config. E.g., secrets.
+    - Annoyingly, this probably necessitates using the
+      `--load-restrictor LoadRestrictionsNone` flag on every
+      invocation of `kustomize`.
+- The command the user should run to build the manifest is:
+  `kustomize build --load-restrictor LoadRestrictionsNone -o ./generated-cluster.yaml`
+- Migration instructions: we should provide migration instructions for
+  folks migrating from the old overlays or manual customization
+  - These should first construct a `kustomization.yaml` that recreates
+    the old cluster config using the new overlays.
+  - We should provide instructions for easily diffing the new and old
+    generated cluster.  Perhaps the easiest way to do this covering
+    all old methods of customization, is to write a script that dumps
+    all resources into a `kustomization.yaml` that emits to a single
+    file. Then diff that file against the new `generated-cluster.yaml`
+
+
+
 # [WIP] Sourcegraph Kustomize
 
 This repository contains a set of Kustomize components and overlays that are designed to work with the [Sourcegraph Kubernetes deployment repository](https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph), and to replace the [older version of the overlays](https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph/-/tree/overlays).
