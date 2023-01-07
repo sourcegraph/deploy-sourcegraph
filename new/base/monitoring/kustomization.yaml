@@ -21,3 +21,10 @@ resources:
 - prometheus/prometheus.PersistentVolumeClaim.yaml
 - prometheus/prometheus.Service.yaml
 - prometheus/prometheus.ServiceAccount.yaml
+patchesJson6902:
+- target:
+    name: .*
+  patch: |-
+    - op: replace
+      path: /metadata/labels/sourcegraph-element
+      value: monitoring
