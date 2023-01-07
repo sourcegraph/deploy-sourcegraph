@@ -80,7 +80,7 @@ metadata:
   name: prometheus
   namespace: sourcegraph-monitoring
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   labels:
@@ -122,41 +122,6 @@ rules:
   - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  labels:
-    app.kubernetes.io/component: prometheus
-    category: rbac
-    deploy: sourcegraph
-    sourcegraph-resource-requires: cluster-admin
-  name: prometheus
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - endpoints
-  - namespaces
-  - nodes
-  - nodes/metrics
-  - nodes/proxy
-  - pods
-  - services
-  verbs:
-  - get
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - configmaps
-  verbs:
-  - get
-- nonResourceURLs:
-  - /metrics
-  verbs:
-  - get
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   labels:
@@ -214,7 +179,42 @@ rules:
   verbs:
   - update
 ---
-apiVersion: rbac.authorization.k8s.io/v1beta1
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: prometheus
+    category: rbac
+    deploy: sourcegraph
+    sourcegraph-resource-requires: cluster-admin
+  name: prometheus
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  - namespaces
+  - nodes
+  - nodes/metrics
+  - nodes/proxy
+  - pods
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   labels:
@@ -227,6 +227,23 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: nginx-ingress-role
+subjects:
+- kind: ServiceAccount
+  name: nginx-ingress-serviceaccount
+  namespace: ingress-nginx
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    deploy: sourcegraph
+  name: nginx-ingress-clusterrole-nisa-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: nginx-ingress-clusterrole
 subjects:
 - kind: ServiceAccount
   name: nginx-ingress-serviceaccount
@@ -249,23 +266,6 @@ subjects:
 - kind: ServiceAccount
   name: prometheus
   namespace: sourcegraph-monitoring
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  labels:
-    app.kubernetes.io/name: ingress-nginx
-    app.kubernetes.io/part-of: ingress-nginx
-    deploy: sourcegraph
-  name: nginx-ingress-clusterrole-nisa-binding
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: nginx-ingress-clusterrole
-subjects:
-- kind: ServiceAccount
-  name: nginx-ingress-serviceaccount
-  namespace: ingress-nginx
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -5182,3 +5182,28 @@ spec:
       - hostPath:
           path: /proc
         name: proc
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: 150m
+  labels:
+    app: sourcegraph-frontend
+    app.kubernetes.io/component: frontend
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: sourcegraph-frontend
+  namespace: sourcegraph-core
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: sourcegraph-frontend
+            port:
+              number: 30080
+        path: /
+        pathType: Prefix
