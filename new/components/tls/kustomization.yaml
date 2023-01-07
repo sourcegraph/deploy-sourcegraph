@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+secretGenerator:
+- name: sourcegraph-tls
+  files:
+    - "../../userfiles/tls.crt"
+    - "../../userfiles/tls.key"
+  type: "kubernetes.io/tls"
+generatorOptions:
+  disableNameSuffixHash: true
+patchesStrategicMerge:
+  - |-
+    apiVersion: networking.k8s.io/v1
+    kind: Ingress
+    metadata:
+      name: sourcegraph-frontend
+    spec:
+      tls:
+      - hosts:
+        - sourcegraph.example.com
+        secretName: sourcegraph-tls
+

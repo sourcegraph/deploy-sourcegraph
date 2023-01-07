@@ -2677,6 +2677,15 @@ metadata:
   namespace: sourcegraph-monitoring
 ---
 apiVersion: v1
+data:
+  tls.crt: Zm9vCg==
+  tls.key: YmFyCg==
+kind: Secret
+metadata:
+  name: sourcegraph-tls
+type: kubernetes.io/tls
+---
+apiVersion: v1
 kind: Service
 metadata:
   labels:
@@ -5207,3 +5216,7 @@ spec:
               number: 30080
         path: /
         pathType: Prefix
+  tls:
+  - hosts:
+    - sourcegraph.example.com
+    secretName: sourcegraph-tls
