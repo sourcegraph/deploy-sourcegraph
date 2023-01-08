@@ -1,12 +1,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  - vars.yaml
   - base/sourcegraph
   - base/monitoring
   - base/ingress
-# components:
-#   - components/StorageClass/gcp
-#   - components/tls
+components:
+  - components/storage-class/gcp
+  - components/tls
 
 # TODO
 # - [x] include monitoring
