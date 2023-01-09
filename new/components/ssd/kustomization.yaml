@@ -3,7 +3,7 @@ kind: Component
 components:
 - pod-tmp-gc
 configMapGenerator:
-  - name: sourcegraph-frontend-env
+  - name: sourcegraph-kustomize-env
     behavior: merge
     literals:
       - SSD_NODE_PATH=SOURCEGRAPH_OVERLAY_PLACEHOLDER
@@ -14,6 +14,6 @@ vars:
     objref:
       apiVersion: v1
       kind: ConfigMap
-      name: sourcegraph-frontend-env
+      name: sourcegraph-kustomize-env
     fieldref:
       fieldpath: data.SSD_NODE_PATH

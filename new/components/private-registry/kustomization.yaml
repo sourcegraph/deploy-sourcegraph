@@ -93,7 +93,7 @@ components:
 #   newName: $(DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY)/sourcegraph/prometheus
 #   # newTag: new.private.tag
 configMapGenerator:
-  - name: sourcegraph-frontend-env
+  - name: sourcegraph-kustomize-env
     behavior: merge
     literals:
       - DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY=$(DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY)
@@ -104,6 +104,6 @@ vars:
     objref:
       apiVersion: v1
       kind: ConfigMap
-      name: sourcegraph-frontend-env
+      name: sourcegraph-kustomize-env
     fieldref:
       fieldpath: data.DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY

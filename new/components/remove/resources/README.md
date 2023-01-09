@@ -1,0 +1,1 @@
+Remove all container resources

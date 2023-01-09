@@ -1,17 +1,124 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-# update namespace value if needed
-namespace: default
-# Resources for Sourcegraph main stacks
 resources:
 - ../../base/sourcegraph
-# Essential component for updating frontend env vars
 configMapGenerator:
+# Handle updating env vars for frontend
 - name: sourcegraph-frontend-env
   behavior: merge
-  env: configs/sourcegraph.env
+  env: config/frontend.env
+# Handle updating configs using env vars for kustomize
+- name: sourcegraph-kustomize-env
+  behavior: merge
+  env: config/kustomize.env
+# Handle updating endpoints configs for frontend
+replacements:
+- path: config/patches/endpoints-update.yaml
+##########################################################
+# DO NOT MAKE ANY CHANGES ABOVE THIS LINE
+##########################################################
+# update namespace value if needed
+namespace: default
 components:
-# Resources for Sourcegraph monitoring stacks - RBAC required
+# Add resources for Sourcegraph monitoring stacks
+# RBACs required
 - ../../components/monitoring
-- ../../components/storage-cloud/cloud
 
+# Use private-registry
+# Add env vars below to config/kustomize.env:
+# - DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY
+- ../../components/private-registry
+
+# Disable or enable rockskip
+- ../../components/disable/rockskip
+- ../../components/enable/rockskip
+
+# Create resources for using local SSDs - RBACs required
+# Add env vars below to config/kustomize.env:
+# - SSD_NODE_PATH
+- ../../components/ssd
+
+# Use nodeport 30080
+- ../../components/nodeport
+
+# Remove all daemonsets resources
+- ../../components/remove/daemonset
+
+# Remove cadvisor
+- ../../components/remove/cadvisor
+
+# Remove the default ingress from frontend
+- ../../components/remove/default-ingress
+
+# Remove all pvcs resources
+- ../../components/remove/pvcs
+
+# Remove all container resources (Limits, requests)
+- ../../components/remove/resources
+
+# Update network-policy
+# See docs
+- ../../components/network-policy
+
+# Use custom redis servers
+# Add env vars below to config/frontend.env:
+# - REDIS_CACHE_ENDPOINT
+# - REDIS_STORE_ENDPOINT
+- ../../components/redis
+
+# Update replica counts
+- ../../components/replica
+
+# Use ssh to clon repositories
+# Also see GENERATE SECRETS sections for importing ssh files
+# Non-root user
+- ../../components/ssh/non-root
+# Root user
+- ../../components/ssh/root
+
+# Create storage class resources for cloud providers
+# For aws
+- ../../components/storage-class/aws
+# For azure
+- ../../components/storage-class/azure
+# For gcp
+- ../../components/storage-class/gcp
+# For other cloud providers
+# Add env vars below to config/kustomize.env:
+# - STORAGECLASS_NAME
+# - STORAGECLASS_PROVISIONER
+# - STORAGECLASS_PARAM_TYPE
+- ../../components/storage-class/cloud
+
+##########################################################
+# GENERATE SECRETS
+##########################################################
+# secretGenerator:
+# # Generate secrets for gitserver to use ssh
+# - name: gitserver-ssh
+#   files:
+#   - config/id_rsa
+#   - config/known_hosts
+# # Generate secrets for database
+# - name: dbs-secrets
+#   files:
+#   - config/secrets.env
+##########################################################
+# UPDATE REPLICA COUNTS
+##########################################################
+# replicas:
+# - name: gitserver
+#   count: 1
+# - name: searcher
+#   count: 1
+# - name: symbols
+#   count: 1
+# - name: indexed-search
+#   count: 1
+# - name: gitserver
+#   count: 1
+# - name: sourcegraph-frontend
+#   count: 2
+# - name: precise-code-intel-worker
+#   count: 1
+##########################################################

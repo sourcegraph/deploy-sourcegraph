@@ -3,7 +3,7 @@ kind: Component
 resources:
   - patches/sourcegraph.StorageClass.yaml
 configMapGenerator:
-  - name: sourcegraph-frontend-env
+  - name: sourcegraph-kustomize-env
     behavior: merge
     literals:
       - DEPLOY_SOURCEGRAPH_STORAGECLASS_NAME=SOURCEGRAPH_OVERLAY_PLACEHOLDER
@@ -45,20 +45,20 @@ vars:
     objref:
       apiVersion: v1
       kind: ConfigMap
-      name: sourcegraph-frontend-env
+      name: sourcegraph-kustomize-env
     fieldref:
       fieldpath: data.DEPLOY_SOURCEGRAPH_STORAGECLASS_NAME
   - name: DEPLOY_SOURCEGRAPH_STORAGECLASS_PROVISIONER
     objref:
       apiVersion: v1
       kind: ConfigMap
-      name: sourcegraph-frontend-env
+      name: sourcegraph-kustomize-env
     fieldref:
       fieldpath: data.DEPLOY_SOURCEGRAPH_STORAGECLASS_PROVISIONER
   - name: DEPLOY_SOURCEGRAPH_STORAGECLASS_PARAM_TYPE
     objref:
       apiVersion: v1
       kind: ConfigMap
-      name: sourcegraph-frontend-env
+      name: sourcegraph-kustomize-env
     fieldref:
       fieldpath: data.DEPLOY_SOURCEGRAPH_STORAGECLASS_PARAM_TYPE
