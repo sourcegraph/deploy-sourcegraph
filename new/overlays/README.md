@@ -15,15 +15,15 @@ Run the following command from the root of this repository to generate a new set
 $ kubectl kustomize $PATH_TO_OVERLAY -o new/generated-cluster.yaml
 ```
 
-The new set of manifests can then be found in the [new/generated-cluster.yaml](../preview-cluster/) directory.
+The new set of manifests can then be found in the `new/generated-cluster.yaml` file.
 
 ### Apply an overlay
 
 To apply the customiziation made with an overlay:
 
 1. Follow the steps above to build manifests from an overlay
-2. Make sure the manifests in the output directory `generated-cluster/` are generated correctly
-3. Run the following command from the root of this repository to apply the manifests from the output directory `new/generated-cluster.yaml`
+2. Make sure the manifests in the output file `new/generated-cluster.yaml` are generated correctly
+3. Run the following command from the root of this repository to apply the manifests from the output file `new/generated-cluster.yaml`
 
    ```bash
    $ kubectl apply -k --prune -l deploy=sourcegraph -f new/generated-cluster.yaml
