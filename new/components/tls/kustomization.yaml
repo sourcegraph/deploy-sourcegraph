@@ -1,0 +1,23 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+resources:
+- patches/nginx.ConfigMap.yaml
+- patches/nginx.Deployment.yaml
+- patches/nginx.Service.yaml
+patchesStrategicMerge:
+- patches/sourcegraph-frontend.Ingress.yaml
+configMapGenerator:
+  - name: sourcegraph-kustomize-env
+    behavior: merge
+    literals:
+      - TLS_HOST=SOURCEGRAPH_OVERLAY_PLACEHOLDER
+configurations:
+- patches/transformer.yaml
+vars:
+  - name: TLS_HOST
+    objref:
+      apiVersion: v1
+      kind: ConfigMap
+      name: sourcegraph-kustomize-env
+    fieldref:
+      fieldpath: data.TLS_HOST

@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sourcegraph-frontend
+spec:
+  tls:
+  - hosts:
+    - $(TLS_HOST)
+    secretName: sourcegraph-tls
+  rules:
+    - host: $(TLS_HOST)
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: sourcegraph-frontend
+              port:
+                number: 30080
