@@ -16,8 +16,6 @@ IMPORTANT: Only works with Sourcegraph version v4.4.0+ (TBC)
   - contains manifests with the default value for all Sourcegraph services
 - components
   - contains preconfigured components that are created for different purposes, and are ready to be used in an overlay
-- config
-  - contains components that require additional configurations before they can be added to an overlay as a component
 - overlays
   - deploy: the default directory for building a customized overlay for your Sourcegraph deployment
   - quick-start: contains different ready-to-use overlays built for different situations and purposes
@@ -55,11 +53,10 @@ $ kubectl kustomize $REMOTE_OVERLAY_URL -o $PATH_TO_EXISITING_DIRECTORY
 
 ##### Example
 
-To generate manifests for Sourcegraph version v4.4.0 using the remote URL for our k3s overlay that is configured for a size XS instance, and then send the output files to the `new/preview-cluster` directory on your local machine:
+To generate manifests for Sourcegraph version v4.4.0 using the remote URL for our k3s overlay that is configured for a size XS instance, and then send the output to the `new/generated-cluster.yaml` file on your local machine:
 
 ```bash
-$ mkdir -p new/preview-cluster
-$ kubectl kustomize https://github.com/sourcegraph/deploy-sourcegraph/new/overlays/quick-start/k3s/xs?ref=v4.4.0 -o new/preview-cluster
+$ kubectl kustomize https://github.com/sourcegraph/deploy-sourcegraph/new/overlays/quick-start/k3s/xs?ref=v4.4.0 -o new/generated-cluster.yaml
 ```
 
 ## Apply an overlay
@@ -67,7 +64,7 @@ $ kubectl kustomize https://github.com/sourcegraph/deploy-sourcegraph/new/overla
 To apply the customizations configured with your overlay:
 
 1. Follow the steps in the `Generate manifests` section above to build manifests from an overlay
-2. Make sure the manifests in the output directory `new/preview-cluster` are generated correctly
+2. Make sure the manifests in the output directory `new/generated-cluster.yaml` are generated correctly
 3. Run the following command to apply overlay directly using the remote URL
 
 ```bash
@@ -132,20 +129,20 @@ Run the following command in the root of this repository.
 
 ##### Individual output files
 
-To produce seperated manifest file for each resources to the `new/preview-cluster` directory, run the following command from the root of this repository:
+To produce seperated manifest file for each resources to the `new/generated-cluster.yaml` file, run the following command from the root of this repository:
 
 ```bash
-# Example: kubectl kustomize new/kustomize/overlays/quick-start/basic/xs -o new/preview-cluster
-$ kubectl kustomize $PATH_TO_OVERLAY -o new/preview-cluster
+# Example: kubectl kustomize new/kustomize/overlays/quick-start/basic/xs -o new/generated-cluster.yaml
+$ kubectl kustomize $PATH_TO_OVERLAY -o new/generated-cluster.yaml
 ```
 
 ##### Single output file
 
-To groups all the manifests into a single file named `cluster.yaml` to the `new/preview-cluster/` directory:
+To groups all the manifests into a single file named `cluster.yaml` to the `new/generated-cluster.yaml` directory:
 
 ```bash
-# Example: kubectl kustomize new/kustomize/overlays/quick-start/minikube -o new/preview-cluster.yaml
-$ kubectl kustomize $PATH_TO_OVERLAY -o new/preview-cluster.yaml
+# Example: kubectl kustomize new/kustomize/overlays/quick-start/minikube -o new/generated-cluster.yaml.yaml
+$ kubectl kustomize $PATH_TO_OVERLAY -o new/generated-cluster.yaml.yaml
 ```
 
 #### Apply an overlay
@@ -153,9 +150,9 @@ $ kubectl kustomize $PATH_TO_OVERLAY -o new/preview-cluster.yaml
 To apply the customizations configured with your overlay:
 
 1. Follow the steps in the `Generate manifests` section above to build manifests from an overlay
-2. Make sure the manifests in the output directory `new/preview-cluster` are generated correctly
-3. Run the following command from the root of this repository to apply the manifests from the output directory `new/preview-cluster`
+2. Make sure the manifests in the output directory `new/generated-cluster.yaml` are generated correctly
+3. Run the following command from the root of this repository to apply the manifests from the output directory `new/generated-cluster.yaml`
 
 ```bash
-$ kubectl apply -k --prune -l deploy=sourcegraph -f new/preview-cluster/
+$ kubectl apply -k --prune -l deploy=sourcegraph -f new/generated-cluster.yaml
 ```

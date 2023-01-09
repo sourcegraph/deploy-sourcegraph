@@ -21,10 +21,10 @@ If you have this repository cloned locally, check out a version branch that supp
 git checkout $VERSION_NUMBER
 # Generate manifests with resources from the old base cluster
 # RBACs required
-kubectl kustomize new/overlays/quick-start/current -o new/preview-cluster
+kubectl kustomize new/overlays/quick-start/current -o new/generated-cluster.yaml
 ```
 
-The manifests will be grouped and exported to the new/preview-cluster directory.
+The manifests will be grouped and exported to the new/generated-cluster.yaml directory.
 
 ### Remote build
 

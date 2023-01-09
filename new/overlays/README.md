@@ -11,11 +11,11 @@ Each overlay is created with different kustomize components that are located ins
 Run the following command from the root of this repository to generate a new set of manifests from an overlay:
 
 ```bash
-# Example: kubectl kustomize new/kustomize/overlays/quick-start/basic/xs -o new/preview-cluster/
-$ kubectl kustomize $PATH_TO_OVERLAY -o new/preview-cluster/
+# Example: kubectl kustomize new/kustomize/overlays/quick-start/basic/xs -o new/generated-cluster.yaml
+$ kubectl kustomize $PATH_TO_OVERLAY -o new/generated-cluster.yaml
 ```
 
-The new set of manifests can then be found in the [new/preview-cluster/](../preview-cluster/) directory.
+The new set of manifests can then be found in the [new/generated-cluster.yaml](../preview-cluster/) directory.
 
 ### Apply an overlay
 
@@ -23,8 +23,8 @@ To apply the customiziation made with an overlay:
 
 1. Follow the steps above to build manifests from an overlay
 2. Make sure the manifests in the output directory `generated-cluster/` are generated correctly
-3. Run the following command from the root of this repository to apply the manifests from the output directory `new/preview-cluster/`
+3. Run the following command from the root of this repository to apply the manifests from the output directory `new/generated-cluster.yaml`
 
    ```bash
-   $ kubectl apply -k --prune -l deploy=sourcegraph -f new/preview-cluster/
+   $ kubectl apply -k --prune -l deploy=sourcegraph -f new/generated-cluster.yaml
    ```

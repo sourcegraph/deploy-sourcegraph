@@ -8,5 +8,6 @@ reclaimPolicy: Retain
 allowVolumeExpansion: true
 # Read https://kubernetes.io/docs/concepts/storage/storage-classes/ to configure the "provisioner" and "parameters" fields for your cloud provider.
 # SSDs are highly recommended!
-# provisioner:
-# parameters:
+provisioner: $(DEPLOY_SOURCEGRAPH_STORAGECLASS_PROVISIONER)
+parameters:
+  type: $(DEPLOY_SOURCEGRAPH_STORAGECLASS_PARAM_TYPE) # This configures SSDs (recommended).

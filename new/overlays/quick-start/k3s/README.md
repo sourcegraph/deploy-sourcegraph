@@ -10,10 +10,10 @@ If you have this repository cloned locally, check out a version branch that supp
 
 ```sh
 # Replace xs with your instance size
-kubectl kustomize new/overlays/quick-start/k3s/xs -o new/preview-cluster
+kubectl kustomize new/overlays/quick-start/k3s/xs -o new/generated-cluster.yaml
 ```
 
-The manifests will be grouped and exported to the new/preview-cluster directory.
+The manifests will be grouped and exported to the new/generated-cluster.yaml directory.
 
 ### Remote build
 
