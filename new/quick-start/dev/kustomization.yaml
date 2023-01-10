@@ -2,10 +2,11 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: sourcegraph-kustomize-example
 resources:
-  - ../../base/sourcegraph                # Sourcegraph Main Stacks
-
-# Add components here
+# Sourcegraph Main Stacks
+- ../../base/sourcegraph
 components:
-  - ../../components/internal/ci-volume
-  - ../../components/remove/resources
-  - ../../components/remove/pvcs
+# Monitoring Stacks - RBACs required
+- ../../components/monitoring
+- ../../components/internal/ci-volume
+- ../../components/remove/resources
+- ../../components/remove/pvcs
