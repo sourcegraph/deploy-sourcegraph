@@ -16,12 +16,6 @@ patchesStrategicMerge:
 - |-
   $patch: delete
   apiVersion: rbac.authorization.k8s.io/v1
-  kind: RoleBinding
-  metadata:
-    name: prometheus-nonprivileged
-- |-
-  $patch: delete
-  apiVersion: rbac.authorization.k8s.io/v1
   kind: ClusterRoleBinding
   metadata:
     name: prometheus
@@ -49,3 +43,9 @@ patchesStrategicMerge:
   kind: Deployment
   metadata:
     name: prometheus
+# - |-
+#   $patch: delete
+#   apiVersion: rbac.authorization.k8s.io/v1
+#   kind: RoleBinding
+#   metadata:
+#     name: prometheus-nonprivileged

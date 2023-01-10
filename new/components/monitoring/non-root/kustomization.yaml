@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+resources:
+- ../../../base/monitoring
+- patches/prometheus/prometheus.RoleBinding.yaml
+components:
+- ../../remove/daemonset
+patchesStrategicMerge:
+- patches/grafana/grafana.StatefulSet.yaml
+- patches/prometheus/prometheus.ConfigMap.yaml
+- patches/prometheus/prometheus.Deployment.yaml
