@@ -1,9 +1,5 @@
 apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
-resources:
-- patches/nginx.ConfigMap.yaml
-- patches/nginx.Deployment.yaml
-- patches/nginx.Service.yaml
 patchesStrategicMerge:
 - patches/sourcegraph-frontend.Ingress.yaml
 configMapGenerator:
@@ -11,6 +7,8 @@ configMapGenerator:
     behavior: merge
     literals:
       - TLS_HOST=SOURCEGRAPH_OVERLAY_PLACEHOLDER
+      - TLS_INGRESS_CLASS_NAME=SOURCEGRAPH_OVERLAY_PLACEHOLDER
+      - TLS_CLUSTER_ISSUER=SOURCEGRAPH_OVERLAY_PLACEHOLDER
 configurations:
 - patches/transformer.yaml
 vars:
@@ -21,3 +19,17 @@ vars:
       name: sourcegraph-kustomize-env
     fieldref:
       fieldpath: data.TLS_HOST
+  - name: TLS_INGRESS_CLASS_NAME
+    objref:
+      apiVersion: v1
+      kind: ConfigMap
+      name: sourcegraph-kustomize-env
+    fieldref:
+      fieldpath: data.TLS_INGRESS_CLASS_NAME
+  - name: TLS_CLUSTER_ISSUER
+    objref:
+      apiVersion: v1
+      kind: ConfigMap
+      name: sourcegraph-kustomize-env
+    fieldref:
+      fieldpath: data.TLS_CLUSTER_ISSUER
