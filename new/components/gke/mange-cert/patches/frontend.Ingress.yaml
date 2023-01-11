@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sourcegraph-frontend
+  annotations:
+    # See
+    # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/
+    # for more nginx annotations.
+    kubernetes.io/ingress.class: gce
+    # We can upload large files (extensions)
+    nginx.ingress.kubernetes.io/proxy-body-size: "150m"
+    networking.gke.io/managed-certificates: $(GKE_MANAGED_CERT_NAME) # replace with actual Google-managed certificate name
+    # if you reserve a static IP, uncomment below and update ADDRESS_NAME
+    # also, make changes to your DNS record accordingly
+    # kubernetes.io/ingress.global-static-ip-name: $(GKE_STATIC_IP)

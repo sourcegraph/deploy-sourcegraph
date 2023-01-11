@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+patchesStrategicMerge:
+- patches/frontend.Ingress.yaml
+configMapGenerator:
+  - name: sourcegraph-kustomize-env
+    behavior: merge
+    literals:
+      - GKE_MANAGED_CERT_NAME=SOURCEGRAPH_OVERLAY_PLACEHOLDER
+configurations:
+- patches/transformer.yaml
+vars:
+  - name: GKE_MANAGED_CERT_NAME
+    objref:
+      apiVersion: v1
+      kind: ConfigMap
+      name: sourcegraph-kustomize-env
+    fieldref:
+      fieldpath: data.GKE_MANAGED_CERT_NAME
