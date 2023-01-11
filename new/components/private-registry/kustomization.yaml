@@ -2,6 +2,21 @@ apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
 components:
   - preconfig
+configMapGenerator:
+  - name: sourcegraph-kustomize-env
+    behavior: merge
+    literals:
+      - DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY=$(DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY)
+configurations:
+- patches/transformer.yaml
+vars:
+  - name: DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY
+    objref:
+      apiVersion: v1
+      kind: ConfigMap
+      name: sourcegraph-kustomize-env
+    fieldref:
+      fieldpath: data.DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY
 ########################## HOW TO USE ########################################
 # Replace the DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY variable with your registry
 #
@@ -92,18 +107,3 @@ components:
 # - name: index.docker.io/sourcegraph/node-exporter
 #   newName: $(DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY)/sourcegraph/prometheus
 #   # newTag: new.private.tag
-configMapGenerator:
-  - name: sourcegraph-kustomize-env
-    behavior: merge
-    literals:
-      - DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY=$(DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY)
-configurations:
-- patches/transformer.yaml
-vars:
-  - name: DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY
-    objref:
-      apiVersion: v1
-      kind: ConfigMap
-      name: sourcegraph-kustomize-env
-    fieldref:
-      fieldpath: data.DEPLOY_SOURCEGRAPH_PRIVATE_REGISTRY

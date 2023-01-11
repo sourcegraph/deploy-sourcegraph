@@ -1,0 +1,16 @@
+# A BackendConfig CRD. 
+# This is necessary to instruct the GCP load balancer on how to perform health checks on our deployment.
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: sourcegraph-frontend
+  labels:
+    app: sourcegraph-frontend
+    app.kubernetes.io/component: frontend
+    deploy: sourcegraph
+spec:
+  healthCheck:
+    checkIntervalSec: 5
+    timeoutSec: 5
+    requestPath: /ready
+    port: 6060 # we use a custom port to perform healthcheck

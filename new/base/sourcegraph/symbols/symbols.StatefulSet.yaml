@@ -38,12 +38,12 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        # - name: OTEL_AGENT_HOST
-        #   valueFrom:
-        #     fieldRef:
-        #       fieldPath: status.hostIP
-        # - name: OTEL_EXPORTER_OTLP_ENDPOINT
-        #   value: http://$(OTEL_AGENT_HOST):4317
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
         image: index.docker.io/sourcegraph/symbols:187572_2022-12-06_cbecc5321c7d@sha256:75615a60f318dc898eae2e5037efcd53e63cf28c2b8fca388b6923d215ff9db9
         livenessProbe:
           httpGet:

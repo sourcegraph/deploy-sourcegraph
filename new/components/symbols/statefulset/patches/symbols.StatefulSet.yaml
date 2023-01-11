@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: searcher
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: searcher
+  serviceName: searcher
+  template:
+    metadata:
+      labels:
+        app: searcher
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        name: searcher
+        resources:
+          limits:
+            cpu: "2"
+            memory: 2G
+          requests:
+            cpu: 500m
+            memory: 500M
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 101
+          runAsUser: 100
+      securityContext:
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
+        runAsUser: 100
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: cache-ssd
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 50G
+      storageClassName: sourcegraph
