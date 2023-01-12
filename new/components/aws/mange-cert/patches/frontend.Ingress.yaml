@@ -1,0 +1,8 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sourcegraph-frontend
+  annotations:
+    kubernetes.io/ingress.class: alb
+    # Replace AWS_MANAGED_CERT_ARN with ARN of the AWS-managed TLS certificate
+    alb.ingress.kubernetes.io/certificate-arn: $(AWS_MANAGED_CERT_ARN) 

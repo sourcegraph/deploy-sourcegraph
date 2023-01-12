@@ -2,17 +2,15 @@ apiVersion: deployment.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - ../../base/sourcegraph
-# Handle updating endpoints configs for frontend
+# DO NOT REMOVE: Handle updating endpoints configs for frontend
 replacements:
 - path: util/endpoints-update.yaml
 configMapGenerator:
-# Handle updating env vars for frontend
-# DO NOT REMOVE
+# DO NOT REMOVE: Handle updating env vars for frontend
 - name: sourcegraph-frontend-env
   behavior: merge
   env: env/frontend.env
-# Handle updating configs using env vars for kustomize
-# DO NOT REMOVE
+# DO NOT REMOVE: Handle updating configs using env vars for kustomize
 - name: sourcegraph-kustomize-env
   behavior: merge
   env: config/overlay.config

@@ -15,11 +15,13 @@ IMPORTANT: Only works with Sourcegraph version v4.4.0+ (TBC)
 - base
   - contains manifests with the default value for all Sourcegraph services
 - components
-  - contains preconfigured components that are created for different purposes, and are ready to be used in an overlay
+  - contains preconfigured components that are ready to use
 - overlays
-  - the default directory for building a customized overlay for your Sourcegraph deployment
+  - the default directory for building a customized overlay for a tailored Sourcegraph deployment
 - quick-start
   - contains different ready-to-use overlays built for different use cases
+
+**IMPORTANT:** Please create your own sets of overlays within the 'overlays' directory and refrain from making changes to the other directories to prevent potential conflicts during future updates and ensure a seamless upgrade process.
 
 ## How to use
 

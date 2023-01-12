@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+patchesStrategicMerge:
+- patches/frontend.Ingress.yaml
+configMapGenerator:
+  - name: sourcegraph-kustomize-env
+    behavior: merge
+    literals:
+      - AWS_MANAGED_CERT_ARN=SOURCEGRAPH_OVERLAY_PLACEHOLDER
+configurations:
+- patches/transformer.yaml
+vars:
+  - name: AWS_MANAGED_CERT_ARN
+    objref:
+      apiVersion: v1
+      kind: ConfigMap
+      name: sourcegraph-kustomize-env
+    fieldref:
+      fieldpath: data.AWS_MANAGED_CERT_ARN
