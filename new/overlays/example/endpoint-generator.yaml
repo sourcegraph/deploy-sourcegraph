@@ -1,0 +1,13 @@
+apiVersion: SourcegraphDeployment
+kind: EndpointsConfigMapGenerator
+metadata:
+  name: endpoints-map
+  annotations:
+    config.kubernetes.io/function: |
+      exec: 
+        path: ../../plugins/endpoints-generator.sh  
+spec:
+  gitserver: 4
+  indexer: 5
+  searcher: 3
+  symbols: 2

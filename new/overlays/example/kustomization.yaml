@@ -1,0 +1,26 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+- ../../base/sourcegraph
+# Handle updating endpoints configs for frontend
+generators:
+- endpoint-generator.yaml
+configMapGenerator:
+# Handle updating env vars for frontend
+# DO NOT REMOVE
+- name: sourcegraph-frontend-env
+  behavior: merge
+  env: env/frontend.env
+# Handle updating configs using env vars for kustomize
+# DO NOT REMOVE
+- name: sourcegraph-kustomize-env
+  behavior: merge
+  env: config/overlay.config
+##########################################################
+# DO NOT MAKE ANY CHANGES ABOVE THIS LINE 
+##########################################################
+# update namespace value if needed
+namespace: default
+components:
+# [RBACs required] deploy Sourcegraph monitoring stacks
+- ../../components/monitoring
