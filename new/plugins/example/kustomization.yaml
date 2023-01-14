@@ -2,7 +2,10 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - ../../base/sourcegraph
+- ../../base/monitoring/cadvisor
 # Handle updating endpoints configs for frontend
+replacements:
+- path: util/endpoints-update.yaml
 generators:
 - endpoint-generator.yaml
 configMapGenerator:
@@ -19,8 +22,11 @@ configMapGenerator:
 ##########################################################
 # DO NOT MAKE ANY CHANGES ABOVE THIS LINE 
 ##########################################################
-# update namespace value if needed
+# This update namespace for all resources
+# Add "components/namespace" to your components to create namespace
 namespace: default
 components:
 # [RBACs required] deploy Sourcegraph monitoring stacks
-- ../../components/monitoring
+# - ../../components/monitoring
+- ../../components/enable/service-discovery
+- ../../components/hostname

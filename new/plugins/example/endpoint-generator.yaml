@@ -1,4 +1,4 @@
-apiVersion: SourcegraphDeployment
+apiVersion: SourcegraphKustomizePlugins
 kind: EndpointsConfigMapGenerator
 metadata:
   name: endpoints-map
@@ -6,6 +6,8 @@ metadata:
     config.kubernetes.io/function: |
       exec: 
         path: ../../plugins/endpoints-generator.sh  
+# Update replica counts for gitserver, indexer, searcher, and symbols 
+# below to generate endpoints for each replica
 spec:
   gitserver: 4
   indexer: 5

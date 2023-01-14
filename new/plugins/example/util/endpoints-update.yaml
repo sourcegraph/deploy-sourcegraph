@@ -1,0 +1,47 @@
+- source:
+    kind: StatefulSet
+    name: gitserver
+    fieldPath: spec.replicas
+  targets:
+    - select:
+        kind: ConfigMap
+        name: sourcegraph-frontend-env
+      fieldPaths:
+      - data.GITSERVER_REPLICA_COUNT
+- source:
+    group: apps
+    name: searcher
+    fieldPath: spec.replicas
+  reject:
+  - kind: Service
+  - kind: Deployment
+  targets:
+    - select:
+        kind: ConfigMap
+        name: sourcegraph-frontend-env
+      fieldPaths:
+      - data.SEARCHER_REPLICA_COUNT
+- source:
+    group: apps
+    name: symbols
+    fieldPath: spec.replicas
+  reject:
+  - kind: Service
+  - kind: Deployment
+  targets:
+    - select:
+        kind: ConfigMap
+        name: sourcegraph-frontend-env
+      fieldPaths:
+      - data.SYMBOLS_REPLICA_COUNT
+- source:
+    kind: StatefulSet
+    name: indexed-search
+    fieldPath: spec.replicas
+  targets:
+    - select:
+        kind: ConfigMap
+        name: sourcegraph-frontend-env
+      fieldPaths:
+      - data.INDEXED_SEARCH_REPLICA_COUNT
+      
