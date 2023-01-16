@@ -1,0 +1,1 @@
+Component to deploy [otel-collector(OpenTelemetry)](https://docs.sourcegraph.com/admin/observability/opentelemetry) with default settings on your instance to enable [tracing](https://docs.sourcegraph.com/admin/observability/opentelemetry#tracing).

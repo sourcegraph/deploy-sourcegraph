@@ -25,7 +25,8 @@ spec:
         deploy: sourcegraph
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/blobstore:187572_2022-12-06_cbecc5321c7d@sha256:8e57384c78a3b31cbe31d41656dbcbb8ee7279d96630a33936a2098afabb1317
+      - name: blobstore
+        image: index.docker.io/sourcegraph/blobstore:187572_2022-12-06_cbecc5321c7d@sha256:8e57384c78a3b31cbe31d41656dbcbb8ee7279d96630a33936a2098afabb1317
         livenessProbe:
           httpGet:
             path: /
@@ -33,7 +34,6 @@ spec:
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
-        name: blobstore
         ports:
         - containerPort: 9000
           name: blobstore

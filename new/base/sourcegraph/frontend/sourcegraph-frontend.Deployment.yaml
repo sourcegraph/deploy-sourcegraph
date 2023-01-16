@@ -54,9 +54,10 @@ spec:
         envFrom:
         - configMapRef:
             name: sourcegraph-frontend-env
-        - configMapRef:
-            name: sourcegraph-endpoints-map
+        # - configMapRef:
+        #     name: sourcegraph-endpoints-map
         # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
+        env:
         - name: OTEL_AGENT_HOST
           valueFrom:
             fieldRef:

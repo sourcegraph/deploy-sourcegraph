@@ -1,0 +1,41 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+patchesJson6902:
+  - target:
+      kind: .*
+      name: otel-collector|otel-agent
+      version: v1
+    patch: |-
+      - op: remove
+        path: /spec
+patchesStrategicMerge:
+- |-
+  $patch: delete
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: otel-agent
+- |-
+  $patch: delete
+  apiVersion: apps/v1
+  kind: DaemonSet
+  metadata:
+    name: otel-agent
+- |-
+  $patch: delete
+  apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: otel-collector
+- |-
+  $patch: delete
+  apiVersion: apps/v1
+  kind: Deployment
+  metadata:
+    name: otel-collector
+- |-
+  $patch: delete
+  apiVersion: v1
+  kind: Service
+  metadata:
+    name: otel-collector

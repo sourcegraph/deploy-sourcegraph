@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cadvisor
+spec:
+  template:
+    spec:
+      securityContext:
+        $patch: delete
+      serviceAccountName: cadvisor
+      containers:
+      - name: cadvisor
+        securityContext:
+          privileged: null
+          $patch: delete
