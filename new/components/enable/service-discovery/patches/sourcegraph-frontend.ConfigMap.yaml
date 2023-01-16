@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sourcegraph-frontend-env
+data:
+  SRC_GIT_SERVERS: k8s+rpc://gitserver:3178?kind=sts
+  SEARCHER_URL: k8s+http://searcher:3181
+  SYMBOLS_URL: http://symbols:3184
+  INDEXED_SEARCH_SERVERS: k8s+rpc://indexed-search:6070?kind=sts
