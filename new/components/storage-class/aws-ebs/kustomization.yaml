@@ -2,5 +2,21 @@ apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
 resources:
   - sourcegraph.StorageClass.yaml
-components:
-- ../../sourcegraph
+patchesJson6902:
+  - target:
+      kind: StatefulSet
+      name: .*
+      group: apps
+      version: v1
+    patch: |-
+      - op: replace
+        path: /spec/volumeClaimTemplates/0/spec/storageClassName
+        value: sourcegraph
+  - target:
+      kind: PersistentVolumeClaim
+      name: .*
+      version: v1
+    patch: |-
+      - op: replace
+        path: /spec/storageClassName
+        value: sourcegraph

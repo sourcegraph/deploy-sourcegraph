@@ -2,17 +2,18 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
 - ../../base/sourcegraph
-# Handle updating endpoints configs for frontend
+# [DO NOT REMOVE] Add replica count to frontend as env vars
+# to allows intercommunication between services
 replacements:
-- path: util/endpoints-update.yaml
+- path: config/sourcegraph-kustomize.yaml
 configMapGenerator:
-# Handle updating env vars for frontend
-# DO NOT REMOVE
+# [DO NOT REMOVE] Merge the values in the env/frontend.env file 
+# to the env vars list in sourcegraph-frontend
 - name: sourcegraph-frontend-env
   behavior: merge
   env: env/frontend.env
-# Handle updating configs using env vars for kustomize
-# DO NOT REMOVE
+# [DO NOT REMOVE] Update resources with custom env vars values
+# based on values defined in the config/overlay.config
 - name: sourcegraph-kustomize-env
   behavior: merge
   env: config/overlay.config
