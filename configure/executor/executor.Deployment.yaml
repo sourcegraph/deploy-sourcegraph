@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: executor
+  namespace: default
+  labels:
+    deploy: sourcegraph
+spec:
+  selector:
+    matchLabels:
+      app: executor
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: executor
+    spec:
+      containers:
+        - name: executor
+          image: index.docker.io/sourcegraph/executor:insiders
+          imagePullPolicy: Always 
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - executor
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            exec:
+              command:
+                - pgrep
+                - executor
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 5
+          terminationMessagePolicy: FallbackToLogsOnError
+          # Refer to https://docs.sourcegraph.com/admin/deploy_executors_binary#step-2-setup-environment-variables on how to populate these variables          
+          env:  
+            - name: EXECUTOR_FRONTEND_URL
+              value: 
+            - name: EXECUTOR_FRONTEND_PASSWORD
+              value: 
+            - name: EXECUTOR_USE_FIRECRACKER
+              value: "false"
+            - name: EXECUTOR_QUEUE_NAME
+              value: 
+            - name: DOCKER_HOST
+              value: tcp://localhost:2375
+            - name: SRC_ACCESS_TOKEN 
+              value: 
+            - name: SRC_ENDPOINT
+              value: 
+          volumeMounts:
+            - mountPath: /tmp
+              name: shared-data              
+        - name: dind
+          image: docker:20.10.22-dind
+          securityContext:
+            privileged: true          
+          command:
+            - 'dockerd'
+            - '--tls=false'
+            - '--mtu=1200'
+            - '--registry-mirror=http://private-docker-registry:5000'
+            - '--host=tcp://0.0.0.0:2375'
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - dockerd
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            exec:
+              command:
+                - pgrep
+                - dockerd
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 5            
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+          ports:
+            - containerPort: 2375
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /tmp
+              name: shared-data
+            - mountPath: /etc/docker/daemon.json
+              subPath: daemon.json
+              name: docker-config
+      volumes:
+        - name: shared-data
+          emptyDir:
+            sizeLimit: 5Gi
+        - name: docker-config
+          configMap:
+            defaultMode: 420
+            name: docker-config              
