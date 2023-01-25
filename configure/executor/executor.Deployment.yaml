@@ -4,7 +4,7 @@ metadata:
   name: executor
   annotations:
     description: Runs sourcegraph executor replicas for batch chanes and codeintel auto indexing.
-    kubectl.kubernetes.io/default-container: executor  
+    kubectl.kubernetes.io/default-container: executor
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
@@ -29,7 +29,7 @@ spec:
       containers:
         - name: executor
           image: index.docker.io/sourcegraph/executor:insiders
-          imagePullPolicy: Always 
+          imagePullPolicy: Always
           livenessProbe:
             httpGet:
               path: /healthz
@@ -48,36 +48,36 @@ spec:
             - containerPort: 6060
               name: debug
           terminationMessagePolicy: FallbackToLogsOnError
-          # Refer to https://docs.sourcegraph.com/admin/deploy_executors_binary#step-2-setup-environment-variables on how to populate these variables          
-          env:  
+          # Refer to https://docs.sourcegraph.com/admin/deploy_executors_binary#step-2-setup-environment-variables on how to populate these variables
+          env:
             - name: EXECUTOR_FRONTEND_URL
-              value: 
+              value:
             - name: EXECUTOR_FRONTEND_PASSWORD
-              value: 
+              value:
             - name: EXECUTOR_USE_FIRECRACKER
               value: "false"
             - name: EXECUTOR_QUEUE_NAME
-              value: 
+              value:
             - name: EXECUTOR_JOB_NUM_CPUS
               value: "0"
             - name: EXECUTOR_JOB_MEMORY
-              value: "0"              
+              value: "0"
             - name: DOCKER_HOST
               value: tcp://localhost:2375
-            - name: SRC_ACCESS_TOKEN 
-              value: 
+            - name: SRC_ACCESS_TOKEN
+              value:
             - name: SRC_ENDPOINT
-              value: 
+              value:
             # Note: Must match the mount point shared with the dind sidecar
             - name: TMPDIR
-              value: /scratch              
+              value: /scratch
           volumeMounts:
             - mountPath: /scratch
-              name: executor-scratch              
+              name: executor-scratch
         - name: dind
           image: docker:20.10.22-dind
           securityContext:
-            privileged: true          
+            privileged: true
           command:
             - 'dockerd'
             - '--tls=false'
@@ -95,7 +95,7 @@ spec:
               port: 2375
             initialDelaySeconds: 10
             periodSeconds: 5
-            failureThreshold: 5            
+            failureThreshold: 5
           env:
             - name: POD_NAME
               valueFrom:
