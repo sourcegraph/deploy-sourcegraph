@@ -2,9 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: executor
-  namespace: default
   labels:
+    app: executor
     deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: executor
 spec:
   selector:
     matchLabels:
