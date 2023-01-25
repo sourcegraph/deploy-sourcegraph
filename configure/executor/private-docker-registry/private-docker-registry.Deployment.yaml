@@ -2,9 +2,10 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: private-docker-registry
-  namespace: default
   labels:
-    app: private-docker-registry
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: private-docker-registry
 spec:
   replicas: 1
   strategy:
@@ -13,9 +14,6 @@ spec:
     matchLabels:
       app: private-docker-registry
   template:
-    metadata:
-      labels:
-        app: private-docker-registry
     spec:
       containers:
         - image: index.docker.io/registry:2
