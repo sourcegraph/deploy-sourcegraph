@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: executor
-          image: index.docker.io/sourcegraph/executor:insiders
+          image: index.docker.io/sourcegraph/executor:insiders@sha256:dfeef2e31d6c7b9bc3e5bf581180668f7c033ffcf1fff9d3d6380b7b998d4c2b
           imagePullPolicy: Always
           livenessProbe:
             httpGet:
@@ -64,10 +64,6 @@ spec:
               value: "0"
             - name: DOCKER_HOST
               value: tcp://localhost:2375
-            - name: SRC_ACCESS_TOKEN
-              value:
-            - name: SRC_ENDPOINT
-              value:
             # Note: Must match the mount point shared with the dind sidecar
             - name: TMPDIR
               value: /scratch
@@ -75,7 +71,7 @@ spec:
             - mountPath: /scratch
               name: executor-scratch
         - name: dind
-          image: docker:20.10.22-dind
+          image: docker:20.10.22-dind@sha256:03f2d563100b9776283de1e18f10a1f0b66d2fdc7918831bf8db1cda767d6b37
           securityContext:
             privileged: true
           command:
