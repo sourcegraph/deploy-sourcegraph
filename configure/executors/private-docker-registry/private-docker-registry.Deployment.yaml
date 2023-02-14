@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: private-docker-registry
+  labels:
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: private-docker-registry
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: private-docker-registry
+  template:
+    spec:
+      containers:
+        - image: index.docker.io/registry:2
+          name: private-docker-registry
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: REGISTRY_PROXY_REMOTEURL
+              value: http://registry-1.docker.io
+          ports:
+            - containerPort: 5000
+              name: registry
+          livenessProbe:
+            httpGet:
+              path: /
+              port: registry
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: registry
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5         
+          volumeMounts:
+            - mountPath: /var/lib/registry
+              name: cache
+      volumes:
+        - name: cache
+          persistentVolumeClaim:
+            claimName: private-docker-registry

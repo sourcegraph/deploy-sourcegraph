@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: executor
+  annotations:
+    description: Runs sourcegraph executor replicas for batch chanes and codeintel auto indexing.
+    kubectl.kubernetes.io/default-container: executor
+  labels:
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: executor
+spec:
+  selector:
+    matchLabels:
+      app: executor
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: executor
+    spec:
+      containers:
+        - name: executor
+          image: index.docker.io/sourcegraph/executor:insiders@sha256:dfeef2e31d6c7b9bc3e5bf581180668f7c033ffcf1fff9d3d6380b7b998d4c2b
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: debug
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: debug
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 6060
+              name: debug
+          terminationMessagePolicy: FallbackToLogsOnError
+          # Refer to https://docs.sourcegraph.com/admin/deploy_executors_binary#step-2-setup-environment-variables on how to populate these variables
+          env:
+            - name: EXECUTOR_FRONTEND_URL
+              value:
+            - name: EXECUTOR_FRONTEND_PASSWORD
+              value:
+            - name: EXECUTOR_USE_FIRECRACKER
+              value: "false"
+            - name: EXECUTOR_QUEUE_NAME
+              value:
+            - name: EXECUTOR_JOB_NUM_CPUS
+              value: "0"
+            - name: EXECUTOR_JOB_MEMORY
+              value: "0"
+            - name: DOCKER_HOST
+              value: tcp://localhost:2375
+            # Note: Must match the mount point shared with the dind sidecar
+            - name: TMPDIR
+              value: /scratch
+          volumeMounts:
+            - mountPath: /scratch
+              name: executor-scratch
+        - name: dind
+          image: docker:20.10.22-dind@sha256:03f2d563100b9776283de1e18f10a1f0b66d2fdc7918831bf8db1cda767d6b37
+          securityContext:
+            privileged: true
+          command:
+            - 'dockerd'
+            - '--tls=false'
+            - '--mtu=1200'
+            - '--registry-mirror=http://private-docker-registry:5000'
+            - '--host=tcp://0.0.0.0:2375'
+          livenessProbe:
+            tcpSocket:
+                  port: 2375
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            tcpSocket:
+              port: 2375
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 5
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+          ports:
+            - containerPort: 2375
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /scratch
+              name: executor-scratch
+            - mountPath: /etc/docker/daemon.json
+              subPath: daemon.json
+              name: docker-config
+      volumes:
+        - name: executor-scratch
+          emptyDir: {}
+        - name: docker-config
+          configMap:
+            defaultMode: 420
+            name: docker-config

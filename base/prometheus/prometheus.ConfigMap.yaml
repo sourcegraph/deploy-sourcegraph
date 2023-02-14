@@ -163,6 +163,16 @@ data:
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: instance
+      # Sourcegraph specific customization. We want to add a label to every 
+      # metric that indicates the node it came from.
+      - source_labels: [__meta_kubernetes_endpoint_node_name]
+        action: replace
+        target_label: nodename
+      metric_relabel_configs:
+      # Sourcegraph specific customization. Drop metrics with empty nodename responses from the k8s API
+      - source_labels: [nodename]
+        regex: ^$
+        action: drop
 
     # Example scrape config for probing services via the Blackbox Exporter.
     #
@@ -235,6 +245,11 @@ data:
       - source_labels: [__meta_kubernetes_namespace]
         action: replace
         target_label: ns
+      # Sourcegraph specific customization. We want to add a label to every 
+      # metric that indicates the node it came from.
+      - source_labels: [__meta_kubernetes_pod_node_name]
+        action: replace
+        target_label: nodename
 
       metric_relabel_configs:
       # cAdvisor-specific customization. Drop container metrics exported by cAdvisor
@@ -255,6 +270,10 @@ data:
         action: replace
         target_label: name
         separator: '-'
+      # Sourcegraph specific customization. Drop metrics with empty nodename responses from the k8s API
+      - source_labels: [nodename]
+        regex: ^$
+        action: drop
 
     # Scrape prometheus itself for metrics.
     - job_name: 'builtin-prometheus'

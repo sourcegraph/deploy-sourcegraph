@@ -112,7 +112,7 @@ patches:
   path: delete-resources-4.yaml
 - target:
     kind: Deployment
-    name: minio
+    name: blobstore
     group: apps
     version: v1
   path: delete-resources.yaml
@@ -297,11 +297,11 @@ patches:
       template:
         spec:
           containers:
-          - name: minio
+          - name: blobstore
             args:
-            - minio
+            - blobstore
             - server
-            - /data-minio
+            - /data-blobstore
             env:
               - name: POD_NAME
                 valueFrom:
@@ -309,19 +309,19 @@ patches:
                     apiVersion: v1
                     fieldPath: metadata.name
             volumeMounts:
-            - mountPath: /data-minio
-              name: minio-data
+            - mountPath: /data-blobstore
+              name: blobstore-data
               subPathExpr: $(POD_NAME)
 
           volumes:
-            - name: minio-data
+            - name: blobstore-data
               hostPath:
                 path: /mnt/disks/ssd0/buildkite/cluster-deployments/
                 type: DirectoryOrCreate
               persistentVolumeClaim: null
   target:
     kind: Deployment
-    name: minio
+    name: blobstore
 - patch: |-
     apiVersion: apps/v1
     kind: Deployment
@@ -449,9 +449,7 @@ patches:
 
 patchesStrategicMerge:
 - cadvisor/delete-Daemonset.yaml
-- cadvisor/delete-ClusterRole.yaml
-- cadvisor/delete-ClusterRoleBinding.yaml
 - cadvisor/delete-ServiceAccount.yaml
-- cadvisor/delete-PodSecurityPolicy.yaml
-
+- node-exporter/delete-Daemonset.yaml
+- node-exporter/delete-Service.yaml
 

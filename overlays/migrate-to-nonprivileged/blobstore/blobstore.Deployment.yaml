@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: minio
+  name: blobstore
 spec:
   template:
     spec:
       initContainers:
         - name: transfer-file-ownership
-          image: index.docker.io/sourcegraph/alpine-3.14:insiders@sha256:9c4a58065415570210e79ed346479f9e9c7f41a52e14b1968eb23b685da2fbcc
+          image: index.docker.io/sourcegraph/alpine-3.14:insiders@sha256:43602f8e5a1bfebe33375007149f6808bc08e95374e8ddd576149ed7eaf95c0d
           command: ["sh", "-c", "chown -R 100:101 /data"]
           volumeMounts:
           - mountPath: /data
-            name: minio-data
+            name: blobstore-data
           securityContext:
             runAsUser: 0
