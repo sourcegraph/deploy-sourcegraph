@@ -1,6 +1,11 @@
 steps:
   - label: ":k8s:"
     command: .buildkite/verify-yaml.sh
+    plugins:
+      - ssh://git@github.com/sourcegraph/buildkite-sourcegraph-secrets-manager-plugin.git#main:
+         env:
+          GOOGLE_CREDENTIALS: BUILDKITE_GCLOUD_SERVICE_ACCOUNT
+
     agents: { queue: no-auth }
 
   - label: ":k8s:"
