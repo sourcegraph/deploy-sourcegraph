@@ -1,6 +1,6 @@
 #!/bin/bash
 
-target_src_version="3.35.1"
+target_src_version="4.5.0"
 current_src_version=$(src version | grep -i current | sed 's/current version: //i')
 
 if [ "$current_src_version" != "$target_src_version" ]; then
