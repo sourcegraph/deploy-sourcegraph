@@ -31,15 +31,18 @@ spec:
           image: index.docker.io/sourcegraph/executor:insiders@sha256:deda81624796df31b56bdaa6820b3332eaa2cbe5e1729886d15ce3c6f57b69b5
           imagePullPolicy: Always
           livenessProbe:
-            command:
-              - /usr/local/bin/executor
-              - validate
+            exec:
+              command:
+                - /usr/local/bin/executor
+                - validate
             initialDelaySeconds: 60
-            timeoutSeconds: 5
+            timeoutSeconds: 30
           readinessProbe:
-            command:
-              - /usr/local/bin/executor
-              - validate
+            exec:
+              command:
+                - /usr/local/bin/executor
+                - validate
+            timeoutSeconds: 30
           terminationMessagePolicy: FallbackToLogsOnError
           # Refer to https://docs.sourcegraph.com/admin/deploy_executors_binary#step-2-setup-environment-variables on how to populate these variables
           env:
@@ -64,7 +67,8 @@ spec:
             - mountPath: /scratch
               name: executor-scratch
         - name: dind
-          image: index.docker.io/sourcegraph/dind:insiders@sha256:c8b70b89e8a2c3022ca94320f9e3237847209218463c365058718d492fb83f4a
+          image: index.docker.io/sourcegraph/dind:insiders@sha256:06a4a6ac7c200cdd14ebb1cde5be3f02e5df525e1a3e4c1bc258b08e514e550c
+          imagePullPolicy: Always
           securityContext:
             privileged: true
           command:
@@ -102,7 +106,9 @@ spec:
               name: docker-config
       volumes:
         - name: executor-scratch
-          emptyDir: {}
+          emptyDir:
+            # Ensure we don't cause disk pressure on nodes. This value can be adjusted based on the size of the batch change or code intel requirements.
+            sizeLimit: 10Gi
         - name: docker-config
           configMap:
             defaultMode: 420
