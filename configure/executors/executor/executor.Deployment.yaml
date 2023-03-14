@@ -33,16 +33,16 @@ spec:
           livenessProbe:
             exec:
               command:
+                - /usr/bin/pgrep
                 - /usr/local/bin/executor
-                - validate
-            initialDelaySeconds: 60
-            timeoutSeconds: 30
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
           readinessProbe:
             exec:
               command:
+                - /usr/bin/pgrep
                 - /usr/local/bin/executor
-                - validate
-            timeoutSeconds: 30
+            periodSeconds: 5
           terminationMessagePolicy: FallbackToLogsOnError
           # Refer to https://docs.sourcegraph.com/admin/deploy_executors_binary#step-2-setup-environment-variables on how to populate these variables
           env:
@@ -108,7 +108,8 @@ spec:
         - name: executor-scratch
           emptyDir:
             # Ensure we don't cause disk pressure on nodes. This value can be adjusted based on the size of the batch change or code intel requirements.
-            sizeLimit: 10Gi
+            # Refer to https://docs.sourcegraph.com/admin/executors/deploy_executors#resource-recommendations for more information
+            sizeLimit: 20Gi
         - name: docker-config
           configMap:
             defaultMode: 420
