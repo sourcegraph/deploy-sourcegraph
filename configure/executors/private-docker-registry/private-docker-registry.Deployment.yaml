@@ -7,13 +7,16 @@ metadata:
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: private-docker-registry
 spec:
-  replicas: 1
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       app: private-docker-registry
+  replicas: 1
+  strategy:
+    type: Recreate
   template:
+    metadata:
+      labels:
+        app: private-docker-registry
     spec:
       containers:
         - image: index.docker.io/registry:2
@@ -38,7 +41,7 @@ spec:
               port: registry
               scheme: HTTP
             periodSeconds: 5
-            timeoutSeconds: 5         
+            timeoutSeconds: 5
           volumeMounts:
             - mountPath: /var/lib/registry
               name: cache
