@@ -105,5 +105,6 @@ curl --retry-connrefused --retry 2 --retry-delay 10 -m 30 http://localhost:30080
 /usr/local/bin/src version
 
 # run a validation script against it
-ADMIN_TOKEN=$(/usr/local/bin/src admin create --url http://localhost:30080 --username e2e-test-user --email e2e@sourcegraph.com --password 123123123-e2e-test --with-token)
+# '2>&1' is work around bug where token is output to stderr instead of stdout. Will be patched in 5.0.3 of src-cli
+ADMIN_TOKEN=$(/usr/local/bin/src admin create --url http://localhost:30080 --username e2e-test-user --email e2e@sourcegraph.com --password 123123123-e2e-test --with-token 2>&1)
 SRC_ACCESS_TOKEN=$ADMIN_TOKEN SRC_GITHUB_TOKEN=$GH_TOKEN SRC_ENDPOINT=http://localhost:30080/ /usr/local/bin/src validate install validate.json
