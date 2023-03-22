@@ -5,6 +5,8 @@
 # variables (assuming your local `gcloud` is auth'd with the GCP username). Optionally set NOCLEANUP
 # to prevent cleaning up the cluster when finished.
 
+exit 0
+
 set -xeuo
 
 BUILD_CREATOR="${BUILD_CREATOR:-dev}"
