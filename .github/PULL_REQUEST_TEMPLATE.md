@@ -1,4 +1,8 @@
+### Description
+
 <!-- description here -->
+
+> NOTE:
 
 ### Checklist
 
@@ -8,10 +12,12 @@
   this repository. If uneeded, add link or explanation of why it is not needed here.
 -->
 
-* [ ] [CHANGELOG.md](https://github.com/sourcegraph/sourcegraph/blob/main/CHANGELOG.md) updated
-* [ ] [K8s Upgrade notes updated](https://github.com/sourcegraph/sourcegraph/blob/main/doc/admin/updates/kubernetes.md)
-* [ ] Sister [deploy-sourcegraph-docker](https://github.com/sourcegraph/deploy-sourcegraph-docker) change:
-* [ ] All images have a valid tag and SHA256 sum
+- [ ] [CHANGELOG.md](https://github.com/sourcegraph/sourcegraph/blob/main/CHANGELOG.md) updated
+- [ ] [K8s Upgrade notes updated](https://github.com/sourcegraph/sourcegraph/blob/main/doc/admin/updates/kubernetes.md)
+- [ ] Sister [deploy-sourcegraph-k8s](https://github.com/sourcegraph/deploy-sourcegraph-docker) change:
+- [ ] Sister [deploy-sourcegraph-docker](https://github.com/sourcegraph/deploy-sourcegraph-docker) change:
+- [ ] All images have a valid tag and SHA256 sum
+- [ ] I acknowledge that [deploy-sourcegraph-k8s](https://github.com/sourcegraph/deploy-sourcegraph-k8s) is now the preferred Kubernetes deployment repository
 
 ### Test plan
 
