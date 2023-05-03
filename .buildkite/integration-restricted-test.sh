@@ -16,4 +16,3 @@ export BUILD_BRANCH=unknown
 
 # TODO(jac): PodSecurity Policies were entirely removed in k8s v1.25
 # ./tests/integration/restricted/test.sh
-
