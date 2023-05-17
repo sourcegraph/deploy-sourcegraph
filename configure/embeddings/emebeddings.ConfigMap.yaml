@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: embeddings
+    app.kubernetes.io/component: embeddings
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: embeddings-backend
+data:
+  # EMBEDDINGS_UPLOAD_BACKEND: blobstore
+  # EMBEDDINGS_UPLOAD_AWS_ENDPOINT: http://blobstore:9000
+  # Add env vars for `embeddings`, `worker` services below
+  # See [storing-embeddings-indexes](https://docs.sourcegraph.com/cody/explanations/code_graph_context#storing-embedding-indexes) for more details
+  # EMBEDDINGS_UPLOAD_MANAGE_BUCKET: "true"
+  # EMBEDDINGS_REPO_INDEX_CACHE_SIZE: "5"
+
+  ############
+  ##   S3   ##
+  ############
+  # EMBEDDINGS_UPLOAD_BACKEND: S3
+  # EMBEDDINGS_UPLOAD_BUCKET: <my bucket name>
+  # EMBEDDINGS_UPLOAD_AWS_ENDPOINT: https://s3.us-east-1.amazonaws.com
+  # EMBEDDINGS_UPLOAD_AWS_ACCESS_KEY_ID: <your access key>
+  # EMBEDDINGS_UPLOAD_AWS_SECRET_ACCESS_KEY: <your secret key>
+  # EMBEDDINGS_UPLOAD_AWS_SESSION_TOKEN: <your session token> # (optional)
+  # EMBEDDINGS_UPLOAD_AWS_USE_EC2_ROLE_CREDENTIALS: "true" # (optional; set to use EC2 metadata API over static credentials)
+  # EMBEDDINGS_UPLOAD_AWS_REGION: us-east-1
+
+  #############
+  ##   GCS   ##
+  #############
+  # EMBEDDINGS_UPLOAD_BACKEND: GCS
+  # EMBEDDINGS_UPLOAD_BUCKET: <my bucket name>
+  # EMBEDDINGS_UPLOAD_GCP_PROJECT_ID: <my project id>
+  # EMBEDDINGS_UPLOAD_GOOGLE_APPLICATION_CREDENTIALS_FILE: </path/to/file>
+  # EMBEDDINGS_UPLOAD_GOOGLE_APPLICATION_CREDENTIALS_FILE_CONTENT: <{"my": "content"}>

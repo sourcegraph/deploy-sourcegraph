@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Handles embeddings searches
+  name: embeddings
+  labels:
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: embeddings
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: embeddings
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        deploy: sourcegraph
+        app: embeddings
+    spec:
+      containers:
+        - name: embeddings
+          image: index.docker.io/sourcegraph/embeddings:5.0.3@sha256:1d8f05ed57e361451d92eabbb3a0d90169c1108f48a274d556e43f541190e01a
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: OTEL_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://$(OTEL_AGENT_HOST):4317
+          envFrom:
+            - configMapRef:
+                name: embeddings-backend
+          ports:
+            - containerPort: 9991
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "8"
+              memory: 64G
+            requests:
+              cpu: "4"
+              memory: 32G
