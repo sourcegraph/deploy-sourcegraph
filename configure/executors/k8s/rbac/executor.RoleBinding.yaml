@@ -1,0 +1,18 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: sg-executor-role-binding
+  labels:
+    category: rbac
+    deploy: sourcegraph
+    sourcegraph-resource-requires: cluster-admin
+    app.kubernetes.io/component: executor
+subjects:
+  - kind: ServiceAccount
+    name: executor
+    namespace: default
+roleRef:
+  apiGroup: "rbac.authorization.k8s.io"
+  kind: Role
+  name: executor
