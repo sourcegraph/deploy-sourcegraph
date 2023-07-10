@@ -1,0 +1,67 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: executor
+  annotations:
+    description: Runs sourcegraph executor replicas for batch changes and codeintel auto indexing.
+    kubectl.kubernetes.io/default-container: executor
+  labels:
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: executor
+spec:
+  selector:
+    matchLabels:
+      app: executor
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: executor
+    spec:
+      serviceAccountName: executor
+      containers:
+        - name: executor
+          image: index.docker.io/sourcegraph/executor-kubernetes:5.1_230340_2023-06-23_5.0-93d39d620e83@sha256:172770133661d4d148327d2cac87c051a6409871ee6f6e28ce3495b60f883ad5
+          imagePullPolicy: Always
+          livenessProbe:
+            exec:
+              command:
+                - /usr/bin/pgrep
+                - -f
+                - /usr/local/bin/executor
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - /usr/bin/pgrep
+                - -f
+                - /usr/local/bin/executor
+            periodSeconds: 5
+          terminationMessagePolicy: FallbackToLogsOnError
+          env:
+            - name: EXECUTOR_FRONTEND_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: executor-secret
+                  key: password
+          # Refer to https://docs.sourcegraph.com/admin/executors/deploy_executors_binary#step-2-setup-environment-variables on how to populate these variables
+          envFrom:
+            - configMapRef:
+                name: executor-config
+          volumeMounts:
+            - mountPath: /data
+              name: sg-executor-volume
+      volumes:
+        - name: sg-executor-volume
+          persistentVolumeClaim:
+            claimName: sg-executor-pvc

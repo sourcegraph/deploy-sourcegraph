@@ -1,0 +1,29 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: executor
+  labels:
+    category: rbac
+    deploy: sourcegraph
+    sourcegraph-resource-requires: cluster-admin
+    app.kubernetes.io/component: executor
+rules:
+  # Executors create Job pods to run processes. Once Jobs are completed, they are cleaned up.
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - create
+      - delete
+  # Executors need to look up and steam logs from the Job Pods.
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - pods/log
+    verbs:
+      - get
+      - list
+      - watch
