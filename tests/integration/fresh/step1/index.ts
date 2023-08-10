@@ -48,18 +48,6 @@ baseFiles.then(
             'base',
             {
                 files,
-                transformations: [
-                    (obj: any) => {
-                        if (!obj.metadata) {
-                            obj.metadata = {}
-                        }
-                        if (!obj.metadata.annotations) {
-                            obj.metadata.annotations = {}
-                        }
-                        obj.metadata.annotations['pulumi.com/timeoutSeconds'] = '300'
-                        return obj
-                    },
-                ],
             },
             {
                 providers: { kubernetes: k8sProvider },
