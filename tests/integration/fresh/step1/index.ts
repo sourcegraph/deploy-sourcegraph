@@ -3,8 +3,8 @@ import * as path from 'path'
 import * as fg from 'fast-glob'
 import * as k8s from '@pulumi/kubernetes'
 
-import { k8sProvider } from './cluster'
-import { deploySourcegraphRoot, generatedBase } from './config'
+import {k8sProvider} from './cluster'
+import {deploySourcegraphRoot, generatedBase} from './config'
 
 const storageClass = new k8s.storage.v1.StorageClass(
     'sourcegraph-storage-class',
@@ -24,7 +24,7 @@ const storageClass = new k8s.storage.v1.StorageClass(
             type: 'pd-ssd',
         },
     },
-    { provider: k8sProvider }
+    {provider: k8sProvider}
 )
 
 const nameSpace = new k8s.core.v1.Namespace(
@@ -34,7 +34,7 @@ const nameSpace = new k8s.core.v1.Namespace(
             name: 'ns-sourcegraph',
         },
     },
-    { provider: k8sProvider }
+    {provider: k8sProvider}
 )
 
 const globOptions = {
@@ -48,9 +48,21 @@ baseFiles.then(
             'base',
             {
                 files,
+                transformations: [
+                    (obj: any) => {
+                        if (!obj.metadata) {
+                            obj.metadata = {}
+                        }
+                        if (!obj.metadata.annotations) {
+                            obj.metadata.annotations = {}
+                        }
+                        obj.metadata.annotations["pulumi.com/timeoutSeconds"] = "300"
+                        return obj;
+                    }
+                ]
             },
             {
-                providers: { kubernetes: k8sProvider },
+                providers: {kubernetes: k8sProvider},
                 dependsOn: [storageClass, nameSpace],
             }
         )
@@ -67,7 +79,7 @@ const ingressNginx = ingressNginxFiles.then(
             {
                 files,
             },
-            { providers: { kubernetes: k8sProvider } }
+            {providers: {kubernetes: k8sProvider}}
         )
 )
 
