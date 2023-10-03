@@ -27,7 +27,7 @@ spec:
     spec:
       initContainers:
       - name: correct-data-dir-permissions
-        image: index.docker.io/sourcegraph/alpine-3.14:insiders@sha256:14308dbf1c0cd0fa69b81b9fc46b2643a89721f0c8b3fce4c312d80a80e7f543
+        image: index.docker.io/sourcegraph/alpine-3.14:insiders@sha256:2ca865598b56061ccfb9660012a57005a2b02a0bce6010372a37cd1c1dd55ee6
         command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
         volumeMounts:
         - mountPath: /data
@@ -43,7 +43,7 @@ spec:
             memory: "50Mi"
       containers:
       - env:
-        image: index.docker.io/sourcegraph/postgres-12-alpine:insiders@sha256:774914f3a157ed25177dd7877651c11bac74346d52b15ab93686a5ff6619b931
+        image: index.docker.io/sourcegraph/postgres-12-alpine:insiders@sha256:a4651269312574e336bdf9876a6b38527ce4669c7bc738df531704cd64345173
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
           exec:
