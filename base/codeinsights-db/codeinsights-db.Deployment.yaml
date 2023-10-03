@@ -26,7 +26,7 @@ spec:
     spec:
       initContainers:
       - name: correct-data-dir-permissions
-        image: index.docker.io/sourcegraph/alpine-3.14:insiders@sha256:14308dbf1c0cd0fa69b81b9fc46b2643a89721f0c8b3fce4c312d80a80e7f543
+        image: index.docker.io/sourcegraph/alpine-3.14:insiders@sha256:2ca865598b56061ccfb9660012a57005a2b02a0bce6010372a37cd1c1dd55ee6
         command: ["sh", "-c", "if [ -d /var/lib/postgresql/data/pgdata ]; then chmod 750 /var/lib/postgresql/data/pgdata; fi"]
         volumeMounts:
         - mountPath: /var/lib/postgresql/data/
@@ -42,7 +42,7 @@ spec:
             memory: "50Mi"
       containers:
       - name: codeinsights
-        image: index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:3597d70fe8a91c442e4848104c0d0cad0dd9e1f324e5710d4887330f1e0dd560
+        image: index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:3078d3d721c5c00d6441850351e58e212c22f4a6d59176e89988066647f6ce0a
         env:
         - name: POSTGRES_DB
           value: postgres
