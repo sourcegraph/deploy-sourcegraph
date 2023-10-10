@@ -162,7 +162,7 @@ func testLifecycle(t *testing.T, pt *integration.ProgramTester, noCleanup bool) 
 		// Ensure that before we exit, we attempt to destroy and remove the stack.
 		defer func() {
 			destroyErr := pt.TestLifeCycleDestroy()
-			if err != nil {
+			if destroyErr != nil {
 				t.Errorf("failed to clean up: %s", destroyErr)
 				t.Fail()
 			}
