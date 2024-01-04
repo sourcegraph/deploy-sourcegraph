@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/sourcegraph/sourcegraph/enterprise/dev/ci/images"
+	"github.com/sourcegraph/sourcegraph/dev/ci/images"
 )
 
 var (
