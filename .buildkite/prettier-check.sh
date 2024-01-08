@@ -5,6 +5,6 @@ set -euxo pipefail
 
 cd tests/integration/fresh/step1
 
-yarn
+pnpm install
 
-yarn run prettier-check
+pnpm prettier-check
