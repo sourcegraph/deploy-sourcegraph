@@ -11,4 +11,3 @@ After executing the script you can apply the generated manifests from the `gener
 ```shell script
 kubectl apply --prune -l deploy=sourcegraph -f generated-cluster --recursive
 ```
-
