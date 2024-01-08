@@ -7,6 +7,7 @@ You need to create the storageclass if it doesn't exist yet. See [these docs](ht
 To use it, update the two patch files in this directory with your storageclass name.
 
 To generate to the cluster, execute the following command:
+
 ```shell script
 ./overlay-generate-cluster.sh storageclass generated-cluster
 ```

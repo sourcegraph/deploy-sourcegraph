@@ -17,7 +17,7 @@ If we only do it at cluster creation time (when the disks are empty) it is fast 
 volumes we know that the pod user can write to it even without the fsGroup and subsequent apply operations.
 
 In Kubernetes 1.18 fsGroup gets an additional [feature](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#configure-volume-permission-and-ownership-change-policy-for-pods)
-called `fsGroupChangePolicy` that will allow us to control the chmod/chown better. 
+called `fsGroupChangePolicy` that will allow us to control the chmod/chown better.
 
 To use it execute the following command from the root directory of this repository:
 
