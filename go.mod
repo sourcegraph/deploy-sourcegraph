@@ -18,3 +18,6 @@ require (
 )
 
 replace github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.4.3+incompatible
+
+// This was a quick fix to unblock the v5.2.6 release. Release tooling is breaking when trying to get vanity import paths
+replace sourcegraph.com/sourcegraph/appdash-data => github.com/sourcegraph/appdash-data v0.0.0-20151005221446-73f23eafcf67
