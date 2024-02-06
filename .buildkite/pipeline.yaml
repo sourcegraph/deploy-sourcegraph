@@ -23,13 +23,13 @@ steps:
     command: .buildkite/verify-release/verify-release.sh
     agents: { queue: standard }
 
-  - label: ":k8s: :sleuth_or_spy:" 
+  - label: ":k8s: :sleuth_or_spy:"
     command: .buildkite/check-image-names.sh
     agents: { queue: standard }
 
   - label: ":k8s:"
     command: .buildkite/verify-overlays.sh
-    agents: { queue: standard }    
+    agents: { queue: standard }
 
   - wait
 
@@ -59,3 +59,31 @@ steps:
   - label: ":k8s:"
     command: .buildkite/cleanup-disks.sh
     agents: { queue: standard }
+
+  - label: "Release: test"
+    if: "build.branch =~ /^wip_/"
+    command: |
+      wget https://storage.googleapis.com/buildkite_public_assets/sg-rfc795.tar.gz
+      tar zxf sg-rfc795.tar.gz
+      chmod +x ./sg-rfc795
+
+      ./sg-rfc795 release run test --workdir=. --config-from-commit
+
+  - wait
+
+  - label: "Release: finalize"
+    if: "build.branch =~ /^wip_/"
+    command: |
+      wget https://storage.googleapis.com/buildkite_public_assets/sg-rfc795.tar.gz
+      tar zxf sg-rfc795.tar.gz
+      chmod +x ./sg-rfc795
+
+      ./sg-rfc795 release run internal finalize --workdir=. --config-from-commit
+  - label: "Promote to public: finalize"
+    if: build.message =~ /^promote_release/ && build.branch =~ /^wip-release/
+    command: |
+      wget https://storage.googleapis.com/buildkite_public_assets/sg-rfc795.tar.gz
+      tar zxf sg-rfc795.tar.gz
+      chmod +x ./sg-rfc795
+
+      ./sg-rfc795 release run promote-to-public finalize --workdir=. --config-from-commit
