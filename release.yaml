@@ -45,15 +45,18 @@ internal:
             done
         - name: "sg ops (configure)"
           cmd: |
-            sg-rfc795 ops update-images \
-              --kind k8s \
-              --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal \
-              --docker-username=$DOCKER_USERNAME \
-              --docker-password=$DOCKER_PASSWORD \
-              --pin-tag {{inputs.server.tag}} \
-              configure/
+            folders=$(find configure -type d -d 1)
 
-            exit 1
+            for path in $folders; do
+              echo "updating ${path}"
+              sg-rfc795 ops update-images \
+                --kind k8s \
+                --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
+                --docker-username=$DOCKER_USERNAME \
+                --docker-password=$DOCKER_PASSWORD \
+                --pin-tag {{inputs.server.tag}} \
+                ${path}/
+            done
         - name: "git:branch"
           cmd: |
             echo "Creating branch wip_{{version}}"
@@ -76,7 +79,6 @@ internal:
       minor:
         - name: "sg ops (base)"
           cmd: |
-            exit 0
             sg-rfc795 ops update-images \
               --kind k8s \
               --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal \
@@ -86,7 +88,6 @@ internal:
               base/
         - name: "sg ops (overlays)"
           cmd: |
-            exit 0
             folders=$(find overlays -type d -d 1 \! -name "low-resource")
 
             for path in $folders; do
@@ -113,7 +114,6 @@ internal:
                 --pin-tag {{inputs.server.tag}} \
                 ${path}/
             done
-            exit 1
         - name: "git:branch"
           cmd: |
             echo "Creating branch wip_{{version}}"
@@ -145,24 +145,32 @@ internal:
               base/
         - name: "sg ops (overlays)"
           cmd: |
-            sg-rfc795 ops update-images \
-              --kind k8s \
-              --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal \
-              --docker-username=$DOCKER_USERNAME \
-              --docker-password=$DOCKER_PASSWORD \
-              --pin-tag {{inputs.server.tag}} \
-              overlays/
+            folders=$(find overlays -type d -d 1 \! -name "low-resource")
+
+            for path in $folders; do
+              echo "updating ${path}"
+              sg-rfc795 ops update-images \
+                --kind k8s \
+                --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
+                --docker-username=$DOCKER_USERNAME \
+                --docker-password=$DOCKER_PASSWORD \
+                --pin-tag {{inputs.server.tag}} \
+                ${path}/
+            done
         - name: "sg ops (configure)"
           cmd: |
-            sg-rfc795 ops update-images \
-              --kind k8s \
-              --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal \
-              --docker-username=$DOCKER_USERNAME \
-              --docker-password=$DOCKER_PASSWORD \
-              --pin-tag {{inputs.server.tag}} \
-              configure/
+            folders=$(find configure -type d -d 1)
 
-            exit 1
+            for path in $folders; do
+              echo "updating ${path}"
+              sg-rfc795 ops update-images \
+                --kind k8s \
+                --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
+                --docker-username=$DOCKER_USERNAME \
+                --docker-password=$DOCKER_PASSWORD \
+                --pin-tag {{inputs.server.tag}} \
+                ${path}/
+            done
         - name: "git:branch"
           cmd: |
             echo "Creating branch wip_{{version}}"
@@ -208,7 +216,7 @@ promoteToPublic:
         cmd: |
           sg-rfc795 ops update-images \
             --kind k8s \
-            --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
+            --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal \
             --docker-username=$DOCKER_USERNAME \
             --docker-password=$DOCKER_PASSWORD \
             --pin-tag {{inputs.server.tag}} \
@@ -229,15 +237,18 @@ promoteToPublic:
           done
       - name: "sg ops (configure)"
         cmd: |
-          sg-rfc795 ops update-images \
-            --kind k8s \
-            --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
-            --docker-username=$DOCKER_USERNAME \
-            --docker-password=$DOCKER_PASSWORD \
-            --pin-tag {{inputs.server.tag}} \
-            configure/
+          folders=$(find configure -type d -d 1)
 
-          exit 1
+          for path in $folders; do
+            echo "updating ${path}"
+            sg-rfc795 ops update-images \
+              --kind k8s \
+              --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
+              --docker-username=$DOCKER_USERNAME \
+              --docker-password=$DOCKER_PASSWORD \
+              --pin-tag {{inputs.server.tag}} \
+              ${path}/
+          done
       - name: "git:branch"
         cmd: |
           echo "Creating branch promote-release_{{version}}"
