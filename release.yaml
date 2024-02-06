@@ -194,6 +194,7 @@ internal:
     steps:
       - name: "git"
         cmd: |
+          set -e
           git checkout -b wip-release-{{version}}
           git push origin wip-release-{{version}}
           git checkout -
@@ -264,6 +265,7 @@ promoteToPublic:
           git commit -m "promote_release: {{version}}" -m '{{config}}'
       - name: "github"
         cmd: |
+          set -e
           git push origin promote-release_{{version}}
           gh pr create -f -t "PRETEND PROMOTE RELEASE WIP: promote-release: build {{version}}" --base wip-release-{{version}} --body "Test plan: automated release PR, CI will perform additional checks"
   finalize:
@@ -271,6 +273,7 @@ promoteToPublic:
     steps:
       - name: git:tag
         cmd: |
+          set -e
           branch="wip-release-{{version}}"
           git checkout ${branch}
           git tag {{version}}
