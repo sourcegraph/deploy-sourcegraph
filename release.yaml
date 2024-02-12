@@ -1,0 +1,280 @@
+meta:
+  productName: deploy-sourcegraph
+  repository: "github.com/sourcegraph/deploy-sourcegraph"
+  owners:
+    - "@sourcegraph/release"
+
+inputs:
+  - releaseId: server
+
+requirements:
+  - name: "Github CLI"
+    cmd: gh version
+    fixInstructions: brew install gh
+  - name: "Docker username"
+    env: DOCKER_USERNAME
+  - name: "Docker password"
+    env: DOCKER_PASSWORD
+
+internal:
+  create:
+    steps:
+      patch:
+        - name: "sg ops (base)"
+          cmd: |
+            sg-rfc795 ops update-images \
+              --kind k8s \
+              --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal \
+              --docker-username=$DOCKER_USERNAME \
+              --docker-password=$DOCKER_PASSWORD \
+              --pin-tag {{inputs.server.tag}} \
+              base/
+        - name: "sg ops (overlays)"
+          cmd: |
+            folders=$(find overlays -type d -d 1 \! -name "low-resource")
+
+            for path in $folders; do
+              echo "updating ${path}"
+              sg-rfc795 ops update-images \
+                --kind k8s \
+                --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
+                --docker-username=$DOCKER_USERNAME \
+                --docker-password=$DOCKER_PASSWORD \
+                --pin-tag {{inputs.server.tag}} \
+                ${path}/
+            done
+        - name: "sg ops (configure)"
+          cmd: |
+            folders=$(find configure -type d -d 1)
+
+            for path in $folders; do
+              echo "updating ${path}"
+              sg-rfc795 ops update-images \
+                --kind k8s \
+                --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
+                --docker-username=$DOCKER_USERNAME \
+                --docker-password=$DOCKER_PASSWORD \
+                --pin-tag {{inputs.server.tag}} \
+                ${path}/
+            done
+        - name: "git:branch"
+          cmd: |
+            echo "Creating branch wip_{{version}}"
+            release_branch="wip_{{version}}"
+            git checkout -b $release_branch
+        - name: "git:commit"
+          cmd: |
+            find . -name "*.yaml" | xargs git add
+            find . -name "*.yml" | xargs git add
+            # Careful with the quoting for the config, using double quotes will lead
+            # to the shell dropping out all quotes from the json, leading to failed
+            # parsing.
+            git commit -m "release_patch: {{version}}" -m '{{config}}'
+        - name: "git:push"
+          cmd: |
+            git push origin wip_{{version}}
+        - name: "gh cli"
+          cmd: |
+            gh pr create -f -t "PRETEND RELEASE WIP: release_patch: build {{version}}" --body "Test plan: automated release PR, CI will perform additional checks"  # -l "wip_release"
+      minor:
+        - name: "sg ops (base)"
+          cmd: |
+            sg-rfc795 ops update-images \
+              --kind k8s \
+              --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal \
+              --docker-username=$DOCKER_USERNAME \
+              --docker-password=$DOCKER_PASSWORD \
+              --pin-tag {{inputs.server.tag}} \
+              base/
+        - name: "sg ops (overlays)"
+          cmd: |
+            folders=$(find overlays -type d -d 1 \! -name "low-resource")
+
+            for path in $folders; do
+              echo "updating ${path}"
+              sg-rfc795 ops update-images \
+                --kind k8s \
+                --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
+                --docker-username=$DOCKER_USERNAME \
+                --docker-password=$DOCKER_PASSWORD \
+                --pin-tag {{inputs.server.tag}} \
+                ${path}/
+            done
+        - name: "sg ops (configure)"
+          cmd: |
+            folders=$(find configure -type d -d 1)
+
+            for path in $folders; do
+              echo "updating ${path}"
+              sg-rfc795 ops update-images \
+                --kind k8s \
+                --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
+                --docker-username=$DOCKER_USERNAME \
+                --docker-password=$DOCKER_PASSWORD \
+                --pin-tag {{inputs.server.tag}} \
+                ${path}/
+            done
+        - name: "git:branch"
+          cmd: |
+            echo "Creating branch wip_{{version}}"
+            release_branch="wip_{{version}}"
+            git checkout -b $release_branch
+        - name: "git:commit"
+          cmd: |
+            find . -name "*.yaml" | xargs git add
+            find . -name "*.yml" | xargs git add
+            # Careful with the quoting for the config, using double quotes will lead
+            # to the shell dropping out all quotes from the json, leading to failed
+            # parsing.
+            git commit -m "release_minor: {{version}}" -m '{{config}}'
+        - name: "git:push"
+          cmd: |
+            git push origin wip_{{version}}
+        - name: "gh cli"
+          cmd: |
+            gh pr create -f -t "PRETEND RELEASE WIP: release_minor: build {{version}}" --body "Test plan: automated release PR, CI will perform additional checks"  # -l "wip_release"
+      major:
+        - name: "sg ops (base)"
+          cmd: |
+            sg-rfc795 ops update-images \
+              --kind k8s \
+              --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal \
+              --docker-username=$DOCKER_USERNAME \
+              --docker-password=$DOCKER_PASSWORD \
+              --pin-tag {{inputs.server.tag}} \
+              base/
+        - name: "sg ops (overlays)"
+          cmd: |
+            folders=$(find overlays -type d -d 1 \! -name "low-resource")
+
+            for path in $folders; do
+              echo "updating ${path}"
+              sg-rfc795 ops update-images \
+                --kind k8s \
+                --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
+                --docker-username=$DOCKER_USERNAME \
+                --docker-password=$DOCKER_PASSWORD \
+                --pin-tag {{inputs.server.tag}} \
+                ${path}/
+            done
+        - name: "sg ops (configure)"
+          cmd: |
+            folders=$(find configure -type d -d 1)
+
+            for path in $folders; do
+              echo "updating ${path}"
+              sg-rfc795 ops update-images \
+                --kind k8s \
+                --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
+                --docker-username=$DOCKER_USERNAME \
+                --docker-password=$DOCKER_PASSWORD \
+                --pin-tag {{inputs.server.tag}} \
+                ${path}/
+            done
+        - name: "git:branch"
+          cmd: |
+            echo "Creating branch wip_{{version}}"
+            release_branch="wip_{{version}}"
+            git checkout -b $release_branch
+        - name: "git:commit"
+          cmd: |
+            find . -name "*.yaml" | xargs git add
+            find . -name "*.yml" | xargs git add
+            # Careful with the quoting for the config, using double quotes will lead
+            # to the shell dropping out all quotes from the json, leading to failed
+            # parsing.
+            git commit -m "release_patch: {{version}}" -m '{{config}}'
+        - name: "git:push"
+          cmd: |
+            git push origin wip_{{version}}
+        - name: "gh cli"
+          cmd: |
+            gh pr create -f -t "PRETEND RELEASE WIP: release_major: build {{version}}" --body "Test plan: automated release PR, CI will perform additional checks"  # -l "wip_release"
+  finalize:
+    steps:
+      - name: "git"
+        cmd: |
+          set -e
+          git checkout -b wip-release-{{version}}
+          git push origin wip-release-{{version}}
+          git checkout -
+
+test:
+  steps:
+    - name: "placeholder"
+      cmd: |
+        echo "-- pretending to test release ..."
+
+promoteToPublic:
+  create:
+    steps:
+      - name: "git"
+        cmd: |
+          echo "Checking out origin/wip-release-{{version}}"
+          git fetch origin
+          git checkout origin/wip-release-{{version}}
+      - name: "sg ops (base)"
+        cmd: |
+          sg-rfc795 ops update-images \
+            --kind k8s \
+            --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal \
+            --docker-username=$DOCKER_USERNAME \
+            --docker-password=$DOCKER_PASSWORD \
+            --pin-tag {{inputs.server.tag}} \
+            base/
+      - name: "sg ops (overlays)"
+        cmd: |
+          folders=$(find overlays -type d -d 1 \! -name "low-resource")
+
+          for path in $folders; do
+            echo "updating ${path}"
+            sg-rfc795 ops update-images \
+              --kind k8s \
+              --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
+              --docker-username=$DOCKER_USERNAME \
+              --docker-password=$DOCKER_PASSWORD \
+              --pin-tag {{inputs.server.tag}} \
+              ${path}/
+          done
+      - name: "sg ops (configure)"
+        cmd: |
+          folders=$(find configure -type d -d 1)
+
+          for path in $folders; do
+            echo "updating ${path}"
+            sg-rfc795 ops update-images \
+              --kind k8s \
+              --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
+              --docker-username=$DOCKER_USERNAME \
+              --docker-password=$DOCKER_PASSWORD \
+              --pin-tag {{inputs.server.tag}} \
+              ${path}/
+          done
+      - name: "git:branch"
+        cmd: |
+          echo "Creating branch promote-release_{{version}}"
+          branch="promote-release_{{version}}"
+          git checkout -b $branch
+      - name: "git:commit"
+        cmd: |
+          find . -name "*.yaml" | xargs git add
+          find . -name "*.yml" | xargs git add
+          # Careful with the quoting for the config, using double quotes will lead
+          # to the shell dropping out all quotes from the json, leading to failed
+          # parsing.
+          git commit -m "promote_release: {{version}}" -m '{{config}}'
+      - name: "github"
+        cmd: |
+          set -e
+          git push origin promote-release_{{version}}
+          gh pr create -f -t "PRETEND PROMOTE RELEASE WIP: promote-release: build {{version}}" --base wip-release-{{version}} --body "Test plan: automated release PR, CI will perform additional checks"
+  finalize:
+    # These steps should only really run once the pr created in the create step is merged
+    steps:
+      - name: git:tag
+        cmd: |
+          set -e
+          branch="wip-release-{{version}}"
+          git checkout ${branch}
+          git tag {{version}}
+          git push origin ${branch} --tags
