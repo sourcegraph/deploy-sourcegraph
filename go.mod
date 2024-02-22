@@ -4,7 +4,7 @@ go 1.21.5
 
 require (
 	github.com/pkg/errors v0.9.1
-	github.com/sourcegraph/sourcegraph/dev/ci/images v0.0.0-20231229114136-300ec6158254
+	github.com/sourcegraph/sourcegraph/dev/ci/images v0.0.0-20240222005846-e3158c0c2717
 	github.com/sourcegraph/update-docker-tags v0.10.0
 	github.com/stretchr/testify v1.8.4
 )
