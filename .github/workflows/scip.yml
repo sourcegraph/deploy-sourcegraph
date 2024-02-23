@@ -1,0 +1,21 @@
+name: SCIP
+'on':
+  push:
+    branches-ignore:
+      - renovate/docker-sourcegraph-docker-insiders-images
+jobs:
+  scip-go:
+    if: github.repository == 'sourcegraph/deploy-sourcegraph'
+    runs-on: ubuntu-latest
+    container: sourcegraph/scip-go
+    steps:
+      - uses: actions/checkout@50fbc622fc4ef5163becd7fab6573eac35f8462e
+      - name: Get src-cli
+        run: curl -L https://sourcegraph.com/.api/src-cli/src_linux_amd64 -o /usr/local/bin/src;
+          chmod +x /usr/local/bin/src
+      - name: Set directory to safe for git
+        run: git config --global --add safe.directory $GITHUB_WORKSPACE
+      - name: Generate SCIP data
+        run: scip-go
+      - name: Upload SCIP data
+        run: src code-intel upload -github-token=${{ secrets.GITHUB_TOKEN }}
