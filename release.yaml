@@ -59,23 +59,32 @@ internal:
             done
         - name: "git:branch"
           cmd: |
-            echo "Creating branch wip_{{version}}"
-            release_branch="wip_{{version}}"
-            git checkout -b $release_branch
+            set -eu
+            branch="internal/release-{{version}}"
+            echo "Creating branch $branch"
+            git checkout -b $branch
         - name: "git:commit"
           cmd: |
             find . -name "*.yaml" | xargs git add
             find . -name "*.yml" | xargs git add
+
             # Careful with the quoting for the config, using double quotes will lead
             # to the shell dropping out all quotes from the json, leading to failed
             # parsing.
             git commit -m "release_patch: {{version}}" -m '{{config}}'
         - name: "git:push"
           cmd: |
-            git push origin wip_{{version}}
-        - name: "gh cli"
+            branch="internal/release-{{version}}"
+            git push origin "$branch"
+        - name: "github:pr"
           cmd: |
-            gh pr create -f -t "PRETEND RELEASE WIP: release_patch: build {{version}}" --body "Test plan: automated release PR, CI will perform additional checks"  # -l "wip_release"
+            set -eu
+            gh pr create \
+              --fill \
+              --draft \
+              --title "(internal) release_patch: build {{version}}" \
+              --body "Test plan: automated release PR, CI will perform additional checks"
+            echo "🚢 Please check the associated CI build to ensure the process completed".
       minor:
         - name: "sg ops (base)"
           cmd: |
@@ -116,23 +125,32 @@ internal:
             done
         - name: "git:branch"
           cmd: |
-            echo "Creating branch wip_{{version}}"
-            release_branch="wip_{{version}}"
-            git checkout -b $release_branch
+            set -eu
+            branch="internal/release-{{version}}"
+            echo "Creating branch $branch"
+            git checkout -b $branch
         - name: "git:commit"
           cmd: |
             find . -name "*.yaml" | xargs git add
             find . -name "*.yml" | xargs git add
+
             # Careful with the quoting for the config, using double quotes will lead
             # to the shell dropping out all quotes from the json, leading to failed
             # parsing.
             git commit -m "release_minor: {{version}}" -m '{{config}}'
         - name: "git:push"
           cmd: |
-            git push origin wip_{{version}}
-        - name: "gh cli"
+            branch="internal/release-{{version}}"
+            git push origin "$branch"
+        - name: "github:pr"
           cmd: |
-            gh pr create -f -t "PRETEND RELEASE WIP: release_minor: build {{version}}" --body "Test plan: automated release PR, CI will perform additional checks"  # -l "wip_release"
+            set -eu
+            gh pr create \
+              --fill \
+              --draft \
+              --title "(internal) release_patch: build {{version}}" \
+              --body "Test plan: automated release PR, CI will perform additional checks"
+            echo "🚢 Please check the associated CI build to ensure the process completed".
       major:
         - name: "sg ops (base)"
           cmd: |
@@ -173,31 +191,49 @@ internal:
             done
         - name: "git:branch"
           cmd: |
-            echo "Creating branch wip_{{version}}"
-            release_branch="wip_{{version}}"
-            git checkout -b $release_branch
+            set -eu
+            branch="internal/release-{{version}}"
+            echo "Creating branch $branch"
+            git checkout -b $branch
         - name: "git:commit"
           cmd: |
             find . -name "*.yaml" | xargs git add
             find . -name "*.yml" | xargs git add
+
             # Careful with the quoting for the config, using double quotes will lead
             # to the shell dropping out all quotes from the json, leading to failed
             # parsing.
-            git commit -m "release_patch: {{version}}" -m '{{config}}'
+            git commit -m "release_major: {{version}}" -m '{{config}}'
         - name: "git:push"
           cmd: |
-            git push origin wip_{{version}}
-        - name: "gh cli"
+            branch="internal/release-{{version}}"
+            git push origin "$branch"
+        - name: "github:pr"
           cmd: |
-            gh pr create -f -t "PRETEND RELEASE WIP: release_major: build {{version}}" --body "Test plan: automated release PR, CI will perform additional checks"  # -l "wip_release"
+            set -eu
+            gh pr create \
+              --fill \
+              --draft \
+              --title "(internal) release_patch: build {{version}}" \
+              --body "Test plan: automated release PR, CI will perform additional checks"
+            echo "🚢 Please check the associated CI build to ensure the process completed".
   finalize:
     steps:
-      - name: "git"
+      - name: "notifications"
         cmd: |
-          set -e
-          git checkout -b wip-release-{{version}}
-          git push origin wip-release-{{version}}
-          git checkout -
+          set -eu
+
+          branch="internal/release-{{version}}"
+
+          # Post a comment on the PR.
+          cat << EOF | gh pr comment "$branch" --body-file -
+          - :green_circle: Internal release is ready for promotion!
+          - :warning: Do not close/merge the pull request or delete the associated branch if you intend to promote it.
+          EOF
+          # Post an annotation.
+          cat << EOF | buildkite-agent annotate --style info
+          Internal release is ready for promotion under the branch [\`$branch\`](https://github.com/sourcegraph/deploy-sourcegraph/tree/$branch).
+          EOF
 
 test:
   steps:
@@ -210,14 +246,16 @@ promoteToPublic:
     steps:
       - name: "git"
         cmd: |
-          echo "Checking out origin/wip-release-{{version}}"
-          git fetch origin
-          git checkout origin/wip-release-{{version}}
+          set -eu
+          branch="internal/release-{{version}}"
+          echo "Checking out origin/${branch}"
+          git fetch origin "${branch}"
+          git switch "${branch}"
       - name: "sg ops (base)"
         cmd: |
           sg ops update-images \
             --kind k8s \
-            --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal \
+            --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public \
             --docker-username=$DOCKER_USERNAME \
             --docker-password=$DOCKER_PASSWORD \
             --pin-tag {{inputs.server.tag}} \
@@ -252,29 +290,67 @@ promoteToPublic:
           done
       - name: "git:branch"
         cmd: |
-          echo "Creating branch promote-release_{{version}}"
-          branch="promote-release_{{version}}"
-          git checkout -b $branch
+          set -eu
+          branch="promote/release-{{version}}"
+          git switch -c "${branch}"
       - name: "git:commit"
         cmd: |
+          set -eu
+          branch="promote/release-{{version}}"
           find . -name "*.yaml" | xargs git add
           find . -name "*.yml" | xargs git add
+
           # Careful with the quoting for the config, using double quotes will lead
           # to the shell dropping out all quotes from the json, leading to failed
           # parsing.
-          git commit -m "promote_release: {{version}}" -m '{{config}}'
-      - name: "github"
+          git commit -am 'promote-release: {{version}}' -m '{{config}}'
+          git push origin "${branch}"
+      - name: "github:pr"
         cmd: |
-          set -e
-          git push origin promote-release_{{version}}
-          gh pr create -f -t "PRETEND PROMOTE RELEASE WIP: promote-release: build {{version}}" --base wip-release-{{version}} --body "Test plan: automated release PR, CI will perform additional checks"
+          set -eu
+          internal_branch="internal/release-{{version}}"
+          gh pr create \
+            --fill \
+            --draft \
+            --base "$internal_branch" \
+            --title "(promote) release: build {{version}}" \
+            --body "Test plan: automated release PR, CI will perform additional checks"
+          echo "🚢 Please check the associated CI build to ensure the process completed".
   finalize:
     # These steps should only really run once the pr created in the create step is merged
     steps:
       - name: git:tag
         cmd: |
-          set -e
-          branch="wip-release-{{version}}"
-          git checkout ${branch}
+          set -eu
+
+          # Branches
+          internal_branch="internal/release-{{version}}"
+          promote_branch="promote/release-{{version}}"
+          release_branch="release-{{version}}"
+
+          # Create the final branch holding the tagged commit
+          git checkout "${promote_branch}"
+          git switch -c "${release_branch}"
           git tag {{version}}
-          git push origin ${branch} --tags
+          git push origin ${release_branch} --tags
+
+          # Web URL to the tag
+          tag_url="https://github.com/sourcegraph/deploy-sourcegraph/tree/{{version}}"
+
+          # Annotate PRs
+          cat << EOF | gh pr comment "$internal_branch" --body-file -
+          - :green_circle: Release has been promoted, see tag: $tag_url.
+          - :no_entry: Do not under any circumstance delete the branch holding the tagged commit (i.e. \`$release_branch\`).
+          - :arrow_right: You can safely close the PR and delete its a associated branch.
+          EOF
+
+          cat << EOF | gh pr comment "$promote_branch" --body-file -
+          - :green_circle: Release has been promoted, see tag: $tag_url.
+          - :no_entry: Do not under any circumstance delete the branch holding the tagged commit (i.e. \`$release_branch\`).
+          - :arrow_right: You can safely close that PR and delete its a associated branch.
+          EOF
+
+          # Annotate build
+          cat << EOF | buildkite-agent annotate --style info
+          Promoted release is **publicly available** through a git tag at [\`{{version}}\`](https://github.com/sourcegraph/deploy-sourcegraph/tree/{{version}}).
+          EOF
