@@ -31,7 +31,7 @@ internal:
               base/
         - name: "sg ops (overlays)"
           cmd: |
-            folders=$(find overlays -type d -d 1 \! -name "low-resource")
+            folders=$(find overlays -maxdepth 1 overlays -type d \! -name "low-resource")
 
             for path in $folders; do
               echo "updating ${path}"
@@ -45,7 +45,7 @@ internal:
             done
         - name: "sg ops (configure)"
           cmd: |
-            folders=$(find configure -type d -d 1)
+            folders=$(find configure -maxdepth 1 -type d)
 
             for path in $folders; do
               echo "updating ${path}"
@@ -97,7 +97,7 @@ internal:
               base/
         - name: "sg ops (overlays)"
           cmd: |
-            folders=$(find overlays -type d -d 1 \! -name "low-resource")
+            folders=$(find overlays -maxdepth 1 -type d \! -name "low-resource")
 
             for path in $folders; do
               echo "updating ${path}"
@@ -111,7 +111,7 @@ internal:
             done
         - name: "sg ops (configure)"
           cmd: |
-            folders=$(find configure -type d -d 1)
+            folders=$(find configure -maxdepth 1 -type d)
 
             for path in $folders; do
               echo "updating ${path}"
@@ -163,7 +163,7 @@ internal:
               base/
         - name: "sg ops (overlays)"
           cmd: |
-            folders=$(find overlays -type d -d 1 \! -name "low-resource")
+            folders=$(find overlays -maxdepth 1 -type d \! -name "low-resource")
 
             for path in $folders; do
               echo "updating ${path}"
@@ -177,7 +177,7 @@ internal:
             done
         - name: "sg ops (configure)"
           cmd: |
-            folders=$(find configure -type d -d 1)
+            folders=$(find configure -maxdepth 1 -type d)
 
             for path in $folders; do
               echo "updating ${path}"
@@ -262,7 +262,7 @@ promoteToPublic:
             base/
       - name: "sg ops (overlays)"
         cmd: |
-          folders=$(find overlays -type d -d 1 \! -name "low-resource")
+          folders=$(find overlays -maxdepth 1 -type d \! -name "low-resource")
 
           for path in $folders; do
             echo "updating ${path}"
@@ -276,7 +276,7 @@ promoteToPublic:
           done
       - name: "sg ops (configure)"
         cmd: |
-          folders=$(find configure -type d -d 1)
+          folders=$(find configure -maxdepth 1 -type d )
 
           for path in $folders; do
             echo "updating ${path}"
