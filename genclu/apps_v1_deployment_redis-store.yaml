@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Redis for storing semi-persistent data like user sessions.
+  labels:
+    app.kubernetes.io/component: redis
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: redis-store
+  namespace: foobar
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: redis-store
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: redis-store
+        deploy: sourcegraph
+    spec:
+      containers:
+      - image: index.docker.io/sourcegraph/redis-store:insiders@sha256:cf0ec768d43a3107f54a3e915e227d75d5ea314ed6219926827dbc66fe3796f0
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: redis
+        name: redis-store
+        ports:
+        - containerPort: 6379
+          name: redis
+        readinessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: redis
+        resources:
+          limits:
+            cpu: "1"
+            memory: 7Gi
+          requests:
+            cpu: "1"
+            memory: 7Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 1000
+          runAsUser: 999
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /redis-data
+          name: redis-data
+      - image: index.docker.io/sourcegraph/redis_exporter:84464_2021-01-15_c2e4c28@sha256:f3f51453e4261734f08579fe9c812c66ee443626690091401674be4fb724da70
+        name: redis-exporter
+        ports:
+        - containerPort: 9121
+          name: redisexp
+        resources:
+          limits:
+            cpu: 10m
+            memory: 100Mi
+          requests:
+            cpu: 10m
+            memory: 100Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 1000
+          runAsUser: 999
+        terminationMessagePolicy: FallbackToLogsOnError
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 0
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-store

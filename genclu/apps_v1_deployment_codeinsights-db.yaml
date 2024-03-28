@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Code Insights Postgres DB instance.
+  labels:
+    app.kubernetes.io/component: codeinsights-db
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: codeinsights-db
+  namespace: foobar
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: codeinsights-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: codeinsights-db
+        deploy: sourcegraph
+        group: backend
+    spec:
+      containers:
+      - env:
+        - name: POSTGRES_DB
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: password
+        - name: POSTGRES_USER
+          value: postgres
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        - name: POSTGRESQL_CONF_DIR
+          value: /conf
+        image: index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:f973d43dfddc714bf001f378fc3edd9a47456e0f50d492d22b0fb290baadcbef
+        name: codeinsights
+        ports:
+        - containerPort: 5432
+          name: codeinsights-db
+        resources:
+          limits:
+            cpu: "4"
+            memory: 2Gi
+          requests:
+            cpu: "4"
+            memory: 2Gi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 70
+          runAsUser: 70
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data/
+          name: disk
+        - mountPath: /conf
+          name: codeinsights-conf
+      - env:
+        - name: DATA_SOURCE_NAME
+          value: postgres://postgres:@localhost:5432/?sslmode=disable
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/code_insights_queries.yaml
+        image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:058803235a9deca67412edb01ec6fe22f58a7326c2f565281f7e745701df3080
+        name: pgsql-exporter
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - if [ -d /var/lib/postgresql/data/pgdata ]; then chmod 750 /var/lib/postgresql/data/pgdata;
+          fi
+        image: index.docker.io/sourcegraph/alpine-3.14:insiders@sha256:c12d8679188e14a5e7d581aa5550ab411f2013fb0662a3f697d378460fe7b5f4
+        name: correct-data-dir-permissions
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 70
+          runAsUser: 70
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data/
+          name: disk
+      securityContext:
+        fsGroup: 70
+        runAsUser: 70
+      terminationGracePeriodSeconds: 120
+      volumes:
+      - name: disk
+        persistentVolumeClaim:
+          claimName: codeinsights-db
+      - configMap:
+          defaultMode: 511
+          name: codeinsights-db-conf
+        name: codeinsights-conf
