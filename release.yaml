@@ -219,6 +219,27 @@ internal:
             echo "🚢 Please check the associated CI build to ensure the process completed".
   finalize:
     steps:
+      - name: 'Register on release registry'
+        cmd: |
+          echo "Registering internal deploy-sourcegraph {{version}} release on release registry"
+          COMMIT_SHA=$(git rev-parse HEAD)
+          body=$(curl -s --fail-with-body -X POST "https://releaseregistry.sourcegraph.com/v1/releases" -H "Content-Type: application/json" -H "Authorization: ${RELEASE_REGISTRY_TOKEN}" -d '{
+              "name": "deploy-sourcegraph",
+              "version": "{{version}}",
+              "git_sha": "${COMMIT_SHA}"
+            }')
+          exit_code=$?
+
+          if [ $exit_code != 0 ]; then
+            echo "❌ Failed to create release in release registry, got:"
+            echo "--- raw body ---"
+            echo $body
+            echo "--- raw body ---"
+            exit $exit_code
+          else
+            echo "Release created, see:"
+            echo $body | jq .web_url
+          fi
       - name: "notifications"
         cmd: |
           set -eu
@@ -354,3 +375,19 @@ promoteToPublic:
           cat << EOF | buildkite-agent annotate --style info
           Promoted release is **publicly available** through a git tag at [\`{{version}}\`](https://github.com/sourcegraph/deploy-sourcegraph/tree/{{version}}).
           EOF
+      - name: 'Promote on release registry'
+        cmd: |
+          echo "Promoting deploy-sourcegraph {{version}} release on release registry"
+            body=$(curl -s --fail-with-body -X POST "https://releaseregistry.sourcegraph.com/v1/releases/deploy-sourcegraph/{{version}}/promote" -H "Content-Type: application/json" -H "Authorization: ${RELEASE_REGISTRY_TOKEN}")
+            exit_code=$?
+
+            if [ $exit_code != 0 ]; then
+              echo "❌ Failed to promote release on release registry, got:"
+              echo "--- raw body ---"
+              echo $body
+              echo "--- raw body ---"
+              exit $exit_code
+            else
+              echo "Release promoted, see:"
+              echo $body | jq .web_url
+            fi
