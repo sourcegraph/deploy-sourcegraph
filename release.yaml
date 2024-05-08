@@ -8,6 +8,9 @@ inputs:
   - releaseId: server
 
 requirements:
+  # We use wget here, because curl --fail-with-body was introduced in a version ulterior to what we can have on the CI agents.
+  - name: "wget"
+    cmd: "wget --help"
   - name: "Github CLI"
     cmd: gh version
     fixInstructions: brew install gh
@@ -237,6 +240,27 @@ internal:
           cat << EOF | buildkite-agent annotate --style info
           Internal release is ready for promotion under the branch [\`$branch\`](https://github.com/sourcegraph/deploy-sourcegraph/tree/$branch).
           EOF
+      - name: 'Register on release registry'
+        cmd: |
+          echo "Registering internal deploy-sourcegraph-docker {{version}} release on release registry"
+          COMMIT_SHA=$(git rev-parse HEAD)
+          body=$(wget --content-on-error -O- --header="Content-Type: application/json" --header="Authorization: ${RELEASE_REGISTRY_TOKEN}" --post-data '{
+              "name": "deploy-sourcegraph",
+              "version": "{{version}}",
+              "git_sha": "'${COMMIT_SHA}'"
+            }' "https://releaseregistry.sourcegraph.com/v1/releases")
+          exit_code=$?
+
+          if [ $exit_code != 0 ]; then
+            echo "❌ Failed to create release in release registry, got:"
+            echo "--- raw body ---"
+            echo $body
+            echo "--- raw body ---"
+            exit $exit_code
+          else
+            echo "Release created, see:"
+            echo $body
+          fi
 
 test:
   steps:
@@ -322,6 +346,22 @@ promoteToPublic:
   finalize:
     # These steps should only really run once the pr created in the create step is merged
     steps:
+      - name: 'Promote on release registry'
+        cmd: |
+          echo "Promoting deploy-sourcegraph {{version}} release on release registry"
+          body=$(wget --content-on-error -O- --header="Content-Type: application/json" --header="Authorization: ${RELEASE_REGISTRY_TOKEN}" --post-data '' "https://releaseregistry.sourcegraph.com/v1/releases/deploy-sourcegraph/{{version}}/promote")
+          exit_code=$?
+
+          if [ $exit_code != 0 ]; then
+            echo "❌ Failed to promote release on release registry, got:"
+            echo "--- raw body ---"
+            echo $body
+            echo "--- raw body ---"
+            exit $exit_code
+          else
+            echo "Release promoted, see:"
+            echo $body
+          fi
       - name: git:tag
         cmd: |
           set -eu
