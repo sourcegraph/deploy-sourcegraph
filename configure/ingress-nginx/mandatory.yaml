@@ -5,9 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
-
 ---
-
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -16,7 +14,6 @@ metadata:
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
-
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -26,7 +23,6 @@ metadata:
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
-
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -36,7 +32,6 @@ metadata:
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
-
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -46,7 +41,6 @@ metadata:
   labels:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/part-of: ingress-nginx
-
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -104,7 +98,6 @@ rules:
       - ingresses/status
     verbs:
       - update
-
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
@@ -149,7 +142,6 @@ rules:
       - endpoints
     verbs:
       - get
-
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -167,7 +159,6 @@ subjects:
   - kind: ServiceAccount
     name: nginx-ingress-serviceaccount
     namespace: ingress-nginx
-
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -184,9 +175,7 @@ subjects:
   - kind: ServiceAccount
     name: nginx-ingress-serviceaccount
     namespace: ingress-nginx
-
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -275,9 +264,7 @@ spec:
               exec:
                 command:
                   - /wait-shutdown
-
 ---
-
 apiVersion: v1
 kind: LimitRange
 metadata:
