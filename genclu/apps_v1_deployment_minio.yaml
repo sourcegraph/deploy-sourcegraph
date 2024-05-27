@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: MinIO for storing LSIF uploads.
+    kubectl.kubernetes.io/default-container: minio
+  labels:
+    app.kubernetes.io/component: minio
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: minio
+  namespace: foobar
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: minio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: minio
+        deploy: sourcegraph
+    spec:
+      containers:
+      - args:
+        - minio
+        - server
+        - /data
+        env:
+        - name: MINIO_ACCESS_KEY
+          value: AKIAIOSFODNN7EXAMPLE
+        - name: MINIO_SECRET_KEY
+          value: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+        image: index.docker.io/sourcegraph/minio:insiders@sha256:d5377e0c6e4ed742c551f253591d4a1a7f3a104ca17c51d46d6324206577f209
+        livenessProbe:
+          httpGet:
+            path: /minio/health/live
+            port: minio
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        name: minio
+        ports:
+        - containerPort: 9000
+          name: minio
+        readinessProbe:
+          httpGet:
+            path: /minio/health/live
+            port: minio
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        resources:
+          limits:
+            cpu: "1"
+            memory: 500M
+          requests:
+            cpu: "1"
+            memory: 500M
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 101
+          runAsUser: 100
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /data
+          name: minio-data
+      securityContext:
+        fsGroup: 101
+        runAsUser: 0
+      volumes:
+      - name: minio-data
+        persistentVolumeClaim:
+          claimName: minio
