@@ -36,8 +36,22 @@ spec:
           name: redis
         readinessProbe:
           initialDelaySeconds: 5
-          tcpSocket:
-            port: redis
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - |
+                #!/bin/bash
+                if [ -f /etc/redis/redis.conf ]; then
+                  export REDISCLI_AUTH=$(grep -h "requirepass" /etc/redis/redis.conf | cut -d ' ' -f 2)
+                fi
+                response=$(
+                  redis-cli ping
+                )
+                if [ "$response" != "PONG" ]; then
+                  echo "$response"
+                  exit 1
+                fi
         resources:
           limits:
             cpu: "1"
