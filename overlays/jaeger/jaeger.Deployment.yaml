@@ -28,34 +28,34 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "16686"
     spec:
-        containers:
-        - name: jaeger
-          image: index.docker.io/sourcegraph/jaeger-all-in-one:insiders@sha256:3b7d972994ba6ae3b58575db3249478e2d9393e8b7f1d5c952523aaf0fdd10cf
-          args: ["--memory.max-traces=20000"]
-          ports:
-            - containerPort: 5775
-              protocol: UDP
-            - containerPort: 6831
-              protocol: UDP
-            - containerPort: 6832
-              protocol: UDP
-            - containerPort: 5778
-              protocol: TCP
-            - containerPort: 16686
-              protocol: TCP
-            - containerPort: 14250
-              protocol: TCP
-          readinessProbe:
-            httpGet:
-              path: "/"
-              port: 14269
-            initialDelaySeconds: 5
-          resources:
-            limits:
-              cpu: "1"
-              memory: 1G
-            requests:
-              cpu: 500m
-              memory: 500M
-        securityContext:
-          runAsUser: 0
+      containers:
+      - name: jaeger
+        image: index.docker.io/sourcegraph/jaeger-all-in-one:5.4.7765@sha256:b43961d23cfceb3d84297f35ad8c28a4450952467f37301e21191525623ef0b3
+        args: ["--memory.max-traces=20000"]
+        ports:
+        - containerPort: 5775
+          protocol: UDP
+        - containerPort: 6831
+          protocol: UDP
+        - containerPort: 6832
+          protocol: UDP
+        - containerPort: 5778
+          protocol: TCP
+        - containerPort: 16686
+          protocol: TCP
+        - containerPort: 14250
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: "/"
+            port: 14269
+          initialDelaySeconds: 5
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1G
+          requests:
+            cpu: 500m
+            memory: 500M
+      securityContext:
+        runAsUser: 0
