@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - name: redis-cache
-        image: index.docker.io/sourcegraph/redis-cache:insiders@sha256:7b5f4501ec28696b9c842def4217f03e21e687c824c277623425f9acddf1def8
+        image: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal/redis-cache:5.5.0@sha256:f31464d5c53b15ffcfc6974014d238116715d2c88d29f171105b4ac6b4186df6
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 30
@@ -40,21 +40,21 @@ spec:
           timeoutSeconds: 5
           exec:
             command:
-              - /bin/sh
-              - -c
-              - |
-                #!/bin/bash
-                PASS_CHECK=$(grep -h "requirepass" /etc/redis/redis.conf | cut -d ' ' -f 2)
-                if [ ! -z "$PASS_CHECK" ]; then
-                  export REDISCLI_AUTH="$PASS_CHECK"
-                fi
-                response=$(
-                  redis-cli ping
-                )
-                if [ "$response" != "PONG" ]; then
-                  echo "$response"
-                  exit 1
-                fi
+            - /bin/sh
+            - -c
+            - |
+              #!/bin/bash
+              PASS_CHECK=$(grep -h "requirepass" /etc/redis/redis.conf | cut -d ' ' -f 2)
+              if [ ! -z "$PASS_CHECK" ]; then
+                export REDISCLI_AUTH="$PASS_CHECK"
+              fi
+              response=$(
+                redis-cli ping
+              )
+              if [ "$response" != "PONG" ]; then
+                echo "$response"
+                exit 1
+              fi
         resources:
           limits:
             cpu: "1"
@@ -66,7 +66,7 @@ spec:
         - mountPath: /redis-data
           name: redis-data
       - name: redis-exporter
-        image: index.docker.io/sourcegraph/redis_exporter:insiders@sha256:e5c30856d511423b655c7e3c524f6118336845a0f9a339fc92738f5282a67c35
+        image: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal/redis_exporter:5.5.0@sha256:c9eb1c4cca9158e6cb26cd2df81fdfe27867fba128504123ff2ae030c200cd48
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 9121
