@@ -28,7 +28,7 @@ spec:
     spec:
       containers:
         - name: executor
-          image: index.docker.io/sourcegraph/executor:insiders@sha256:da6653e0cd6f95d60a0db2f0342c4d77d652d786112dbb8d66752e68f1e0609d
+          image: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal/executor:5.5.2463@sha256:5bc936f623c6e5f93658a5d0921b9ca79ec9148d54f5ba48ed94eb5ce79f49c2
           imagePullPolicy: Always
           livenessProbe:
             exec:
@@ -67,7 +67,7 @@ spec:
             - mountPath: /scratch
               name: executor-scratch
         - name: dind
-          image: index.docker.io/sourcegraph/dind:insiders@sha256:da2ab73a8e22ff7873bb671ee44fb7b940adac304f36ce4f93df3b6c11838556
+          image: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal/dind:5.5.2463@sha256:bcf9755e81b6d0401d37a485f27b7280e6e1a53e0a558819716257bdabebbac3
           imagePullPolicy: Always
           securityContext:
             privileged: true
@@ -79,7 +79,7 @@ spec:
             - '--host=tcp://0.0.0.0:2375'
           livenessProbe:
             tcpSocket:
-                  port: 2375
+              port: 2375
             initialDelaySeconds: 5
             periodSeconds: 5
             failureThreshold: 5
