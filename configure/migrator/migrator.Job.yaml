@@ -1,9 +1,3 @@
-# This manifest is provided in the event that someone may wish to execute
-# database migrations outside of a code deployment.
-#
-# For more information, please see: https://docs.sourcegraph.com/admin/install/kubernetes/operations#database-migrations
-
----
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -18,45 +12,45 @@ spec:
     spec:
       containers:
       - name: migrator
-        image: "index.docker.io/sourcegraph/migrator:insiders@sha256:85d81c0833b7d5ff3d461d437eb429b2b976576765fc703c6b830805f3fc9222"
+        image: "index.docker.io/sourcegraph/migrator:5.6.185@sha256:c723f514cf1eb217fb8c8ca54d174a4cdf2a1f912d949fe77dc88cbe15673307"
         args: ["up"]
         env:
-          - name: PGHOST
-            value: "pgsql"
-          - name: PGPORT
-            value: "5432"
-          - name: PGUSER
-            value: "sg"
-          - name: PGPASSWORD
-            value: "sg"
-          - name: PGDATABASE
-            value: "sg"
-          - name: PGSSLMODE
-            value: "disable"
-          - name: CODEINTEL_PGHOST
-            value: "codeintel-db"
-          - name: CODEINTEL_PGPORT
-            value: "5432"
-          - name: CODEINTEL_PGUSER
-            value: "sg"
-          - name: CODEINTEL_PGPASSWORD
-            value: "sg"
-          - name: CODEINTEL_PGDATABASE
-            value: "sg"
-          - name: CODEINTEL_PGSSLMODE
-            value: "disable"
-          - name: CODEINSIGHTS_PGHOST
-            value: "codeinsights-db"
-          - name: CODEINSIGHTS_PGPORT
-            value: "5432"
-          - name: CODEINSIGHTS_PGUSER
-            value: "postgres"
-          - name: CODEINSIGHTS_PGPASSWORD
-            value: "password"
-          - name: CODEINSIGHTS_PGDATABASE
-            value: "postgres"
-          - name: CODEINSIGHTS_PGSSLMODE
-            value: "disable"
+        - name: PGHOST
+          value: "pgsql"
+        - name: PGPORT
+          value: "5432"
+        - name: PGUSER
+          value: "sg"
+        - name: PGPASSWORD
+          value: "sg"
+        - name: PGDATABASE
+          value: "sg"
+        - name: PGSSLMODE
+          value: "disable"
+        - name: CODEINTEL_PGHOST
+          value: "codeintel-db"
+        - name: CODEINTEL_PGPORT
+          value: "5432"
+        - name: CODEINTEL_PGUSER
+          value: "sg"
+        - name: CODEINTEL_PGPASSWORD
+          value: "sg"
+        - name: CODEINTEL_PGDATABASE
+          value: "sg"
+        - name: CODEINTEL_PGSSLMODE
+          value: "disable"
+        - name: CODEINSIGHTS_PGHOST
+          value: "codeinsights-db"
+        - name: CODEINSIGHTS_PGPORT
+          value: "5432"
+        - name: CODEINSIGHTS_PGUSER
+          value: "postgres"
+        - name: CODEINSIGHTS_PGPASSWORD
+          value: "password"
+        - name: CODEINSIGHTS_PGDATABASE
+          value: "postgres"
+        - name: CODEINSIGHTS_PGSSLMODE
+          value: "disable"
         resources:
           limits:
             cpu: 500m
