@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Backend for indexed text search operations.
+  labels:
+    app.kubernetes.io/component: indexed-search
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: indexed-search
+  namespace: ns-sourcegraph
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: indexed-search
+  serviceName: indexed-search
+  template:
+    metadata:
+      labels:
+        app: indexed-search
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        - name: OPENTELEMETRY_DISABLED
+          value: "false"
+        image: index.docker.io/sourcegraph/indexed-searcher:5.10.2832@sha256:876a5b31fd55dfcd827329b64e2ba5bcce7ed268e0964736b4527aa8b17a835b
+        name: zoekt-webserver
+        ports:
+        - containerPort: 6070
+          name: http
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      - env:
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        - name: OPENTELEMETRY_DISABLED
+          value: "false"
+        image: index.docker.io/sourcegraph/search-indexer:5.10.2832@sha256:deedce4cb9a7c01105904c427d615a23e34301e52728af8f08c73fda4eecbee1
+        name: zoekt-indexserver
+        ports:
+        - containerPort: 6072
+          name: index-http
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: data
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      labels:
+        deploy: sourcegraph
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 200Gi
+      storageClassName: standard

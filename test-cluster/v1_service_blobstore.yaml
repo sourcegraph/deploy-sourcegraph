@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: blobstore
+    app.kubernetes.io/component: blobstore
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: blobstore
+  namespace: ns-sourcegraph
+spec:
+  ports:
+  - name: blobstore
+    port: 9000
+    targetPort: blobstore
+  selector:
+    app: blobstore
+  type: ClusterIP

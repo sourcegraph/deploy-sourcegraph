@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    description: Forwards telemetry data to the OpenTelemetry Collector Deployment.
+    prometheus.io/port: "8888"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app.kubernetes.io/component: otel-collector
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: otel-agent
+  namespace: ns-sourcegraph
+spec:
+  minReadySeconds: 5
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: otel-agent
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: otel-agent
+      labels:
+        app: otel-agent
+        deploy: sourcegraph
+    spec:
+      containers:
+      - command:
+        - /bin/otelcol-sourcegraph
+        - --config=/etc/otel-agent/config.yaml
+        image: index.docker.io/sourcegraph/opentelemetry-collector:5.9.0@sha256:f15976f64335b28fe9605e20991b591466d63ad72f488eb0bdb12a57b0a47dd2
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 13133
+        name: otel-agent
+        ports:
+        - containerPort: 55679
+          name: zpages
+        - containerPort: 4317
+          hostPort: 4317
+          name: otlp-grpc
+        - containerPort: 4318
+          hostPort: 4318
+          name: otlp-http
+        - containerPort: 8888
+          name: metrics
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 13133
+        resources:
+          limits:
+            cpu: 500m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /etc/otel-agent
+          name: config
+      terminationGracePeriodSeconds: 120
+      volumes:
+      - configMap:
+          items:
+          - key: config.yaml
+            path: config.yaml
+          name: otel-agent
+        name: config

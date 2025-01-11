@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Manages background processes.
+  labels:
+    app.kubernetes.io/component: worker
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: worker
+  namespace: ns-sourcegraph
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: worker
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: worker
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
+          value: blobstore
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
+          value: http://blobstore:9000
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        envFrom:
+        - configMapRef:
+            name: embeddings-backend
+            optional: true
+        image: index.docker.io/sourcegraph/worker:5.9.0@sha256:57c465146b25028e2bf86e274fbd9b9897a08ada5e5dd13f20cad3e82fc2b527
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: debug
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        name: worker
+        ports:
+        - containerPort: 3189
+          name: http
+        - containerPort: 6060
+          name: debug
+        - containerPort: 6996
+          name: prom
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        terminationMessagePolicy: FallbackToLogsOnError
+      securityContext:
+        runAsUser: 0

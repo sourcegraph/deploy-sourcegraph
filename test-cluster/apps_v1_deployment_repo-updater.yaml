@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Handles repository metadata (not Git data) lookups and updates from
+      external code hosts and other similar services.
+    kubectl.kubernetes.io/default-container: repo-updater
+  labels:
+    app.kubernetes.io/component: repo-updater
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: repo-updater
+  namespace: ns-sourcegraph
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: repo-updater
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: repo-updater
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        image: index.docker.io/sourcegraph/repo-updater:5.10.2832@sha256:2fc71baa001a842760f219379343e7f89ed144ad8e2d9925ed3f988ba15b9b35
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: debug
+            scheme: HTTP
+          periodSeconds: 1
+          timeoutSeconds: 5
+        name: repo-updater
+        ports:
+        - containerPort: 3182
+          name: http
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 1
+          timeoutSeconds: 5
+        terminationMessagePolicy: FallbackToLogsOnError
+      securityContext:
+        runAsUser: 0

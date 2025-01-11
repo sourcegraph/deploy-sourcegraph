@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Backend for text search operations.
+    kubectl.kubernetes.io/default-container: searcher
+  labels:
+    app.kubernetes.io/component: searcher
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: searcher
+  namespace: ns-sourcegraph
+spec:
+  minReadySeconds: 10
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: searcher
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: searcher
+        deploy: sourcegraph
+    spec:
+      containers:
+      - env:
+        - name: SEARCHER_CACHE_SIZE_MB
+          valueFrom:
+            resourceFieldRef:
+              containerName: searcher
+              divisor: 1M
+              resource: requests.ephemeral-storage
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        image: index.docker.io/sourcegraph/searcher:5.9.0@sha256:82fb0c169e6a852c9f0e2538f309e127553272d4a5bf702cc8b7ca1ed49da7e3
+        name: searcher
+        ports:
+        - containerPort: 3181
+          name: http
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /mnt/cache
+          name: cache-ssd
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - emptyDir: {}
+        name: cache-ssd

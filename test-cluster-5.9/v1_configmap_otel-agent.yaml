@@ -1,0 +1,17 @@
+apiVersion: v1
+data:
+  config.yaml: "receivers:\n  otlp:\n    protocols:\n      grpc: # port 4317\n      http:
+    # port 4318\n\nexporters:\n  otlp:\n    endpoint: \"otel-collector:4317\"\n    tls:\n
+    \     insecure: true\n    sending_queue:\n      num_consumers: 4\n      queue_size:
+    100\n    retry_on_failure:\n      enabled: true\n\nextensions:\n  health_check:\n
+    \   endpoint: \":13133\"\n  zpages:\n    endpoint: \"localhost:55679\"\n\nservice:\n
+    \ extensions:\n    - zpages\n    - health_check\n  pipelines:\n    traces:\n      receivers:\n
+    \       - otlp\n      exporters:\n        - otlp\n      \n"
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: otel-collector
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: otel-agent
+  namespace: ns-sourcegraph

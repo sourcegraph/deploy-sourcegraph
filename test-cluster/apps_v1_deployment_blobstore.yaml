@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: generic S3-like blobstore for storing LSIF uploads.
+    kubectl.kubernetes.io/default-container: blobstore
+  labels:
+    app.kubernetes.io/component: blobstore
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: blobstore
+  namespace: ns-sourcegraph
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: blobstore
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: blobstore
+        deploy: sourcegraph
+    spec:
+      containers:
+      - image: index.docker.io/sourcegraph/blobstore:5.10.2832@sha256:f6b5ca96aa06a48e0c2c1f0387af74bb965029e27d4e0a58cdc38fbd4ac3c80e
+        livenessProbe:
+          httpGet:
+            path: /
+            port: blobstore
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        name: blobstore
+        ports:
+        - containerPort: 9000
+          name: blobstore
+        readinessProbe:
+          httpGet:
+            path: /
+            port: blobstore
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /data
+          name: blobstore-data
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: blobstore-data
+        persistentVolumeClaim:
+          claimName: blobstore

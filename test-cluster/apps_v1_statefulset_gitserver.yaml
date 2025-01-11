@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Stores clones of repositories to perform Git operations.
+    kubectl.kubernetes.io/default-container: gitserver
+  labels:
+    app.kubernetes.io/component: gitserver
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+  name: gitserver
+  namespace: ns-sourcegraph
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: gitserver
+  serviceName: gitserver
+  template:
+    metadata:
+      labels:
+        app: gitserver
+        deploy: sourcegraph
+        group: backend
+        type: gitserver
+    spec:
+      containers:
+      - args:
+        - run
+        env:
+        - name: OTEL_AGENT_HOST
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: http://$(OTEL_AGENT_HOST):4317
+        image: index.docker.io/sourcegraph/gitserver:5.10.2832@sha256:da3e193ab6b37ffa9374fb44d727ebfdbe62f88e117c902e488b348c59663ace
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: rpc
+          timeoutSeconds: 5
+        name: gitserver
+        ports:
+        - containerPort: 3178
+          name: rpc
+          protocol: TCP
+        terminationMessagePolicy: FallbackToLogsOnError
+        volumeMounts:
+        - mountPath: /data/repos
+          name: repos
+      securityContext:
+        runAsUser: 0
+      volumes:
+      - name: repos
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: repos
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 200Gi
+      storageClassName: standard
