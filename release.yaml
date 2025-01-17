@@ -271,13 +271,13 @@ test:
 promoteToPublic:
   create:
     steps:
-      - name: "git"
-        cmd: |
-          set -eu
-          branch="internal/release-{{version}}"
-          echo "Checking out origin/${branch}"
-          git fetch origin "${branch}"
-          git switch "${branch}"
+      #- name: "git"
+      #  cmd: |
+      #    set -eu
+      #    branch="internal/release-{{version}}"
+      #    echo "Checking out origin/${branch}"
+      #    git fetch origin "${branch}"
+      #    git switch "${branch}"
       - name: "sg ops (base)"
         cmd: |
           sg ops update-images \
@@ -315,34 +315,34 @@ promoteToPublic:
               --pin-tag {{inputs.server.tag}} \
               ${path}/
           done
-      - name: "git:branch"
-        cmd: |
-          set -eu
-          branch="promote/release-{{version}}"
-          git switch -c "${branch}"
-      - name: "git:commit"
-        cmd: |
-          set -eu
-          branch="promote/release-{{version}}"
-          find . -name "*.yaml" | xargs git add
-          find . -name "*.yml" | xargs git add
+      #- name: "git:branch"
+      #  cmd: |
+      #    set -eu
+      #    branch="promote/release-{{version}}"
+      #    git switch -c "${branch}"
+      #- name: "git:commit"
+      #  cmd: |
+      #    set -eu
+      #    branch="promote/release-{{version}}"
+      #    find . -name "*.yaml" | xargs git add
+      #    find . -name "*.yml" | xargs git add
 
-          # Careful with the quoting for the config, using double quotes will lead
-          # to the shell dropping out all quotes from the json, leading to failed
-          # parsing.
-          git commit -am 'promote-release: {{version}}' -m '{{config}}'
-          git push origin "${branch}"
-      - name: "github:pr"
-        cmd: |
-          set -eu
-          internal_branch="internal/release-{{version}}"
-          gh pr create \
-            --fill \
-            --draft \
-            --base "$internal_branch" \
-            --title "(promote) release: build {{version}}" \
-            --body "Test plan: automated release PR, CI will perform additional checks"
-          echo "🚢 Please check the associated CI build to ensure the process completed".
+      #    # Careful with the quoting for the config, using double quotes will lead
+      #    # to the shell dropping out all quotes from the json, leading to failed
+      #    # parsing.
+      #    git commit -am 'promote-release: {{version}}' -m '{{config}}'
+      #    git push origin "${branch}"
+      #- name: "github:pr"
+      #  cmd: |
+      #    set -eu
+      #    internal_branch="internal/release-{{version}}"
+      #    gh pr create \
+      #      --fill \
+      #      --draft \
+      #      --base "$internal_branch" \
+      #      --title "(promote) release: build {{version}}" \
+      #      --body "Test plan: automated release PR, CI will perform additional checks"
+      #    echo "🚢 Please check the associated CI build to ensure the process completed".
   finalize:
     # These steps should only really run once the pr created in the create step is merged
     steps:
