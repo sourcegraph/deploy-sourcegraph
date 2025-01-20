@@ -1,6 +1,6 @@
 # Sourcegraph on Kubernetes
 
-[![sourcegraph: search](https://img.shields.io/badge/sourcegraph-search-brightgreen.svg)](https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph) [![master build status](https://badge.buildkite.com/018ed23ed79d7297e7dd109b745597c58d875323fb06e81786.svg?branch=master)](https://buildkite.com/sourcegraph/deploy-sourcegraph)
+[![sourcegraph: search](https://img.shields.io/badge/sourcegraph-search-brightgreen.svg)](https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph) [![main build status](https://badge.buildkite.com/018ed23ed79d7297e7dd109b745597c58d875323fb06e81786.svg?branch=main)](https://buildkite.com/sourcegraph/deploy-sourcegraph)
 
 ## Important Notice
 
@@ -20,7 +20,7 @@ updating, and maintaining a Sourcegraph cluster.
 
 > IMPORTANT: When upgrading Sourcegraph, please check [upgrading docs](https://docs.sourcegraph.com/admin/updates/kubernetes) to check if any manual migrations are necessary.
 >
-> The `master` branch tracks development. Use the branch of this repository corresponding to the
+> The `main` branch tracks development. Use the branch of this repository corresponding to the
 > version of Sourcegraph you wish to deploy, e.g. `git checkout 3.19`.
 
 For product and [pricing](https://about.sourcegraph.com/pricing/) information, visit
