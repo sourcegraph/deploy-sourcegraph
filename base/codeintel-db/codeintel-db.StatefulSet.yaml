@@ -59,7 +59,7 @@ spec:
           value: postgres://sg:@localhost:5432/?sslmode=disable
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
           value: /config/code_intel_queries.yaml
-        image: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal/postgres_exporter:5.9.17785@sha256:f6a536624f6852b3c906b72bbe3bbcc29004a442de165698e5831f7834487bba
+        image: index.docker.io/sourcegraph/postgres_exporter:5.9.17785@sha256:001ded6bccde55bcdcdb907b57c847cbe121cc425ae9a22c5e29dc0600aefc96
         name: pgsql-exporter
         ports:
         - containerPort: 9187
@@ -70,7 +70,7 @@ spec:
         - sh
         - -c
         - if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi
-        image: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal/alpine-3.14:5.9.17785@sha256:37e5c808adb380a04902e8620dbf44a716509431de4e7151e733609b40344084
+        image: index.docker.io/sourcegraph/alpine-3.14:5.9.17785@sha256:e36cf08520e38a27244dea78a5d6519f19cd8aa28b304c6ffeda923bc626a1a1
         name: correct-data-dir-permissions
         resources:
           limits:
