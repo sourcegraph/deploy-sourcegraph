@@ -24,7 +24,7 @@ spec:
         group: backend
     spec:
       containers:
-      - image: index.docker.io/sourcegraph/postgresql-16:5.10.2832@sha256:7a637a98960cb7d3ac6705c7f7335874c005ed9f0c68bfaa0e5eebf2d7f71e94
+      - image: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal/postgresql-16:6.1.1295@sha256:735d3b09cd62ab48d0040dd08ad3c97ae5d13abffae6c2ace7ee7698c25978f1
         livenessProbe:
           exec:
             command:
@@ -61,7 +61,7 @@ spec:
           value: postgres://sg:@localhost:5432/?sslmode=disable
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
           value: /config/queries.yaml
-        image: index.docker.io/sourcegraph/postgres_exporter:5.9.17785@sha256:001ded6bccde55bcdcdb907b57c847cbe121cc425ae9a22c5e29dc0600aefc96
+        image: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal/postgres_exporter:6.1.1295@sha256:eb41e15d936f5f5c054507eddb761108bd89e0f5d8c279a33dd90ab77669cfd8
         name: pgsql-exporter
         ports:
         - containerPort: 9187
@@ -72,7 +72,7 @@ spec:
         - sh
         - -c
         - if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi
-        image: index.docker.io/sourcegraph/alpine-3.14:5.9.17785@sha256:e36cf08520e38a27244dea78a5d6519f19cd8aa28b304c6ffeda923bc626a1a1
+        image: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal/alpine-3.14:6.1.1295@sha256:5551722b2ba1424d00e0735773c8fbcf7fd350c49f8865b4f9675a2a35abd2f1
         name: correct-data-dir-permissions
         resources:
           limits:
