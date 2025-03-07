@@ -37,6 +37,14 @@ spec:
           value: http://$(OTEL_AGENT_HOST):4317
         image: index.docker.io/sourcegraph/gitserver:5.11.0@sha256:f7c4725afd1b27448472edca8b863983d095777e416bcf290f0611927c3be587
         terminationMessagePolicy: FallbackToLogsOnError
+        # Temporary: when migrating from repo names to repo IDs on disk,
+        # gitserver can take a little while to start up. To avoid killing the
+        # pod because of a failed liveness probe, we give it 2 minutes to start up.
+        startupProbe:
+          tcpSocket:
+            port: rpc
+          failureThreshold: 120
+          periodSeconds: 1
         livenessProbe:
           initialDelaySeconds: 5
           tcpSocket:
