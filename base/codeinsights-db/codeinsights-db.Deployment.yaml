@@ -26,7 +26,7 @@ spec:
     spec:
       initContainers:
       - name: correct-data-dir-permissions
-        image: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal/alpine-3.14:6.1.4020@sha256:2da0334535ef009acfb95748a93d9b09d2a70a261d77b3d79249520daac2e5ed
+        image: index.docker.io/sourcegraph/alpine-3.14:6.1.4020@sha256:76999fd9d7933315f217b2944daddf1c9fac26d7c449a13cbbf8f9e2bcc8c480
         command: ["sh", "-c", "if [ -d /var/lib/postgresql/data/pgdata ]; then chmod 750 /var/lib/postgresql/data/pgdata; fi"]
         volumeMounts:
         - mountPath: /var/lib/postgresql/data/
@@ -42,7 +42,7 @@ spec:
             memory: "50Mi"
       containers:
       - name: codeinsights
-        image: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal/postgresql-16-codeinsights:6.1.4020@sha256:9c8a2b2560392910a8b7adc8b541d970e87660cf053631140c4e1f5e31105ec7
+        image: index.docker.io/sourcegraph/postgresql-16-codeinsights:6.1.4020@sha256:229e16d9e898af6dc509d8d8717eb37f38fd06675219c530fabdcb98324abf89
         env:
         - name: POSTGRES_DB
           value: postgres
@@ -75,7 +75,7 @@ spec:
           value: postgres://postgres:@localhost:5432/?sslmode=disable
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
           value: /config/code_insights_queries.yaml
-        image: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal/postgres_exporter:6.1.4020@sha256:43ac97b5ad0002e584ad36d257eccbcd7ca09f18630dfde7392c2f909c64eec2
+        image: index.docker.io/sourcegraph/postgres_exporter:6.1.4020@sha256:870627394b6aa681415302ec1cfc548ef76bb116a8a4c9b1682e7ef364b82c44
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
         resources:
