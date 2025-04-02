@@ -7,7 +7,7 @@ spec:
     spec:
       initContainers:
         - name: transfer-file-ownership
-          image: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal/alpine-3.14:6.2.0@sha256:3213719ab6953290cae0801390abe73edb680f768a18ae8cf5843e6776d8e3d8
+          image: index.docker.io/sourcegraph/alpine-3.14:6.2.0@sha256:903fad504a7197decea98c748465b6d062ba76aae3483ce50d5a3075fb8a7970
           command: ["sh", "-c", "if [[ \"$(stat -c '%u' /data/repos)\" -ne 100 ]]; then chown -R 100:101 /data/repos; fi"]
           volumeMounts:
             - mountPath: /data/repos
