@@ -121,9 +121,9 @@ Additionally you may want to deploy a modified version of a service locally. Min
 
 ```shell
 eval $(minikube docker-env)
-IMAGE=repo-updater:dev ./cmd/repo-updater/build.sh
-kubectl edit deployment/repo-updater # set imagePullPolicy to Never
-kubectl set image deployment repo-updater '*=repo-updater:dev'
+IMAGE=frontend:dev ./cmd/frontend/build.sh
+kubectl edit deployment/frontend # set imagePullPolicy to Never
+kubectl set image deployment frontend '*=frontend:dev'
 ```
 
 You can also use the [minikube overlay](overlays/minikube/README.md). This avoids modifying the config files in `base`.
