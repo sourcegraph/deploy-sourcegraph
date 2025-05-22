@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
+# Skip the rest if this is pipeline upload or empty
+if [[ "${BUILDKITE_COMMAND:-}" =~ "buildkite-agent pipeline upload".* ]]; then
+  exit 0
+elif [[ "${BUILDKITE_COMMAND:-}" = "" ]]; then
+  exit 0
+fi
 
-set -eu
-pushd "$(dirname "${BASH_SOURCE[0]}")"/../..
-
-WORKDIR=$(pwd)
-
-echo "Installing asdf dependencies as defined in '${WORKDIR}/.tool-versions':"
-asdf install
+if [ ! -f .use_mise ]; then
+  source ./asdf-pre-command
+fi
